@@ -1,9 +1,6 @@
 package eu.europeana.migration.metis;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -12,13 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import org.apache.commons.io.FileUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import com.mongodb.MongoClient;
@@ -34,8 +25,6 @@ import eu.europeana.migration.metis.xsl.XSLWriter;
 public class MigrationFromUimToMetis {
 
   private static final Charset XSL_ENCODING = StandardCharsets.UTF_8;
-  private static final String SAMPLE_DATA_OUTPUT_DIRECTORY = null;
-  // private static final String SAMPLE_DATA_OUTPUT_DIRECTORY = "/home/jochen/Desktop/output/";
 
   // Only needed for test database
   private static final Set<String> SKIP_VOCABULARY_IDS =
@@ -49,8 +38,8 @@ public class MigrationFromUimToMetis {
     }
   }
 
-  private static void mainInternal(String[] args) throws IOException, XMLStreamException,
-      TransformerException, TransformerFactoryConfigurationError {
+  private static void mainInternal(String[] args)
+      throws IOException, XMLStreamException, TransformerFactoryConfigurationError {
 
     // Load properties file
     final String propertiesFile = args.length > 0 ? args[0] : null;
@@ -76,11 +65,6 @@ public class MigrationFromUimToMetis {
       // Converting to Metis vocabulary
       final Vocabulary vocabulary = convert(uimVocabulary);
       metisVocabularies.add(vocabulary);
-
-      // Apply transformation to sample data
-      if (SAMPLE_DATA_OUTPUT_DIRECTORY == null) {
-        applyXslToSampleData(vocabulary);
-      }
     }
     LogUtils.logInfoMessage("==============================");
 
@@ -125,27 +109,6 @@ public class MigrationFromUimToMetis {
     LogUtils.logInfoMessage("Mappings:");
     LogUtils.logInfoMessage(elementMappings.toString());
     return vocabulary;
-  }
-
-  private static void applyXslToSampleData(Vocabulary vocabulary)
-      throws TransformerException, IOException {
-
-    // Save xsl to file.
-    final File xslFile = new File(SAMPLE_DATA_OUTPUT_DIRECTORY + vocabulary.getId() + ".xsl");
-    FileUtils.writeStringToFile(xslFile, vocabulary.getXslt(), XSL_ENCODING);
-
-    // Transforming sample input
-    final InputStream sample = MigrationFromUimToMetis.class.getClassLoader()
-        .getResourceAsStream("samples/" + vocabulary.getId() + ".xml");
-    if (sample != null) {
-      LogUtils.logInfoMessage("Applying transformation.");
-      final File outputFile = new File(SAMPLE_DATA_OUTPUT_DIRECTORY + vocabulary.getId() + ".xml");
-      final Transformer transformer = TransformerFactory.newInstance().newTransformer(
-          new StreamSource(new ByteArrayInputStream(vocabulary.getXslt().getBytes(XSL_ENCODING))));
-      transformer.transform(new StreamSource(sample), new StreamResult(outputFile));
-    } else {
-      LogUtils.logInfoMessage("Could not apply transformation: sample file  not found.");
-    }
   }
 
   private static List<ControlledVocabularyImpl> getVocabulariesFromSource(
