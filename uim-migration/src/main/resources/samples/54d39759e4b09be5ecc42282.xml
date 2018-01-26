@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:iso-thes="http://purl.org/iso25964/skos-thes#"
+	xmlns:vocnet="http://schema.vocnet.org/"
+	xmlns:xe="http://xe.vocnet.org/"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:xl="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:crm="http://www.cidoc-crm.org/cidoc-crm/"
+	xmlns:isocat="http://www.isocat.org/datcat/"
+	xmlns:schema="https://schema.org/"
+	xmlns:lt="http://terminology.lido-schema.org/">
+    <skos:Concept rdf:about="http://partage.vocnet.org/part00036">
+        <skos:prefLabel xml:lang="no">arbeid på papir</skos:prefLabel>
+        <skos:altLabel xml:lang="de">Arbeit auf Papier</skos:altLabel>
+        <skos:altLabel xml:lang="de">Arbeiten auf Papier (visuelle Werke)</skos:altLabel>
+        <skos:altLabel xml:lang="sl">dela na papirju</skos:altLabel>
+        <skos:prefLabel xml:lang="sl">delo na papirju</skos:prefLabel>
+        <skos:altLabel xml:lang="de">Grafik (visuelles Werk)</skos:altLabel>
+        <skos:altLabel xml:lang="de">Grafiken</skos:altLabel>
+        <skos:prefLabel xml:lang="de">Graphik (visuelles Werk)</skos:prefLabel>
+        <skos:altLabel xml:lang="de">Graphiken</skos:altLabel>
+        <skos:prefLabel xml:lang="sv">konst på papper</skos:prefLabel>
+        <skos:altLabel xml:lang="de">Kunst auf Papier</skos:altLabel>
+        <skos:altLabel xml:lang="pt">obra em papel</skos:altLabel>
+        <skos:altLabel xml:lang="es">obra en papel</skos:altLabel>
+        <skos:altLabel xml:lang="ca">obra en paper</skos:altLabel>
+        <skos:prefLabel xml:lang="es">obra sobre papel</skos:prefLabel>
+        <skos:prefLabel xml:lang="ca">obra sobre paper</skos:prefLabel>
+        <skos:altLabel xml:lang="pt">obras em papel</skos:altLabel>
+        <skos:altLabel xml:lang="ca">obras en papel</skos:altLabel>
+        <skos:altLabel xml:lang="es">obras en papel</skos:altLabel>
+        <skos:altLabel xml:lang="ca">obras sobre papel</skos:altLabel>
+        <skos:altLabel xml:lang="es">obras sobre papel</skos:altLabel>
+        <skos:prefLabel xml:lang="fr">œuvre sur papier</skos:prefLabel>
+        <skos:altLabel xml:lang="fr">oeuvres sur papier</skos:altLabel>
+        <skos:prefLabel xml:lang="it">oggetti di carta</skos:prefLabel>
+        <skos:prefLabel xml:lang="fi">paperityöt</skos:prefLabel>
+        <skos:prefLabel xml:lang="hu">papír alapú tárgy</skos:prefLabel>
+        <skos:altLabel xml:lang="hu">papír alapú tárgyak</skos:altLabel>
+        <skos:prefLabel xml:lang="pl">praca na papierze</skos:prefLabel>
+        <skos:altLabel xml:lang="pl">prace na papierze</skos:altLabel>
+        <skos:prefLabel xml:lang="cs">práce na papíře</skos:prefLabel>
+        <skos:prefLabel xml:lang="hr">rad na papiru</skos:prefLabel>
+        <skos:altLabel xml:lang="hr">radovi na papiru</skos:altLabel>
+        <skos:prefLabel xml:lang="pt">trabalho sobre papel</skos:prefLabel>
+        <skos:altLabel xml:lang="pt">trabalhos sobre papel</skos:altLabel>
+        <skos:altLabel xml:lang="de">Werk auf Papier</skos:altLabel>
+        <skos:altLabel xml:lang="nl">werk op papier</skos:altLabel>
+        <skos:altLabel xml:lang="de">Werke auf Papier</skos:altLabel>
+        <skos:prefLabel xml:lang="nl">werken op papier</skos:prefLabel>
+        <skos:altLabel xml:lang="en">work on paper</skos:altLabel>
+        <skos:prefLabel xml:lang="en">works on paper</skos:prefLabel>
+        <skos:broader rdf:resource="http://partage.vocnet.org/part01377"/>
+        <vocnet:isMemberOfArray rdf:resource="http://partage.vocnet.org/part00037"/>
+        <vocnet:isMemberOfConceptGroup rdf:resource="http://partage.vocnet.org/part01345"/>
+        <skos:exactMatch rdf:resource="300189621"/>
+        <skos:closeMatch rdf:resource="http://d-nb.info/gnd/4395805-9"/>
+        <xe:superordinateSimple rdf:resource="http://partage.vocnet.org/part00037"/>
+        <xe:superordinateSimple rdf:resource="http://partage.vocnet.org/part01345"/>
+        <xe:status>approved</xe:status>
+        <xe:processingState>in_progress</xe:processingState>
+    </skos:Concept>
+</rdf:RDF>

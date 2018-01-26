@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:aat="http://vocab.getty.edu/aat/"
+	xmlns:aat_contrib="http://vocab.getty.edu/aat/contrib/"
+	xmlns:aat_rel="http://vocab.getty.edu/aat/rel/"
+	xmlns:aat_rev="http://vocab.getty.edu/aat/rev/"
+	xmlns:aat_scopeNote="http://vocab.getty.edu/aat/scopeNote/"
+	xmlns:aat_source="http://vocab.getty.edu/aat/source/"
+	xmlns:aat_source_rev="http://vocab.getty.edu/aat/source/rev/"
+	xmlns:aat_term="http://vocab.getty.edu/aat/term/"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dct="http://purl.org/dc/terms/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:gvp="http://vocab.getty.edu/ontology#"
+	xmlns:gvp_lang="http://vocab.getty.edu/language/"
+	xmlns:iso="http://purl.org/iso25964/skos-thes#"
+	xmlns:luc="http://www.ontotext.com/owlim/lucene#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:prov="http://www.w3.org/ns/prov#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:rr="http://www.w3.org/ns/r2rml#"
+	xmlns:rrx="http://purl.org/r2rml-ext/"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:vann="http://purl.org/vocab/vann/"
+	xmlns:voaf="http://purl.org/vocommons/voaf#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+<skos:Concept rdf:about="http://vocab.getty.edu/aat/300000228">
+	<rdf:type rdf:resource="http://vocab.getty.edu/ontology#Subject"/>
+	<rdf:type rdf:resource="http://vocab.getty.edu/ontology#Concept"/>
+	<rdf:type rdf:nodeID="node836"/>
+	<rdfs:label xml:lang="en">fish hatcheries</rdfs:label>
+	<rdfs:label xml:lang="en">fish hatchery</rdfs:label>
+	<rdfs:label xml:lang="en">hatcheries, fish</rdfs:label>
+	<rdfs:label xml:lang="en">fish breeding stations</rdfs:label>
+	<rdfs:label xml:lang="en">breeding stations, fish</rdfs:label>
+	<rdfs:label xml:lang="en">stations, fish breeding</rdfs:label>
+	<rdfs:label xml:lang="nl">viskwekerijen</rdfs:label>
+	<rdfs:label xml:lang="nl">viskwekerij</rdfs:label>
+	<rdfs:label xml:lang="fr">alevinières</rdfs:label>
+	<rdfs:label xml:lang="fr">alevinière</rdfs:label>
+	<rdfs:label xml:lang="fr">écloseries (fish hatcheries)</rdfs:label>
+	<rdfs:label xml:lang="fr">écloserie (fish hatchery)</rdfs:label>
+	<rdfs:label xml:lang="es">piscifactorías</rdfs:label>
+	<rdfs:label xml:lang="es">piscifactoría</rdfs:label>
+	<rdfs:label xml:lang="es">establecimiento piscícola</rdfs:label>
+	<rdfs:seeAlso rdf:resource="http://www.getty.edu/vow/AATFullDisplay?find=&amp;logic=AND&amp;note=&amp;subjectid=300000228"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+	<skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/40503"/>
+	<skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/58823"/>
+	<skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/96178"/>
+	<skos:inScheme rdf:resource="http://vocab.getty.edu/aat/"/>
+	<skos:prefLabel xml:lang="en">fish hatcheries</skos:prefLabel>
+	<skos:prefLabel xml:lang="nl">viskwekerijen</skos:prefLabel>
+	<skos:prefLabel xml:lang="fr">alevinières</skos:prefLabel>
+	<skos:prefLabel xml:lang="es">piscifactorías</skos:prefLabel>
+	<skos:altLabel xml:lang="en">fish hatchery</skos:altLabel>
+	<skos:altLabel xml:lang="en">hatcheries, fish</skos:altLabel>
+	<skos:altLabel xml:lang="en">fish breeding stations</skos:altLabel>
+	<skos:altLabel xml:lang="en">breeding stations, fish</skos:altLabel>
+	<skos:altLabel xml:lang="en">stations, fish breeding</skos:altLabel>
+	<skos:altLabel xml:lang="nl">viskwekerij</skos:altLabel>
+	<skos:altLabel xml:lang="fr">alevinière</skos:altLabel>
+	<skos:altLabel xml:lang="fr">écloseries (fish hatcheries)</skos:altLabel>
+	<skos:altLabel xml:lang="fr">écloserie (fish hatchery)</skos:altLabel>
+	<skos:altLabel xml:lang="es">piscifactoría</skos:altLabel>
+	<skos:altLabel xml:lang="es">establecimiento piscícola</skos:altLabel>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/40503"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/58823"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/96178"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5000044172"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001684355"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001688195"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001695880"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5000044173"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001114010"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001114011"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001114012"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001114013"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001114014"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001114015"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001680340"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001680341"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001680342"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001680343"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002177463"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002177464"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002177465"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002871722"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002871723"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5000044172"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001684355"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001688195"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001695880"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5000044173"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001114010"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001114011"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001114012"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001114013"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001114014"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001114015"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001680340"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001680341"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001680342"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001680343"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002177463"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002177464"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002177465"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002871722"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002871723"/>
+	<skos:semanticRelation rdf:resource="http://vocab.getty.edu/aat/300000202"/>
+	<skos:semanticRelation rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+	<skos:semanticRelation rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+	<skos:broader rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+	<skos:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300000202"/>
+	<skos:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+	<skos:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+	<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000000228-en"/>
+	<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000462984-nl"/>
+	<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000312655-fr"/>
+	<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000410416-es"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000290106-en"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000159947-en"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000000229-en"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000242082-en"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000242081-en"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000462985-nl"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000312656-fr"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000312658-fr"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000312657-fr"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000410417-es"/>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000410418-es"/>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1988-01-01T00:00:00</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2007-10-26T09:05:45</dct:modified>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2007-10-26T12:35:29</dct:modified>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2007-12-07T08:59:59</dct:modified>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1993-03-22T00:00:00</dct:modified>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2007-10-26T09:04:34</dct:modified>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:02:10</dct:modified>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-22T23:40:01</dct:modified>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T22:04:48</dct:modified>
+	<gvp:broaderPreferredTransitive rdf:resource="http://vocab.getty.edu/aat/300000202"/>
+	<gvp:broaderPreferredTransitive rdf:resource="http://vocab.getty.edu/aat/300000201"/>
+	<gvp:broaderPreferredTransitive rdf:resource="http://vocab.getty.edu/aat/300000203"/>
+	<gvp:broaderPreferredTransitive rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+	<gvp:broaderPreferredTransitive rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+	<gvp:broaderPreferredTransitive rdf:resource="http://vocab.getty.edu/aat/300000213"/>
+	<gvp:broaderPreferredTransitive rdf:resource="http://vocab.getty.edu/aat/300264550"/>
+	<gvp:broaderPreferredTransitive rdf:resource="http://vocab.getty.edu/aat/300264092"/>
+	<gvp:broaderPreferred rdf:resource="http://vocab.getty.edu/aat/300000213"/>
+	<gvp:parentString>&lt;farms by function&gt;, farms, agricultural complexes, &lt;complexes by function&gt;, complexes (buildings), Built Complexes and Districts, Built Environment (Hierarchy Name), Objects Facet</gvp:parentString>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000052373"/>
+	<gvp:broaderGeneric rdf:resource="http://vocab.getty.edu/aat/300000213"/>
+	<gvp:prefLabelGVP rdf:resource="http://vocab.getty.edu/aat/term/1000000228-en"/>
+	<gvp:prefLabelLoC rdf:resource="http://vocab.getty.edu/aat/term/1000000228-en"/>
+	<dc:identifier>300000228</dc:identifier>
+	<gvp:broader rdf:resource="http://vocab.getty.edu/aat/300000213"/>
+	<gvp:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300000202"/>
+	<gvp:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300000201"/>
+	<gvp:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300000203"/>
+	<gvp:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+	<gvp:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+	<gvp:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300000213"/>
+	<gvp:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300264550"/>
+	<gvp:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300264092"/>
+	<gvp:parentStringAbbrev>&lt;farms by function&gt;, farms, ... Objects Facet</gvp:parentStringAbbrev>
+	<prov:wasGeneratedBy rdf:resource="http://vocab.getty.edu/aat/rev/5000044172"/>
+</skos:Concept>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/scopeNote/40503">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<skosxl:literalForm xml:lang="en">Facilities where fish eggs are hatched and the fry raised, especially to stock lakes, streams, and ponds.</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/en"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046682"/>
+	<dc:identifier>40503</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/scopeNote/58823">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+	<skosxl:literalForm xml:lang="es">Instalación donde se incuban las huevas de los peces y donde crecen las crías, especialmente en lagos, corrientes y estanques con abundancia de ellos.</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300389311"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/es"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000051034"/>
+	<dc:identifier>58823</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/scopeNote/96178">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+	<skosxl:literalForm xml:lang="nl">Inrichting waar visseneitjes worden uitgebroed en de jonge vissen, die later in meren, stromen en vijvers worden uitgezet, worden grootgebracht.</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/nl"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000077523"/>
+	<dc:identifier>96178</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000000228-en">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<skosxl:literalForm xml:lang="en">fish hatcheries</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/en"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+	<gvp:term xml:lang="en">fish hatcheries</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000042061"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000024811"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046682"/>
+	<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000042061"/>
+	<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000024811"/>
+	<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000046682"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/PluralNoun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/Descriptor"/>
+	<dc:identifier>1000000228</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000462984-nl">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+	<skosxl:literalForm xml:lang="nl">viskwekerijen</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/nl"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">7</gvp:displayOrder>
+	<gvp:term xml:lang="nl">viskwekerijen</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000077523"/>
+	<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+	<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000077523"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/Descriptor"/>
+	<dc:identifier>1000462984</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000312655-fr">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<skosxl:literalForm xml:lang="fr">alevinières</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388306"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/fr"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">9</gvp:displayOrder>
+	<gvp:term xml:lang="fr">alevinières</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/PluralNoun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/Descriptor"/>
+	<dc:identifier>1000312655</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000410416-es">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+	<skosxl:literalForm xml:lang="es">piscifactorías</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300389311"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/es"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">13</gvp:displayOrder>
+	<gvp:term xml:lang="es">piscifactorías</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000051214"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+	<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000051214"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/PluralNoun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/Descriptor"/>
+	<dc:identifier>1000410416</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000290106-en">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<skosxl:literalForm xml:lang="en">fish hatchery</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/en"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+	<gvp:term xml:lang="en">fish hatchery</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046717"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000046717"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/SingularNoun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/AlternateDescriptor"/>
+	<dc:identifier>1000290106</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000159947-en">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<skosxl:literalForm xml:lang="en">hatcheries, fish</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/en"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</gvp:displayOrder>
+	<gvp:term xml:lang="en">hatcheries, fish</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046717"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000046717"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/Noun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/UsedForTerm"/>
+	<dc:identifier>1000159947</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000000229-en">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<skosxl:literalForm xml:lang="en">fish breeding stations</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/en"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">4</gvp:displayOrder>
+	<gvp:term xml:lang="en">fish breeding stations</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000035111"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000035111"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/Noun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/UsedForTerm"/>
+	<dc:identifier>1000000229</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000242082-en">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<skosxl:literalForm xml:lang="en">breeding stations, fish</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/en"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">5</gvp:displayOrder>
+	<gvp:term xml:lang="en">breeding stations, fish</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046717"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000046717"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/Noun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/UsedForTerm"/>
+	<dc:identifier>1000242082</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000242081-en">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<skosxl:literalForm xml:lang="en">stations, fish breeding</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/en"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">6</gvp:displayOrder>
+	<gvp:term xml:lang="en">stations, fish breeding</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046717"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000046717"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/Noun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/UsedForTerm"/>
+	<dc:identifier>1000242081</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000462985-nl">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+	<skosxl:literalForm xml:lang="nl">viskwekerij</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/nl"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">8</gvp:displayOrder>
+	<gvp:term xml:lang="nl">viskwekerij</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000077523"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/AlternateDescriptor"/>
+	<dc:identifier>1000462985</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000312656-fr">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<skosxl:literalForm xml:lang="fr">alevinière</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388306"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/fr"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">10</gvp:displayOrder>
+	<gvp:term xml:lang="fr">alevinière</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/SingularNoun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/AlternateDescriptor"/>
+	<dc:identifier>1000312656</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000312658-fr">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<skosxl:literalForm xml:lang="fr">écloseries (fish hatcheries)</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388306"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/fr"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">11</gvp:displayOrder>
+	<gvp:term xml:lang="fr">écloseries</gvp:term>
+	<gvp:qualifier xml:lang="fr">fish hatcheries</gvp:qualifier>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/Noun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/UsedForTerm"/>
+	<dc:identifier>1000312658</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000312657-fr">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<skosxl:literalForm xml:lang="fr">écloserie (fish hatchery)</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300388306"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/fr"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">12</gvp:displayOrder>
+	<gvp:term xml:lang="fr">écloserie</gvp:term>
+	<gvp:qualifier xml:lang="fr">fish hatchery</gvp:qualifier>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000159"/>
+	<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000048434"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/Noun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/UsedForTerm"/>
+	<dc:identifier>1000312657</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000410417-es">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+	<skosxl:literalForm xml:lang="es">piscifactoría</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300389311"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/es"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">14</gvp:displayOrder>
+	<gvp:term xml:lang="es">piscifactoría</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000049607"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000048810-term-1000410417"/>
+	<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/SingularNoun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/AlternateDescriptor"/>
+	<dc:identifier>1000410417</dc:identifier>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000410418-es">
+	<rdf:type rdf:nodeID="node839"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+	<skosxl:literalForm xml:lang="es">establecimiento piscícola</skosxl:literalForm>
+	<dct:language rdf:resource="http://vocab.getty.edu/aat/300389311"/>
+	<dct:language rdf:resource="http://vocab.getty.edu/language/es"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">15</gvp:displayOrder>
+	<gvp:term xml:lang="es">establecimiento piscícola</gvp:term>
+	<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000049666-term-1000410418"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/aat/term/POS/SingularNoun"/>
+	<gvp:termType rdf:resource="http://vocab.getty.edu/aat/term/type/UsedForTerm"/>
+	<dc:identifier>1000410418</dc:identifier>
+</skosxl:Label>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000048810-term-1000410417">
+	<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000048810"/>
+	<bibo:locator>690</bibo:locator>
+</bibo:DocumentPart>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000049666-term-1000410418">
+	<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000049666"/>
+	<bibo:locator>15:466</bibo:locator>
+</bibo:DocumentPart>
+
+</rdf:RDF>

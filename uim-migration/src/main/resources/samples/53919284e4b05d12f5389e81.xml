@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.opengis.net/ont/geosparql#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:sf="http://www.opengis.net/ont/sf#" xmlns:isbd="http://iflastandards.info/ns/isbd/elements/" xmlns:gndo="http://d-nb.info/standards/elementset/gnd#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:marcRole="http://id.loc.gov/vocabulary/relators/" xmlns:lib="http://purl.org/library/" xmlns:umbel="http://umbel.org/umbel#" xmlns:rdau="http://rdaregistry.info/Elements/u/" xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:skos="http://www.w3.org/2004/02/skos/core#">
+<rdf:Description rdf:about="http://d-nb.info/gnd/1023810115">
+<rdf:type rdf:resource="http://d-nb.info/standards/elementset/gnd#SubjectHeadingSensoStricto"/>
+<gndo:gndIdentifier>1023810115</gndo:gndIdentifier>
+<gndo:oldAuthorityNumber>(DE-588)4074553-3</gndo:oldAuthorityNumber>
+<gndo:oldAuthorityNumber>(DE-588c)4074553-3</gndo:oldAuthorityNumber>
+<gndo:contributingPerson rdf:resource="http://d-nb.info/gnd/118640909"/>
+<gndo:variantNameForTheSubjectHeading>Assumptio Mariae</gndo:variantNameForTheSubjectHeading>
+<gndo:variantNameForTheSubjectHeading>Aufnahme Mariens in den Himmel</gndo:variantNameForTheSubjectHeading>
+<gndo:variantNameForTheSubjectHeading>Dormitio Beatae Mariae Vi&#x323;rginis</gndo:variantNameForTheSubjectHeading>
+<gndo:variantNameForTheSubjectHeading>Himmelfahrt Marias</gndo:variantNameForTheSubjectHeading>
+<gndo:preferredNameForTheSubjectHeading>Himmelfahrt Mariens</gndo:preferredNameForTheSubjectHeading>
+<gndo:broaderTermGeneral rdf:resource="http://d-nb.info/gnd/4074563-6"/>
+<gndo:relatedTerm rdf:resource="http://d-nb.info/gnd/4205103-4"/>
+<gndo:gndSubjectCategory rdf:resource="http://d-nb.info/standards/vocab/gnd/gnd-sc#3.4b"/>
+</rdf:Description>
+</rdf:RDF>
+

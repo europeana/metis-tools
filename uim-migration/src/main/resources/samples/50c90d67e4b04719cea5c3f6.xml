@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://RDVocab.info/ElementsGr2/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdaEnt="http://RDVocab.info/uri/schema/FRBRentitiesRDA/" xmlns:local="#local-functions" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<rdf:Description rdf:about="http://www.mimo-db.eu/InstrumentMaker/Corporation/130">
+<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+<rdf:type rdf:resource="http://RDVocab.info/uri/schema/FRBRentitiesRDA/CorporateBody"/>
+<foaf:name>C. Mahillon</foaf:name>
+<foaf:name>Mahillon</foaf:name>
+<foaf:name>Charles Mahillon</foaf:name>
+<rdaGr2:dateOfEstablishment>1836</rdaGr2:dateOfEstablishment>
+<rdaGr2:dateOfTermination>1935</rdaGr2:dateOfTermination>
+</rdf:Description>
+<skos:Concept rdf:about="http://www.mimo-db.eu/InstrumentMaker/Corporation/130">
+<skos:prefLabel>C. Mahillon</skos:prefLabel>
+<skos:altLabel>Mahillon</skos:altLabel>
+<skos:altLabel>Charles Mahillon</skos:altLabel>
+</skos:Concept>
+</rdf:RDF>

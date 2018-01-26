@@ -1,0 +1,5 @@
+source.mongo.url=mongodb://
+source.mongo.databasename=
+target.mongo.url=mongodb://
+target.mongo.databasename=
+

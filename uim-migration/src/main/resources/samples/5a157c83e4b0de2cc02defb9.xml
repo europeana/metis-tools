@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:aat="http://vocab.getty.edu/aat/"
+	xmlns:aat_contrib="http://vocab.getty.edu/aat/contrib/"
+	xmlns:aat_rel="http://vocab.getty.edu/aat/rel/"
+	xmlns:aat_rev="http://vocab.getty.edu/aat/rev/"
+	xmlns:aat_scopeNote="http://vocab.getty.edu/aat/scopeNote/"
+	xmlns:aat_source="http://vocab.getty.edu/aat/source/"
+	xmlns:aat_source_rev="http://vocab.getty.edu/aat/source/rev/"
+	xmlns:aat_term="http://vocab.getty.edu/aat/term/"
+	xmlns:adms="http://www.w3.org/ns/adms#"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:bio="http://purl.org/vocab/bio/0.1/"
+	xmlns:cc="http://creativecommons.org/ns#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcat="http://www.w3.org/ns/dcat#"
+	xmlns:dct="http://purl.org/dc/terms/"
+	xmlns:dctype="http://purl.org/dc/dcmitype/"
+	xmlns:fmt="http://www.w3.org/ns/formats/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:gvp="http://vocab.getty.edu/ontology#"
+	xmlns:gvp_lang="http://vocab.getty.edu/language/"
+	xmlns:iso="http://purl.org/iso25964/skos-thes#"
+	xmlns:luc="http://www.ontotext.com/owlim/lucene#"
+	xmlns:ontogeo="http://www.ontotext.com/owlim/geo#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:prov="http://www.w3.org/ns/prov#"
+	xmlns:ptop="http://www.ontotext.com/proton/protontop#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:rr="http://www.w3.org/ns/r2rml#"
+	xmlns:rrx="http://purl.org/r2rml-ext/"
+	xmlns:schema="http://schema.org/"
+	xmlns:sd="http://www.w3.org/ns/sparql-service-description#"
+	xmlns:sesame="http://www.openrdf.org/schema/sesame#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:tgn="http://vocab.getty.edu/tgn/"
+	xmlns:tgn_contrib="http://vocab.getty.edu/tgn/contrib/"
+	xmlns:tgn_rel="http://vocab.getty.edu/tgn/rel/"
+	xmlns:tgn_rev="http://vocab.getty.edu/tgn/rev/"
+	xmlns:tgn_scopeNote="http://vocab.getty.edu/tgn/scopeNote/"
+	xmlns:tgn_source="http://vocab.getty.edu/tgn/source/"
+	xmlns:tgn_source_rev="http://vocab.getty.edu/tgn/source/rev/"
+	xmlns:tgn_term="http://vocab.getty.edu/tgn/term/"
+	xmlns:ulan="http://vocab.getty.edu/ulan/"
+	xmlns:ulan_bio="http://vocab.getty.edu/ulan/bio/"
+	xmlns:ulan_contrib="http://vocab.getty.edu/ulan/contrib/"
+	xmlns:ulan_event="http://vocab.getty.edu/ulan/event/"
+	xmlns:ulan_rel="http://vocab.getty.edu/ulan/rel/"
+	xmlns:ulan_rev="http://vocab.getty.edu/ulan/rev/"
+	xmlns:ulan_scopeNote="http://vocab.getty.edu/ulan/scopeNote/"
+	xmlns:ulan_source="http://vocab.getty.edu/ulan/source/"
+	xmlns:ulan_source_rev="http://vocab.getty.edu/ulan/source/rev/"
+	xmlns:ulan_term="http://vocab.getty.edu/ulan/term/"
+	xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
+	xmlns:vann="http://purl.org/vocab/vann/"
+	xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
+	xmlns:vdpp="http://data.lirmm.fr/ontologies/vdpp#"
+	xmlns:voaf="http://purl.org/vocommons/voaf#"
+	xmlns:voag="http://voag.linkedmodel.org/voag#"
+	xmlns:void="http://rdfs.org/ns/void#"
+	xmlns:wdrs="http://www.w3.org/2007/05/powder-s#"
+	xmlns:wgs="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	xmlns:wv="http://vocab.org/waiver/terms/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+<gvp:Subject rdf:about="http://vocab.getty.edu/tgn/1003865">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+	<rdf:type rdf:resource="http://vocab.getty.edu/ontology#AdminPlaceConcept"/>
+	<rdfs:label>Vorpommern</rdfs:label>
+	<rdfs:label>Hither Pomerania</rdfs:label>
+	<rdfs:seeAlso rdf:resource="http://www.getty.edu/vow/TGNFullDisplay?find=&amp;place=&amp;nation=&amp;subjectid=1003865"/>
+	<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-09-12T23:45:00</dct:created>
+	<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-06-03T10:08:00</dct:modified>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5000770137"/>
+	<skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5018867591"/>
+	<gvp:broader rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<gvp:broaderPartitiveExtended rdf:resource="http://vocab.getty.edu/tgn/1000003"/>
+	<gvp:broaderPartitiveExtended rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<gvp:broaderPartitiveExtended rdf:resource="http://vocab.getty.edu/tgn/7000084"/>
+	<gvp:broaderPartitiveExtended rdf:resource="http://vocab.getty.edu/tgn/7029392"/>
+	<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/tgn/1000003"/>
+	<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/tgn/7000084"/>
+	<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/tgn/7029392"/>
+	<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/tgn/1000003"/>
+	<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/tgn/7000084"/>
+	<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/tgn/7029392"/>
+	<gvp:parentString>Mecklenburg-Vorpommern, Deutschland, Europe, World</gvp:parentString>
+	<skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5000770137"/>
+	<skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5018867591"/>
+	<gvp:parentStringAbbrev>Mecklenburg-Vorpommern, Deutschland, ... World</gvp:parentStringAbbrev>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">6917</gvp:displayOrder>
+	<gvp:placeType rdf:resource="http://vocab.getty.edu/aat/300387346"/>
+	<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/tgn/term/4041"/>
+	<skos:prefLabel>Vorpommern</skos:prefLabel>
+	<skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/321161"/>
+	<skos:altLabel>Hither Pomerania</skos:altLabel>
+	<gvp:broaderPartitive rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<gvp:broaderPreferred rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<skos:broader rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<iso:broaderPartitive rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<gvp:prefLabelGVP rdf:resource="http://vocab.getty.edu/tgn/term/4041"/>
+	<skos:inScheme rdf:resource="http://vocab.getty.edu/tgn/"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006267-subject-1003865"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006541-subject-1003865"/>
+	<gvp:placeTypePreferred rdf:resource="http://vocab.getty.edu/aat/300387346"/>
+	<dc:identifier>1003865</dc:identifier>
+	<skos:broaderTransitive rdf:resource="http://vocab.getty.edu/tgn/1000003"/>
+	<skos:broaderTransitive rdf:resource="http://vocab.getty.edu/tgn/7000094"/>
+	<skos:broaderTransitive rdf:resource="http://vocab.getty.edu/tgn/7000084"/>
+	<cc:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+	<void:inDataset rdf:resource="http://vocab.getty.edu/dataset/tgn"/>
+	<dct:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+	<prov:wasGeneratedBy rdf:resource="http://vocab.getty.edu/tgn/rev/5000770137"/>
+	<foaf:focus rdf:resource="http://vocab.getty.edu/tgn/1003865-place"/>
+</gvp:Subject>
+<prov:Activity rdf:about="http://vocab.getty.edu/tgn/rev/5000770137">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+	<dc:type>created</dc:type>
+	<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-09-12T23:45:00</prov:startedAtTime>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/tgn/rev/5018867591">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<dc:type>moved</dc:type>
+	<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-06-03T10:08:00</prov:startedAtTime>
+	<dc:description>Old Parent: Neubrandenburg (7003732)</dc:description>
+	<prov:used rdf:resource="http://vocab.getty.edu/tgn/1003865"/>
+</prov:Activity>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006267-subject-1003865">
+	<dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006267"/>
+	<bibo:locator>966</bibo:locator>
+</bibo:DocumentPart>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006541-subject-1003865">
+	<dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006541"/>
+	<bibo:locator>I-186</bibo:locator>
+</bibo:DocumentPart>
+<skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/4041">
+	<gvp:term>Vorpommern</gvp:term>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+	<skosxl:literalForm>Vorpommern</skosxl:literalForm>
+	<gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+	<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006541-term-4041"/>
+	<dc:identifier>4041</dc:identifier>
+</skosxl:Label>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006541-term-4041">
+	<dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006541"/>
+	<bibo:locator>I-186</bibo:locator>
+</bibo:DocumentPart>
+<skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/321161">
+	<gvp:term>Hither Pomerania</gvp:term>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+	<skosxl:literalForm>Hither Pomerania</skosxl:literalForm>
+	<gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/historic"/>
+	<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+	<dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+	<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+	<dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006267-term-321161"/>
+	<dc:identifier>321161</dc:identifier>
+</skosxl:Label>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006267-term-321161">
+	<dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006267"/>
+	<bibo:locator>966</bibo:locator>
+</bibo:DocumentPart>
+<rdf:Statement rdf:about="http://vocab.getty.edu/tgn/rel/1003865-placeType-300387346">
+	<rdf:subject rdf:resource="http://vocab.getty.edu/tgn/1003865"/>
+	<rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#placeTypePreferred"/>
+	<rdf:object rdf:resource="http://vocab.getty.edu/aat/300387346"/>
+	<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+</rdf:Statement>
+<schema:Place rdf:about="http://vocab.getty.edu/tgn/1003865-place">
+	<rdf:type rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing"/>
+	<wgs:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">53.6667</wgs:lat>
+	<wgs:long rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">13.75</wgs:long>
+	<cc:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+	<void:inDataset rdf:resource="http://vocab.getty.edu/dataset/tgn"/>
+	<dct:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+	<schema:geo>
+		<schema:GeoCoordinates rdf:about="http://vocab.getty.edu/tgn/1003865-geometry">
+			<schema:latitude rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">53.6667</schema:latitude>
+			<schema:longitude rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">13.75</schema:longitude>
+		</schema:GeoCoordinates>
+	</schema:geo>
+</schema:Place>
+
+</rdf:RDF>

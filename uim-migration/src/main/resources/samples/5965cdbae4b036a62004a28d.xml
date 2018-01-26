@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:crm="http://erlangen-crm.org/101001/" xmlns:udc="http://udcdata.info/udc-schema#">
+<skos:ConceptScheme rdf:about="http://udcdata.info/udc-schema">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#ConceptScheme"/>
+<dcterms:title>UDC Summary</dcterms:title>
+<skos:note/>
+</skos:ConceptScheme>
+<skos:Concept rdf:about="http://udcdata.info/rdf/065280">
+<skos:inScheme rdf:resource="http://udcdata.info/udc-schema"/>
+<skos:broader rdf:resource="http://udcdata.info/rdf/064676"/>
+<skos:notation rdf:datatype="http://udcdata.info/UDCnotation">75</skos:notation>
+<skos:prefLabel xml:lang="en">Painting</skos:prefLabel>
+<udc:applicationNote xml:lang="en">The special auxiliaries 7.01/.09 are relevant here. Denote the work of particular artists by alphabetic extension.</udc:applicationNote>
+<skos:related rdf:resource="http://udcdata.info/rdf/028848"/>
+<skos:example xml:lang="en">75PICASSO Paintings by Picasso</skos:example>
+</skos:Concept>
+</rdf:RDF>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:isothes="http://purl.org/iso25964/skos-thes#"
+         xmlns:dc="http://purl.org/dc/terms/">
+    <skos:Concept rdf:about="http://vocabularies.unesco.org/thesaurus/concept11059">
+        <skos:prefLabel xml:lang="ru">Иммигранты</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">Immigrants</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Inmigrante</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Immigrant</skos:prefLabel>
+        <skos:related rdf:resource="http://vocabularies.unesco.org/thesaurus/concept10423"/>
+    </skos:Concept>
+    <skos:Concept rdf:about="http://vocabularies.unesco.org/thesaurus/concept426">
+        <skos:prefLabel xml:lang="en">Migrants</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Migrante</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Migrant</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Мигранты</skos:prefLabel>
+        <skos:narrower rdf:resource="http://vocabularies.unesco.org/thesaurus/concept10423"/>
+    </skos:Concept>
+    <isothes:ConceptGroup rdf:about="http://vocabularies.unesco.org/thesaurus/domain4">
+        <rdf:type rdf:resource="http://vocabularies.unesco.org/ontology#Domain"/>
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Collection"/>
+        <skos:prefLabel xml:lang="ru">Социальные и гуманитарные науки</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">Social and human sciences</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Sciences sociales et humaines</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Ciencias sociales y humanas</skos:prefLabel>
+        <skos:member>
+            <isothes:ConceptGroup rdf:about="http://vocabularies.unesco.org/thesaurus/mt4.35">
+                <rdf:type rdf:resource="http://vocabularies.unesco.org/ontology#MicroThesaurus"/>
+                <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Collection"/>
+                <skos:prefLabel xml:lang="es">Población</skos:prefLabel>
+                <skos:prefLabel xml:lang="fr">Population</skos:prefLabel>
+                <skos:prefLabel xml:lang="en">Population</skos:prefLabel>
+                <skos:prefLabel xml:lang="ru">Население</skos:prefLabel>
+                <skos:member rdf:resource="http://vocabularies.unesco.org/thesaurus/concept10423"/>
+            </isothes:ConceptGroup>
+        </skos:member>
+    </isothes:ConceptGroup>
+    <skos:ConceptScheme rdf:about="http://vocabularies.unesco.org/thesaurus">
+        <skos:prefLabel xml:lang="en">UNESCO Thesaurus</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Thésaurus de l'UNESCO</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Тезаурус ЮНЕСКО</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Tesauro de la UNESCO</skos:prefLabel>
+    </skos:ConceptScheme>
+    <skos:Concept rdf:about="http://vocabularies.unesco.org/thesaurus/concept10321">
+        <skos:prefLabel xml:lang="es">Estudiante extranjero</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Иностранные учащиеся</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Étudiant étranger</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">Foreign students</skos:prefLabel>
+        <skos:related rdf:resource="http://vocabularies.unesco.org/thesaurus/concept10423"/>
+    </skos:Concept>
+    <skos:Concept rdf:about="http://vocabularies.unesco.org/thesaurus/concept2535">
+        <skos:prefLabel xml:lang="es">Xenofobia</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">Xenophobia</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Ксенофобия</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Xénophobie</skos:prefLabel>
+        <skos:related rdf:resource="http://vocabularies.unesco.org/thesaurus/concept10423"/>
+    </skos:Concept>
+    <skos:Concept rdf:about="http://vocabularies.unesco.org/thesaurus/concept10423">
+        <dc:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2006-05-23T00:00:00</dc:modified>
+        <skos:altLabel xml:lang="ru">Неграждане</skos:altLabel>
+        <skos:altLabel xml:lang="en">Aliens</skos:altLabel>
+        <skos:altLabel xml:lang="ru">Чужеземцы</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Ressortissant étranger</skos:altLabel>
+        <skos:altLabel xml:lang="en">Noncitizens</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Non-citoyen</skos:altLabel>
+        <skos:inScheme rdf:resource="http://vocabularies.unesco.org/thesaurus"/>
+        <skos:prefLabel xml:lang="ru">Иностранцы</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Extranjero</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">Foreigners</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Étranger</skos:prefLabel>
+        <skos:hiddenLabel xml:lang="fr">Etranger</skos:hiddenLabel>
+        <skos:hiddenLabel xml:lang="fr">Ressortissant etranger</skos:hiddenLabel>
+        <skos:broader rdf:resource="http://vocabularies.unesco.org/thesaurus/concept426"/>
+        <skos:related rdf:resource="http://vocabularies.unesco.org/thesaurus/concept11059"/>
+        <skos:related rdf:resource="http://vocabularies.unesco.org/thesaurus/concept10321"/>
+        <skos:related rdf:resource="http://vocabularies.unesco.org/thesaurus/concept2535"/>
+    </skos:Concept>
+</rdf:RDF>

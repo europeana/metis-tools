@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:aat="http://vocab.getty.edu/aat/" xmlns:aat_contrib="http://vocab.getty.edu/aat/contrib/" xmlns:aat_rel="http://vocab.getty.edu/aat/rel/" xmlns:aat_rev="http://vocab.getty.edu/aat/rev/" xmlns:aat_scopeNote="http://vocab.getty.edu/aat/scopeNote/" xmlns:aat_source="http://vocab.getty.edu/aat/source/" xmlns:aat_source_rev="http://vocab.getty.edu/aat/source/rev/" xmlns:aat_term="http://vocab.getty.edu/aat/term/" xmlns:adms="http://www.w3.org/ns/adms#" xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:bio="http://purl.org/vocab/bio/0.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcat="http://www.w3.org/ns/dcat#" xmlns:dct="http://purl.org/dc/terms/" xmlns:dctype="http://purl.org/dc/dcmitype/" xmlns:fmt="http://www.w3.org/ns/formats/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:freq="http://purl.org/cld/freq/" xmlns:gvp="http://vocab.getty.edu/ontology#" xmlns:gvp_lang="http://vocab.getty.edu/language/" xmlns:iso="http://purl.org/iso25964/skos-thes#" xmlns:luc="http://www.ontotext.com/owlim/lucene#" xmlns:ontogeo="http://www.ontotext.com/owlim/geo#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:ptop="http://www.ontotext.com/proton/protontop#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rr="http://www.w3.org/ns/r2rml#" xmlns:rrx="http://purl.org/r2rml-ext/" xmlns:schema="http://schema.org/" xmlns:sd="http://www.w3.org/ns/sparql-service-description#" xmlns:sesame="http://www.openrdf.org/schema/sesame#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#" xmlns:tgn="http://vocab.getty.edu/tgn/" xmlns:tgn_contrib="http://vocab.getty.edu/tgn/contrib/" xmlns:tgn_rel="http://vocab.getty.edu/tgn/rel/" xmlns:tgn_rev="http://vocab.getty.edu/tgn/rev/" xmlns:tgn_scopeNote="http://vocab.getty.edu/tgn/scopeNote/" xmlns:tgn_source="http://vocab.getty.edu/tgn/source/" xmlns:tgn_source_rev="http://vocab.getty.edu/tgn/source/rev/" xmlns:tgn_term="http://vocab.getty.edu/tgn/term/" xmlns:ulan="http://vocab.getty.edu/ulan/" xmlns:ulan_bio="http://vocab.getty.edu/ulan/bio/" xmlns:ulan_contrib="http://vocab.getty.edu/ulan/contrib/" xmlns:ulan_event="http://vocab.getty.edu/ulan/event/" xmlns:ulan_rel="http://vocab.getty.edu/ulan/rel/" xmlns:ulan_rev="http://vocab.getty.edu/ulan/rev/" xmlns:ulan_scopeNote="http://vocab.getty.edu/ulan/scopeNote/" xmlns:ulan_source="http://vocab.getty.edu/ulan/source/" xmlns:ulan_source_rev="http://vocab.getty.edu/ulan/source/rev/" xmlns:ulan_term="http://vocab.getty.edu/ulan/term/" xmlns:vaem="http://www.linkedmodel.org/schema/vaem#" xmlns:vann="http://purl.org/vocab/vann/" xmlns:vcard="http://www.w3.org/2006/vcard/ns#" xmlns:vdpp="http://data.lirmm.fr/ontologies/vdpp#" xmlns:voaf="http://purl.org/vocommons/voaf#" xmlns:voag="http://voag.linkedmodel.org/voag#" xmlns:void="http://rdfs.org/ns/void#" xmlns:wdrs="http://www.w3.org/2007/05/powder-s#" xmlns:wgs="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:wv="http://vocab.org/waiver/terms/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+<gvp:Subject rdf:about="http://vocab.getty.edu/aat/300000206">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<rdf:type rdf:resource="http://vocab.getty.edu/ontology#Concept"/>
+<rdfs:label xml:lang="en">farms</rdfs:label>
+<rdfs:label xml:lang="en">farm (agricultural complex)</rdfs:label>
+<rdfs:label xml:lang="es">granjas</rdfs:label>
+<rdfs:label xml:lang="en">complexes, farm</rdfs:label>
+<rdfs:label xml:lang="es">granja</rdfs:label>
+<rdfs:label xml:lang="en">farm complexes</rdfs:label>
+<rdfs:label xml:lang="en">farmsteads</rdfs:label>
+<rdfs:label xml:lang="nl">boerderijen (complexen)</rdfs:label>
+<rdfs:label xml:lang="nl">boerderij (complex)</rdfs:label>
+<rdfs:label xml:lang="nl">hoeven (complexen)</rdfs:label>
+<rdfs:label xml:lang="de">Bauernhöfe</rdfs:label>
+<rdfs:label xml:lang="de">Bauernhof</rdfs:label>
+<rdfs:seeAlso rdf:resource="http://www.getty.edu/vow/AATFullDisplay?find=&amp;logic=AND&amp;note=&amp;subjectid=300000206"/>
+<dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1988-01-01T00:00:00</dct:created>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-05-29T00:00:00</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1993-03-22T00:00:00</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:02:08</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-22T23:39:57</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T22:04:13</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2016-09-23T08:43:37</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-02-21T11:46:07</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:15:01</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-06-19T22:47:51</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-06-19T22:47:50</dct:modified>
+<dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T22:04:15</dct:modified>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5000043934"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5000043935"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001113328"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001113329"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001113330"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001113331"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001113332"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002177361"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002177362"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002871594"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002871595"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002871596"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5004158928"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5004158929"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5004287346"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5000043937"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001169921"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001546177"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001546178"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001546176"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5004287345"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002177372"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002871610"/>
+<skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5004158944"/>
+<gvp:broader rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300000202"/>
+<gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300000203"/>
+<gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300264092"/>
+<gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300264550"/>
+<gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300000201"/>
+<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300000202"/>
+<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300000203"/>
+<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300264092"/>
+<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300264550"/>
+<gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300000201"/>
+<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300000202"/>
+<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300000203"/>
+<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300264092"/>
+<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300264550"/>
+<gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300000201"/>
+<gvp:parentString>agricultural complexes, &lt;complexes by function&gt;, complexes (buildings and sites), Built Complexes and Districts (hierarchy name), Built Environment (hierarchy name), Objects Facet</gvp:parentString>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/41302"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/58820"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/96175"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/134559"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5000043934"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5000043935"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001113328"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001113329"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001113330"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001113331"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001113332"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002177361"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002177362"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002871594"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002871595"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002871596"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5004158928"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5004158929"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5004287346"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5000043937"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001169921"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001546177"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001546178"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001546176"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5004287345"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002177372"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002871610"/>
+<skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5004158944"/>
+<gvp:parentStringAbbrev>agricultural complexes, &lt;complexes by function&gt;, ... Objects Facet</gvp:parentStringAbbrev>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000000206-en"/>
+<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000462966-nl"/>
+<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000651021-de"/>
+<skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000410401-es"/>
+<skos:prefLabel xml:lang="en">farms</skos:prefLabel>
+<skos:prefLabel xml:lang="es">granjas</skos:prefLabel>
+<skos:prefLabel xml:lang="nl">boerderijen (complexen)</skos:prefLabel>
+<skos:prefLabel xml:lang="de">Bauernhof</skos:prefLabel>
+<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000289951-en"/>
+<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000242074-en"/>
+<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000078490-en"/>
+<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000159944-en"/>
+<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000462967-nl"/>
+<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000462968-nl"/>
+<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000651020-de"/>
+<skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000410402-es"/>
+<skos:altLabel xml:lang="en">farm (agricultural complex)</skos:altLabel>
+<skos:altLabel xml:lang="en">complexes, farm</skos:altLabel>
+<skos:altLabel xml:lang="es">granja</skos:altLabel>
+<skos:altLabel xml:lang="en">farm complexes</skos:altLabel>
+<skos:altLabel xml:lang="en">farmsteads</skos:altLabel>
+<skos:altLabel xml:lang="nl">boerderij (complex)</skos:altLabel>
+<skos:altLabel xml:lang="nl">hoeven (complexen)</skos:altLabel>
+<skos:altLabel xml:lang="de">Bauernhöfe</skos:altLabel>
+<gvp:broaderGeneric rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<gvp:broaderPreferred rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<skos:broader rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<iso:broaderGeneric rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<gvp:prefLabelGVP rdf:resource="http://vocab.getty.edu/aat/term/1000000206-en"/>
+<gvp:prefLabelLoC rdf:resource="http://vocab.getty.edu/aat/term/1000000206-en"/>
+<skos:inScheme rdf:resource="http://vocab.getty.edu/aat/"/>
+<skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/41302"/>
+<skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/58820"/>
+<skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/96175"/>
+<skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/134559"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+<skos:related rdf:resource="http://vocab.getty.edu/aat/300192802"/>
+<dc:identifier>300000206</dc:identifier>
+<gvp:aat2421_locus-setting_for rdf:resource="http://vocab.getty.edu/aat/300192802"/>
+<skos:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300000202"/>
+<skos:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300125766"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300008633"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300000210"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300411503"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300000222"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300045490"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300000214"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300248842"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300000228"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300199033"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300265732"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300008890"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300411558"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300000340"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300000246"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300000218"/>
+<skos:narrower rdf:resource="http://vocab.getty.edu/aat/300000248"/>
+<iso:subordinateArray rdf:resource="http://vocab.getty.edu/aat/300000213"/>
+<iso:subordinateArray rdf:resource="http://vocab.getty.edu/aat/300000208"/>
+<iso:subordinateArray rdf:resource="http://vocab.getty.edu/aat/300000206-array"/>
+<void:inDataset rdf:resource="http://vocab.getty.edu/dataset/aat"/>
+<dct:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+<cc:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+<prov:wasGeneratedBy>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5000043934">
+    <rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+    <dc:type>created</dc:type>
+    <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1988-01-01T00:00:00</prov:startedAtTime>
+</prov:Activity>
+</prov:wasGeneratedBy>
+</gvp:Subject>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5000043935">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1993-03-22T00:00:00</prov:startedAtTime>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001113328">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:02:08</prov:startedAtTime>
+<dc:description>farms (1000000206);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001113329">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:02:08</prov:startedAtTime>
+<dc:description>farm (1000289951);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001113330">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:02:08</prov:startedAtTime>
+<dc:description>complexes, farm (1000242074);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001113331">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:02:08</prov:startedAtTime>
+<dc:description>farm complexes (1000078490);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001113332">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:02:08</prov:startedAtTime>
+<dc:description>farmsteads (1000159944);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002177361">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-22T23:39:57</prov:startedAtTime>
+<dc:description>granjas (1000410401);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002177362">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-22T23:39:57</prov:startedAtTime>
+<dc:description>granja (1000410402);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002871594">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T22:04:13</prov:startedAtTime>
+<dc:description>boerderijen (1000462966);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002871595">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T22:04:13</prov:startedAtTime>
+<dc:description>boerderij (1000462967);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002871596">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T22:04:13</prov:startedAtTime>
+<dc:description>hoeven (1000462968);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5004158928">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2016-09-23T08:43:37</prov:startedAtTime>
+<dc:description>Bauernhöfe (1000651020);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5004158929">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>term added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2016-09-23T08:43:37</prov:startedAtTime>
+<dc:description>Bauernhof (1000651021);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5004287346">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>note updated</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-02-21T11:46:07</prov:startedAtTime>
+<dc:description>Language: German (70101)</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5000043937">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>relation added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-05-29T00:00:00</prov:startedAtTime>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001169921">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>relation added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:15:01</prov:startedAtTime>
+<dc:description>farms (300000206) 'related to' farming (300192802);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001546177">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>relation deleted</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-06-19T22:47:51</prov:startedAtTime>
+<dc:description>farms (300000206) 'related to' farming (300192802);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001546178">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>relation added</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-06-19T22:47:51</prov:startedAtTime>
+<dc:description>farms (300000206) 'activity/event taking place is' farming (300192802);</dc:description>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001546176">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>updated</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-06-19T22:47:50</prov:startedAtTime>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5004287345">
+<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+<dc:type>updated</dc:type>
+<prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-02-21T11:46:07</prov:startedAtTime>
+<prov:used rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</prov:Activity>
+<gvp:ScopeNote rdf:about="http://vocab.getty.edu/aat/scopeNote/41302">
+<rdf:value xml:lang="en">Complexes where plants or animals are raised for livelihood or commerce.</rdf:value>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099620"/>
+<dc:identifier>41302</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+</gvp:ScopeNote>
+<gvp:ScopeNote rdf:about="http://vocab.getty.edu/aat/scopeNote/58820">
+<rdf:value xml:lang="es">Complejo en el que las plantas o los animales se crían para el sustento o el comercio.</rdf:value>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000051034"/>
+<dc:identifier>58820</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388071"/>
+</gvp:ScopeNote>
+<gvp:ScopeNote rdf:about="http://vocab.getty.edu/aat/scopeNote/96175">
+<rdf:value xml:lang="nl">Complexen waar planten worden verbouwd of dieren gefokt voor levensonderhoud of handel.</rdf:value>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+<dc:identifier>96175</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+</gvp:ScopeNote>
+<gvp:ScopeNote rdf:about="http://vocab.getty.edu/aat/scopeNote/134559">
+<rdf:value xml:lang="de">Anlage, in der Pflanzen oder Tiere zum Lebensunterhalt oder zum Handel herangezogen werden.</rdf:value>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000084808"/>
+<dc:identifier>134559</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388344"/>
+</gvp:ScopeNote>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000000206-en">
+<gvp:term xml:lang="en">farms</gvp:term>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+<skosxl:literalForm xml:lang="en">farms</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/Descriptor"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/PluralNoun"/>
+<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000008771"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000024811"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000035251"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000035571"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000000771-term-1000000206"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000046657-term-1000000206"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000008771"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000010621"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000024811"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000035251"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000035571"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000039651"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000000771-term-1000000206"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046657-term-1000000206"/>
+<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000010621"/>
+<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000039651"/>
+<dc:identifier>1000000206</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000462966-nl">
+<gvp:term xml:lang="nl">boerderijen</gvp:term>
+<gvp:qualifier xml:lang="nl">complexen</gvp:qualifier>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">6</gvp:displayOrder>
+<skosxl:literalForm xml:lang="nl">boerderijen (complexen)</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/Descriptor"/>
+<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+<dc:identifier>1000462966</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000651021-de">
+<gvp:term xml:lang="de">Bauernhof</gvp:term>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">10</gvp:displayOrder>
+<skosxl:literalForm xml:lang="de">Bauernhof</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/AlternateDescriptor"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/SingularNoun"/>
+<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000083634-term-1000651021"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000083630-term-1000651021"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000083657-term-1000651021"/>
+<dc:identifier>1000651021</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388344"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000410401-es">
+<gvp:term xml:lang="es">granjas</gvp:term>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">11</gvp:displayOrder>
+<skosxl:literalForm xml:lang="es">granjas</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/Descriptor"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/PluralNoun"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000051214"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000051214"/>
+<dc:identifier>1000410401</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388071"/>
+</skosxl:Label>
+<bibo:Document rdf:about="http://vocab.getty.edu/aat/source/2000000771-term-1000000206">
+<rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000000771"/>
+<bibo:locator>IND</bibo:locator>
+</bibo:Document>
+<bibo:Document rdf:about="http://vocab.getty.edu/aat/source/2000046657-term-1000000206">
+<rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000046657"/>
+<bibo:locator>(source AAT)</bibo:locator>
+</bibo:Document>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000083634-term-1000651021">
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000083634"/>
+<bibo:locator>http://www.duden.de/node/700538/revisions/1310286/view</bibo:locator>
+</bibo:DocumentPart>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000083630-term-1000651021">
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000083630"/>
+<bibo:locator>http://d-nb.info/gnd/4004770-2</bibo:locator>
+</bibo:DocumentPart>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000083657-term-1000651021">
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000083657"/>
+<bibo:locator>"Bauernhof", accessed 12 Aug 2014</bibo:locator>
+</bibo:DocumentPart>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000289951-en">
+<gvp:term xml:lang="en">farm</gvp:term>
+<gvp:qualifier xml:lang="en">agricultural complex</gvp:qualifier>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+<skosxl:literalForm xml:lang="en">farm (agricultural complex)</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/AlternateDescriptor"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/SingularNoun"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000094828"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000094828"/>
+<dc:identifier>1000289951</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000242074-en">
+<gvp:term xml:lang="en">complexes, farm</gvp:term>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</gvp:displayOrder>
+<skosxl:literalForm xml:lang="en">complexes, farm</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/UsedForTerm"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000094828"/>
+<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000094828"/>
+<dc:identifier>1000242074</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000078490-en">
+<gvp:term xml:lang="en">farm complexes</gvp:term>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">4</gvp:displayOrder>
+<skosxl:literalForm xml:lang="en">farm complexes</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/UsedForTerm"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000094828"/>
+<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000094828"/>
+<dc:identifier>1000078490</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000159944-en">
+<gvp:term xml:lang="en">farmsteads</gvp:term>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">5</gvp:displayOrder>
+<skosxl:literalForm xml:lang="en">farmsteads</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/UsedForTerm"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000010761"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000039001-term-1000159944"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000010761"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046657-term-1000159944"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000039001-term-1000159944"/>
+<gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/aat/source/2000046657-term-1000159944"/>
+<dc:identifier>1000159944</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000462967-nl">
+<gvp:term xml:lang="nl">boerderij</gvp:term>
+<gvp:qualifier xml:lang="nl">complex</gvp:qualifier>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">7</gvp:displayOrder>
+<skosxl:literalForm xml:lang="nl">boerderij (complex)</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/AlternateDescriptor"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+<dc:identifier>1000462967</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000462968-nl">
+<gvp:term xml:lang="nl">hoeven</gvp:term>
+<gvp:qualifier xml:lang="nl">complexen</gvp:qualifier>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">8</gvp:displayOrder>
+<skosxl:literalForm xml:lang="nl">hoeven (complexen)</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/UsedForTerm"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+<dc:identifier>1000462968</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000651020-de">
+<gvp:term xml:lang="de">Bauernhöfe</gvp:term>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">9</gvp:displayOrder>
+<skosxl:literalForm xml:lang="de">Bauernhöfe</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/Descriptor"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/PluralNoun"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+<gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+<gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000083634-term-1000651020"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000083634-term-1000651020"/>
+<dc:identifier>1000651020</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388344"/>
+</skosxl:Label>
+<skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000410402-es">
+<gvp:term xml:lang="es">granja</gvp:term>
+<gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">12</gvp:displayOrder>
+<skosxl:literalForm xml:lang="es">granja</skosxl:literalForm>
+<gvp:termType rdf:resource="http://vocab.getty.edu/term/type/AlternateDescriptor"/>
+<gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/SingularNoun"/>
+<gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+<dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000048810-term-1000410402"/>
+<dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000049487-term-1000410402"/>
+<dc:identifier>1000410402</dc:identifier>
+<dct:language rdf:resource="http://vocab.getty.edu/aat/300388071"/>
+</skosxl:Label>
+<bibo:Document rdf:about="http://vocab.getty.edu/aat/source/2000046657-term-1000159944">
+<rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000046657"/>
+<bibo:locator>(source AAT)</bibo:locator>
+</bibo:Document>
+<bibo:Document rdf:about="http://vocab.getty.edu/aat/source/2000039001-term-1000159944">
+<rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000039001"/>
+<bibo:locator>149</bibo:locator>
+</bibo:Document>
+<bibo:Document rdf:about="http://vocab.getty.edu/aat/source/2000083634-term-1000651020">
+<rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000083634"/>
+<bibo:locator>http://www.duden.de/node/700538/revisions/1310286/view</bibo:locator>
+</bibo:Document>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000048810-term-1000410402">
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000048810"/>
+<bibo:locator>1414</bibo:locator>
+</bibo:DocumentPart>
+<bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000049487-term-1000410402">
+<dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000049487"/>
+<bibo:locator>305</bibo:locator>
+</bibo:DocumentPart>
+<rdf:Statement rdf:about="http://vocab.getty.edu/aat/rel/300000206-aat2421_locus-setting_for-300192802">
+<rdf:subject rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+<rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#aat2421_locus-setting_for"/>
+<rdf:object rdf:resource="http://vocab.getty.edu/aat/300192802"/>
+</rdf:Statement>
+<iso:ThesaurusArray rdf:about="http://vocab.getty.edu/aat/300000206-array">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Collection"/>
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#OrderedCollection"/>
+<skos:member rdf:resource="http://vocab.getty.edu/aat/300008633"/>
+<skos:member rdf:resource="http://vocab.getty.edu/aat/300000222"/>
+<skos:member rdf:resource="http://vocab.getty.edu/aat/300248842"/>
+<skos:member rdf:resource="http://vocab.getty.edu/aat/300000213"/>
+<skos:member rdf:resource="http://vocab.getty.edu/aat/300000208"/>
+<skos:memberList rdf:resource="http://vocab.getty.edu/aat/300000206-list-300008633"/>
+<iso:superOrdinate rdf:resource="http://vocab.getty.edu/aat/300000206"/>
+</iso:ThesaurusArray>
+<rdf:List rdf:about="http://vocab.getty.edu/aat/300000206-list-300008633">
+<rdf:rest rdf:resource="http://vocab.getty.edu/aat/300000206-list-300000222"/>
+<rdf:first rdf:resource="http://vocab.getty.edu/aat/300008633"/>
+</rdf:List>
+<rdf:List rdf:about="http://vocab.getty.edu/aat/300000206-list-300000222">
+<rdf:rest rdf:resource="http://vocab.getty.edu/aat/300000206-list-300248842"/>
+<rdf:first rdf:resource="http://vocab.getty.edu/aat/300000222"/>
+</rdf:List>
+<rdf:List rdf:about="http://vocab.getty.edu/aat/300000206-list-300248842">
+<rdf:rest rdf:resource="http://vocab.getty.edu/aat/300000206-list-300000213"/>
+<rdf:first rdf:resource="http://vocab.getty.edu/aat/300248842"/>
+</rdf:List>
+<rdf:List rdf:about="http://vocab.getty.edu/aat/300000206-list-300000213">
+<rdf:rest rdf:resource="http://vocab.getty.edu/aat/300000206-list-300000208"/>
+<rdf:first rdf:resource="http://vocab.getty.edu/aat/300000213"/>
+</rdf:List>
+<rdf:List rdf:about="http://vocab.getty.edu/aat/300000206-list-300000208">
+<rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+<rdf:first rdf:resource="http://vocab.getty.edu/aat/300000208"/>
+</rdf:List>
+</rdf:RDF>
+

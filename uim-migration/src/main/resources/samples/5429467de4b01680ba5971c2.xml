@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/TR/REC-html40" xmlns:skos="http://www.w3.org/2004/02/skos/core#">
+<skos:Concept xmlns:dcterms="http://purl.org/dc/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:shic="http://light.demon.co.uk/shic.rdf#" xmlns:imj="http://www.imj.org.il/imagine/thesaurus/objects/ObjectClassification.rdf#" rdf:about="http://www.imj.org.il/imagine/thesaurus/objects/T15729">
+<skos:notation>T15729</skos:notation>
+<skos:inScheme rdf:resource="http://www.imj.org.il/imagine/thesaurus/objects/ObjectClassification"/>
+<skos:prefLabel xml:lang="en">Rug</skos:prefLabel>
+<skos:altLabel xml:lang="en">Carpet</skos:altLabel>
+<skos:broaderTransitive rdf:resource="http://www.imj.org.il/imagine/thesaurus/objects/T15617">
+<imj:broaderLabel xml:lang="en">House accessories</imj:broaderLabel>
+<imj:broaderLabel xml:lang="he">אביזרים לבית</imj:broaderLabel>
+</skos:broaderTransitive>
+<skos:prefLabel xml:lang="he">מרבד</skos:prefLabel>
+<skos:altLabel xml:lang="he">שטיח</skos:altLabel>
+<owl:sameAs rdf:resource="http://collection.britishmuseum.org/id/thesauri/x8822"/>
+</skos:Concept>
+</rdf:RDF>
+

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:local="#local-functions">
+<skos:Concept rdf:about="http://www.mimo-db.eu/HornbostelAndSachs/108">
+<skos:prefLabel xml:lang="">211.22 Barrel-shaped drums</skos:prefLabel>
+<skos:definition>Drums with barrel-shaped bodies, where the diameter is larger at the middle than at the ends. The outline of the body is curvilinear. Tightly stretched membranes enclose one or both ends, and are directly struck by the player using the hands or intermediate devices such as sticks.</skos:definition>
+<skos:broader>
+    <skos:Concept rdf:about="http://www.mimo-db.eu/HornbostelAndSachs/100">
+    <skos:prefLabel>211.2 Tubular drums</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.mimo-db.eu/HornbostelAndSachs/"/>
+</skos:Concept>
+</skos:broader>
+<skos:narrower>
+    <skos:Concept rdf:about="http://www.mimo-db.eu/HornbostelAndSachs/5538">
+    <skos:prefLabel>211.221 Single-skin barrel drums</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.mimo-db.eu/HornbostelAndSachs/"/>
+</skos:Concept>
+</skos:narrower>
+<skos:narrower>
+    <skos:Concept rdf:about="http://www.mimo-db.eu/HornbostelAndSachs/5541">
+    <skos:prefLabel>211.222 Double-skin barrel drums</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.mimo-db.eu/HornbostelAndSachs/"/>
+</skos:Concept>
+</skos:narrower>
+<skos:related>
+    <skos:Concept rdf:about="http://www.mimo-db.eu/InstrumentsKeywords/2504">
+    <skos:prefLabel>Barrel drum</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.mimo-db.eu/InstrumentsKeywords/"/>
+</skos:Concept>
+</skos:related>
+<skos:related>
+    <skos:Concept rdf:about="http://www.mimo-db.eu/InstrumentsKeywords/5175">
+    <skos:prefLabel>Ciblon</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.mimo-db.eu/InstrumentsKeywords/"/>
+</skos:Concept>
+</skos:related>
+<skos:related>
+    <skos:Concept rdf:about="http://www.mimo-db.eu/InstrumentsKeywords/5256">
+    <skos:prefLabel>Kenang</skos:prefLabel>
+    <skos:inScheme rdf:resource="http://www.mimo-db.eu/InstrumentsKeywords/"/>
+</skos:Concept>
+</skos:related>
+</skos:Concept>
+</rdf:RDF>
+
