@@ -80,10 +80,10 @@ public class MigrationFromUimToMetis {
     // Create object and set simple properties
     final Vocabulary vocabulary = new Vocabulary();
     vocabulary.setId(uimVocabulary.getId().toString());
-    vocabulary.setURI(uimVocabulary.getURI());
+    vocabulary.setUri(uimVocabulary.getURI());
     vocabulary.setIterations(uimVocabulary.getIterations());
     vocabulary.setName(uimVocabulary.getName());
-    // TODO set suffix!
+    vocabulary.setSuffix(uimVocabulary.getSuffix());
 
     // Split the rules into sets of url rules and type rules and save them.
     final Set<String> typeRules =
@@ -91,12 +91,8 @@ public class MigrationFromUimToMetis {
     final Set<String> urlRules =
         typeRules.stream().filter(rule -> !rule.matches("^<#.*>$")).collect(Collectors.toSet());
     typeRules.removeAll(urlRules);
-    if (urlRules.isEmpty()) {
-      urlRules.add("*");
-    }
-    // TODO why not make array of these two variables?
-    vocabulary.setRules(urlRules.stream().collect(Collectors.joining(" ")));
-    vocabulary.setTypeRules(typeRules.stream().collect(Collectors.joining(" ")));
+    vocabulary.setRules(urlRules);
+    vocabulary.setTypeRules(typeRules);
 
     // Reading and parsing element mappings and save them as XSL
     final ElementMappings elementMappings = ElementMappings.create(uimVocabulary);
