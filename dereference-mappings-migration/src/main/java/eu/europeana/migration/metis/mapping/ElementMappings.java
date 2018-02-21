@@ -23,6 +23,8 @@ public class ElementMappings {
   private static final Set<Element> IGNORED_TAG_SET =
       Arrays.stream(IGNORED_TAG_ARRAY).collect(Collectors.toSet());
 
+  private static final Element DOCUMENT_ID_ATTRIBUTE = new Element(Namespace.RDF, "about");
+
   private final HierarchicalElementMapping parentMapping;
   private final Set<HierarchicalElementMapping> childMappings;
   private final Type type;
@@ -62,7 +64,8 @@ public class ElementMappings {
     final Type type = types.get(0);
 
     // Split into tag mappings and mappings involving attributes. Check that attribute mappings
-    // always have a from attribute.
+    // always have a from attribute. We copy the content for all tag mappings (except possibly the
+    // parent mapping, but this will be sorted out later).
     final Map<ElementMapping, Set<ElementMapping>> tagsWithContent = new HashMap<>();
     final Set<FlatElementMapping> attributeMappings = new HashSet<>();
     for (FlatElementMapping mapping : flatMappingSet) {
@@ -79,8 +82,9 @@ public class ElementMappings {
       }
     }
 
-    // Go by all attribute mappings and figure out what to do with them. If an attribute mapping
-    // does not contain a to attribute, assume it is the same as the from attribute.
+    // Go by all attribute mappings and add it to a matching tag mapping if one exists, otherwise
+    // create a new tag mapping (that does not copy content). If an attribute mapping does not
+    // contain a to attribute, assume it is the same as the from attribute.
     final Map<ElementMapping, Set<ElementMapping>> tagsWithoutContent = new HashMap<>();
     for (FlatElementMapping mapping : attributeMappings) {
       final ElementMapping tagMapping =
@@ -97,7 +101,8 @@ public class ElementMappings {
       }
     }
 
-    // Convert to hierarchical structure: find the parent mapping and filter unneeded mappings
+    // Convert to hierarchical structure: find the parent mapping and remove the mappings that are
+    // to be ignored. Check the parent mapping.
     HierarchicalElementMapping[] parentMapping = new HierarchicalElementMapping[1];
     final Set<HierarchicalElementMapping> childMappings = new HashSet<>();
     addHierarchicalMappings(type, false, tagsWithoutContent, childMappings, parentMapping);
@@ -105,6 +110,10 @@ public class ElementMappings {
     if (parentMapping[0] == null) {
       throw new IllegalArgumentException(
           "There is no mapping to the parent tag: " + type.getMainTag().toString() + ".");
+    }
+    if (getDocumentIdMappings(parentMapping[0]).size() != 1) {
+      throw new IllegalArgumentException("There must be exactly one mapping to the attribute '"
+          + DOCUMENT_ID_ATTRIBUTE.toString() + "' of the parent tag.");
     }
 
     // Done
@@ -159,6 +168,16 @@ public class ElementMappings {
 
   public Set<HierarchicalElementMapping> getChildMappings() {
     return childMappings;
+  }
+
+  private static List<Element> getDocumentIdMappings(HierarchicalElementMapping parentMapping) {
+    return parentMapping.getAttributeMappings().stream()
+        .filter(mapping -> DOCUMENT_ID_ATTRIBUTE.equals(mapping.getTo()))
+        .map(ElementMapping::getFrom).collect(Collectors.toList());
+  }
+
+  public Element getDocumentIdMapping() {
+    return getDocumentIdMappings(getParentMapping()).get(0);
   }
 
   @Override
