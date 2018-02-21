@@ -10,6 +10,13 @@ public class EdmMappedField implements Serializable {
 
   private String attribute;
 
+  public EdmMappedField() {}
+
+  public EdmMappedField(String label, String attribute) {
+    this.label = label;
+    this.attribute = attribute;
+  }
+
   public String getLabel() {
     return label;
   }

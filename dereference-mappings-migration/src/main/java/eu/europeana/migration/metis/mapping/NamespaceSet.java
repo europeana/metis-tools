@@ -23,7 +23,7 @@ public enum NamespaceSet {
   }),
 
   GENERAL_INPUT(namespaceSet -> {
-    addToSet(namespaceSet, "xml", "http://www.w3.org/XML/1998/namespace");
+    addToSet(namespaceSet, Namespace.XML.getPrefix(), Namespace.XML.getUri());
     addToSet(namespaceSet, Namespace.RDF.getPrefix(), Namespace.RDF.getUri());
     addToSet(namespaceSet, "rdfs", "http://www.w3.org/2000/01/rdf-schema#");
   }),

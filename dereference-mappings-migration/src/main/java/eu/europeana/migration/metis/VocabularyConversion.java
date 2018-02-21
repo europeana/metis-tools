@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
@@ -32,8 +33,8 @@ public class VocabularyConversion {
     vocabulary.setSuffix(uimVocabulary.getSuffix());
 
     // Split the rules into sets of url rules and type rules and save them.
-    final Set<String> typeRules =
-        Arrays.stream(uimVocabulary.getRules()).map(String::trim).collect(Collectors.toSet());
+    final Set<String> typeRules = uimVocabulary.getRules() == null ? new HashSet<>()
+        : Arrays.stream(uimVocabulary.getRules()).map(String::trim).collect(Collectors.toSet());
     final Set<String> urlRules =
         typeRules.stream().filter(rule -> !rule.matches("^<#.*>$")).collect(Collectors.toSet());
     typeRules.removeAll(urlRules);
