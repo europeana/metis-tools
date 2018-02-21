@@ -62,15 +62,4 @@ public class HierarchicalElementMapping {
     return tagMapping.toString() + (includeValueOfTag ? "" : " [Tag contents not included]")
         + attributeMappingString;
   }
-
-  /**
-   * If the mappings define an unchanged behavior, we copy the entire node. Otherwise we just copy
-   * the values as specified by this mapping.
-   * 
-   * @return
-   */
-  public boolean shouldCopyWholeNode() {
-    return includeValueOfTag && tagMapping.mapsToSameTag()
-        && attributeMappings.stream().allMatch(ElementMapping::mapsToSameTag);
-  }
 }
