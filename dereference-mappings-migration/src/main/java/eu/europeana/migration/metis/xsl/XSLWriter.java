@@ -25,7 +25,7 @@ public class XSLWriter {
   private static final String XSL_TAG_IF = "if";
   private static final String XSL_TAG_ATTRIBUTE = "attribute";
   private static final String XSL_TAG_VALUE_OF = "value-of";
-  private static final String XSL_TAG_COPY_OF = "copy-of";
+  private static final String XSL_TAG_TEXT = "text";
 
   private static final String XSL_ATTR_VERSION = "version";
   private static final String XSL_ATTR_NAME = "name";
@@ -38,9 +38,10 @@ public class XSLWriter {
   private static final String VALUE_XML_VERSION = "1.0";
   private static final String VALUE_XSL_VERSION = "1.0";
   private static final String VALUE_XSL_ATTR_PREFIX = "@";
+  private static final String VALUE_XSL_DIRECT_CHILD_PREFIX = "./";
   private static final String VALUE_INDENT = "yes";
   private static final String VALUE_ENCODING = StandardCharsets.UTF_8.name();
-  
+
   public static final String TARGET_ID_PARAMETER_NAME = "targetId";
   private static final String TARGET_ID_DEFAULT_VALUE = "";
 
@@ -104,7 +105,7 @@ public class XSLWriter {
     writer.writeAttribute(XSL_ATTR_NAME, TARGET_ID_PARAMETER_NAME);
     writer.writeAttribute(XSL_ATTR_SELECT, TARGET_ID_DEFAULT_VALUE);
     writer.writeEndElement();
-    
+
     // Write output directive
     writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_OUTPUT);
     writer.writeAttribute(XSL_ATTR_INDENT, VALUE_INDENT);
@@ -126,14 +127,17 @@ public class XSLWriter {
   private static void writeTemplateContents(XMLStreamWriter writer, ElementMappings mappings)
       throws XMLStreamException {
 
-    // Start parent tag (including for-each).
+    // Write comment
     final ElementMapping parentTagMapping = mappings.getParentMapping().getTagMapping();
+    writer.writeComment(" Parent mapping: " + parentTagMapping.toString() + " ");
+    
+    // Start parent tag (including for-each).
     writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_FOR_EACH);
     writer.writeAttribute(XSL_ATTR_SELECT,
-        "./" + parentTagMapping.getFrom().toString(TAG_SEPARATOR));
+        VALUE_XSL_DIRECT_CHILD_PREFIX + parentTagMapping.getFrom().toString(TAG_SEPARATOR));
     writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_IF);
-    writer.writeAttribute(XSL_ATTR_TEST,
-        "@" + mappings.getDocumentIdMapping().toString() + "=$" + TARGET_ID_PARAMETER_NAME);
+    writer.writeAttribute(XSL_ATTR_TEST, VALUE_XSL_ATTR_PREFIX
+        + mappings.getDocumentIdMapping().toString() + "=$" + TARGET_ID_PARAMETER_NAME);
     writer.writeStartElement(parentTagMapping.getTo().getNamespace().getUri(),
         parentTagMapping.getTo().getTagName());
 
@@ -154,48 +158,76 @@ public class XSLWriter {
   private static void writeChildMapping(XMLStreamWriter writer,
       HierarchicalElementMapping childMapping) throws XMLStreamException {
 
-    // If we cannot copy the whole node, we copy the values.
-    if (childMapping.shouldCopyWholeNode()) {
+    // Write comment
+    writer.writeComment(" Tag mapping: " + childMapping.getTagMapping().toString() + " ");
 
-      // Make a copy if the entire node.
-      writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_COPY_OF);
-      writer.writeAttribute(XSL_ATTR_SELECT,
-          childMapping.getTagMapping().getTo().toString(TAG_SEPARATOR));
-      writer.writeEndElement();
+    // Start child tag (including for-each).
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_FOR_EACH);
+    writer.writeAttribute(XSL_ATTR_SELECT, VALUE_XSL_DIRECT_CHILD_PREFIX
+        + childMapping.getTagMapping().getFrom().toString(TAG_SEPARATOR));
+    writer.writeStartElement(childMapping.getTagMapping().getTo().getNamespace().getUri(),
+        childMapping.getTagMapping().getTo().getTagName());
 
-    } else {
+    // Write attributes of child tag
+    writeAttributes(writer, childMapping.getAttributeMappings());
 
-      // Start child tag (including for-each).
-      writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_FOR_EACH);
-      writer.writeAttribute(XSL_ATTR_SELECT,
-          ".//" + childMapping.getTagMapping().getFrom().toString(TAG_SEPARATOR));
-      writer.writeStartElement(childMapping.getTagMapping().getTo().getNamespace().getUri(),
-          childMapping.getTagMapping().getTo().getTagName());
-
-      // Write attributes of child tag
-      writeAttributes(writer, childMapping.getAttributeMappings());
-
-      // Write tag value if needed
-      if (childMapping.isIncludeValueOfTag()) {
-        writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_VALUE_OF);
-        writer.writeAttribute(XSL_ATTR_SELECT, ".");
-        writer.writeEndElement();
-      }
-
-      // End child tag (including for-each).
-      writer.writeEndElement();
-      writer.writeEndElement();
+    // Write tag value if needed
+    if (childMapping.isIncludeValueOfTag()) {
+      writeTagValue(writer);
     }
+
+    // End child tag (including for-each).
+    writer.writeEndElement();
+    writer.writeEndElement();
+  }
+
+  private static void writeTagValue(XMLStreamWriter writer) throws XMLStreamException {
+
+    // Write comment
+    writer.writeComment(" Text content mapping (only for non-space-only content) ");
+
+    // Start for-each on all child text nodes and normalize.
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_FOR_EACH);
+    writer.writeAttribute(XSL_ATTR_SELECT, "text()[normalize-space()]");
+
+    // Add space between different text nodes.
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_IF);
+    writer.writeAttribute(XSL_ATTR_TEST, "position() > 1");
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_TEXT);
+    writer.writeCharacters(" ");
+    writer.writeEndElement();
+    writer.writeEndElement();
+
+    // Write the text node.
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_VALUE_OF);
+    writer.writeAttribute(XSL_ATTR_SELECT, "normalize-space(.)");
+    writer.writeEndElement();
+
+    // Done
+    writer.writeEndElement();
   }
 
   private static void writeAttributes(XMLStreamWriter writer, Set<ElementMapping> attributeMappings)
       throws XMLStreamException {
     for (ElementMapping attribute : attributeMappings) {
+
+      // Write comment.
+      writer.writeComment(" Attribute mapping: " + attribute.toString() + " ");
+
+      // Check if the attribute exists in the source.
+      writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_IF);
+      writer.writeAttribute(XSL_ATTR_TEST,
+          VALUE_XSL_ATTR_PREFIX + attribute.getFrom().toString(TAG_SEPARATOR));
+
+      // Copy the attribute.
       writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_ATTRIBUTE);
       writer.writeAttribute(XSL_ATTR_NAME, attribute.getTo().toString(TAG_SEPARATOR));
       writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_VALUE_OF);
       writer.writeAttribute(XSL_ATTR_SELECT,
           VALUE_XSL_ATTR_PREFIX + attribute.getFrom().toString(TAG_SEPARATOR));
+
+      // Done.
+      writer.writeEndElement();
       writer.writeEndElement();
       writer.writeEndElement();
     }
