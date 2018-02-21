@@ -18,25 +18,31 @@ public class XSLWriter {
   private static final String TAG_SEPARATOR = ":";
 
   private static final String XSL_TAG_STYLESHEET = "stylesheet";
+  private static final String XSL_TAG_PARAMETER = "param";
   private static final String XSL_TAG_OUTPUT = "output";
   private static final String XSL_TAG_TEMPLATE = "template";
   private static final String XSL_TAG_FOR_EACH = "for-each";
+  private static final String XSL_TAG_IF = "if";
   private static final String XSL_TAG_ATTRIBUTE = "attribute";
   private static final String XSL_TAG_VALUE_OF = "value-of";
   private static final String XSL_TAG_COPY_OF = "copy-of";
 
   private static final String XSL_ATTR_VERSION = "version";
+  private static final String XSL_ATTR_NAME = "name";
+  private static final String XSL_ATTR_SELECT = "select";
   private static final String XSL_ATTR_INDENT = "indent";
   private static final String XSL_ATTR_ENCODING = "encoding";
   private static final String XSL_ATTR_MATCH = "match";
-  private static final String XSL_ATTR_SELECT = "select";
-  private static final String XSL_ATTR_NAME = "name";
+  private static final String XSL_ATTR_TEST = "test";
 
   private static final String VALUE_XML_VERSION = "1.0";
   private static final String VALUE_XSL_VERSION = "1.0";
   private static final String VALUE_XSL_ATTR_PREFIX = "@";
   private static final String VALUE_INDENT = "yes";
   private static final String VALUE_ENCODING = StandardCharsets.UTF_8.name();
+  
+  public static final String TARGET_ID_PARAMETER_NAME = "targetId";
+  private static final String TARGET_ID_DEFAULT_VALUE = "";
 
   private static final String INCOMING_BASE_TAG = Namespace.RDF.getPrefix() + TAG_SEPARATOR + "RDF";
 
@@ -93,6 +99,12 @@ public class XSLWriter {
       writer.writeNamespace(namespaceDeclaration.getPrefix(), namespaceDeclaration.getUri());
     }
 
+    // Write input parameter for rdf:about ID.
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_PARAMETER);
+    writer.writeAttribute(XSL_ATTR_NAME, TARGET_ID_PARAMETER_NAME);
+    writer.writeAttribute(XSL_ATTR_SELECT, TARGET_ID_DEFAULT_VALUE);
+    writer.writeEndElement();
+    
     // Write output directive
     writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_OUTPUT);
     writer.writeAttribute(XSL_ATTR_INDENT, VALUE_INDENT);
@@ -119,6 +131,9 @@ public class XSLWriter {
     writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_FOR_EACH);
     writer.writeAttribute(XSL_ATTR_SELECT,
         "./" + parentTagMapping.getFrom().toString(TAG_SEPARATOR));
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_IF);
+    writer.writeAttribute(XSL_ATTR_TEST,
+        "@" + mappings.getDocumentIdMapping().toString() + "=$" + TARGET_ID_PARAMETER_NAME);
     writer.writeStartElement(parentTagMapping.getTo().getNamespace().getUri(),
         parentTagMapping.getTo().getTagName());
 
@@ -131,6 +146,7 @@ public class XSLWriter {
     }
 
     // End parent tag (including for-each).
+    writer.writeEndElement();
     writer.writeEndElement();
     writer.writeEndElement();
   }
