@@ -1,7 +1,7 @@
 package eu.europeana.migration.metis.mapping;
 
 import eu.europeana.migration.metis.mapping.Type.ElementWithType;
-import eu.europeana.migration.metis.utils.MigrationUtils;
+import eu.europeana.migration.metis.utils.ObjectIdentityUtils;
 import eu.europeana.migration.metis.utils.Namespace;
 
 class FlatElementMapping {
@@ -92,14 +92,14 @@ class FlatElementMapping {
     }
     final FlatElementMapping other = (FlatElementMapping) otherObject;
     return getFromTag().equals(other.getFromTag())
-        && MigrationUtils.equalsIncludingNull(getFromAttribute(), other.getFromAttribute())
+        && ObjectIdentityUtils.equalsIncludingNull(getFromAttribute(), other.getFromAttribute())
         && getToTag().equals(other.getToTag())
-        && MigrationUtils.equalsIncludingNull(getToAttribute(), other.getToAttribute());
+        && ObjectIdentityUtils.equalsIncludingNull(getToAttribute(), other.getToAttribute());
   }
 
   @Override
   public int hashCode() {
-    return MigrationUtils.hashCodeOfMultipleNullableObjects(getFromTag(), getFromAttribute(),
+    return ObjectIdentityUtils.hashCodeOfMultipleNullableObjects(getFromTag(), getFromAttribute(),
         getToTag(), getToAttribute());
   }
 

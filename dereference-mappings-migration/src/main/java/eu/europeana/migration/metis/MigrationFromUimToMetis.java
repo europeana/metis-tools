@@ -17,12 +17,24 @@ import eu.europeana.metis.dereference.Vocabulary;
 import eu.europeana.migration.metis.utils.LogUtils;
 import eu.europeana.migration.metis.utils.MigrationProperties;
 
+/**
+ * This class performs the migration of vocabulary mappings from UIM to Metis.
+ * 
+ * @author jochen
+ *
+ */
 public class MigrationFromUimToMetis {
 
   // Only needed for test database
   private static final Set<String> SKIP_VOCABULARY_IDS =
       Arrays.stream(new String[] {}).collect(Collectors.toSet());
 
+  /**
+   * The main method performing the vocabulary mappings.
+   * 
+   * @param args the arguments. If the first argument exists it is assumed that it is an alternative
+   *        location for the configuration file (see {@link MigrationProperties}).
+   */
   public static void main(String[] args) {
     try {
       mainInternal(args);
