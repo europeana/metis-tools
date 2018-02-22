@@ -10,7 +10,7 @@ public final class Element {
   private final Namespace namespace;
   private final String tagName;
 
-  protected Element(Namespace namespace, String tagName) {
+  public Element(Namespace namespace, String tagName) {
     if (namespace == null) {
       throw new IllegalArgumentException("Namespace cannot be null");
     }
