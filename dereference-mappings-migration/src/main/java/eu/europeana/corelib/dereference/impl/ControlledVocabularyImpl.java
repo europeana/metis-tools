@@ -8,6 +8,13 @@ import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+/**
+ * This is an object representation of the vocabulary object as used in the UIM database. This class
+ * is copied from the UIM code base.
+ * 
+ * @author jochen
+ *
+ */
 @Entity("ControlledVocabulary")
 public class ControlledVocabularyImpl implements Serializable {
 

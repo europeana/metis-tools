@@ -2,11 +2,24 @@ package eu.europeana.migration.metis.mapping;
 
 import eu.europeana.migration.metis.utils.ObjectIdentityUtils;
 
+/**
+ * This class represents a mapping from one element to another. Equality is defined as both source
+ * and target elements being equal.
+ * 
+ * @author jochen
+ *
+ */
 public class ElementMapping {
 
   private final Element from;
   private final Element to;
 
+  /**
+   * Constructor.
+   * 
+   * @param from The source element from which this mapping maps.
+   * @param to The target element to which this mapping maps.
+   */
   ElementMapping(Element from, Element to) {
     if (from == null) {
       throw new IllegalArgumentException("From tag cannot be null.");
@@ -18,10 +31,18 @@ public class ElementMapping {
     this.to = to;
   }
 
+  /**
+   * 
+   * @return The source element from which this mapping maps.
+   */
   public Element getFrom() {
     return from;
   }
 
+  /**
+   * 
+   * @return The target element to which this mapping maps.
+   */
   public Element getTo() {
     return to;
   }
@@ -40,17 +61,11 @@ public class ElementMapping {
     return ObjectIdentityUtils.hashCodeOfMultipleNullableObjects(getFrom(), getTo());
   }
 
+  /**
+   * Will give a string representation of the source and the target separated by an arrow.
+   */
   @Override
   public String toString() {
     return from.toString() + " -> " + to.toString();
-  }
-
-  /**
-   * Determine whether this mapping maps a tag to itself.
-   * 
-   * @return
-   */
-  boolean mapsToSameTag() {
-    return getFrom().equals(getTo());
   }
 }
