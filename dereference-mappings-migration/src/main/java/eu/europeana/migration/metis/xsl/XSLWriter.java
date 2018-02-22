@@ -3,11 +3,14 @@ package eu.europeana.migration.metis.xsl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import eu.europeana.migration.metis.mapping.Element;
 import eu.europeana.migration.metis.mapping.ElementMapping;
 import eu.europeana.migration.metis.mapping.ElementMappings;
 import eu.europeana.migration.metis.mapping.HierarchicalElementMapping;
@@ -17,23 +20,23 @@ public class XSLWriter {
 
   private static final String TAG_SEPARATOR = ":";
 
-  private static final String XSL_TAG_STYLESHEET = "stylesheet";
-  private static final String XSL_TAG_PARAMETER = "param";
-  private static final String XSL_TAG_OUTPUT = "output";
-  private static final String XSL_TAG_TEMPLATE = "template";
+  private static final String XSL_TAG_ATTRIBUTE = "attribute";
   private static final String XSL_TAG_FOR_EACH = "for-each";
   private static final String XSL_TAG_IF = "if";
-  private static final String XSL_TAG_ATTRIBUTE = "attribute";
-  private static final String XSL_TAG_VALUE_OF = "value-of";
+  private static final String XSL_TAG_OUTPUT = "output";
+  private static final String XSL_TAG_PARAMETER = "param";
+  private static final String XSL_TAG_STYLESHEET = "stylesheet";
+  private static final String XSL_TAG_TEMPLATE = "template";
   private static final String XSL_TAG_TEXT = "text";
+  private static final String XSL_TAG_VALUE_OF = "value-of";
 
-  private static final String XSL_ATTR_VERSION = "version";
+  private static final String XSL_ATTR_ENCODING = "encoding";
+  private static final String XSL_ATTR_INDENT = "indent";
+  private static final String XSL_ATTR_MATCH = "match";
   private static final String XSL_ATTR_NAME = "name";
   private static final String XSL_ATTR_SELECT = "select";
-  private static final String XSL_ATTR_INDENT = "indent";
-  private static final String XSL_ATTR_ENCODING = "encoding";
-  private static final String XSL_ATTR_MATCH = "match";
   private static final String XSL_ATTR_TEST = "test";
+  private static final String XSL_ATTR_VERSION = "version";
 
   private static final String VALUE_XML_VERSION = "1.0";
   private static final String VALUE_XSL_VERSION = "1.0";
@@ -46,6 +49,24 @@ public class XSLWriter {
   private static final String TARGET_ID_DEFAULT_VALUE = "";
 
   private static final String INCOMING_BASE_TAG = Namespace.RDF.getPrefix() + TAG_SEPARATOR + "RDF";
+
+  private static final String[] SKOS_CONCEPT_CONTAINING_TAGS_NAMES = {"related", "broader",
+      "broaderTransitive", "narrower", "narrowerTransitive", "semanticRelation"};
+  private static final Set<Element> SKOS_CONCEPT_CONTAINING_TAGS =
+      Arrays.stream(SKOS_CONCEPT_CONTAINING_TAGS_NAMES)
+          .map(tagName -> new Element(Namespace.SKOS, tagName)).collect(Collectors.toSet());
+  private static final Element RDF_RESOURCE_ATTRIBUTE = new Element(Namespace.RDF, "resource");
+  private static final Element RDF_ABOUT_ATTRIBUTE = new Element(Namespace.RDF, "about");
+  private static final Element SKOS_CONCEPT_TAG = new Element(Namespace.SKOS, "Concept");
+
+  // The XSL string that selects a skos:Concept child with an about attribute.
+  private static final String SKOS_CONCEPT_SUB_TAG_SELECTOR = VALUE_XSL_DIRECT_CHILD_PREFIX
+      + SKOS_CONCEPT_TAG + "[" + VALUE_XSL_ATTR_PREFIX + RDF_ABOUT_ATTRIBUTE + "]";
+
+  // The XSL string that checks that we don't have a resource attribute, followed by an 'and'.
+  private static final String NO_RESOURCE_ATTRIBUTE_AND =
+      "not (" + VALUE_XSL_ATTR_PREFIX + RDF_RESOURCE_ATTRIBUTE + ") and ";
+
 
   private XSLWriter() {}
 
@@ -130,7 +151,7 @@ public class XSLWriter {
     // Write comment
     final ElementMapping parentTagMapping = mappings.getParentMapping().getTagMapping();
     writer.writeComment(" Parent mapping: " + parentTagMapping.toString() + " ");
-    
+
     // Start parent tag (including for-each).
     writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_FOR_EACH);
     writer.writeAttribute(XSL_ATTR_SELECT,
@@ -171,6 +192,9 @@ public class XSLWriter {
     // Write attributes of child tag
     writeAttributes(writer, childMapping.getAttributeMappings());
 
+    // Process exceptional case: skos:Concept containing tag (if necessary).
+    handleSkosConceptContainingTag(writer, childMapping);
+
     // Write tag value if needed
     if (childMapping.isIncludeValueOfTag()) {
       writeTagValue(writer);
@@ -184,7 +208,7 @@ public class XSLWriter {
   private static void writeTagValue(XMLStreamWriter writer) throws XMLStreamException {
 
     // Write comment
-    writer.writeComment(" Text content mapping (only for non-space-only content) ");
+    writer.writeComment(" Text content mapping (only content with non-space characters) ");
 
     // Start for-each on all child text nodes and normalize.
     writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_FOR_EACH);
@@ -231,5 +255,51 @@ public class XSLWriter {
       writer.writeEndElement();
       writer.writeEndElement();
     }
+  }
+
+  private static void handleSkosConceptContainingTag(XMLStreamWriter writer,
+      HierarchicalElementMapping childMapping) throws XMLStreamException {
+
+    // Exceptional situation only applies if we are mapping skos:Concept containing tags.
+    if (!SKOS_CONCEPT_CONTAINING_TAGS.contains(childMapping.getTagMapping().getFrom())
+        || !SKOS_CONCEPT_CONTAINING_TAGS.contains(childMapping.getTagMapping().getTo())) {
+      return;
+    }
+
+    // Find all mappings to the resource attribute.
+    final Set<ElementMapping> resourceTagMappings = childMapping.getAttributeMappings().stream()
+        .filter(mapping -> RDF_RESOURCE_ATTRIBUTE.equals(mapping.getTo()))
+        .collect(Collectors.toSet());
+
+    // If there are any resource attribute mappings other than from itself, we don't interfere.
+    if (resourceTagMappings.stream()
+        .anyMatch(mapping -> !RDF_RESOURCE_ATTRIBUTE.equals(mapping.getFrom()))) {
+      return;
+    }
+
+    // Compose the string that checks whether we have and should use a skos:Concepts sub-tag: We
+    // cannot have a resource attribute (if we mapped it) and we must have a skos:Concept child with
+    // an about attribute.
+    final String condition = (resourceTagMappings.isEmpty() ? "" : NO_RESOURCE_ATTRIBUTE_AND)
+        + SKOS_CONCEPT_SUB_TAG_SELECTOR;
+
+    // Write comment
+    writer.writeComment(" Certain skos relations may be defined in a skos:Concept sub-tag. ");
+    
+    // Check if we need and have a candidate for the resource tag.
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_IF);
+    writer.writeAttribute(XSL_ATTR_TEST, condition);
+
+    // Copy the about attribute of the concept to the resource attribute
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_ATTRIBUTE);
+    writer.writeAttribute(XSL_ATTR_NAME, RDF_RESOURCE_ATTRIBUTE.toString());
+    writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_VALUE_OF);
+    writer.writeAttribute(XSL_ATTR_SELECT,
+        "(" + SKOS_CONCEPT_SUB_TAG_SELECTOR + ")[1]/" + VALUE_XSL_ATTR_PREFIX + RDF_ABOUT_ATTRIBUTE);
+
+    // Done.
+    writer.writeEndElement();
+    writer.writeEndElement();
+    writer.writeEndElement();
   }
 }
