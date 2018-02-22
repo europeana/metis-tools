@@ -14,6 +14,22 @@ import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.migration.metis.utils.LogUtils;
 import eu.europeana.migration.metis.utils.Namespace;
 
+/**
+ * <p>
+ * This class represents a collection of all element mappings in a vocabulary. It consists of a
+ * parent mapping (a unique mapping to the main tag associated with the {@link Type} - see
+ * {@link Type#getMainTag()}) and a list of child mappings.
+ * </p>
+ * <p>
+ * All mappings include a tag mapping and a collection of attribute mappings and are required to be
+ * of the same {@link Type}. Furthermore, the parent mapping must contain exactly one document ID
+ * mapping (an attribute mapping that maps the document ID which is a mapping to the
+ * {@value #DOCUMENT_ID_ATTRIBUTE} attribute of the parent target tag).
+ * </p>
+ * 
+ * @author jochen
+ *
+ */
 public class ElementMappings {
 
   private static final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -36,6 +52,16 @@ public class ElementMappings {
     this.childMappings = Collections.unmodifiableSet(childMappings);
   }
 
+  /**
+   * This method creates an instance of this class for a UIM vocabulary. For the string
+   * representations that are expected of the various elements see
+   * {@link FlatElementMapping#create(NamespaceCollection, String, String, String)}. This method
+   * will throw an exception if they are not of the same {@link Type} or if the parent mapping could
+   * not be determined or if the document ID mapping could not be determined.
+   * 
+   * @param vocabulary the UIM vocabulary from which to extract the mappings.
+   * @return The mappings.
+   */
   public static ElementMappings create(ControlledVocabularyImpl vocabulary) {
 
     // Find the namespaces that are to be used.
@@ -158,14 +184,26 @@ public class ElementMappings {
     LogUtils.logInfoMessage(ignoreMessage.toString());
   }
 
+  /**
+   * 
+   * @return The type of this mapping.
+   */
   public Type getType() {
     return type;
   }
 
+  /**
+   * 
+   * @return The parent mapping.
+   */
   public HierarchicalElementMapping getParentMapping() {
     return parentMapping;
   }
 
+  /**
+   * 
+   * @return The child mappings.
+   */
   public Set<HierarchicalElementMapping> getChildMappings() {
     return childMappings;
   }
@@ -176,10 +214,17 @@ public class ElementMappings {
         .map(ElementMapping::getFrom).collect(Collectors.toList());
   }
 
+  /**
+   * 
+   * @return The element mapping the document ID (the source attribute of the document ID mapping).
+   */
   public Element getDocumentIdMapping() {
     return getDocumentIdMappings(getParentMapping()).get(0);
   }
 
+  /**
+   * Will return a representation of the parent mapping followed by a list of child mappings.
+   */
   @Override
   public String toString() {
     final StringBuilder result = new StringBuilder();

@@ -215,7 +215,7 @@ public class XSLWriter {
     handleSkosConceptContainingTag(writer, childMapping);
 
     // Write tag value if needed
-    if (childMapping.isIncludeValueOfTag()) {
+    if (childMapping.includeValueOfTag()) {
       writeTagValue(writer);
     }
 

@@ -4,6 +4,16 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * This class represents an XSL element mapping (tag plus all its attributes) that is to be used in
+ * a larger data structure (hierarchical in the sense that this class in combination with this
+ * datastructure define relationships between the different mappings). Equality is defined as the
+ * tag mapping being equal, so that we can make sets of these mappings. For this we don't need to
+ * consider the attribute mappings.
+ * 
+ * @author jochen
+ *
+ */
 public class HierarchicalElementMapping {
 
   private static final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -12,6 +22,15 @@ public class HierarchicalElementMapping {
   private final ElementMapping tagMapping;
   private final Set<ElementMapping> attributeMappings;
 
+  /**
+   * Constructor.
+   * 
+   * @param includeValueOfTag Whether the textual content of the tag is to be copied along with the
+   *        tag.
+   * @param tagMapping The mapping from a source tag to a target tag.
+   * @param attributeMappings The mappings from attributes of the source tag to attributes of the
+   *        target tag.
+   */
   HierarchicalElementMapping(boolean includeValueOfTag, ElementMapping tagMapping,
       Set<ElementMapping> attributeMappings) {
     if (tagMapping == null) {
@@ -25,15 +44,28 @@ public class HierarchicalElementMapping {
     this.attributeMappings = Collections.unmodifiableSet(attributeMappings);
   }
 
+  /**
+   * 
+   * @return The attribute mappings (mappings from attributes in the source tag to attributes in the
+   *         target tag).
+   */
   public Set<ElementMapping> getAttributeMappings() {
     return attributeMappings;
   }
 
+  /**
+   * 
+   * @return The tag mapping (from source tag to target tag).
+   */
   public ElementMapping getTagMapping() {
     return tagMapping;
   }
 
-  public boolean isIncludeValueOfTag() {
+  /**
+   * 
+   * @return Whether the textual content of the tag is to be copied along with the tag.
+   */
+  public boolean includeValueOfTag() {
     return includeValueOfTag;
   }
 
@@ -54,6 +86,10 @@ public class HierarchicalElementMapping {
     return mappings.stream().map(ElementMapping::toString).collect(Collectors.joining(separator));
   }
 
+  /**
+   * Will return the tag mapping followed by a list of the attribute mappings. Will also indicate if
+   * the textual value of the tag is excluded from the mapping.
+   */
   @Override
   public String toString() {
     final String attributeSeparator = LINE_SEPARATOR + "-- ";

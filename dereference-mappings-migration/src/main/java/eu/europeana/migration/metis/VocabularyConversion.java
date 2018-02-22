@@ -11,7 +11,6 @@ import javax.xml.stream.XMLStreamException;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.metis.dereference.Vocabulary;
 import eu.europeana.migration.metis.mapping.ElementMappings;
-import eu.europeana.migration.metis.mapping.Type;
 import eu.europeana.migration.metis.utils.LogUtils;
 import eu.europeana.migration.metis.xsl.XSLWriter;
 
@@ -58,7 +57,7 @@ public class VocabularyConversion {
     // Reading and parsing element mappings and save them as XSL
     final ElementMappings elementMappings = ElementMappings.create(uimVocabulary);
     vocabulary.setXslt(new String(XSLWriter.writeToXSL(elementMappings), XSL_ENCODING));
-    vocabulary.setType(Type.convertToMetisType(elementMappings.getType()));
+    vocabulary.setType(elementMappings.getType().getMetisType());
 
     // Done
     LogUtils.logInfoMessage("Type rules: " + vocabulary.getTypeRules());
