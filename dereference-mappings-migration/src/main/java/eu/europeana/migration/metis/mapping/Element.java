@@ -1,6 +1,6 @@
 package eu.europeana.migration.metis.mapping;
 
-import eu.europeana.migration.metis.utils.MigrationUtils;
+import eu.europeana.migration.metis.utils.ObjectIdentityUtils;
 import eu.europeana.migration.metis.utils.Namespace;
 
 public final class Element {
@@ -48,7 +48,7 @@ public final class Element {
 
   @Override
   public int hashCode() {
-    return MigrationUtils.hashCodeOfMultipleNullableObjects(getNamespace().getUri(), getTagName());
+    return ObjectIdentityUtils.hashCodeOfMultipleNullableObjects(getNamespace().getUri(), getTagName());
   }
 
   @Override

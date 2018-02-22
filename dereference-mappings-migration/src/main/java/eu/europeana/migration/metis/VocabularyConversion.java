@@ -15,12 +15,26 @@ import eu.europeana.migration.metis.mapping.Type;
 import eu.europeana.migration.metis.utils.LogUtils;
 import eu.europeana.migration.metis.xsl.XSLWriter;
 
+/**
+ * This class converts an old-style (UIM) vocabulary mapping to a new Metis one.
+ * 
+ * @author jochen
+ *
+ */
 public class VocabularyConversion {
 
   private static final Charset XSL_ENCODING = StandardCharsets.UTF_8;
 
   private VocabularyConversion() {}
 
+  /**
+   * Convert a UIM vocabulary mapping to a Metis one.
+   * 
+   * @param uimVocabulary The UIM vocabulary mapping to convert.
+   * @return The converted (Metis) vocabulary. Is not null.
+   * @throws XMLStreamException
+   * @throws IOException
+   */
   public static Vocabulary convert(ControlledVocabularyImpl uimVocabulary)
       throws XMLStreamException, IOException {
 
