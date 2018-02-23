@@ -14,6 +14,22 @@ import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.migration.metis.utils.LogUtils;
 import eu.europeana.migration.metis.utils.Namespace;
 
+/**
+ * <p>
+ * This class represents a collection of all element mappings in a vocabulary. It consists of a
+ * parent mapping (a unique mapping to the main tag associated with the {@link Type} - see
+ * {@link Type#getMainTag()}) and a list of child mappings.
+ * </p>
+ * <p>
+ * All mappings include a tag mapping and a collection of attribute mappings and are required to be
+ * of the same {@link Type}. Furthermore, the parent mapping must contain exactly one document ID
+ * mapping (an attribute mapping that maps the document ID which is a mapping to the
+ * {@value #DOCUMENT_ID_ATTRIBUTE} attribute of the parent target tag).
+ * </p>
+ * 
+ * @author jochen
+ *
+ */
 public class ElementMappings {
 
   private static final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -22,6 +38,8 @@ public class ElementMappings {
       new Element[] {new Element(Namespace.RDF, "type"), new Element(Namespace.RDF, "RDF")};
   private static final Set<Element> IGNORED_TAG_SET =
       Arrays.stream(IGNORED_TAG_ARRAY).collect(Collectors.toSet());
+
+  private static final Element DOCUMENT_ID_ATTRIBUTE = new Element(Namespace.RDF, "about");
 
   private final HierarchicalElementMapping parentMapping;
   private final Set<HierarchicalElementMapping> childMappings;
@@ -34,6 +52,16 @@ public class ElementMappings {
     this.childMappings = Collections.unmodifiableSet(childMappings);
   }
 
+  /**
+   * This method creates an instance of this class for a UIM vocabulary. For the string
+   * representations that are expected of the various elements see
+   * {@link FlatElementMapping#create(NamespaceCollection, String, String, String)}. This method
+   * will throw an exception if they are not of the same {@link Type} or if the parent mapping could
+   * not be determined or if the document ID mapping could not be determined.
+   * 
+   * @param vocabulary the UIM vocabulary from which to extract the mappings.
+   * @return The mappings.
+   */
   public static ElementMappings create(ControlledVocabularyImpl vocabulary) {
 
     // Find the namespaces that are to be used.
@@ -62,7 +90,8 @@ public class ElementMappings {
     final Type type = types.get(0);
 
     // Split into tag mappings and mappings involving attributes. Check that attribute mappings
-    // always have a from attribute.
+    // always have a from attribute. We copy the content for all tag mappings (except possibly the
+    // parent mapping, but this will be sorted out later).
     final Map<ElementMapping, Set<ElementMapping>> tagsWithContent = new HashMap<>();
     final Set<FlatElementMapping> attributeMappings = new HashSet<>();
     for (FlatElementMapping mapping : flatMappingSet) {
@@ -79,8 +108,9 @@ public class ElementMappings {
       }
     }
 
-    // Go by all attribute mappings and figure out what to do with them. If an attribute mapping
-    // does not contain a to attribute, assume it is the same as the from attribute.
+    // Go by all attribute mappings and add it to a matching tag mapping if one exists, otherwise
+    // create a new tag mapping (that does not copy content). If an attribute mapping does not
+    // contain a to attribute, assume it is the same as the from attribute.
     final Map<ElementMapping, Set<ElementMapping>> tagsWithoutContent = new HashMap<>();
     for (FlatElementMapping mapping : attributeMappings) {
       final ElementMapping tagMapping =
@@ -97,7 +127,8 @@ public class ElementMappings {
       }
     }
 
-    // Convert to hierarchical structure: find the parent mapping and filter unneeded mappings
+    // Convert to hierarchical structure: find the parent mapping and remove the mappings that are
+    // to be ignored. Check the parent mapping.
     HierarchicalElementMapping[] parentMapping = new HierarchicalElementMapping[1];
     final Set<HierarchicalElementMapping> childMappings = new HashSet<>();
     addHierarchicalMappings(type, false, tagsWithoutContent, childMappings, parentMapping);
@@ -105,6 +136,10 @@ public class ElementMappings {
     if (parentMapping[0] == null) {
       throw new IllegalArgumentException(
           "There is no mapping to the parent tag: " + type.getMainTag().toString() + ".");
+    }
+    if (getDocumentIdMappings(parentMapping[0]).size() != 1) {
+      throw new IllegalArgumentException("There must be exactly one mapping to the attribute '"
+          + DOCUMENT_ID_ATTRIBUTE.toString() + "' of the parent tag.");
     }
 
     // Done
@@ -149,18 +184,47 @@ public class ElementMappings {
     LogUtils.logInfoMessage(ignoreMessage.toString());
   }
 
+  /**
+   * 
+   * @return The type of this mapping.
+   */
   public Type getType() {
     return type;
   }
 
+  /**
+   * 
+   * @return The parent mapping.
+   */
   public HierarchicalElementMapping getParentMapping() {
     return parentMapping;
   }
 
+  /**
+   * 
+   * @return The child mappings.
+   */
   public Set<HierarchicalElementMapping> getChildMappings() {
     return childMappings;
   }
 
+  private static List<Element> getDocumentIdMappings(HierarchicalElementMapping parentMapping) {
+    return parentMapping.getAttributeMappings().stream()
+        .filter(mapping -> DOCUMENT_ID_ATTRIBUTE.equals(mapping.getTo()))
+        .map(ElementMapping::getFrom).collect(Collectors.toList());
+  }
+
+  /**
+   * 
+   * @return The element mapping the document ID (the source attribute of the document ID mapping).
+   */
+  public Element getDocumentIdMapping() {
+    return getDocumentIdMappings(getParentMapping()).get(0);
+  }
+
+  /**
+   * Will return a representation of the parent mapping followed by a list of child mappings.
+   */
   @Override
   public String toString() {
     final StringBuilder result = new StringBuilder();

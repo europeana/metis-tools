@@ -9,8 +9,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import eu.europeana.migration.metis.utils.Namespace;
 
+/**
+ * This class represents a known namespace set. All known sets are given as constants.
+ * 
+ * @author jochen
+ *
+ */
 public enum NamespaceSet {
 
+  /** The set that is used for output documents (after applying the XSL transformation). **/
   GENERAL_OUTPUT(namespaceSet -> {
     addToSet(namespaceSet, Namespace.XML.getPrefix(), Namespace.XML.getUri());
     addToSet(namespaceSet, Namespace.RDF.getPrefix(), Namespace.RDF.getUri());
@@ -22,12 +29,14 @@ public enum NamespaceSet {
     addToSet(namespaceSet, Namespace.RDAGR2.getPrefix(), Namespace.RDAGR2.getUri());
   }),
 
+  /** The set that is always allowed for input data (regardless of the source). **/
   GENERAL_INPUT(namespaceSet -> {
-    addToSet(namespaceSet, "xml", "http://www.w3.org/XML/1998/namespace");
+    addToSet(namespaceSet, Namespace.XML.getPrefix(), Namespace.XML.getUri());
     addToSet(namespaceSet, Namespace.RDF.getPrefix(), Namespace.RDF.getUri());
     addToSet(namespaceSet, "rdfs", "http://www.w3.org/2000/01/rdf-schema#");
   }),
 
+  /** DNB-specific namespaces. **/
   DNB(namespaceSet -> {
     addToSet(namespaceSet, "schema", "http://schema.org/");
     addToSet(namespaceSet, "gndo", "http://d-nb.info/standards/elementset/gnd#");
@@ -56,21 +65,25 @@ public enum NamespaceSet {
     addToSet(namespaceSet, "dc", "http://purl.org/dc/elements/1.1/");
   }, "http://d-nb.info/gnd"),
 
+  /** Dismarc-specific namespaces. **/
   DISMARC(namespaceSet -> {
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
     addToSet(namespaceSet, "dc", "http://purl.org/dc/elements/1.1/");
   }, "http://purl.org/dismarc/ns/"),
 
+  /** Eagle-specific namespaces. **/
   EAGLE(namespaceSet -> {
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
   }, "http://www.eagle-network.eu/voc/material/skos/"),
 
+  /** Europeana-specific namespaces. **/
   EUROPEANA(namespaceSet -> {
     addToSet(namespaceSet, "dc", "http://purl.org/dc/elements/1.1/");
     addToSet(namespaceSet, "dcterms", "http://purl.org/dc/terms/");
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
   }, "http://data.europeana.eu/concept/"),
 
+  /** Geonames-specific namespaces. **/
   GEONAMES(namespaceSet -> {
     addToSet(namespaceSet, "cc", "http://creativecommons.org/ns#");
     addToSet(namespaceSet, "dcterms", "http://purl.org/dc/terms/");
@@ -80,6 +93,7 @@ public enum NamespaceSet {
     addToSet(namespaceSet, Namespace.WGS84_POS.getPrefix(), Namespace.WGS84_POS.getUri());
   }, "http://sws.geonames.org/"),
 
+  /** Getty-specific namespaces. **/
   GETTY(namespaceSet -> {
     addToSet(namespaceSet, "aat", "http://vocab.getty.edu/aat/");
     addToSet(namespaceSet, "aat_contrib", "http://vocab.getty.edu/aat/contrib/");
@@ -146,11 +160,13 @@ public enum NamespaceSet {
     addToSet(namespaceSet, "xsd", "http://www.w3.org/2001/XMLSchema#");
   }, "http://vocab.getty.edu/"),
 
+  /** Iconclass-specific namespaces. **/
   ICONCLASS(namespaceSet -> {
     addToSet(namespaceSet, "dc", "http://purl.org/dc/elements/1.1/");
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
   }, "http://www.imj.org.il/imagine/thesaurus/objects"),
 
+  /** Israel museum-specific namespaces. **/
   ISRAEL_MUSEUM(namespaceSet -> {
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
     addToSet(namespaceSet, "dcterms", "http://purl.org/dc/terms/");
@@ -160,6 +176,7 @@ public enum NamespaceSet {
         "http://www.imj.org.il/imagine/thesaurus/objects/ObjectClassification.rdf#");
   }, "http://iconclass.org/"),
 
+  /** MIMO-specific namespaces. **/
   MIMO(namespaceSet -> {
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
     addToSet(namespaceSet, Namespace.FOAF.getPrefix(), Namespace.FOAF.getUri());
@@ -169,6 +186,7 @@ public enum NamespaceSet {
     addToSet(namespaceSet, "dc", "http://purl.org/dc/elements/1.1/");
   }, "http://www.mimo-db.eu/"),
 
+  /** Partage-specific namespaces. **/
   PARTAGE(namespaceSet -> {
     addToSet(namespaceSet, "dcterms", "http://purl.org/dc/terms/");
     addToSet(namespaceSet, Namespace.FOAF.getPrefix(), Namespace.FOAF.getUri());
@@ -184,6 +202,7 @@ public enum NamespaceSet {
     addToSet(namespaceSet, "lt", "http://terminology.lido-schema.org/");
   }, "http://partage.vocnet.org/"),
 
+  /** Photo consortium-specific namespaces. **/
   PHOTO_CONSORTIUM(namespaceSet -> {
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
     addToSet(namespaceSet, Namespace.OWL.getPrefix(), Namespace.OWL.getUri());
@@ -193,12 +212,14 @@ public enum NamespaceSet {
     addToSet(namespaceSet, "schema", "http://bib.arts.kuleuven.be/photoVocabulary/schema#");
   }, "http://bib.arts.kuleuven.be/photoVocabulary/"),
 
+  /** RDA-specific namespaces. **/
   RDA(namespaceSet -> {
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
     addToSet(namespaceSet, "dc", "http://purl.org/dc/elements/1.1/");
     addToSet(namespaceSet, "reg", "http://metadataregistry.org/uri/schema/registry/");
   }, "http://rdaregistry.info/termList/RDACarrierType"),
 
+  /** UDC-specific namespaces. **/
   UDC(namespaceSet -> {
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
     addToSet(namespaceSet, Namespace.OWL.getPrefix(), Namespace.OWL.getUri());
@@ -207,12 +228,14 @@ public enum NamespaceSet {
     addToSet(namespaceSet, "udc", "http://udcdata.info/udc-schema#");
   }, "http://udcdata.info/rdf"),
 
+  /** UNESCO-specific namespaces. **/
   UNESCO(namespaceSet -> {
     addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
     addToSet(namespaceSet, "isothes", "http://purl.org/iso25964/skos-thes#");
     addToSet(namespaceSet, "dc", "http://purl.org/dc/terms/");
   }, "http://vocabularies.unesco.org/thesaurus/"),
 
+  /** VIAF-specific namespaces. **/
   VIAF(namespaceSet -> {
     addToSet(namespaceSet, "rdaGr2", Namespace.RDAGR2.getUri());
     addToSet(namespaceSet, "umbel", "http://umbel.org/umbel#");
@@ -227,6 +250,10 @@ public enum NamespaceSet {
     addToSet(namespaceSet, "schema", "http://schema.org/");
   }, "http://viaf.org/viaf/");
 
+  /**
+   * The namespace collection that is used for output documents (after applying the XSL
+   * transformation).
+   */
   public static final NamespaceCollection OUTPUT_COLLECTION =
       new NamespaceCollection(Collections.singleton(GENERAL_OUTPUT));
 
@@ -239,6 +266,10 @@ public enum NamespaceSet {
     populator.populateNamespaceSet(namespaces);
   }
 
+  /**
+   * 
+   * @return The namespaces in this set.
+   */
   public Set<Namespace> getNamespaces() {
     return Collections.unmodifiableSet(namespaces);
   }
@@ -259,6 +290,13 @@ public enum NamespaceSet {
     }
   }
 
+  /**
+   * Get the namespace collection for a given input source. This collection consists of the
+   * {@link #GENERAL_INPUT} set together with any specific sets defined for the given input source.
+   * 
+   * @param uriString The input source.
+   * @return The namespace collection.
+   */
   public static NamespaceCollection getCollectionForInput(String uriString) {
     final URI uri = convertToUri(uriString);
     final Set<NamespaceSet> result = Arrays.stream(values())

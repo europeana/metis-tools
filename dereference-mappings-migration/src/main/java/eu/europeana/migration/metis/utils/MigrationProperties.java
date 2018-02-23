@@ -6,6 +6,13 @@ import java.io.InputStream;
 import java.util.Properties;
 import eu.europeana.migration.metis.MigrationFromUimToMetis;
 
+/**
+ * This class is responsible for reading the configuration file and giving out the properties in
+ * that file.
+ * 
+ * @author jochen
+ *
+ */
 public class MigrationProperties {
 
   private static final String DEFAULT_PROPERTIES_NAME = "migration.properties";
@@ -20,6 +27,14 @@ public class MigrationProperties {
   private final String targetMongoUrl;
   private final String targetMongoDbName;
 
+  /**
+   * Constructor.
+   * 
+   * @param sourceMongoUrl The url of the source database.
+   * @param sourceMongoDbName The database name in the source database.
+   * @param targetMongoUrl The url of the target database.
+   * @param targetMongoDbName The database name in the target database.
+   */
   public MigrationProperties(String sourceMongoUrl, String sourceMongoDbName, String targetMongoUrl,
       String targetMongoDbName) {
     this.sourceMongoUrl = sourceMongoUrl;
@@ -28,16 +43,25 @@ public class MigrationProperties {
     this.targetMongoDbName = targetMongoDbName;
   }
 
-  public static MigrationProperties readFromFile(String propertiesFileName) throws IOException {
+  /**
+   * Read the property file. In case the file could not be read or one of the required properties is
+   * missing an exception is thrown.
+   * 
+   * @param propertiesFilePath The path of the properties file. Can be null, in which case the
+   *        method will look for a file named {@value #DEFAULT_PROPERTIES_NAME} in the class path.
+   * @return An instance of this class containing the properties. Is not null.
+   * @throws IOException
+   */
+  public static MigrationProperties readFromFile(String propertiesFilePath) throws IOException {
 
-    final String fileNameForMessages = propertiesFileName != null ? propertiesFileName
+    final String fileNameForMessages = propertiesFilePath != null ? propertiesFilePath
         : (DEFAULT_PROPERTIES_NAME + " (default properties file)");
-    LogUtils.logInfoMessage("Reading property file: " + propertiesFileName);
+    LogUtils.logInfoMessage("Reading property file: " + propertiesFilePath);
 
     final Properties properties = new Properties();
     final InputStream input;
-    if (propertiesFileName != null) {
-      input = new FileInputStream(propertiesFileName);
+    if (propertiesFilePath != null) {
+      input = new FileInputStream(propertiesFilePath);
     } else {
       input = MigrationFromUimToMetis.class.getClassLoader()
           .getResourceAsStream(DEFAULT_PROPERTIES_NAME);
@@ -68,18 +92,34 @@ public class MigrationProperties {
     return result;
   }
 
+  /**
+   * 
+   * @return The url of the source database.
+   */
   public String getSourceMongoUrl() {
     return sourceMongoUrl;
   }
 
+  /**
+   * 
+   * @return The name of the source database.
+   */
   public String getSourceMongoDbName() {
     return sourceMongoDbName;
   }
 
+  /**
+   * 
+   * @return The url of the target database.
+   */
   public String getTargetMongoUrl() {
     return targetMongoUrl;
   }
 
+  /**
+   * 
+   * @return The name of the target database.
+   */
   public String getTargetMongoDbName() {
     return targetMongoDbName;
   }

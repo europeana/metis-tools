@@ -1,8 +1,6 @@
 package eu.europeana.migration.metis;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,20 +14,27 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.metis.dereference.Vocabulary;
-import eu.europeana.migration.metis.mapping.ElementMappings;
-import eu.europeana.migration.metis.mapping.Type;
 import eu.europeana.migration.metis.utils.LogUtils;
 import eu.europeana.migration.metis.utils.MigrationProperties;
-import eu.europeana.migration.metis.xsl.XSLWriter;
 
+/**
+ * This class performs the migration of vocabulary mappings from UIM to Metis.
+ * 
+ * @author jochen
+ *
+ */
 public class MigrationFromUimToMetis {
-
-  private static final Charset XSL_ENCODING = StandardCharsets.UTF_8;
 
   // Only needed for test database
   private static final Set<String> SKIP_VOCABULARY_IDS =
       Arrays.stream(new String[] {}).collect(Collectors.toSet());
 
+  /**
+   * The main method performing the vocabulary mappings.
+   * 
+   * @param args the arguments. If the first argument exists it is assumed that it is an alternative
+   *        location for the configuration file (see {@link MigrationProperties}).
+   */
   public static void main(String[] args) {
     try {
       mainInternal(args);
@@ -63,7 +68,7 @@ public class MigrationFromUimToMetis {
           + uimVocabulary.getId().toString() + ").");
 
       // Converting to Metis vocabulary
-      final Vocabulary vocabulary = convert(uimVocabulary);
+      final Vocabulary vocabulary = VocabularyConversion.convert(uimVocabulary);
       metisVocabularies.add(vocabulary);
     }
     LogUtils.logInfoMessage("==============================");
@@ -72,43 +77,6 @@ public class MigrationFromUimToMetis {
     LogUtils.logInfoMessage("Saving resulting vocabularies.");
     saveVocabulariesToDestination(metisVocabularies, properties);
 
-  }
-
-  private static Vocabulary convert(ControlledVocabularyImpl uimVocabulary)
-      throws XMLStreamException, IOException {
-
-    // Create object and set simple properties
-    final Vocabulary vocabulary = new Vocabulary();
-    vocabulary.setId(uimVocabulary.getId().toString());
-    vocabulary.setURI(uimVocabulary.getURI());
-    vocabulary.setIterations(uimVocabulary.getIterations());
-    vocabulary.setName(uimVocabulary.getName());
-    // TODO set suffix!
-
-    // Split the rules into sets of url rules and type rules and save them.
-    final Set<String> typeRules =
-        Arrays.stream(uimVocabulary.getRules()).map(String::trim).collect(Collectors.toSet());
-    final Set<String> urlRules =
-        typeRules.stream().filter(rule -> !rule.matches("^<#.*>$")).collect(Collectors.toSet());
-    typeRules.removeAll(urlRules);
-    if (urlRules.isEmpty()) {
-      urlRules.add("*");
-    }
-    // TODO why not make array of these two variables?
-    vocabulary.setRules(urlRules.stream().collect(Collectors.joining(" ")));
-    vocabulary.setTypeRules(typeRules.stream().collect(Collectors.joining(" ")));
-
-    // Reading and parsing element mappings and save them as XSL
-    final ElementMappings elementMappings = ElementMappings.create(uimVocabulary);
-    vocabulary.setXslt(new String(XSLWriter.writeToXSL(elementMappings), XSL_ENCODING));
-    vocabulary.setType(Type.convertToMetisType(elementMappings.getType()));
-
-    // Done
-    LogUtils.logInfoMessage("Type rules: " + vocabulary.getTypeRules());
-    LogUtils.logInfoMessage("URL rules : " + vocabulary.getRules());
-    LogUtils.logInfoMessage("Mappings:");
-    LogUtils.logInfoMessage(elementMappings.toString());
-    return vocabulary;
   }
 
   private static List<ControlledVocabularyImpl> getVocabulariesFromSource(
