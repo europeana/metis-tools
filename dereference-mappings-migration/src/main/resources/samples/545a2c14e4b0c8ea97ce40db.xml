@@ -1,12 +1,41 @@
-<?xml version="1.0"?>
-<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.opengis.net/ont/geosparql#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:sf="http://www.opengis.net/ont/sf#" xmlns:isbd="http://iflastandards.info/ns/isbd/elements/" xmlns:gndo="http://d-nb.info/standards/elementset/gnd#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:marcRole="http://id.loc.gov/vocabulary/relators/" xmlns:lib="http://purl.org/library/" xmlns:umbel="http://umbel.org/umbel#" xmlns:rdau="http://rdaregistry.info/Elements/u/" xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:skos="http://www.w3.org/2004/02/skos/core#">
-<rdf:Description rdf:about="http://d-nb.info/gnd/10000666-8">
-<gndo:gndIdentifier>10000666-8</gndo:gndIdentifier>
-<gndo:oldAuthorityNumber>(DE-588b)10000666-8</gndo:oldAuthorityNumber>
-<gndo:variantNameForTheCorporateBody>Verein fu&#x308;r Verbesserung der Wasserstandsverha&#x308;ltnisse im Regierungsbezirke Mittelfranken</gndo:variantNameForTheCorporateBody>
-<gndo:preferredNameForTheCorporateBody>Verein fu&#x308;r Verbesserung der Wasserstandsverha&#x308;ltnisse im Regierungsbezirk Mittelfranken</gndo:preferredNameForTheCorporateBody>
-<gndo:geographicAreaCode rdf:resource="http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-DXDE"/>
-<gndo:dateOfEstablishment>1884</gndo:dateOfEstablishment>
-<rdf:type rdf:resource="http://d-nb.info/standards/elementset/gnd#CorporateBody"/>
-</rdf:Description>
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:schema="http://schema.org/"
+	xmlns:gndo="http://d-nb.info/standards/elementset/gnd#"
+	xmlns:lib="http://purl.org/library/"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:geo="http://www.opengis.net/ont/geosparql#"
+	xmlns:umbel="http://umbel.org/umbel#"
+	xmlns:rdau="http://rdaregistry.info/Elements/u/"
+	xmlns:sf="http://www.opengis.net/ont/sf#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:vivo="http://vivoweb.org/ontology/core#"
+	xmlns:isbd="http://iflastandards.info/ns/isbd/elements/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:mo="http://purl.org/ontology/mo/"
+	xmlns:marcRole="http://id.loc.gov/vocabulary/relators/"
+	xmlns:dnba="http://d-nb.info/standards/elementset/agrelon#"
+	xmlns:dcmitype="http://purl.org/dc/dcmitype/"
+	xmlns:dbp="http://dbpedia.org/property/"
+	xmlns:dnbt="http://d-nb.info/standards/elementset/dnb#"
+	xmlns:dnb_intern="http://dnb.de/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:v="http://www.w3.org/2006/vcard/ns#"
+	xmlns:ebu="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:gbv="http://purl.org/ontology/gbv/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <rdf:Description rdf:about="http://d-nb.info/gnd/10000666-8">
+        <rdf:type rdf:resource="http://d-nb.info/standards/elementset/gnd#CorporateBody"/>
+        <gndo:gndIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10000666-8</gndo:gndIdentifier>
+        <owl:sameAs rdf:resource="http://viaf.org/viaf/125229626"/>
+        <gndo:oldAuthorityNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(DE-588b)10000666-8</gndo:oldAuthorityNumber>
+        <gndo:variantNameForTheCorporateBody rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Verein für Verbesserung der Wasserstandsverhältnisse im Regierungsbezirke Mittelfranken</gndo:variantNameForTheCorporateBody>
+        <gndo:variantNameForTheCorporateBody rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Verein zur Verbesserung der Wasserstandsverhaeltnisse im Regierungsbezirk Mittelfranken</gndo:variantNameForTheCorporateBody>
+        <gndo:preferredNameForTheCorporateBody rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Verein für Verbesserung der Wasserstandsverhältnisse im Regierungsbezirk Mittelfranken</gndo:preferredNameForTheCorporateBody>
+        <gndo:geographicAreaCode rdf:resource="http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-DXDE"/>
+        <gndo:dateOfEstablishment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1884</gndo:dateOfEstablishment>
+    </rdf:Description>
 </rdf:RDF>

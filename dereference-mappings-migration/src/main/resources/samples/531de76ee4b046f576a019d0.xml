@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <rdf:RDF xmlns:cc="http://creativecommons.org/ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:gn="http://www.geonames.org/ontology#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#">
-<gn:Feature rdf:about="http://sws.geonames.org/1123961/">
-<rdfs:isDefinedBy rdf:resource="http://sws.geonames.org/1123961/about.rdf"/>
-<gn:name>Spāndō Kats</gn:name>
-<gn:alternateName>Aspando Kats</gn:alternateName>
-<gn:alternateName>Espand-e Kach Rūyeh</gn:alternateName>
-<gn:alternateName>Spānḏo Kac</gn:alternateName>
-<gn:alternateName>Spāndo Kats</gn:alternateName>
-<gn:alternateName>Spāndō Kats</gn:alternateName>
-<gn:alternateName>Spāndow Kats</gn:alternateName>
-<gn:alternateName>Spandukach</gn:alternateName>
-<gn:alternateName xml:lang="fa">دشتٔٔ سيلابی سپاند</gn:alternateName>
-<gn:alternateName>سپاندو کڅ</gn:alternateName>
-<gn:featureClass rdf:resource="http://www.geonames.org/ontology#P"/>
-<gn:featureCode rdf:resource="http://www.geonames.org/ontology#P.PPL"/>
-<gn:countryCode>AF</gn:countryCode>
-<wgs84_pos:lat>34.23061</wgs84_pos:lat>
-<wgs84_pos:long>69.7244</wgs84_pos:long>
-<gn:parentFeature rdf:resource="http://sws.geonames.org/1134561/"/>
-<gn:parentCountry rdf:resource="http://sws.geonames.org/1149361/"/>
-<gn:parentADM1 rdf:resource="http://sws.geonames.org/1134561/"/>
-<gn:nearbyFeatures rdf:resource="http://sws.geonames.org/1123961/nearby.rdf"/>
-<gn:locationMap rdf:resource="http://www.geonames.org/1123961/spando-kats.html"/>
-</gn:Feature>
-<foaf:Document rdf:about="http://sws.geonames.org/1123961/about.rdf">
-<foaf:primaryTopic rdf:resource="http://sws.geonames.org/1123961/"/>
-<cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/"/>
-<cc:attributionURL rdf:resource="http://sws.geonames.org/1123961/"/>
-<cc:attributionName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">GeoNames</cc:attributionName>
-<dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2006-01-15</dcterms:created>
-<dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-01-16</dcterms:modified>
-</foaf:Document>
+    <gn:Feature rdf:about="http://sws.geonames.org/1123961/">
+        <rdfs:isDefinedBy rdf:resource="http://sws.geonames.org/1123961/about.rdf"/>
+        <gn:name>Spāndō Kats</gn:name>
+        <gn:alternateName>Aspando Kats</gn:alternateName>
+        <gn:alternateName>Espand-e Kach Rūyeh</gn:alternateName>
+        <gn:alternateName>Spānḏo Kac</gn:alternateName>
+        <gn:alternateName>Spāndo Kats</gn:alternateName>
+        <gn:alternateName>Spāndō Kats</gn:alternateName>
+        <gn:alternateName>Spāndow Kats</gn:alternateName>
+        <gn:alternateName>Spandukach</gn:alternateName>
+        <gn:alternateName xml:lang="fa">دشتٔٔ سيلابی سپاند</gn:alternateName>
+        <gn:alternateName>سپاندو کڅ</gn:alternateName>
+        <gn:featureClass rdf:resource="http://www.geonames.org/ontology#P"/>
+        <gn:featureCode rdf:resource="http://www.geonames.org/ontology#P.PPL"/>
+        <gn:countryCode>AF</gn:countryCode>
+        <wgs84_pos:lat>34.23061</wgs84_pos:lat>
+        <wgs84_pos:long>69.7244</wgs84_pos:long>
+        <gn:parentFeature rdf:resource="http://sws.geonames.org/7053255/"/>
+        <gn:parentCountry rdf:resource="http://sws.geonames.org/1149361/"/>
+        <gn:parentADM1 rdf:resource="http://sws.geonames.org/1134561/"/>
+        <gn:parentADM2 rdf:resource="http://sws.geonames.org/7053255/"/>
+        <gn:nearbyFeatures rdf:resource="http://sws.geonames.org/1123961/nearby.rdf"/>
+        <gn:locationMap rdf:resource="http://www.geonames.org/1123961/spando-kats.html"/>
+    </gn:Feature>
+    <foaf:Document rdf:about="http://sws.geonames.org/1123961/about.rdf">
+        <foaf:primaryTopic rdf:resource="http://sws.geonames.org/1123961/"/>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/"/>
+        <cc:attributionURL rdf:resource="http://sws.geonames.org/1123961/"/>
+        <cc:attributionName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">GeoNames</cc:attributionName>
+        <dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2006-01-15</dcterms:created>
+        <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-02-17</dcterms:modified>
+    </foaf:Document>
 </rdf:RDF>
-

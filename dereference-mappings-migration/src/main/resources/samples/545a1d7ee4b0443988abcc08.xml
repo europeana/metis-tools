@@ -1,127 +1,202 @@
-<?xml version="1.0"?>
-<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.opengis.net/ont/geosparql#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:sf="http://www.opengis.net/ont/sf#" xmlns:isbd="http://iflastandards.info/ns/isbd/elements/" xmlns:gndo="http://d-nb.info/standards/elementset/gnd#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:marcRole="http://id.loc.gov/vocabulary/relators/" xmlns:lib="http://purl.org/library/" xmlns:umbel="http://umbel.org/umbel#" xmlns:rdau="http://rdaregistry.info/Elements/u/" xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:skos="http://www.w3.org/2004/02/skos/core#">
-<rdf:Description rdf:about="http://d-nb.info/gnd/100006000">
-<rdf:type rdf:resource="http://d-nb.info/standards/elementset/gnd#RoyalOrMemberOfARoyalHouse"/>
-<foaf:page rdf:resource="http://de.wikipedia.org/wiki/Johann_II._%28Pfalz-Zweibr%C3%BCcken-Veldenz%29"/>
-<owl:sameAs rdf:resource="http://dbpedia.org/resource/John_II,_Count_Palatine_of_Zweibr%C3%BCcken"/>
-<owl:sameAs rdf:resource="http://viaf.org/viaf/64344358"/>
-<gndo:gndIdentifier>100006000</gndo:gndIdentifier>
-<gndo:oldAuthorityNumber>(DE-588a)100006000</gndo:oldAuthorityNumber>
-<gndo:variantNameForThePerson>Johann &lt;Bayern, Herzog&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Bayern, Herzog</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;bei Rhein, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>bei Rhein, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;Kurpfalz, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Kurpfalz, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;Pfalz, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Pfalz, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;Pfalzgraf bei Rhein&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Pfalzgraf bei Rhein</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;Rhein, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Rhein, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;Rheinpfalz, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Rheinpfalz, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johannes &lt;Comes Palatinus Rheni, Boiariae Dux&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johannes</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Comes Palatinus Rheni, Boiariae Dux</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;II., Pfalz-Zweibru&#x308;cken-Veldenz, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:counting>II.</gndo:counting>
-    <gndo:epithetGenericNameTitleOrTerritory>Pfalz-Zweibru&#x308;cken-Veldenz, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johann &lt;II., Zweibru&#x308;cken, Herzog&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:counting>II.</gndo:counting>
-    <gndo:epithetGenericNameTitleOrTerritory>Zweibru&#x308;cken, Herzog</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johannes &lt;Bayern, Herzog&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johannes</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Bayern, Herzog</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johannes &lt;bei Rhein, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johannes</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>bei Rhein, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johannes &lt;Kurpfalz, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johannes</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Kurpfalz, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johannes &lt;Pfalz, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johannes</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Pfalz, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:variantNameForThePerson>Johannes &lt;Rhein, Pfalzgraf&gt;</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johannes</gndo:personalName>
-    <gndo:epithetGenericNameTitleOrTerritory>Rhein, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:variantNameEntityForThePerson>
-<gndo:preferredNameForThePerson>Johann &lt;II., Pfalz-Zweibru&#x308;cken, Pfalzgraf&gt;</gndo:preferredNameForThePerson>
-<gndo:preferredNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:personalName>Johann</gndo:personalName>
-    <gndo:counting>II.</gndo:counting>
-    <gndo:epithetGenericNameTitleOrTerritory>Pfalz-Zweibru&#x308;cken, Pfalzgraf</gndo:epithetGenericNameTitleOrTerritory>
-</gndo:preferredNameEntityForThePerson>
-<gndo:familialRelationship>
-    <rdf:Description rdf:about="http://d-nb.info/gnd/120091879">
-    <gndo:preferredNameForThePerson>Luise &lt;Pfalz-Zweibru&#x308;cken, Pfalzgra&#x308;fin&gt;</gndo:preferredNameForThePerson>
-</rdf:Description>
-</gndo:familialRelationship>
-<gndo:professionOrOccupation>
-    <rdf:Description rdf:about="http://d-nb.info/gnd/4000464-8">
-    <gndo:preferredNameForTheSubjectHeading>Adel</gndo:preferredNameForTheSubjectHeading>
-</rdf:Description>
-</gndo:professionOrOccupation>
-<gndo:professionOrOccupation>
-    <rdf:Description rdf:about="http://d-nb.info/gnd/4159676-6">
-    <gndo:preferredNameForTheSubjectHeading>Herzog</gndo:preferredNameForTheSubjectHeading>
-</rdf:Description>
-</gndo:professionOrOccupation>
-<gndo:professionOrOccupation>
-    <rdf:Description rdf:about="http://d-nb.info/gnd/4173982-6">
-    <gndo:preferredNameForTheSubjectHeading>Pfalzgraf</gndo:preferredNameForTheSubjectHeading>
-</rdf:Description>
-</gndo:professionOrOccupation>
-<gndo:gndSubjectCategory rdf:resource="http://d-nb.info/standards/vocab/gnd/gnd-sc#16.5p"/>
-<gndo:geographicAreaCode rdf:resource="http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-DE"/>
-<gndo:publication>Eltisten Ordnung, Unser von Gottes Gnaden Johansen Pfaltzgrafen bey Rhein ... - 1633</gndo:publication>
-<gndo:biographicalOrHistoricalInformation xml:lang="de">Gemahl von Catherine de Rohan (Heirat 1604) und Luise Juliane, Tochter von Friedrich IV., Kurfu&#x308;rst von der Pfalz (Heirat 1612)</gndo:biographicalOrHistoricalInformation>
-<gndo:gender rdf:resource="http://d-nb.info/standards/vocab/gnd/Gender#male"/>
-<gndo:dateOfBirth rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1584</gndo:dateOfBirth>
-<gndo:dateOfDeath rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1635</gndo:dateOfDeath>
-</rdf:Description>
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:schema="http://schema.org/"
+	xmlns:gndo="http://d-nb.info/standards/elementset/gnd#"
+	xmlns:lib="http://purl.org/library/"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:geo="http://www.opengis.net/ont/geosparql#"
+	xmlns:umbel="http://umbel.org/umbel#"
+	xmlns:rdau="http://rdaregistry.info/Elements/u/"
+	xmlns:sf="http://www.opengis.net/ont/sf#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:vivo="http://vivoweb.org/ontology/core#"
+	xmlns:isbd="http://iflastandards.info/ns/isbd/elements/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:mo="http://purl.org/ontology/mo/"
+	xmlns:marcRole="http://id.loc.gov/vocabulary/relators/"
+	xmlns:dnba="http://d-nb.info/standards/elementset/agrelon#"
+	xmlns:dcmitype="http://purl.org/dc/dcmitype/"
+	xmlns:dbp="http://dbpedia.org/property/"
+	xmlns:dnbt="http://d-nb.info/standards/elementset/dnb#"
+	xmlns:dnb_intern="http://dnb.de/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:v="http://www.w3.org/2006/vcard/ns#"
+	xmlns:ebu="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:gbv="http://purl.org/ontology/gbv/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <rdf:Description rdf:about="http://d-nb.info/gnd/100006000">
+        <rdf:type rdf:resource="http://d-nb.info/standards/elementset/gnd#RoyalOrMemberOfARoyalHouse"/>
+        <gndo:gndIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">100006000</gndo:gndIdentifier>
+        <foaf:page rdf:resource="https://de.wikipedia.org/wiki/Johann_II._%28Pfalz-Zweibr%C3%BCcken-Veldenz%29"/>
+        <owl:sameAs rdf:resource="http://dbpedia.org/resource/John_II,_Count_Palatine_of_Zweibr%C3%BCcken"/>
+        <owl:sameAs rdf:resource="http://viaf.org/viaf/64344358"/>
+        <gndo:oldAuthorityNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(DE-588a)100006000</gndo:oldAuthorityNumber>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, Bayern, Herzog</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099228">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bayern, Herzog</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, bei Rhein, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099229">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bei Rhein, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, Kurpfalz, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099230">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Kurpfalz, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, Pfalz, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099231">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pfalz, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, Pfalzgraf bei Rhein</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099232">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pfalzgraf bei Rhein</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099233">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, Rhein, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099234">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Rhein, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, Rheinpfalz, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099235">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Rheinpfalz, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes, Comes Palatinus Rheni, Boiariae Dux</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099236">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comes Palatinus Rheni, Boiariae Dux</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann II., Pfalz-Zweibrücken-Veldenz, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099237">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:counting rdf:datatype="http://www.w3.org/2001/XMLSchema#string">II.</gndo:counting>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pfalz-Zweibrücken-Veldenz, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann II., Zweibrücken, Herzog</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099238">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:counting rdf:datatype="http://www.w3.org/2001/XMLSchema#string">II.</gndo:counting>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Zweibrücken, Herzog</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes, Bayern, Herzog</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099239">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bayern, Herzog</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes, bei Rhein, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099240">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bei Rhein, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes, Kurpfalz, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099241">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Kurpfalz, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes, Pfalz, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099242">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pfalz, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes, Rhein, Pfalzgraf</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099243">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johannes</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Rhein, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann II, Pfalzgraf bei Rhein-Zweibrücken</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099244">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:counting rdf:datatype="http://www.w3.org/2001/XMLSchema#string">II</gndo:counting>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pfalzgraf bei Rhein-Zweibrücken</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann II, Pfalzgraf bei Rhein</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099245">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:counting rdf:datatype="http://www.w3.org/2001/XMLSchema#string">II</gndo:counting>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pfalzgraf bei Rhein</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann II, Herzog von Zweibrücken</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099246">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:counting rdf:datatype="http://www.w3.org/2001/XMLSchema#string">II</gndo:counting>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Herzog von Zweibrücken</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann, Herzog von Bayern</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099247">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Herzog von Bayern</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:preferredNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann II., Pfalz-Zweibrücken, Pfalzgraf</gndo:preferredNameForThePerson>
+        <gndo:preferredNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c6mmk3e1x8099248">
+                <gndo:personalName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Johann</gndo:personalName>
+                <gndo:counting rdf:datatype="http://www.w3.org/2001/XMLSchema#string">II.</gndo:counting>
+                <gndo:nameAddition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pfalz-Zweibrücken, Pfalzgraf</gndo:nameAddition>
+            </rdf:Description>
+        </gndo:preferredNameEntityForThePerson>
+        <gndo:familialRelationship rdf:resource="http://d-nb.info/gnd/120091879"/>
+        <gndo:professionOrOccupation rdf:resource="http://d-nb.info/gnd/4000464-8"/>
+        <gndo:professionOrOccupation rdf:resource="http://d-nb.info/gnd/4159676-6"/>
+        <gndo:professionOrOccupation rdf:resource="http://d-nb.info/gnd/4173982-6"/>
+        <gndo:gndSubjectCategory rdf:resource="http://d-nb.info/standards/vocab/gnd/gnd-sc#16.5p"/>
+        <gndo:geographicAreaCode rdf:resource="http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-DE"/>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Eltisten Ordnung, Unser von Gottes Gnaden Johansen Pfaltzgrafen bey Rhein ... - 1633</gndo:publication>
+        <gndo:biographicalOrHistoricalInformation xml:lang="de">Gemahl von Catherine de Rohan (Heirat 1604) und Luise Juliane, Tochter von Friedrich IV., Kurfürst von der Pfalz (Heirat 1612)</gndo:biographicalOrHistoricalInformation>
+        <gndo:gender rdf:resource="http://d-nb.info/standards/vocab/gnd/gender#male"/>
+        <gndo:dateOfBirth rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1584</gndo:dateOfBirth>
+        <gndo:dateOfDeath rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1635</gndo:dateOfDeath>
+    </rdf:Description>
 </rdf:RDF>
-

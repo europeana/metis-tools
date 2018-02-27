@@ -1,19 +1,18 @@
 <?xml version="1.0"?>
 <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:skos="http://www.w3.org/2004/02/skos/core#">
-<rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="http://data.europeana.eu/concept/soundgenres/Music/Western_classical_music">
-<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
-<skos:prefLabel xml:lang="es">M&#xFA;sica cl&#xE1;sica occidental</skos:prefLabel>
-<skos:prefLabel xml:lang="pl">Zachodnia muzyka klasyczna</skos:prefLabel>
-<skos:notation>4357</skos:notation>
-<skos:inScheme rdf:resource="http://data.europeana.eu/concept/soundgenres"/>
-<skos:broader rdf:resource="http://data.europeana.eu/concept/soundgenres/Music"/>
-<skos:prefLabel xml:lang="en">Western classical music</skos:prefLabel>
-<skos:prefLabel xml:lang="fr">Musique classique occidentale</skos:prefLabel>
-<skos:prefLabel xml:lang="de">Westliche klassische Musik</skos:prefLabel>
-<skos:prefLabel xml:lang="it">Musica classica occidentale</skos:prefLabel>
-<skos:note xml:lang="en">Western classical or art music of any type, sacred or secular, for voices and/or instruments.</skos:note>
-<dcterms:dateSubmitted>2014-12-03T11:15:03Z</dcterms:dateSubmitted>
-<dcterms:modified>2016-01-13T12:31:53Z</dcterms:modified>
-</rdf:Description>
+    <rdf:Description xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="http://data.europeana.eu/concept/soundgenres/Music/Western_classical_music">
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <skos:prefLabel xml:lang="es">M&#xFA;sica cl&#xE1;sica occidental</skos:prefLabel>
+        <skos:prefLabel xml:lang="pl">Zachodnia muzyka klasyczna</skos:prefLabel>
+        <skos:notation>4357</skos:notation>
+        <skos:inScheme rdf:resource="http://data.europeana.eu/concept/soundgenres"/>
+        <skos:broader rdf:resource="http://data.europeana.eu/concept/soundgenres/Music"/>
+        <skos:prefLabel xml:lang="en">Western classical music</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Musique classique occidentale</skos:prefLabel>
+        <skos:prefLabel xml:lang="de">Westliche klassische Musik</skos:prefLabel>
+        <skos:prefLabel xml:lang="it">Musica classica occidentale</skos:prefLabel>
+        <skos:note xml:lang="en">Western classical or art music of any type, sacred or secular, for voices and/or instruments.</skos:note>
+        <dcterms:dateSubmitted>2014-12-03T11:15:03Z</dcterms:dateSubmitted>
+        <dcterms:modified>2016-01-13T12:31:53Z</dcterms:modified>
+    </rdf:Description>
 </rdf:RDF>
-

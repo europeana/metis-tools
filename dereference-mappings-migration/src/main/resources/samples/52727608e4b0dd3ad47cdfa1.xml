@@ -1,49 +1,72 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:void="http://rdfs.org/ns/void#" xmlns:owl="http://www.w3.org/2002/07/owl#"
-	xmlns:viaf="http://viaf.org/ontology/1.1/#" xmlns:foaf="http://xmlns.com/foaf/0.1/"
-	xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#"
-	xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	xmlns:rdaEnt="http://rdvocab.info/uri/schema/FRBRentitiesRDA/"
-	xml:base="http://viaf.org/">
-	<foaf:Document rdf:about="http://viaf.org/viaf/13114421/">
-		<void:inDataset rdf:resource="http://viaf.org/viaf/data" />
-		<foaf:primaryTopic rdf:resource="http://viaf.org/viaf/13114421" />
-	</foaf:Document>
-	<rdf:Description rdf:about="http://viaf.org/viaf/13114421">
-		<!--The primary entity (formerly a viaf:NameAuthorityCluster) -->
-		<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person" />
-		<rdf:type rdf:resource="http://rdvocab.info/uri/schema/FRBRentitiesRDA/Person" />
-		<foaf:name>Lončarić, Zvonimir 1927-</foaf:name>
-		<foaf:name>Loncaric, Zvonimir</foaf:name>
-		<rdaGr2:dateOfBirth>1927-03-13</rdaGr2:dateOfBirth>
-		<rdaGr2:dateOfDeath>2004-11-11</rdaGr2:dateOfDeath>
-		<owl:sameAs rdf:resource="http://dbpedia.org/resource/Zvonimir_Lončarić" />
-		<owl:sameAs rdf:resource="http://d-nb.info/gnd/119275236" />
-	</rdf:Description>
-	<!--Controlled and alternate headings from various authority files -->
-	<skos:Concept
-		rdf:about="http://viaf.org/viaf/sourceID/WKP%7CZvonimir_Lončarić#skos:Concept">
-		<skos:inScheme rdf:resource="http://viaf.org/authorityScheme/WKP" />
-		<skos:prefLabel>Loncaric, Zvonimir</skos:prefLabel>
-		<foaf:focus rdf:resource="http://viaf.org/viaf/13114421" />
-	</skos:Concept>
-	<skos:Concept
-		rdf:about="http://viaf.org/viaf/sourceID/DNB%7C119275236#skos:Concept">
-		<skos:inScheme rdf:resource="http://viaf.org/authorityScheme/DNB" />
-		<skos:prefLabel>Lončarić, Zvonimir 1927-</skos:prefLabel>
-		<foaf:focus rdf:resource="http://viaf.org/viaf/13114421" />
-	</skos:Concept>
-	<!--Deprecated identifiers -->
-	<rdf:Description rdf:about="http://viaf.org/viaf/13114421/#skos:Concept">
-		<rdfs:comment>This concept identifier is deprecated. See the
-			foaf:focus link for the primary entity.</rdfs:comment>
-		<foaf:focus rdf:resource="http://viaf.org/viaf/13114421" />
-	</rdf:Description>
-	<rdf:Description rdf:about="http://viaf.org/viaf/13114421/#foaf:Person">
-		<rdfs:comment>This primary entity identifier is deprecated. See the
-			owl:sameAs link for the new identifier.</rdfs:comment>
-		<owl:sameAs rdf:resource="http://viaf.org/viaf/13114421" />
-	</rdf:Description>
+<rdf:RDF
+    xmlns:umbel="http://umbel.org/umbel#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:genont="http://www.w3.org/2006/gen/ont#"
+    xmlns:pto="http://www.productontology.org/id/"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:re="http://oclcsrw.google.code/redirect"
+    xmlns:void="http://rdfs.org/ns/void#"
+    xmlns:bgn="http://bibliograph.net/"
+    xmlns:schema="http://schema.org/"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" >
+    <rdf:Description rdf:about="http://viaf.org/viaf/sourceID/LC%7Cno2016126372#skos:Concept">
+        <foaf:focus rdf:resource="http://viaf.org/viaf/13114421"/>
+        <skos:prefLabel>Lončarić, Zvonimir, 1927-2004</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://viaf.org/authorityScheme/LC"/>
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NSK%7C000013320#skos:Concept">
+        <foaf:focus rdf:resource="http://viaf.org/viaf/13114421"/>
+        <skos:altLabel>Lončarić, Zvonko</skos:altLabel>
+        <skos:prefLabel>Lončarić, Zvonimir</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://viaf.org/authorityScheme/NSK"/>
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://viaf.org/viaf/sourceID/DNB%7C119275236#skos:Concept">
+        <foaf:focus rdf:resource="http://viaf.org/viaf/13114421"/>
+        <skos:prefLabel>Lončarić, Zvonimir 1927-</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://viaf.org/authorityScheme/DNB"/>
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://viaf.org/viaf/13114421/">
+        <foaf:primaryTopic rdf:resource="http://viaf.org/viaf/13114421"/>
+        <void:inDataset rdf:resource="http://viaf.org/viaf/data"/>
+        <rdf:type rdf:resource="http://www.w3.org/2006/gen/ont#InformationResource"/>
+        <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Document"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://viaf.org/viaf/13114421">
+        <rdf:type rdf:resource="http://schema.org/Person"/>
+        <schema:sameAs rdf:resource="http://isni.org/isni/000000001335233X"/>
+        <schema:alternateName>Zvonimir Lončarić</schema:alternateName>
+        <rdfs:comment xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+        <schema:birthDate>1927-03-13</schema:birthDate>
+        <skos:prefLabel xml:lang="hr-HR">Zvonimir Lončarić</skos:prefLabel>
+        <schema:deathDate>2004-11-11</schema:deathDate>
+        <schema:sameAs rdf:resource="http://d-nb.info/gnd/119275236"/>
+        <schema:name xml:lang="en-US">Zvonimir Lončarić</schema:name>
+        <schema:name xml:lang="de-DE">Zvonimir Lončarić</schema:name>
+        <schema:alternateName>Zvonko Lončarić</schema:alternateName>
+        <schema:sameAs rdf:resource="http://www.wikidata.org/entity/Q8075571"/>
+        <skos:prefLabel xml:lang="en-US">Zvonimir Lončarić</skos:prefLabel>
+        <skos:prefLabel xml:lang="de-DE">Zvonimir Lončarić</skos:prefLabel>
+        <schema:gender rdf:resource="http://www.wikidata.org/entity/Q6581097"/>
+        <schema:name xml:lang="en">Zvonimir Lončarić</schema:name>
+        <schema:name xml:lang="hr-HR">Zvonimir Lončarić</schema:name>
+        <schema:givenName>Zvonko</schema:givenName>
+        <schema:sameAs rdf:resource="http://id.loc.gov/authorities/names/no2016126372"/>
+        <schema:familyName>Lončarić</schema:familyName>
+        <schema:sameAs rdf:resource="http://dbpedia.org/resource/Zvonimir_Lončarić"/>
+        <dcterms:identifier>13114421</dcterms:identifier>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://viaf.org/viaf/sourceID/ISNI%7C000000001335233X#skos:Concept">
+        <foaf:focus rdf:resource="http://viaf.org/viaf/13114421"/>
+        <skos:altLabel>Zvonimir Lončarić beeldhouwer uit Kroatië (1927-2004)</skos:altLabel>
+        <skos:altLabel>Zvonimir Lončarić Croatian sculptor, painter and animated film artist</skos:altLabel>
+        <skos:altLabel>Lončarić, Zvonko</skos:altLabel>
+        <skos:prefLabel>Zvonimir Lončarić</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://viaf.org/authorityScheme/ISNI"/>
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    </rdf:Description>
 </rdf:RDF>
-

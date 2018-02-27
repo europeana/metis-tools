@@ -1,54 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:dc="http://purl.org/dc/elements/1.1/">
-<rdf:Description rdf:about="http://iconclass.org/11%28%2B5%29">
-<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
-<skos:prefLabel xml:lang="fr">Religion chrétienne (+ donateur(s), suppliant(s), avec ou sans saint(s) patron(s))</skos:prefLabel>
-<skos:prefLabel xml:lang="en">Christian religion (+ donor(s), supplicant(s), whether or not with patron saint(s))</skos:prefLabel>
-<skos:prefLabel xml:lang="de">christliche Religion (+ Stifter, Bittsteller, mit oder ohne Schutzheilige(n))</skos:prefLabel>
-<skos:prefLabel xml:lang="it">religione cristiana (+ donatore/i, supplice/i, con o senza santo/i patrono/i)</skos:prefLabel>
-<skos:prefLabel xml:lang="fi">kristinusko (+ lahjoittaja(t), suojeluspyhimyksen (-pyhimysten) kanssa tai ilman)</skos:prefLabel>
-<skos:inScheme rdf:resource="http://iconclass.org/rdf/2011/09/"/>
-<skos:notation>11(+5)</skos:notation>
-<skos:broader rdf:resource="http://iconclass.org/11"/>
-<dc:subject xml:lang="fr">donateur</dc:subject>
-<dc:subject xml:lang="fr">patron</dc:subject>
-<dc:subject xml:lang="fr">religion</dc:subject>
-<dc:subject xml:lang="fr">religion chrétienne</dc:subject>
-<dc:subject xml:lang="fr">saint</dc:subject>
-<dc:subject xml:lang="fr">suppliant</dc:subject>
-<dc:subject xml:lang="fr">supra-naturelle</dc:subject>
-<dc:subject xml:lang="en">Christian religion</dc:subject>
-<dc:subject xml:lang="en">donor</dc:subject>
-<dc:subject xml:lang="en">patron</dc:subject>
-<dc:subject xml:lang="en">religion</dc:subject>
-<dc:subject xml:lang="en">saint</dc:subject>
-<dc:subject xml:lang="en">supernatural</dc:subject>
-<dc:subject xml:lang="en">supplicant</dc:subject>
-<dc:subject xml:lang="de">Bittsteller</dc:subject>
-<dc:subject xml:lang="de">Heiliger</dc:subject>
-<dc:subject xml:lang="de">Patron</dc:subject>
-<dc:subject xml:lang="de">Religion</dc:subject>
-<dc:subject xml:lang="de">Schutzpatron</dc:subject>
-<dc:subject xml:lang="de">Stifter</dc:subject>
-<dc:subject xml:lang="de">christliche Religion</dc:subject>
-<dc:subject xml:lang="de">übernatürlich</dc:subject>
-<dc:subject xml:lang="it">donatore</dc:subject>
-<dc:subject xml:lang="it">patrono</dc:subject>
-<dc:subject xml:lang="it">religione</dc:subject>
-<dc:subject xml:lang="it">religione cristiana</dc:subject>
-<dc:subject xml:lang="it">santo/a</dc:subject>
-<dc:subject xml:lang="it">soprannaturale</dc:subject>
-<dc:subject xml:lang="it">supplice</dc:subject>
-<dc:subject xml:lang="fi">kristinusko</dc:subject>
-<dc:subject xml:lang="fi">lahjoittaja</dc:subject>
-<dc:subject xml:lang="fi">mesenaatti</dc:subject>
-<dc:subject xml:lang="fi">pyhimys</dc:subject>
-<dc:subject xml:lang="fi">rukoilija</dc:subject>
-<dc:subject xml:lang="fi">suojelija</dc:subject>
-<dc:subject xml:lang="fi">suojeluspyhimys</dc:subject>
-<dc:subject xml:lang="fi">toimeksiantaja</dc:subject>
-<dc:subject xml:lang="fi">uskonto</dc:subject>
-<dc:subject xml:lang="fi">yliluonnollinen</dc:subject>
-</rdf:Description>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+>
+    <rdf:Description rdf:about="http://iconclass.org/11%28%2B5%29">
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <skos:prefLabel xml:lang="fr">Religion chrétienne (+ donateur(s), suppliant(s), avec ou sans saint(s) patron(s))</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">Christian religion (+ donor(s), supplicant(s), whether or not with patron saint(s))</skos:prefLabel>
+        <skos:prefLabel xml:lang="de">christliche Religion (+ Stifter, Bittsteller, mit oder ohne Schutzheilige(n))</skos:prefLabel>
+        <skos:prefLabel xml:lang="it">religione cristiana (+ donatore/i, supplice/i, con o senza santo/i patrono/i)</skos:prefLabel>
+        <skos:prefLabel xml:lang="fi">kristinusko (+ lahjoittaja(t), suojeluspyhimyksen (-pyhimysten) kanssa tai ilman)</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://iconclass.org/rdf/2011/09/"/>
+        <skos:notation>11(+5)</skos:notation>
+        <skos:broader rdf:resource="http://iconclass.org/11"/>
+        <dc:subject xml:lang="fr">donateur</dc:subject>
+        <dc:subject xml:lang="fr">patron</dc:subject>
+        <dc:subject xml:lang="fr">religion</dc:subject>
+        <dc:subject xml:lang="fr">religion chrétienne</dc:subject>
+        <dc:subject xml:lang="fr">saint</dc:subject>
+        <dc:subject xml:lang="fr">suppliant</dc:subject>
+        <dc:subject xml:lang="fr">supra-naturelle</dc:subject>
+        <dc:subject xml:lang="en">Christian religion</dc:subject>
+        <dc:subject xml:lang="en">donor</dc:subject>
+        <dc:subject xml:lang="en">patron</dc:subject>
+        <dc:subject xml:lang="en">religion</dc:subject>
+        <dc:subject xml:lang="en">saint</dc:subject>
+        <dc:subject xml:lang="en">supernatural</dc:subject>
+        <dc:subject xml:lang="en">supplicant</dc:subject>
+        <dc:subject xml:lang="de">Bittsteller</dc:subject>
+        <dc:subject xml:lang="de">Heiliger</dc:subject>
+        <dc:subject xml:lang="de">Patron</dc:subject>
+        <dc:subject xml:lang="de">Religion</dc:subject>
+        <dc:subject xml:lang="de">Schutzpatron</dc:subject>
+        <dc:subject xml:lang="de">Stifter</dc:subject>
+        <dc:subject xml:lang="de">christliche Religion</dc:subject>
+        <dc:subject xml:lang="de">übernatürlich</dc:subject>
+        <dc:subject xml:lang="it">donatore</dc:subject>
+        <dc:subject xml:lang="it">patrono</dc:subject>
+        <dc:subject xml:lang="it">religione</dc:subject>
+        <dc:subject xml:lang="it">religione cristiana</dc:subject>
+        <dc:subject xml:lang="it">santo/a</dc:subject>
+        <dc:subject xml:lang="it">soprannaturale</dc:subject>
+        <dc:subject xml:lang="it">supplice</dc:subject>
+        <dc:subject xml:lang="fi">kristinusko</dc:subject>
+        <dc:subject xml:lang="fi">lahjoittaja</dc:subject>
+        <dc:subject xml:lang="fi">mesenaatti</dc:subject>
+        <dc:subject xml:lang="fi">pyhimys</dc:subject>
+        <dc:subject xml:lang="fi">rukoilija</dc:subject>
+        <dc:subject xml:lang="fi">suojelija</dc:subject>
+        <dc:subject xml:lang="fi">suojeluspyhimys</dc:subject>
+        <dc:subject xml:lang="fi">toimeksiantaja</dc:subject>
+        <dc:subject xml:lang="fi">uskonto</dc:subject>
+        <dc:subject xml:lang="fi">yliluonnollinen</dc:subject>
+    </rdf:Description>
 </rdf:RDF>
-

@@ -1,36 +1,68 @@
-<?xml version="1.0"?>
-<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:geo="http://www.opengis.net/ont/geosparql#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:sf="http://www.opengis.net/ont/sf#" xmlns:isbd="http://iflastandards.info/ns/isbd/elements/" xmlns:gndo="http://d-nb.info/standards/elementset/gnd#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:marcRole="http://id.loc.gov/vocabulary/relators/" xmlns:lib="http://purl.org/library/" xmlns:umbel="http://umbel.org/umbel#" xmlns:rdau="http://rdaregistry.info/Elements/u/" xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:skos="http://www.w3.org/2004/02/skos/core#">
-<rdf:Description rdf:about="http://d-nb.info/gnd/100000541">
-<rdf:type rdf:resource="http://d-nb.info/standards/elementset/gnd#DifferentiatedPerson"/>
-<owl:sameAs rdf:resource="http://viaf.org/viaf/12624856"/>
-<gndo:gndIdentifier>100000541</gndo:gndIdentifier>
-<gndo:oldAuthorityNumber>(DE-588a)100000541</gndo:oldAuthorityNumber>
-<gndo:variantNameForThePerson>Mosca, Gioseppe</gndo:variantNameForThePerson>
-<gndo:variantNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:forename>Gioseppe</gndo:forename>
-    <gndo:surname>Mosca</gndo:surname>
-</gndo:variantNameEntityForThePerson>
-<gndo:preferredNameForThePerson>Mosca, Giuseppe</gndo:preferredNameForThePerson>
-<gndo:preferredNameEntityForThePerson rdf:parseType="Resource">
-    <gndo:forename>Giuseppe</gndo:forename>
-    <gndo:surname>Mosca</gndo:surname>
-</gndo:preferredNameEntityForThePerson>
-<gndo:professionOrOccupationAsLiteral>Komponist</gndo:professionOrOccupationAsLiteral>
-<gndo:professionOrOccupationAsLiteral>Musiker</gndo:professionOrOccupationAsLiteral>
-<gndo:geographicAreaCode rdf:resource="http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-IT"/>
-<gndo:publication>Mosca, Giuseppe: L' amore e l'armi. - 1815</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: Emira, regina d'Egitto. - 1821</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: Emira, regina d'Egitto. - 1824</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: La gioventu&#x300; d'Enrico V.. - 1818</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: I tre mariti. - 1814</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: La poetessa errante. - 1822</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: La fortunata combinazione. - 1802</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: La dama locandiera ossia L'albergo de'pitocchi. - 1822</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: Le bestie in uomimi. - 1812</gndo:publication>
-<gndo:publication>Mosca, Giuseppe: Avviso al pubblico. - 1814</gndo:publication>
-<gndo:gender rdf:resource="http://d-nb.info/standards/vocab/gnd/Gender#notKnown"/>
-<gndo:dateOfBirth rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1772</gndo:dateOfBirth>
-<gndo:dateOfDeath rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1839</gndo:dateOfDeath>
-</rdf:Description>
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:schema="http://schema.org/"
+	xmlns:gndo="http://d-nb.info/standards/elementset/gnd#"
+	xmlns:lib="http://purl.org/library/"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:geo="http://www.opengis.net/ont/geosparql#"
+	xmlns:umbel="http://umbel.org/umbel#"
+	xmlns:rdau="http://rdaregistry.info/Elements/u/"
+	xmlns:sf="http://www.opengis.net/ont/sf#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:vivo="http://vivoweb.org/ontology/core#"
+	xmlns:isbd="http://iflastandards.info/ns/isbd/elements/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:mo="http://purl.org/ontology/mo/"
+	xmlns:marcRole="http://id.loc.gov/vocabulary/relators/"
+	xmlns:dnba="http://d-nb.info/standards/elementset/agrelon#"
+	xmlns:dcmitype="http://purl.org/dc/dcmitype/"
+	xmlns:dbp="http://dbpedia.org/property/"
+	xmlns:dnbt="http://d-nb.info/standards/elementset/dnb#"
+	xmlns:dnb_intern="http://dnb.de/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:v="http://www.w3.org/2006/vcard/ns#"
+	xmlns:ebu="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:gbv="http://purl.org/ontology/gbv/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <rdf:Description rdf:about="http://d-nb.info/gnd/100000541">
+        <rdf:type rdf:resource="http://d-nb.info/standards/elementset/gnd#DifferentiatedPerson"/>
+        <gndo:gndIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">100000541</gndo:gndIdentifier>
+        <owl:sameAs rdf:resource="http://viaf.org/viaf/12624856"/>
+        <gndo:oldAuthorityNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(DE-588a)100000541</gndo:oldAuthorityNumber>
+        <gndo:variantNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Gioseppe</gndo:variantNameForThePerson>
+        <gndo:variantNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c5o0opmlx12312765">
+                <gndo:forename rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gioseppe</gndo:forename>
+                <gndo:surname rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca</gndo:surname>
+            </rdf:Description>
+        </gndo:variantNameEntityForThePerson>
+        <gndo:preferredNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe</gndo:preferredNameForThePerson>
+        <gndo:preferredNameEntityForThePerson>
+            <rdf:Description rdf:nodeID="node1c5o0opmlx12312766">
+                <gndo:forename rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Giuseppe</gndo:forename>
+                <gndo:surname rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca</gndo:surname>
+            </rdf:Description>
+        </gndo:preferredNameEntityForThePerson>
+        <gndo:familialRelationship rdf:resource="http://d-nb.info/gnd/1079102868"/>
+        <dnba:hasSibling rdf:resource="http://d-nb.info/gnd/1079102868"/>
+        <gndo:professionOrOccupation rdf:resource="http://d-nb.info/gnd/4032009-1"/>
+        <gndo:professionOrOccupation rdf:resource="http://d-nb.info/gnd/4040841-3"/>
+        <gndo:geographicAreaCode rdf:resource="http://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-IT"/>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: L' amore e l'armi. - 1815</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: Emira, regina d'Egitto. - 1821</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: Emira, regina d'Egitto. - 1824</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: La gioventù d'Enrico V.. - 1818</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: I tre mariti. - 1814</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: La poetessa errante. - 1822</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: La fortunata combinazione. - 1802</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: La dama locandiera ossia L'albergo de'pitocchi. - 1822</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: Le bestie in uomimi. - 1812</gndo:publication>
+        <gndo:publication rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mosca, Giuseppe: Avviso al pubblico. - 1814</gndo:publication>
+        <gndo:gender rdf:resource="http://d-nb.info/standards/vocab/gnd/gender#notKnown"/>
+        <gndo:dateOfBirth rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1772</gndo:dateOfBirth>
+        <gndo:dateOfDeath rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1839</gndo:dateOfDeath>
+    </rdf:Description>
 </rdf:RDF>
-

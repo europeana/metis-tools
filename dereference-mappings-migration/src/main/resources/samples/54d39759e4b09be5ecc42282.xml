@@ -15,12 +15,12 @@
     <skos:Concept rdf:about="http://partage.vocnet.org/part00036">
         <skos:prefLabel xml:lang="no">arbeid på papir</skos:prefLabel>
         <skos:altLabel xml:lang="de">Arbeit auf Papier</skos:altLabel>
-        <skos:altLabel xml:lang="de">Arbeiten auf Papier (visuelle Werke)</skos:altLabel>
+        <skos:altLabel xml:lang="de">Arbeiten auf Papier (Visuelle Werke)</skos:altLabel>
         <skos:altLabel xml:lang="sl">dela na papirju</skos:altLabel>
         <skos:prefLabel xml:lang="sl">delo na papirju</skos:prefLabel>
-        <skos:altLabel xml:lang="de">Grafik (visuelles Werk)</skos:altLabel>
+        <skos:altLabel xml:lang="de">Grafik (Visuelles Werk)</skos:altLabel>
         <skos:altLabel xml:lang="de">Grafiken</skos:altLabel>
-        <skos:prefLabel xml:lang="de">Graphik (visuelles Werk)</skos:prefLabel>
+        <skos:prefLabel xml:lang="de">Graphik (Visuelles Werk)</skos:prefLabel>
         <skos:altLabel xml:lang="de">Graphiken</skos:altLabel>
         <skos:prefLabel xml:lang="sv">konst på papper</skos:prefLabel>
         <skos:altLabel xml:lang="de">Kunst auf Papier</skos:altLabel>
