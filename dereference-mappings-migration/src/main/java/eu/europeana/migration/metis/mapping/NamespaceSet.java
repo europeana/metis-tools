@@ -19,14 +19,15 @@ public enum NamespaceSet {
 
   /** The set that is used for output documents (after applying the XSL transformation). **/
   GENERAL_OUTPUT(namespaceSet -> {
-    addToSet(namespaceSet, Namespace.XML.getPrefix(), Namespace.XML.getUri());
-    addToSet(namespaceSet, Namespace.RDF.getPrefix(), Namespace.RDF.getUri());
-    addToSet(namespaceSet, Namespace.EDM.getPrefix(), Namespace.EDM.getUri());
-    addToSet(namespaceSet, Namespace.OWL.getPrefix(), Namespace.OWL.getUri());
-    addToSet(namespaceSet, Namespace.SKOS.getPrefix(), Namespace.SKOS.getUri());
-    addToSet(namespaceSet, Namespace.WGS84_POS.getPrefix(), Namespace.WGS84_POS.getUri());
-    addToSet(namespaceSet, Namespace.FOAF.getPrefix(), Namespace.FOAF.getUri());
-    addToSet(namespaceSet, Namespace.RDAGR2.getPrefix(), Namespace.RDAGR2.getUri());
+    // Add the namespaces themselves so to make use of the capitalization functionality.
+    namespaceSet.add(Namespace.XML);
+    namespaceSet.add(Namespace.RDF);
+    namespaceSet.add(Namespace.EDM);
+    namespaceSet.add(Namespace.OWL);
+    namespaceSet.add(Namespace.SKOS);
+    namespaceSet.add(Namespace.WGS84_POS);
+    namespaceSet.add(Namespace.FOAF);
+    namespaceSet.add(Namespace.RDAGR2);
   }),
 
   /** The set that is always allowed for input data (regardless of the source). **/

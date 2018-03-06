@@ -12,16 +12,16 @@ import eu.europeana.migration.metis.utils.Namespace;
 public enum Type {
 
   /** The agent type. **/
-  AGENT(new Element(Namespace.EDM, "agent"), "ag_", ContextualClass.AGENT),
+  AGENT(new Element(Namespace.EDM, "Agent"), "ag_", ContextualClass.AGENT),
 
   /** The timespan type. **/
-  TIMESPAN(new Element(Namespace.EDM, "timespan"), "ts_", ContextualClass.TIMESPAN),
+  TIMESPAN(new Element(Namespace.EDM, "Timespan"), "ts_", ContextualClass.TIMESPAN),
 
   /** The place type. **/
-  PLACE(new Element(Namespace.EDM, "place"), "pl_", ContextualClass.PLACE),
+  PLACE(new Element(Namespace.EDM, "Place"), "pl_", ContextualClass.PLACE),
 
   /** The concept type. **/
-  CONCEPT(new Element(Namespace.SKOS, "concept"), "cc_", ContextualClass.CONCEPT);
+  CONCEPT(new Element(Namespace.SKOS, "Concept"), "cc_", ContextualClass.CONCEPT);
 
   private static final String PLACEHOLDER_SEPARATOR = "_";
 
@@ -77,7 +77,7 @@ public enum Type {
    */
   public static Type getTypeForTag(String tagPlaceholder) {
     for (Type type : values()) {
-      if (type.mainTag.toString(PLACEHOLDER_SEPARATOR).equals(tagPlaceholder)
+      if (type.mainTag.toString(PLACEHOLDER_SEPARATOR).equalsIgnoreCase(tagPlaceholder)
           || tagPlaceholder.startsWith(type.typePrefix)) {
         return type;
       }
@@ -96,7 +96,7 @@ public enum Type {
       NamespaceCollection namespaceCollection) {
     final Type type = getTypeForTag(tagPlaceholder);
     final String tagName;
-    if (type.mainTag.toString(PLACEHOLDER_SEPARATOR).equals(tagPlaceholder)) {
+    if (type.mainTag.toString(PLACEHOLDER_SEPARATOR).equalsIgnoreCase(tagPlaceholder)) {
       tagName = tagPlaceholder;
     } else {
       tagName = tagPlaceholder.substring(type.typePrefix.length());

@@ -57,8 +57,6 @@ public class XSLWriter {
    **/
   public static final String TARGET_ID_PARAMETER_NAME = "targetId";
 
-  private static final String TARGET_ID_DEFAULT_VALUE = "";
-
   private static final String INCOMING_BASE_TAG = Namespace.RDF.getPrefix() + TAG_SEPARATOR + "RDF";
 
   private static final String[] SKOS_CONCEPT_CONTAINING_TAGS_NAMES = {"related", "broader",
@@ -143,7 +141,6 @@ public class XSLWriter {
     // Write input parameter for rdf:about ID.
     writer.writeStartElement(Namespace.XSL.getUri(), XSL_TAG_PARAMETER);
     writer.writeAttribute(XSL_ATTR_NAME, TARGET_ID_PARAMETER_NAME);
-    writer.writeAttribute(XSL_ATTR_SELECT, TARGET_ID_DEFAULT_VALUE);
     writer.writeEndElement();
 
     // Write output directive

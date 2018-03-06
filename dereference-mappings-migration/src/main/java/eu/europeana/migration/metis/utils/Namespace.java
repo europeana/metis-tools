@@ -29,14 +29,39 @@ public class Namespace {
       new Namespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 
   /** The EDM namespace. **/
-  public static final Namespace EDM = new Namespace("edm", "http://www.europeana.eu/schemas/edm");
+  public static final Namespace EDM = new Namespace("edm", "http://www.europeana.eu/schemas/edm/") {
+    @Override
+    public String capitalizeTagName(String tagName) {
+      switch (tagName) {
+        case "agent":
+          return "Agent";
+        case "place":
+          return "Place";
+        case "timeSpan":
+        case "timespan":
+          return "TimeSpan";
+        default:
+          return super.capitalizeTagName(tagName);
+      }
+    }
+  };
 
   /** The OWL namespace. **/
   public static final Namespace OWL = new Namespace("owl", "http://www.w3.org/2002/07/owl#");
 
   /** The SKOS namespace. **/
   public static final Namespace SKOS =
-      new Namespace("skos", "http://www.w3.org/2004/02/skos/core#");
+      new Namespace("skos", "http://www.w3.org/2004/02/skos/core#") {
+        @Override
+        public String capitalizeTagName(String tagName) {
+          switch (tagName) {
+            case "concept":
+              return "Concept";
+            default:
+              return super.capitalizeTagName(tagName);
+          }
+        }
+      };
 
   /** The WGS84_POS namespace. **/
   public static final Namespace WGS84_POS =
@@ -96,5 +121,16 @@ public class Namespace {
   @Override
   public int hashCode() {
     return prefix.hashCode();
+  }
+
+  /**
+   * Allows for capitalizing tag names that need to be capitalized. Default behavior: return the tag
+   * name unchanged. Subclasses/instances can override.
+   * 
+   * @param tagName The tag name.
+   * @return The capitalized tag name.
+   */
+  public String capitalizeTagName(String tagName) {
+    return tagName;
   }
 }

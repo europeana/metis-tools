@@ -36,7 +36,7 @@ public final class Element {
       throw new IllegalArgumentException("Tag name cannot be null or empty:" + tagName);
     }
     this.namespace = namespace;
-    this.tagName = tagName.trim();
+    this.tagName = namespace.capitalizeTagName(tagName.trim());
   }
 
   /**
