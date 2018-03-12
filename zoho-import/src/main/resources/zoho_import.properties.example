@@ -1,0 +1,8 @@
+#Mongo
+mongo.hosts=
+#mongo.hosts=
+mongo.port=
+
+#Zoho access
+zoho.base.url=
+zoho.base.authentication.token=
