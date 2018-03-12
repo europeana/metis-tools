@@ -6,7 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -18,6 +21,7 @@ import eu.europeana.enrichment.service.EntityService;
 import eu.europeana.enrichment.service.exception.ZohoAccessException;
 import eu.europeana.enrichment.service.zoho.ZohoAccessService;
 import eu.europeana.metis.authentication.dao.ZohoAccessClientDao;
+import eu.europeana.metis.authentication.dao.ZohoApiFields;
 
 /**
  * This class performs the import of organizations from Zoho to Metis.
@@ -44,6 +48,18 @@ public class OrganizationImporter {
 	 */
 	public static void main(String[] args) {
 		OrganizationImporter importer = new OrganizationImporter();
+		
+		Date lastRun = null;
+		if(args.length > 0){
+			SimpleDateFormat format = new SimpleDateFormat(ZohoApiFields.ZOHO_TIME_FORMAT);
+			try {
+				lastRun = format.parse(args[0]);
+			} catch (ParseException e) {
+				LOGGER.error("First argument must be a date formated as: " + ZohoApiFields.ZOHO_TIME_FORMAT, e);
+				return;//the job cannot be run
+			}
+		}
+		
 		try {
 			importer.init();
 		} catch (Exception e) {
@@ -52,14 +68,14 @@ public class OrganizationImporter {
 		}
 			
 		try {
-			importer.run();
+			importer.run(lastRun);
 		} catch (Exception exception) {
 			LOGGER.error("The import job failed!" + exception);
 			LOGGER.info("Successfully imported organizations: " + importer.importedOrgs);
 		}
 	}
 
-	public void run() throws ZohoAccessException {
+	public void run(Date lastRun) throws ZohoAccessException {
 		
 		List<Organization> orgList;
 		int start = 1;
@@ -67,7 +83,7 @@ public class OrganizationImporter {
 		boolean hasNext = true;
 		//zoho doesn't return the number of organizations in get response. 
 		while(hasNext){
-			orgList = zohoAccessService.getOrganizations(start, rows);
+			orgList = zohoAccessService.getOrganizations(start, rows, lastRun);
 			importedOrgs += storeOrganizations(orgList);
 			start += rows;
 			//if no more orgaizations exist in Zoho 
