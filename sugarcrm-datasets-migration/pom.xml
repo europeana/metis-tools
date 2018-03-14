@@ -13,7 +13,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.1</version>
+        <version>${version.maven.compiler.plugin}</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
@@ -28,19 +28,57 @@
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>4.1</version>
+      <version>${version.opencsv}</version>
     </dependency>
     <dependency>
       <artifactId>metis-core-common</artifactId>
       <groupId>eu.europeana.metis</groupId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${version.metis}</version>
     </dependency>
     <dependency>
       <artifactId>metis-core-service</artifactId>
       <groupId>eu.europeana.metis</groupId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${version.metis}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${version.slf4j}</version>
+    </dependency>
+    <!-- Binding for Log4J -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>${version.log4j}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Log4j API and Core implementation required for binding -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${version.log4j}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${version.log4j}</version>
     </dependency>
   </dependencies>
+
+  <properties>
+    <version.maven.compiler.plugin>3.6.1</version.maven.compiler.plugin>
+    <version.opencsv>4.1</version.opencsv>
+    <version.metis>1.0-SNAPSHOT</version.metis>
+    <!-- These two versions are interdependent. -->
+    <version.slf4j>1.7.25</version.slf4j>
+    <version.log4j>2.9.1</version.log4j>
+  </properties>
 
 
 </project>

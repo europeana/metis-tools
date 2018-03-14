@@ -2,6 +2,9 @@ organization.id=
 organization.name=
 user.id=
 datasets.csv.path=
+#mode is CREATE or DELETE and the file with the datasetIds should be specified
+mode=
+datasets.ids.path=
 
 #Truststore
 truststore.path=

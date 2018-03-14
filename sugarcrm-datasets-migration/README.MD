@@ -33,5 +33,9 @@ NM -> OaipmhHarvestPluginMetadata.fromDate
 NM -> OaipmhHarvestPluginMetadata.untilDate
 
 If "Harvesting Type" Column 75 is not "oai_pmh", then no harvesting information will be added
-since at the time of writing http metadata are not ready so these will be bypassed. 
+since at the time of writing http metadata are not ready.
+
+
+**Updating configuration**  
+A migration.properties file should be created under src/main/resources and the relative parameters should be populated. 
 
