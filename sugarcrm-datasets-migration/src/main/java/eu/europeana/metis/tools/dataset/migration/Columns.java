@@ -1,6 +1,7 @@
-package eu.europeana.metis.tools;
+package eu.europeana.metis.tools.dataset.migration;
 
 /**
+ * The columns from the csv that are to be used.
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2018-03-13
  */
