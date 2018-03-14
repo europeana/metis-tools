@@ -16,9 +16,10 @@ import org.slf4j.LoggerFactory;
 public class DatasetsMigrationMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DatasetsMigrationMain.class);
+  private static final String CONFIGURATION_FILE = "migration.properties";
 
   public static void main(String[] args) throws TrustStoreConfigurationException {
-    PropertiesHolder propertiesHolder = new PropertiesHolder("migration.properties");
+    PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting migration script");
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "Append default truststore with custom truststore");
