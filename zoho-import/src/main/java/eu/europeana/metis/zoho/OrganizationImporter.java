@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,7 @@ public class OrganizationImporter {
 					lastRun = parseDate(args[1]);
 					break;
 				default:
-					throw new IllegalArgumentException("Invalid import type. Check command line arguments: " + args);			
+					throw new IllegalArgumentException("Invalid import type. Check command line arguments: " + StringUtils.join(args, ' '));			
 			}
 		}else{
 			throw new IllegalArgumentException("The import type is mandatory! Please provide one of the following as command like argument: " 
