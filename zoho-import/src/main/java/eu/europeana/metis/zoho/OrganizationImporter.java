@@ -25,7 +25,8 @@ import eu.europeana.metis.authentication.dao.ZohoApiFields;
 
 /**
  * This class performs the import of organizations from Zoho to Metis.
- * 
+ * The import type is mandatory as first command line argument, using one of {@link #IMPORT_FULL}, {@link #IMPORT_INCREMENTAL} or {@link #IMPORT_DATE}   
+ * If type is {@link #IMPORT_DATE} second argument needs to be a date provided in Zoho time format, see {@link ZohoApiFields#ZOHO_TIME_FORMAT}
  * @author GordeaS
  *
  */
@@ -37,6 +38,11 @@ public class OrganizationImporter {
 	private static final String PROPERTIES_FILE = "/zoho_import.properties";
 	List<String> failedIports = new ArrayList<String>();
 	int importedOrgs = 0;
+	
+	public static final String IMPORT_FULL = "full";
+	public static final String IMPORT_INCREMENTAL = "incremental";
+	public static final String IMPORT_DATE = "date";
+	private boolean incrementalImport = false;
 	
 	/**
 	 * The main method performing the vocabulary mappings.
@@ -51,14 +57,26 @@ public class OrganizationImporter {
 		
 		Date lastRun = null;
 		if(args.length > 0){
-			SimpleDateFormat format = new SimpleDateFormat(ZohoApiFields.ZOHO_TIME_FORMAT);
-			try {
-				lastRun = format.parse(args[0]);
-			} catch (ParseException e) {
-				LOGGER.error("First argument must be a date formated as: " + ZohoApiFields.ZOHO_TIME_FORMAT, e);
-				return;//the job cannot be run
+			switch(args[0]){
+				case IMPORT_FULL:
+					lastRun = new Date(0);
+					break;
+				case IMPORT_INCREMENTAL:
+					importer.incrementalImport = true;
+					break;
+				case IMPORT_DATE:
+					if(args.length == 1)
+						throw new IllegalArgumentException("A date must be provided when import type is: " + IMPORT_DATE);
+					lastRun = parseDate(args[1]);
+					break;
+				default:
+					throw new IllegalArgumentException("Invalid import type. Check command line arguments: " + args);			
 			}
+		}else{
+			throw new IllegalArgumentException("The import type is mandatory! Please provide one of the following as command like argument: " 
+					+ args);
 		}
+		
 		
 		try {
 			importer.init();
@@ -75,18 +93,35 @@ public class OrganizationImporter {
 		}
 	}
 
+	private static Date parseDate(String dateString) {
+		SimpleDateFormat format = new SimpleDateFormat(ZohoApiFields.ZOHO_TIME_FORMAT);
+		try {
+			return format.parse(dateString);
+		} catch (ParseException e) {
+			String message = "When first argument is: " + IMPORT_DATE + "the second argument must be a date formated as: " + ZohoApiFields.ZOHO_TIME_FORMAT;
+			throw new IllegalArgumentException(message, e); 
+		}
+	}
+
 	public void run(Date lastRun) throws ZohoAccessException {
+		
+		if(incrementalImport){
+			//TODO implement last modified date
+			//lastRun = entityService.getLastModifiedDate();
+			long yesterday = System.currentTimeMillis() - 86400000;
+			lastRun = new Date(yesterday);
+		}
 		
 		List<Organization> orgList;
 		int start = 1;
 		final int rows = 100;
 		boolean hasNext = true;
-		//zoho doesn't return the number of organizations in get response. 
+		//Zoho doesn't return the number of organizations in get response. 
 		while(hasNext){
 			orgList = zohoAccessService.getOrganizations(start, rows, lastRun);
 			importedOrgs += storeOrganizations(orgList);
 			start += rows;
-			//if no more orgaizations exist in Zoho 
+			//if no more organizations exist in Zoho 
 			if(orgList.size() < rows)
 				hasNext = false;
 		}
