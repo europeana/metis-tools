@@ -5,4 +5,4 @@ mongo.port=
 
 #Zoho access
 zoho.base.url=
-zoho.base.authentication.token=
+zoho.authentication.token=

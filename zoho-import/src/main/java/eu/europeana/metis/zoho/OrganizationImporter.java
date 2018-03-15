@@ -147,8 +147,11 @@ public class OrganizationImporter {
 	public void init() throws Exception {
 		Properties appProps = loadProperties(PROPERTIES_FILE);
 		String zohoBaseUrl = appProps.getProperty("zoho.base.url");
-		String token = appProps.getProperty("zoho.base.authentication.token");
 		LOGGER.info("using zoho base URL: " + zohoBaseUrl);
+		String token = appProps.getProperty("zoho.authentication.token");
+		if(token == null || token.length() < 6)
+			throw new IllegalArgumentException("zoho.authentication.token is invalid: " + token);
+		LOGGER.info("using zoho zoho authentication token: " + token.substring(0, 3) + "...");
 		
 		ZohoAccessClientDao zohoAccessClientDao = new ZohoAccessClientDao(zohoBaseUrl,
 				token);
