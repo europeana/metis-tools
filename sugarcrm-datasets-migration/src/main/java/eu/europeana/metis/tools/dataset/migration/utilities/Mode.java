@@ -1,4 +1,4 @@
-package eu.europeana.metis.tools.dataset.migration;
+package eu.europeana.metis.tools.dataset.migration.utilities;
 
 /**
  * The Mode that is used to run the script

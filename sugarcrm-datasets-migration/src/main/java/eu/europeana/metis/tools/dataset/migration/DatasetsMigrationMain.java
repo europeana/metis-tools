@@ -2,6 +2,9 @@ package eu.europeana.metis.tools.dataset.migration;
 
 import eu.europeana.metis.core.dao.DatasetDao;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.tools.dataset.migration.utilities.ExecutorManager;
+import eu.europeana.metis.tools.dataset.migration.utilities.MongoInitializer;
+import eu.europeana.metis.tools.dataset.migration.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;

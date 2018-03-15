@@ -1,4 +1,4 @@
-package eu.europeana.metis.tools.dataset.migration;
+package eu.europeana.metis.tools.dataset.migration.utilities;
 
 import java.io.FileInputStream;
 import java.io.IOException;

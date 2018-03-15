@@ -1,4 +1,4 @@
-package eu.europeana.metis.tools.dataset.migration;
+package eu.europeana.metis.tools.dataset.migration.utilities;
 
 /**
  * The columns from the csv that are to be used.

@@ -1,4 +1,4 @@
-package eu.europeana.metis.tools.dataset.migration;
+package eu.europeana.metis.tools.dataset.migration.utilities;
 
 import com.opencsv.CSVReader;
 import eu.europeana.metis.core.common.Country;
@@ -116,7 +116,7 @@ public class ExecutorManager {
     dataset.setOrganizationId(propertiesHolder.organizationId);
     dataset.setOrganizationName(propertiesHolder.organizationName);
     dataset.setCreatedByUserId(propertiesHolder.userId);
-    SimpleDateFormat dateFormat = new SimpleDateFormat(propertiesHolder.SUGARCRM_DATE_FORMAT);
+    SimpleDateFormat dateFormat = new SimpleDateFormat(PropertiesHolder.SUGARCRM_DATE_FORMAT);
     dataset.setCreatedDate(dateFormat.parse(line[Columns.DATE_CREATED.getIndex()].trim()));
     dataset.setCountry(
         Country.getCountryFromIsoCode(line[Columns.DATASET_COUNTRY_CODE.getIndex()].trim()));
