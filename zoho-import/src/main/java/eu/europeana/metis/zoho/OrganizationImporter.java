@@ -146,8 +146,13 @@ public class OrganizationImporter {
 
 	public void init() throws Exception {
 		Properties appProps = loadProperties(PROPERTIES_FILE);
-		ZohoAccessClientDao zohoAccessClientDao = new ZohoAccessClientDao(appProps.getProperty("zoho.base.url"),
-				appProps.getProperty("zoho.base.authentication.token"));
+		String zohoBaseUrl = appProps.getProperty("zoho.base.url");
+		String token = appProps.getProperty("zoho.base.authentication.token");
+		LOGGER.info("using zoho base URL: " + zohoBaseUrl);
+		
+		ZohoAccessClientDao zohoAccessClientDao = new ZohoAccessClientDao(zohoBaseUrl,
+				token);
+		
 		zohoAccessService = new ZohoAccessService(zohoAccessClientDao);
 
 		String mongoHost = appProps.getProperty("mongo.hosts");
