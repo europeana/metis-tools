@@ -12,6 +12,18 @@
       <MarkerFilter marker="FAILED_CSV_LINES" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>
+    <File name="FailedCsvLinesLetterOnId" fileName="./logs/FailedCsvLinesLetterOnId-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="FAILED_CSV_LINES_LETTER_ON_ID" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
+    <File name="FailedCsvLinesDatasetAlreadyExists" fileName="./logs/FailedCsvLinesDatasetAlreadyExists-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="FAILED_CSV_LINES_DATASET_ALREADY_EXISTS" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
+    <File name="LeadingZerosDatasetIds" fileName="./logs/LeadingZerosDatasetIds-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="LEADING_ZEROS_DATASET_IDS" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
     <File name="SuccessfulDatasetIds" fileName="./logs/successfulDatasetIds-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="SUCCESSFULL_DATASET_IDS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
@@ -23,6 +35,9 @@
       <AppenderRef ref="Console"/>
       <AppenderRef ref="ExecutionLogs"/>
       <AppenderRef ref="FailedCsvLines"/>
+      <AppenderRef ref="FailedCsvLinesLetterOnId"/>
+      <AppenderRef ref="FailedCsvLinesDatasetAlreadyExists"/>
+      <AppenderRef ref="LeadingZerosDatasetIds"/>
       <AppenderRef ref="SuccessfulDatasetIds"/>
     </Root>
   </Loggers>

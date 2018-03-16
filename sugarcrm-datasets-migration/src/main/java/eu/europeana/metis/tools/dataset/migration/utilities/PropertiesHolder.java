@@ -16,6 +16,9 @@ import org.slf4j.MarkerFactory;
 public class PropertiesHolder {
 
   public static final Marker FAILED_CSV_LINES_MARKER = MarkerFactory.getMarker("FAILED_CSV_LINES");
+  public static final Marker FAILED_CSV_LINES_LETTER_ON_ID_MARKER = MarkerFactory.getMarker("FAILED_CSV_LINES_LETTER_ON_ID");
+  public static final Marker FAILED_CSV_LINES_DATASET_ALREADY_EXISTS_MARKER = MarkerFactory.getMarker("FAILED_CSV_LINES_DATASET_ALREADY_EXISTS");
+  public static final Marker LEADING_ZEROS_DATASET_IDS_MARKER = MarkerFactory.getMarker("LEADING_ZEROS_DATASET_IDS");
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker SUCCESSFULL_DATASET_IDS = MarkerFactory
       .getMarker("SUCCESSFULL_DATASET_IDS");
@@ -29,7 +32,7 @@ public class PropertiesHolder {
 
   public final String truststorePath;
   public final String truststorePassword;
-  public static final String SUGARCRM_DATE_FORMAT = "dd-MM-yyyy HH:mm";
+  public static final String SUGARCRM_DATE_FORMAT = "MM/dd/yyyy HH:mm";
   public final String[] mongoHosts;
   public final int[] mongoPorts;
   public final String mongoAuthenticationDb;

@@ -21,10 +21,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Handles execution of the modes and has methods to convert csv lines to {@link Dataset}
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2018-03-14
  */
 public class ExecutorManager {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
 
   private final PropertiesHolder propertiesHolder;
@@ -44,6 +46,7 @@ public class ExecutorManager {
     try (CSVReader reader = new CSVReader(new FileReader(propertiesHolder.datasetsCsvPath))) {
       String[] line;
       reader.readNext();//Bypass titles line
+      readCounter++;
       while ((line = reader.readNext()) != null) {
         readCounter++;
         convertLineToDataset(line, datasetDao);
@@ -52,9 +55,11 @@ public class ExecutorManager {
       LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Reading csv file failed ", e);
     }
 
-    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total lines read: {} ", readCounter);
-    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets stored: {} ", storedCounter);
-    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets failed: {} ", failedCounter);
+    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total lines read(including title line): {} ", readCounter);
+    LOGGER
+        .error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets stored: {} ", storedCounter);
+    LOGGER
+        .error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets failed: {} ", failedCounter);
   }
 
   public void deleteMode() {
@@ -62,11 +67,14 @@ public class ExecutorManager {
       stream.forEach(datasetId -> {
         deletedCounter++;
         datasetDao.deleteByDatasetId(Integer.parseInt(datasetId));
+        LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Counter: {}, datasetId: {}",
+            deletedCounter, datasetId);
       });
     } catch (IOException e) {
       LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Reading dataset ids file failed ", e);
     }
-    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets deleted: {} ", deletedCounter);
+    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets deleted: {} ",
+        deletedCounter);
   }
 
   private void convertLineToDataset(String[] line, DatasetDao datasetDao) {
@@ -83,18 +91,23 @@ public class ExecutorManager {
       if (dataset != null && storedDataset == null) {
         datasetDao.create(dataset);
         storedCounter++;
-        LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Dataset with datasetId: {}, created", datasetIdString);
+        LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
+            "Line: {}, Dataset with datasetId: {}, created", readCounter, datasetIdString);
         LOGGER.info(PropertiesHolder.SUCCESSFULL_DATASET_IDS, datasetIdString);
       } else if (storedDataset != null) {
-        LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER, "Dataset with datasetId: {}, already exists",
+        LOGGER.warn(PropertiesHolder.FAILED_CSV_LINES_DATASET_ALREADY_EXISTS_MARKER,
+            "Line: {}, Dataset with datasetId: {}, already exists", readCounter,
             datasetIdString);
       } else {
-        LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER, "Failed to read dataset from csv line.");
-        LOGGER.warn(PropertiesHolder.FAILED_CSV_LINES_MARKER, Arrays.toString(line));
+        LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER,
+            "Line: {}, Failed to read dataset from csv line, probably a letter at the end of the id parsing",
+            readCounter);
+        LOGGER.warn(PropertiesHolder.FAILED_CSV_LINES_LETTER_ON_ID_MARKER, Arrays.toString(line));
         failedCounter++;
       }
     } catch (ParseException e) {
-      LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER, "Failed to read dataset from csv line.");
+      LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER,
+          "Line: {}, Failed to read dataset from csv line.", readCounter);
       LOGGER.warn(PropertiesHolder.FAILED_CSV_LINES_MARKER, Arrays.toString(line));
       failedCounter++;
     }
@@ -104,11 +117,14 @@ public class ExecutorManager {
     Dataset dataset = new Dataset();
     dataset.setEcloudDatasetId(String.format("NOT_CREATED_YET-%s", UUID.randomUUID().toString()));
     //Only get the first numeric part of the Columns.NAME field
-    Pattern pattern = Pattern.compile("^(\\d+)_.*");
+    Pattern pattern = Pattern.compile("^(\\d+)_.*|^(\\d+)$");
     Matcher matcher = pattern.matcher(line[Columns.NAME.getIndex()].trim());
     if (matcher.find()) {
-      String datasetId = matcher.group(1);
+      String datasetId = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
       dataset.setDatasetId(Integer.parseInt(datasetId));
+      if (datasetId.charAt(0) == '0') {
+        LOGGER.info(PropertiesHolder.LEADING_ZEROS_DATASET_IDS_MARKER, datasetId);
+      }
     } else {
       return null;
     }
