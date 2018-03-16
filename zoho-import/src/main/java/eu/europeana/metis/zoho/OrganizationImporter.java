@@ -106,12 +106,8 @@ public class OrganizationImporter {
 
 	public void run(Date lastRun) throws ZohoAccessException {
 		
-		if(incrementalImport){
-			//TODO implement last modified date
-			//lastRun = entityService.getLastModifiedDate();
-			long yesterday = System.currentTimeMillis() - 86400000;
-			lastRun = new Date(yesterday);
-		}
+		if(incrementalImport)
+			lastRun = entityService.getLastOrganizationImportDate();
 		
 		List<Organization> orgList;
 		int start = 1;
