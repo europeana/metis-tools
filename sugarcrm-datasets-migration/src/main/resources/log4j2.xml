@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
+    </Console>
+    <File name="ExecutionLogs" fileName="./logs/execution-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="EXECUTION_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n" />
+    </File>
+    <File name="FailedCsvLines" fileName="./logs/failedCsvLines-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="FAILED_CSV_LINES" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
+    <File name="FailedCsvLinesLetterOnId" fileName="./logs/FailedCsvLinesLetterOnId-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="FAILED_CSV_LINES_LETTER_ON_ID" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
+    <File name="FailedCsvLinesDatasetAlreadyExists" fileName="./logs/FailedCsvLinesDatasetAlreadyExists-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="FAILED_CSV_LINES_DATASET_ALREADY_EXISTS" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
+    <File name="LeadingZerosDatasetIds" fileName="./logs/LeadingZerosDatasetIds-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="LEADING_ZEROS_DATASET_IDS" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
+    <File name="SuccessfulDatasetIds" fileName="./logs/successfulDatasetIds-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="SUCCESSFULL_DATASET_IDS" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
+
+  </Appenders>
+  <Loggers>
+    <Root level="INFO">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="ExecutionLogs"/>
+      <AppenderRef ref="FailedCsvLines"/>
+      <AppenderRef ref="FailedCsvLinesLetterOnId"/>
+      <AppenderRef ref="FailedCsvLinesDatasetAlreadyExists"/>
+      <AppenderRef ref="LeadingZerosDatasetIds"/>
+      <AppenderRef ref="SuccessfulDatasetIds"/>
+    </Root>
+  </Loggers>
+</Configuration>

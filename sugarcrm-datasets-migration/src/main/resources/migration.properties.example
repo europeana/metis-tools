@@ -1,0 +1,20 @@
+organization.id=
+organization.name=
+user.id=
+datasets.csv.path=
+#mode is CREATE or DELETE and the file with the datasetIds should be specified
+mode=
+datasets.ids.path=
+
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo
+mongo.hosts=
+mongo.port=
+mongo.authentication.db=
+mongo.username=
+mongo.password=
+mongo.enableSSL=
+mongo.db=
