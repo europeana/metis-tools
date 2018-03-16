@@ -52,7 +52,7 @@ public class VocabularyConversion {
         typeRules.stream().filter(rule -> !rule.matches("^<#.*>$")).collect(Collectors.toSet());
     typeRules.removeAll(urlRules);
     vocabulary.setRules(urlRules);
-    vocabulary.setTypeRules(typeRules);
+    vocabulary.setTypeRules(convertTypeRules(typeRules));
 
     // Reading and parsing element mappings and save them as XSL
     final ElementMappings elementMappings = ElementMappings.create(uimVocabulary);
@@ -65,5 +65,11 @@ public class VocabularyConversion {
     LogUtils.logInfoMessage("Mappings:");
     LogUtils.logInfoMessage(elementMappings.toString());
     return vocabulary;
+  }
+
+  private static Set<String> convertTypeRules(Set<String> uimTypeRules) {
+    // Remove < and > from type rule, and if there is a duplicated #, remove that too.
+    return uimTypeRules.stream().map(rule -> rule.substring(1, rule.length() - 1))
+        .map(rule -> rule.replace("##", "#")).collect(Collectors.toSet());
   }
 }
