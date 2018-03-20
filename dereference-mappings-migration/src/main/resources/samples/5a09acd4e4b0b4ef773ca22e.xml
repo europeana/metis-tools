@@ -1,0 +1,1985 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:aat="http://vocab.getty.edu/aat/"
+	xmlns:aat_contrib="http://vocab.getty.edu/aat/contrib/"
+	xmlns:aat_rel="http://vocab.getty.edu/aat/rel/"
+	xmlns:aat_rev="http://vocab.getty.edu/aat/rev/"
+	xmlns:aat_scopeNote="http://vocab.getty.edu/aat/scopeNote/"
+	xmlns:aat_source="http://vocab.getty.edu/aat/source/"
+	xmlns:aat_source_rev="http://vocab.getty.edu/aat/source/rev/"
+	xmlns:aat_term="http://vocab.getty.edu/aat/term/"
+	xmlns:adms="http://www.w3.org/ns/adms#"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:bio="http://purl.org/vocab/bio/0.1/"
+	xmlns:cc="http://creativecommons.org/ns#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcat="http://www.w3.org/ns/dcat#"
+	xmlns:dct="http://purl.org/dc/terms/"
+	xmlns:dctype="http://purl.org/dc/dcmitype/"
+	xmlns:fmt="http://www.w3.org/ns/formats/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:freq="http://purl.org/cld/freq/"
+	xmlns:gvp="http://vocab.getty.edu/ontology#"
+	xmlns:gvp_lang="http://vocab.getty.edu/language/"
+	xmlns:iso="http://purl.org/iso25964/skos-thes#"
+	xmlns:luc="http://www.ontotext.com/owlim/lucene#"
+	xmlns:ontogeo="http://www.ontotext.com/owlim/geo#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:prov="http://www.w3.org/ns/prov#"
+	xmlns:ptop="http://www.ontotext.com/proton/protontop#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:rr="http://www.w3.org/ns/r2rml#"
+	xmlns:rrx="http://purl.org/r2rml-ext/"
+	xmlns:schema="http://schema.org/"
+	xmlns:sd="http://www.w3.org/ns/sparql-service-description#"
+	xmlns:sesame="http://www.openrdf.org/schema/sesame#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:tgn="http://vocab.getty.edu/tgn/"
+	xmlns:tgn_contrib="http://vocab.getty.edu/tgn/contrib/"
+	xmlns:tgn_rel="http://vocab.getty.edu/tgn/rel/"
+	xmlns:tgn_rev="http://vocab.getty.edu/tgn/rev/"
+	xmlns:tgn_scopeNote="http://vocab.getty.edu/tgn/scopeNote/"
+	xmlns:tgn_source="http://vocab.getty.edu/tgn/source/"
+	xmlns:tgn_source_rev="http://vocab.getty.edu/tgn/source/rev/"
+	xmlns:tgn_term="http://vocab.getty.edu/tgn/term/"
+	xmlns:ulan="http://vocab.getty.edu/ulan/"
+	xmlns:ulan_bio="http://vocab.getty.edu/ulan/bio/"
+	xmlns:ulan_contrib="http://vocab.getty.edu/ulan/contrib/"
+	xmlns:ulan_event="http://vocab.getty.edu/ulan/event/"
+	xmlns:ulan_rel="http://vocab.getty.edu/ulan/rel/"
+	xmlns:ulan_rev="http://vocab.getty.edu/ulan/rev/"
+	xmlns:ulan_scopeNote="http://vocab.getty.edu/ulan/scopeNote/"
+	xmlns:ulan_source="http://vocab.getty.edu/ulan/source/"
+	xmlns:ulan_source_rev="http://vocab.getty.edu/ulan/source/rev/"
+	xmlns:ulan_term="http://vocab.getty.edu/ulan/term/"
+	xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
+	xmlns:vann="http://purl.org/vocab/vann/"
+	xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
+	xmlns:vdpp="http://data.lirmm.fr/ontologies/vdpp#"
+	xmlns:voaf="http://purl.org/vocommons/voaf#"
+	xmlns:voag="http://voag.linkedmodel.org/voag#"
+	xmlns:void="http://rdfs.org/ns/void#"
+	xmlns:wdrs="http://www.w3.org/2007/05/powder-s#"
+	xmlns:wgs="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	xmlns:wv="http://vocab.org/waiver/terms/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+    <gvp:Subject rdf:about="http://vocab.getty.edu/ulan/500032927">
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdf:type rdf:resource="http://vocab.getty.edu/ontology#PersonConcept"/>
+        <rdfs:label>Vermeer, Jan</rdfs:label>
+        <rdfs:label>Vermeer, Johannes</rdfs:label>
+        <rdfs:label>Jan Vermeer</rdfs:label>
+        <rdfs:label>Johannes Vermeer</rdfs:label>
+        <rdfs:label>Meer, Jan van der</rdfs:label>
+        <rdfs:label>Vermeer van Delft, Jan</rdfs:label>
+        <rdfs:label>Vermeer van Delft, Johannes</rdfs:label>
+        <rdfs:label>Vermeer van Delft, Jan Reyniersz</rdfs:label>
+        <rdfs:label>Vermeer, Johannes van Delft</rdfs:label>
+        <rdfs:label>van der Meer, Jan</rdfs:label>
+        <rdfs:label>Johannes Vermeer van Delft</rdfs:label>
+        <rdfs:label>Van der Meer, Jan</rdfs:label>
+        <rdfs:label>Van der Meer van Delft, Jan</rdfs:label>
+        <rdfs:label>Der Meer, Jan van</rdfs:label>
+        <rdfs:label>Vermeer de Delft, Jan</rdfs:label>
+        <rdfs:label>Vermer Delftskiĭ, Ĭokhannes</rdfs:label>
+        <rdfs:label>Vermer, Ĭokhannes</rdfs:label>
+        <rdfs:label>De Delfsche van der Meer</rdfs:label>
+        <rdfs:label>de Delfsche vander Meer</rdfs:label>
+        <rdfs:label>de Delftsche van der Meer</rdfs:label>
+        <rdfs:label>de Delfze van der Meer</rdfs:label>
+        <rdfs:label>Delfsche van der Meer</rdfs:label>
+        <rdfs:label>Delfter Vermeer</rdfs:label>
+        <rdfs:label>Delftsche Vermeer</rdfs:label>
+        <rdfs:label>De Meere</rdfs:label>
+        <rdfs:label>Der Delftsche v. d. Neer</rdfs:label>
+        <rdfs:label>jan der meer</rdfs:label>
+        <rdfs:label>jan van der meer der altere</rdfs:label>
+        <rdfs:label>Jan Vermeer of Delft</rdfs:label>
+        <rdfs:label>J. vander Meer van Delft</rdfs:label>
+        <rdfs:label>J. Vermeer of Delft</rdfs:label>
+        <rdfs:label>Meer, Van der, of Delft</rdfs:label>
+        <rdfs:label>van der Meer</rdfs:label>
+        <rdfs:label>Vander-Meer, de Delfet</rdfs:label>
+        <rdfs:label>Vandermeer de Delft</rdfs:label>
+        <rdfs:label>Van der Meer de Delft</rdfs:label>
+        <rdfs:label>Vander Meer de Delft</rdfs:label>
+        <rdfs:label>Vander Méer, de Delft</rdfs:label>
+        <rdfs:label>Van der Meer, of Delft</rdfs:label>
+        <rdfs:label>vander Meer van Delft</rdfs:label>
+        <rdfs:label>V. der Meer, of Delft</rdfs:label>
+        <rdfs:label>V. D. Meer</rdfs:label>
+        <rdfs:label>ver meer</rdfs:label>
+        <rdfs:label>vermeer of haarlem</rdfs:label>
+        <rdfs:label>vermeer of haarlem, jan</rdfs:label>
+        <rdfs:label>Vermeer van Delft</rdfs:label>
+        <rdfs:label>Vermeer van van Delft</rdfs:label>
+        <rdfs:seeAlso rdf:resource="http://www.getty.edu/vow/ULANFullDisplay?find=&amp;role=&amp;nation=&amp;subjectid=500032927"/>
+        <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-04-06T00:00:00</dct:created>
+        <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-05-16T00:00:00</dct:created>
+        <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1989-12-22T00:00:00</dct:created>
+        <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-05-05T00:00:00</dct:created>
+        <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-01-05T00:00:00</dct:created>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-02-05T18:03:08</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-04-03T11:58:57</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2008-10-07T14:27:50</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-05-21T11:31:46</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-16T03:59:54</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-02-18T11:41:14</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:33</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-16T03:59:57</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-11-05T18:07:46</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-02-18T11:41:17</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-03-19T14:43:58</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-07-27T11:50:35</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T14:02:57</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T15:24:36</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T15:25:26</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T15:26:51</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T15:31:10</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T08:47:40</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T09:23:10</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T10:35:09</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T11:04:47</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T11:14:38</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T12:14:51</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T12:47:11</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T12:56:46</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T13:10:30</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T13:21:13</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-05-01T09:52:25</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-08-28T13:59:38</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-08-28T14:00:34</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-11-25T11:26:20</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2004-02-02T08:05:05</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-03-28T17:41:48</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2008-10-07T14:47:51</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-08-25T09:46:03</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-08-25T09:47:35</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-08-25T09:47:57</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-03-03T12:08:02</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-09-30T15:25:04</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2015-09-17T10:05:16</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2015-09-17T10:06:46</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-03-03T12:08:03</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-02-24T14:52:29</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-11-01T14:13:25</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2008-10-07T14:27:53</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-02-24T14:52:56</dct:modified>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500090924"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500090925"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500090926"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500090928"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500090927"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501178914"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501178916"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501185799"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5503682316"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5503682317"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5503682318"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5504028666"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5504028667"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5504297031"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5504297032"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5505513547"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5505513548"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5505513549"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5505513550"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5505513551"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5505513552"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971429"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971430"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971431"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971432"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971433"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971434"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971435"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971436"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971437"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971438"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971439"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971440"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971441"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971442"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971443"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971444"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971445"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971446"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971447"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971448"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971449"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971450"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971451"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971452"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971453"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971454"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971455"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971456"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971457"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971458"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5502614008"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5506516738"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959043"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959046"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959047"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959049"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959050"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959058"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959059"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959060"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959062"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959063"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959064"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959065"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959066"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959067"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959068"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501185798"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501203203"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501493800"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501493803"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501562691"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5501740502"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5502576135"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5502614007"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5503682488"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5504028665"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5506187394"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5506187395"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5506187413"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5506516290"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5506762067"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5507190989"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5507190990"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5500959061"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5504297044"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5506516291"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5507683703"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508640633"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971506"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5503682333"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5504297049"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5505354505"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5505513580"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5507683723"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/ulan/rev/5508971540"/>
+        <gvp:broader rdf:resource="http://vocab.getty.edu/ulan/500000002"/>
+        <gvp:broaderInstantialExtended rdf:resource="http://vocab.getty.edu/ulan/500000002"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/ulan/500000002"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/ulan/500000002"/>
+        <gvp:parentString>Persons, Artists</gvp:parentString>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/scopeNote/51011"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500090924"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500090925"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500090926"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500090928"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500090927"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501178914"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501178916"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501185799"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5503682316"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5503682317"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5503682318"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5504028666"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5504028667"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5504297031"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5504297032"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5505513547"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5505513548"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5505513549"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5505513550"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5505513551"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5505513552"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971429"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971430"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971431"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971432"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971433"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971434"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971435"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971436"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971437"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971438"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971439"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971440"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971441"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971442"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971443"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971444"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971445"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971446"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971447"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971448"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971449"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971450"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971451"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971452"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971453"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971454"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971455"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971456"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971457"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971458"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5502614008"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5506516738"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959043"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959046"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959047"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959049"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959050"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959058"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959059"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959060"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959062"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959063"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959064"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959065"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959066"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959067"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959068"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501185798"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501203203"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501493800"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501493803"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501562691"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5501740502"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5502576135"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5502614007"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5503682488"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5504028665"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5506187394"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5506187395"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5506187413"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5506516290"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5506762067"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5507190989"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5507190990"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5500959061"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5504297044"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5506516291"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5507683703"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508640633"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971506"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5503682333"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5504297049"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5505354505"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5505513580"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5507683723"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/ulan/rev/5508971540"/>
+        <gvp:parentStringAbbrev>Persons, Artists</gvp:parentStringAbbrev>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">179428</gvp:displayOrder>
+        <gvp:agentType rdf:resource="http://vocab.getty.edu/aat/300025103"/>
+        <gvp:agentType rdf:resource="http://vocab.getty.edu/aat/300025904"/>
+        <gvp:agentType rdf:resource="http://vocab.getty.edu/aat/300025136"/>
+        <skos:exactMatch>
+            <rdf:Description rdf:about="http://vocab.getty.edu/ulan/500032927">
+                <skos:exactMatch rdf:resource="http://id.loc.gov/authorities/names/n79006488"/>
+                <skosxl:prefLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500090577"/>
+                <skos:prefLabel>Vermeer, Johannes</skos:prefLabel>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500637491"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500090570"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500090575"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500090572"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500090573"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500090574"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500090578"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500090571"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500465195"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500569691"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500775325"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500775328"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500775329"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500775330"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500775331"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500775332"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984156"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984178"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984172"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984177"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984166"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984179"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984167"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984160"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984168"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984157"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984151"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984170"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984173"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984171"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984169"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984152"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984163"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984155"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984161"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984162"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984165"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984154"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984175"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984159"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984153"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984158"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984180"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984181"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984174"/>
+                <skosxl:altLabel rdf:resource="http://vocab.getty.edu/ulan/term/1500984176"/>
+                <skos:altLabel>Vermeer, Jan</skos:altLabel>
+                <skos:altLabel>Jan Vermeer</skos:altLabel>
+                <skos:altLabel>Johannes Vermeer</skos:altLabel>
+                <skos:altLabel>Meer, Jan van der</skos:altLabel>
+                <skos:altLabel>Vermeer van Delft, Jan</skos:altLabel>
+                <skos:altLabel>Vermeer van Delft, Johannes</skos:altLabel>
+                <skos:altLabel>Vermeer van Delft, Jan Reyniersz</skos:altLabel>
+                <skos:altLabel>Vermeer, Johannes van Delft</skos:altLabel>
+                <skos:altLabel>van der Meer, Jan</skos:altLabel>
+                <skos:altLabel>Johannes Vermeer van Delft</skos:altLabel>
+                <skos:altLabel>Van der Meer, Jan</skos:altLabel>
+                <skos:altLabel>Van der Meer van Delft, Jan</skos:altLabel>
+                <skos:altLabel>Der Meer, Jan van</skos:altLabel>
+                <skos:altLabel>Vermeer de Delft, Jan</skos:altLabel>
+                <skos:altLabel>Vermer Delftskiĭ, Ĭokhannes</skos:altLabel>
+                <skos:altLabel>Vermer, Ĭokhannes</skos:altLabel>
+                <skos:altLabel>De Delfsche van der Meer</skos:altLabel>
+                <skos:altLabel>de Delfsche vander Meer</skos:altLabel>
+                <skos:altLabel>de Delftsche van der Meer</skos:altLabel>
+                <skos:altLabel>de Delfze van der Meer</skos:altLabel>
+                <skos:altLabel>Delfsche van der Meer</skos:altLabel>
+                <skos:altLabel>Delfter Vermeer</skos:altLabel>
+                <skos:altLabel>Delftsche Vermeer</skos:altLabel>
+                <skos:altLabel>De Meere</skos:altLabel>
+                <skos:altLabel>Der Delftsche v. d. Neer</skos:altLabel>
+                <skos:altLabel>jan der meer</skos:altLabel>
+                <skos:altLabel>jan van der meer der altere</skos:altLabel>
+                <skos:altLabel>Jan Vermeer of Delft</skos:altLabel>
+                <skos:altLabel>J. vander Meer van Delft</skos:altLabel>
+                <skos:altLabel>J. Vermeer of Delft</skos:altLabel>
+                <skos:altLabel>Meer, Van der, of Delft</skos:altLabel>
+                <skos:altLabel>van der Meer</skos:altLabel>
+                <skos:altLabel>Vander-Meer, de Delfet</skos:altLabel>
+                <skos:altLabel>Vandermeer de Delft</skos:altLabel>
+                <skos:altLabel>Van der Meer de Delft</skos:altLabel>
+                <skos:altLabel>Vander Meer de Delft</skos:altLabel>
+                <skos:altLabel>Vander Méer, de Delft</skos:altLabel>
+                <skos:altLabel>Van der Meer, of Delft</skos:altLabel>
+                <skos:altLabel>vander Meer van Delft</skos:altLabel>
+                <skos:altLabel>V. der Meer, of Delft</skos:altLabel>
+                <skos:altLabel>V. D. Meer</skos:altLabel>
+                <skos:altLabel>ver meer</skos:altLabel>
+                <skos:altLabel>vermeer of haarlem</skos:altLabel>
+                <skos:altLabel>vermeer of haarlem, jan</skos:altLabel>
+                <skos:altLabel>Vermeer van Delft</skos:altLabel>
+                <skos:altLabel>Vermeer van van Delft</skos:altLabel>
+                <gvp:broaderInstantial rdf:resource="http://vocab.getty.edu/ulan/500000002"/>
+                <gvp:broaderPreferred rdf:resource="http://vocab.getty.edu/ulan/500000002"/>
+                <gvp:prefLabelGVP rdf:resource="http://vocab.getty.edu/ulan/term/1500090577"/>
+                <skos:inScheme rdf:resource="http://vocab.getty.edu/ulan/"/>
+                <skos:scopeNote rdf:resource="http://vocab.getty.edu/ulan/scopeNote/51011"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000001"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000002"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000130"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000005"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000189"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000016"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+                <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000256"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100000048"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100039894"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100041030"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100041042"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100041062"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042297"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043542"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100045787"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100046495"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100153925"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100153979"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100154640"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100156731"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042617-subject-500032927"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100145356-subject-500032927"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-subject-500032927"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100156395-subject-500032927"/>
+                <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100156593-subject-500032927"/>
+                <gvp:agentTypePreferred rdf:resource="http://vocab.getty.edu/aat/300025103"/>
+                <gvp:agentTypeNonPreferred rdf:resource="http://vocab.getty.edu/aat/300025904"/>
+                <gvp:agentTypeNonPreferred rdf:resource="http://vocab.getty.edu/aat/300025136"/>
+                <skos:related rdf:resource="http://vocab.getty.edu/ulan/500015658"/>
+                <skos:related rdf:resource="http://vocab.getty.edu/ulan/500112058"/>
+                <dc:identifier>500032927</dc:identifier>
+                <gvp:ulan1000_related_to rdf:resource="http://vocab.getty.edu/ulan/500112058"/>
+                <gvp:ulan1102_student_of rdf:resource="http://vocab.getty.edu/ulan/500015658"/>
+                <skos:mappingRelation>
+                    <rdf:Description rdf:about="http://vocab.getty.edu/ulan/500032927">
+                        <skos:mappingRelation rdf:resource="http://id.loc.gov/authorities/names/n79006488"/>
+                        <skos:closeMatch>
+                            <rdf:Description rdf:about="http://vocab.getty.edu/ulan/500032927">
+                                <skos:closeMatch rdf:resource="http://id.loc.gov/authorities/names/n79006488"/>
+                                <void:inDataset rdf:resource="http://vocab.getty.edu/dataset/ulan"/>
+                                <dct:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+                                <cc:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+                                <prov:wasGeneratedBy rdf:resource="http://vocab.getty.edu/ulan/rev/5500090924"/>
+                                <prov:wasGeneratedBy rdf:resource="http://vocab.getty.edu/ulan/rev/5500090925"/>
+                                <prov:wasGeneratedBy rdf:resource="http://vocab.getty.edu/ulan/rev/5500090926"/>
+                                <prov:wasGeneratedBy rdf:resource="http://vocab.getty.edu/ulan/rev/5500090928"/>
+                                <prov:wasGeneratedBy rdf:resource="http://vocab.getty.edu/ulan/rev/5500090927"/>
+                                <foaf:focus rdf:resource="http://vocab.getty.edu/ulan/500032927-agent"/>
+                            </rdf:Description>
+                        </skos:closeMatch>
+                    </rdf:Description>
+                </skos:mappingRelation>
+            </rdf:Description>
+        </skos:exactMatch>
+    </gvp:Subject>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500090924">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+        <dc:type>created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1989-12-22T00:00:00</prov:startedAtTime>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500090925">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+        <dc:type>created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-01-05T00:00:00</prov:startedAtTime>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500090926">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+        <dc:type>created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-04-06T00:00:00</prov:startedAtTime>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500090928">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+        <dc:type>created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-05-05T00:00:00</prov:startedAtTime>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500090927">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+        <dc:type>created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-05-16T00:00:00</prov:startedAtTime>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501178914">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-02-05T18:03:08</prov:startedAtTime>
+        <dc:description>I (1500205912);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501178916">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term deleted</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-02-05T18:03:08</prov:startedAtTime>
+        <dc:description>Vermeer, Jan (1500090576);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501185799">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term deleted</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-04-03T11:58:57</prov:startedAtTime>
+        <dc:description>I (1500205912);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5503682316">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2008-10-07T14:27:50</prov:startedAtTime>
+        <dc:description>Vermeer Van Delft, Johannes (1500413812);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5503682317">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2008-10-07T14:27:50</prov:startedAtTime>
+        <dc:description>Johannes Vermeer Van Delft (1500465195);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5503682318">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2008-10-07T14:27:50</prov:startedAtTime>
+        <dc:description>Vermeer Van Delft, Jan Reyniersz (1500413813);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5504028666">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term deleted</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-05-21T11:31:46</prov:startedAtTime>
+        <dc:description>Vermeer Van Delft, Johannes (1500413812);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5504028667">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term deleted</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-05-21T11:31:46</prov:startedAtTime>
+        <dc:description>Vermeer Van Delft, Jan Reyniersz (1500413813);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5504297031">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-16T03:59:54</prov:startedAtTime>
+        <dc:description>Johannes Vermeer (1500637491);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5504297032">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-16T03:59:54</prov:startedAtTime>
+        <dc:description>Van der Meer, Jan (1500569691);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5505513547">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-02-18T11:41:14</prov:startedAtTime>
+        <dc:description>Van der Meer van Delft, Jan (1500775325);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5505513548">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-02-18T11:41:14</prov:startedAtTime>
+        <dc:description>Meer, Jan van der (1500775328);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5505513549">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-02-18T11:41:14</prov:startedAtTime>
+        <dc:description>Der Meer, Jan van (1500775329);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5505513550">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-02-18T11:41:14</prov:startedAtTime>
+        <dc:description>Vermeer de Delft, Jan (1500775330);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5505513551">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-02-18T11:41:14</prov:startedAtTime>
+        <dc:description>Vermer Delftskiĭ, Ĭokhannes (1500775331);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5505513552">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-02-18T11:41:14</prov:startedAtTime>
+        <dc:description>Vermer, Ĭokhannes (1500775332);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971429">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>De Delfsche van der Meer (1500984156);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971430">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>de Delfsche vander Meer (1500984178);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971431">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>de Delftsche van der Meer (1500984172);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971432">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>de Delfze van der Meer (1500984177);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971433">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Delfsche van der Meer (1500984166);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971434">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Delfter Vermeer (1500984179);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971435">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Delftsche Vermeer (1500984167);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971436">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>De Meere (1500984160);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971437">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Der Delftsche v. d. Neer (1500984168);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971438">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>jan der meer (1500984157);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971439">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>jan van der meer der altere (1500984151);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971440">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Jan Vermeer of Delft (1500984170);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971441">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>J. vander Meer van Delft (1500984173);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971442">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>J. Vermeer of Delft (1500984171);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971443">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Meer, Van der, of Delft (1500984169);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971444">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>van der Meer (1500984152);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971445">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Vander-Meer, de Delfet (1500984163);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971446">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Vandermeer de Delft (1500984155);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971447">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Van der Meer de Delft (1500984161);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971448">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Vander Meer de Delft (1500984162);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971449">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Vander Méer, de Delft (1500984165);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971450">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Van der Meer, of Delft (1500984154);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971451">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>vander Meer van Delft (1500984175);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971452">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>V. der Meer, of Delft (1500984159);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971453">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>V. D. Meer (1500984153);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971454">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>ver meer (1500984158);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971455">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>vermeer of haarlem (1500984180);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971456">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>vermeer of haarlem, jan (1500984181);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971457">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Vermeer van Delft (1500984174);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971458">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Vermeer van van Delft (1500984176);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5502614008">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>relation added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-07-27T11:50:35</prov:startedAtTime>
+        <dc:description>Vermeer, Jan (500032927) 'related to' Vermeer, Isaak (500112058);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5506516738">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>relation added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-03-19T14:43:58</prov:startedAtTime>
+        <dc:description>Vermeer, Johannes (500032927) 'student of' Bramer, Leonard (500015658);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959043">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T14:02:57</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959046">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T15:24:36</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959047">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T15:25:26</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959049">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T15:26:51</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959050">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-22T15:31:10</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959058">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T08:47:40</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959059">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T09:23:10</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959060">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T10:35:09</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959062">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T11:04:47</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959063">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T11:14:38</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959064">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T12:14:51</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959065">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T12:47:11</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959066">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T12:56:46</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959067">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T13:10:30</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959068">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T13:21:13</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501185798">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-04-03T11:58:57</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501203203">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-05-01T09:52:25</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501493800">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-08-28T13:59:38</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501493803">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-08-28T14:00:34</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501562691">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-11-25T11:26:20</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5501740502">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2004-02-02T08:05:05</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5502576135">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-03-28T17:41:48</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5502614007">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-07-27T11:50:35</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5503682488">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2008-10-07T14:47:51</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5504028665">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-05-21T11:31:46</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5506187394">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-08-25T09:46:03</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5506187395">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-08-25T09:47:35</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5506187413">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-08-25T09:47:57</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5506516290">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-03-03T12:08:02</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5506762067">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-09-30T15:25:04</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5507190989">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2015-09-17T10:05:16</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5507190990">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2015-09-17T10:06:46</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5500959061">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>note created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-23T10:35:09</prov:startedAtTime>
+        <dc:description>Language: </dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5504297044">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>note updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-16T03:59:54</prov:startedAtTime>
+        <dc:description>Language: </dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5506516291">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>note updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-03-03T12:08:03</prov:startedAtTime>
+        <dc:description>Language: English (70051)</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5507683703">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>note created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-02-24T14:52:29</prov:startedAtTime>
+        <dc:description>Language: English (70051)</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508640633">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>note created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-11-01T14:13:25</prov:startedAtTime>
+        <dc:description>Language: English (70051)</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/ulan/rev/5508971506">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>note updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2017-12-01T07:46:32</prov:startedAtTime>
+        <dc:description>Language: English (70051)</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+    </prov:Activity>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/ulan/source/2100042617-subject-500032927">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100042617"/>
+        <bibo:locator>NAFL 79006488, accessed 21 May 2009</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/ulan/source/2100145356-subject-500032927">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100145356"/>
+        <bibo:locator>accessed 21 May 2009</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/ulan/source/2100149014-subject-500032927">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>LOC ID: n79006488</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/ulan/source/2100156395-subject-500032927">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100156395"/>
+        <bibo:locator>accessed 21 May 2009</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/ulan/source/2100156593-subject-500032927">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100156593"/>
+        <bibo:locator>LOC ID: n79006488</bibo:locator>
+    </bibo:DocumentPart>
+    <gvp:ScopeNote rdf:about="http://vocab.getty.edu/ulan/scopeNote/51011">
+        <rdf:value xml:lang="en">Vermeer is considered one of the principal Dutch genre painters of the 17th century. His work displays an unprecedented level of mastery in its illusion of reality, and his figures with their calm, solemn air, which add a level of mystery to his paintings. A poem written in 1667, which alludes to the explosion of the Delft municipal arsenal in 1654, led to the misleading notion that Vermeer was the student of Carel Fabritius, the foremost painter of Delft who died in the same explosion. Leonard Bramer, who was also a prominent painter in Delft and friend of Vermeer's family, could also have been his teacher, although his work consists of mostly large easel paintings executed in the dark style of Carravaggio. Despite the mastery of Vermeer's work, it did not have lasting effect on other artists, as he had no known pupils.  Comment on works: Genre; A street scene; pictures by Vrel used to be called Vermeer as well</rdf:value>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100153925"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100145531-scopeNote-51011"/>
+        <dc:identifier>51011</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+    </gvp:ScopeNote>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/ulan/source/2100145531-scopeNote-51011">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100145531"/>
+        <bibo:locator>v. 32, p. 260</bibo:locator>
+    </bibo:DocumentPart>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500090577">
+        <gvp:term>Vermeer, Johannes</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer, Johannes</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:termDisplay rdf:resource="http://vocab.getty.edu/term/display/Indexing"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000189"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000016"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000189"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000016"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100042658"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100154433"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100154640"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100156731"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100158442"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500090577"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100042617-term-1500090577"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042658"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100154433"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100154640"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100156731"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100158442"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500090577"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100156395-term-1500090577"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100145356-term-1500090577"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042617-term-1500090577"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100156395-term-1500090577"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100145356-term-1500090577"/>
+        <dc:identifier>1500090577</dc:identifier>
+    </skosxl:Label>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500090577">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100156395-term-1500090577">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100156395"/>
+        <bibo:locator>accessed 21 May 2009</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100145356-term-1500090577">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100145356"/>
+        <bibo:locator>accessed 21 May 2009</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100042617-term-1500090577">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100042617"/>
+        <bibo:locator>NAFL 79006488, accessed 21 May 2009</bibo:locator>
+    </bibo:Document>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500637491">
+        <gvp:term>Johannes Vermeer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+        <skosxl:literalForm>Johannes Vermeer</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:termDisplay rdf:resource="http://vocab.getty.edu/term/display/Display"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000016"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000016"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100039894"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100156731"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100039894"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100156731"/>
+        <dc:identifier>1500637491</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500090570">
+        <gvp:term>Jan Vermeer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</gvp:displayOrder>
+        <skosxl:literalForm>Jan Vermeer</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500090570</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500090575">
+        <gvp:term>Vermeer, Jan</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">4</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer, Jan</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000005"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000005"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000189"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000189"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100041030"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100145356-term-1500090575"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100041030"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042297"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042658"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100154640"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500090575"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100145356-term-1500090575"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100042658"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500090575"/>
+        <dc:identifier>1500090575</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500090572">
+        <gvp:term>Vermeer van Delft, Jan</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">5</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer van Delft, Jan</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100046495"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500090572"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500090572"/>
+        <dc:identifier>1500090572</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500090573">
+        <gvp:term>Vermeer van Delft, Johannes</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">6</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer van Delft, Johannes</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000002"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000002"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000130"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000130"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100041062"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100041062"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100045787"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100045787"/>
+        <dc:identifier>1500090573</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500090574">
+        <gvp:term>Vermeer van Delft, Jan Reyniersz</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">7</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer van Delft, Jan Reyniersz</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000001"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000001"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000130"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000130"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100046495"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100045787"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100046495"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100045787"/>
+        <dc:identifier>1500090574</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500090578">
+        <gvp:term>Vermeer, Johannes van Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">8</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer, Johannes van Delft</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100041042"/>
+        <dc:identifier>1500090578</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500090571">
+        <gvp:term>van der Meer, Jan</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">9</gvp:displayOrder>
+        <skosxl:literalForm>van der Meer, Jan</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100042266"/>
+        <dc:identifier>1500090571</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500465195">
+        <gvp:term>Johannes Vermeer van Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">10</gvp:displayOrder>
+        <skosxl:literalForm>Johannes Vermeer van Delft</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000130"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000130"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100039894"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100039894"/>
+        <dc:identifier>1500465195</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500569691">
+        <gvp:term>Van der Meer, Jan</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">11</gvp:displayOrder>
+        <skosxl:literalForm>Van der Meer, Jan</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100042658"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500569691"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500569691"/>
+        <dc:identifier>1500569691</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500775325">
+        <gvp:term>Van der Meer van Delft, Jan</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">12</gvp:displayOrder>
+        <skosxl:literalForm>Van der Meer van Delft, Jan</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775325"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775325"/>
+        <dc:identifier>1500775325</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500775328">
+        <gvp:term>Meer, Jan van der</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">13</gvp:displayOrder>
+        <skosxl:literalForm>Meer, Jan van der</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775328"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775328"/>
+        <dc:identifier>1500775328</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500775329">
+        <gvp:term>Der Meer, Jan van</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">14</gvp:displayOrder>
+        <skosxl:literalForm>Der Meer, Jan van</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775329"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775329"/>
+        <dc:identifier>1500775329</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500775330">
+        <gvp:term>Vermeer de Delft, Jan</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">15</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer de Delft, Jan</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775330"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775330"/>
+        <dc:identifier>1500775330</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500775331">
+        <gvp:term>Vermer Delftskiĭ, Ĭokhannes</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">16</gvp:displayOrder>
+        <skosxl:literalForm>Vermer Delftskiĭ, Ĭokhannes</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775331"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775331"/>
+        <dc:identifier>1500775331</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500775332">
+        <gvp:term>Vermer, Ĭokhannes</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">17</gvp:displayOrder>
+        <skosxl:literalForm>Vermer, Ĭokhannes</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775332"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/ulan/source/2100149014-term-1500775332"/>
+        <dc:identifier>1500775332</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984156">
+        <gvp:term>De Delfsche van der Meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">18</gvp:displayOrder>
+        <skosxl:literalForm>De Delfsche van der Meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984156</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984178">
+        <gvp:term>de Delfsche vander Meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">19</gvp:displayOrder>
+        <skosxl:literalForm>de Delfsche vander Meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984178</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984172">
+        <gvp:term>de Delftsche van der Meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">20</gvp:displayOrder>
+        <skosxl:literalForm>de Delftsche van der Meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984172</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984177">
+        <gvp:term>de Delfze van der Meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">21</gvp:displayOrder>
+        <skosxl:literalForm>de Delfze van der Meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984177</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984166">
+        <gvp:term>Delfsche van der Meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">22</gvp:displayOrder>
+        <skosxl:literalForm>Delfsche van der Meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984166</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984179">
+        <gvp:term>Delfter Vermeer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">23</gvp:displayOrder>
+        <skosxl:literalForm>Delfter Vermeer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984179</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984167">
+        <gvp:term>Delftsche Vermeer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">24</gvp:displayOrder>
+        <skosxl:literalForm>Delftsche Vermeer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984167</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984160">
+        <gvp:term>De Meere</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">25</gvp:displayOrder>
+        <skosxl:literalForm>De Meere</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984160</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984168">
+        <gvp:term>Der Delftsche v. d. Neer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">26</gvp:displayOrder>
+        <skosxl:literalForm>Der Delftsche v. d. Neer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984168</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984157">
+        <gvp:term>jan der meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">27</gvp:displayOrder>
+        <skosxl:literalForm>jan der meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984157</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984151">
+        <gvp:term>jan van der meer der altere</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">28</gvp:displayOrder>
+        <skosxl:literalForm>jan van der meer der altere</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984151</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984170">
+        <gvp:term>Jan Vermeer of Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">29</gvp:displayOrder>
+        <skosxl:literalForm>Jan Vermeer of Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984170</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984173">
+        <gvp:term>J. vander Meer van Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">30</gvp:displayOrder>
+        <skosxl:literalForm>J. vander Meer van Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984173</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984171">
+        <gvp:term>J. Vermeer of Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">31</gvp:displayOrder>
+        <skosxl:literalForm>J. Vermeer of Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984171</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984169">
+        <gvp:term>Meer, Van der, of Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">32</gvp:displayOrder>
+        <skosxl:literalForm>Meer, Van der, of Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984169</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984152">
+        <gvp:term>van der Meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">33</gvp:displayOrder>
+        <skosxl:literalForm>van der Meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984152</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984163">
+        <gvp:term>Vander-Meer, de Delfet</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">34</gvp:displayOrder>
+        <skosxl:literalForm>Vander-Meer, de Delfet</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984163</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984155">
+        <gvp:term>Vandermeer de Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">35</gvp:displayOrder>
+        <skosxl:literalForm>Vandermeer de Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984155</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984161">
+        <gvp:term>Van der Meer de Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">36</gvp:displayOrder>
+        <skosxl:literalForm>Van der Meer de Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984161</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984162">
+        <gvp:term>Vander Meer de Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">37</gvp:displayOrder>
+        <skosxl:literalForm>Vander Meer de Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984162</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984165">
+        <gvp:term>Vander Méer, de Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">38</gvp:displayOrder>
+        <skosxl:literalForm>Vander Méer, de Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984165</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984154">
+        <gvp:term>Van der Meer, of Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">39</gvp:displayOrder>
+        <skosxl:literalForm>Van der Meer, of Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984154</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984175">
+        <gvp:term>vander Meer van Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">40</gvp:displayOrder>
+        <skosxl:literalForm>vander Meer van Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984175</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984159">
+        <gvp:term>V. der Meer, of Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">41</gvp:displayOrder>
+        <skosxl:literalForm>V. der Meer, of Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984159</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984153">
+        <gvp:term>V. D. Meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">42</gvp:displayOrder>
+        <skosxl:literalForm>V. D. Meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984153</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984158">
+        <gvp:term>ver meer</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">43</gvp:displayOrder>
+        <skosxl:literalForm>ver meer</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984158</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984180">
+        <gvp:term>vermeer of haarlem</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">44</gvp:displayOrder>
+        <skosxl:literalForm>vermeer of haarlem</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984180</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984181">
+        <gvp:term>vermeer of haarlem, jan</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">45</gvp:displayOrder>
+        <skosxl:literalForm>vermeer of haarlem, jan</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984181</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984174">
+        <gvp:term>Vermeer van Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">46</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer van Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984174</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/ulan/term/1500984176">
+        <gvp:term>Vermeer van van Delft</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">47</gvp:displayOrder>
+        <skosxl:literalForm>Vermeer van van Delft</skosxl:literalForm>
+        <gvp:historicFlag rdf:resource="http://vocab.getty.edu/historic/localUse"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/ulan/source/2100043316"/>
+        <dc:identifier>1500984176</dc:identifier>
+    </skosxl:Label>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500090575">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100145356-term-1500090575">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100145356"/>
+        <bibo:locator>accessed 21 May 2009</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500090572">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500569691">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500775325">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500775328">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500775329">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500775330">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500775331">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <bibo:Document rdf:about="http://vocab.getty.edu/ulan/source/2100149014-term-1500775332">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/ulan/source/2100149014"/>
+        <bibo:locator>n 79006488</bibo:locator>
+    </bibo:Document>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/ulan/rel/500032927-agentType-300025103">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#agentTypePreferred"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/aat/300025103"/>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+    </rdf:Statement>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/ulan/rel/500032927-agentType-300025136">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#agentTypeNonPreferred"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/aat/300025136"/>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+    </rdf:Statement>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/ulan/rel/500032927-agentType-300025904">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#agentTypeNonPreferred"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/aat/300025904"/>
+        <rdfs:comment>to the Delft Guild of St. Luke in 1653</rdfs:comment>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</gvp:displayOrder>
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1653</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1670</gvp:estEnd>
+    </rdf:Statement>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/ulan/rel/500032927-ulan1000_related_to-500112058">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#ulan1000_related_to"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/ulan/500112058"/>
+    </rdf:Statement>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/ulan/rel/500032927-ulan1102_student_of-500015658">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500032927"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#ulan1102_student_of"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/ulan/500015658"/>
+        <rdfs:comment>possible student/teacher relationship</rdfs:comment>
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1650</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1674</gvp:estEnd>
+    </rdf:Statement>
+    <schema:Person rdf:about="http://vocab.getty.edu/ulan/500032927-agent">
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000579373"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000488340"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000564041"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000560205"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000169308"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000084168"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000084169"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000084170"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000084171"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000084172"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000396248"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000396249"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000396250"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000309904"/>
+        <gvp:biography rdf:resource="http://vocab.getty.edu/ulan/bio/4000475924"/>
+        <gvp:biographyPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000169308"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000579373"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000488340"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000564041"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000560205"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000084168"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000084169"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000084170"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000084171"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000084172"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000396248"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000396249"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000396250"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000309904"/>
+        <gvp:biographyNonPreferred rdf:resource="http://vocab.getty.edu/ulan/bio/4000475924"/>
+        <gvp:eventPreferred rdf:resource="http://vocab.getty.edu/ulan/event/118133"/>
+        <bio:event rdf:resource="http://vocab.getty.edu/ulan/event/176177"/>
+        <bio:event rdf:resource="http://vocab.getty.edu/ulan/event/118133"/>
+        <gvp:eventNonPreferred rdf:resource="http://vocab.getty.edu/ulan/event/176177"/>
+        <gvp:nationalityPreferred rdf:resource="http://vocab.getty.edu/aat/300111175"/>
+        <schema:nationality rdf:resource="http://vocab.getty.edu/aat/300111175"/>
+        <void:inDataset rdf:resource="http://vocab.getty.edu/dataset/ulan"/>
+        <dct:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+        <cc:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+    </schema:Person>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000579373">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1675</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300400512"/>
+        <schema:description>Dutch artist, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000488340">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1675</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000012"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>artist, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000564041">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">0001</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2100</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000016"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300400512"/>
+        <schema:description>Unknown artist</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000560205">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1800</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2100</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000016"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300400512"/>
+        <schema:description>artist, active 20th century</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000169308">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1675</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch painter, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000084168">
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000002"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch artist, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000084169">
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000001"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch artist, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000084170">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1675</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000005"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch painter, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000084171">
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000003"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000084172">
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000011"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch painter, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000396248">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1675</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch painter, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000396249">
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch painter</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000396250">
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch painter</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000309904">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1675</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000130"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch artist, 1632-1675</schema:description>
+    </gvp:Biography>
+    <gvp:Biography rdf:about="http://vocab.getty.edu/ulan/bio/4000475924">
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1675</gvp:estEnd>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000189"/>
+        <schema:gender rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+        <schema:description>Dutch painter, 1632-1675</schema:description>
+    </gvp:Biography>
+    <bio:Event rdf:about="http://vocab.getty.edu/ulan/event/176177">
+        <rdf:type rdf:resource="http://schema.org/Event"/>
+        <rdfs:comment>October 31, 1632</rdfs:comment>
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estStart>
+        <gvp:estEnd rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1632</gvp:estEnd>
+        <schema:location rdf:resource="http://vocab.getty.edu/tgn/7006804-place"/>
+        <dct:type rdf:resource="http://vocab.getty.edu/aat/300069030"/>
+    </bio:Event>
+    <bio:Event rdf:about="http://vocab.getty.edu/ulan/event/118133">
+        <rdf:type rdf:resource="http://schema.org/Event"/>
+        <schema:location rdf:resource="http://vocab.getty.edu/tgn/7006804-place"/>
+        <dct:type rdf:resource="http://vocab.getty.edu/aat/300393177"/>
+    </bio:Event>
+</rdf:RDF>

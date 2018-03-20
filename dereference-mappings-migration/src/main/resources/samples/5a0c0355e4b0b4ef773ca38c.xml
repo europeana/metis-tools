@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:aat="http://vocab.getty.edu/aat/"
+	xmlns:aat_contrib="http://vocab.getty.edu/aat/contrib/"
+	xmlns:aat_rel="http://vocab.getty.edu/aat/rel/"
+	xmlns:aat_rev="http://vocab.getty.edu/aat/rev/"
+	xmlns:aat_scopeNote="http://vocab.getty.edu/aat/scopeNote/"
+	xmlns:aat_source="http://vocab.getty.edu/aat/source/"
+	xmlns:aat_source_rev="http://vocab.getty.edu/aat/source/rev/"
+	xmlns:aat_term="http://vocab.getty.edu/aat/term/"
+	xmlns:adms="http://www.w3.org/ns/adms#"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:bio="http://purl.org/vocab/bio/0.1/"
+	xmlns:cc="http://creativecommons.org/ns#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcat="http://www.w3.org/ns/dcat#"
+	xmlns:dct="http://purl.org/dc/terms/"
+	xmlns:dctype="http://purl.org/dc/dcmitype/"
+	xmlns:fmt="http://www.w3.org/ns/formats/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:freq="http://purl.org/cld/freq/"
+	xmlns:gvp="http://vocab.getty.edu/ontology#"
+	xmlns:gvp_lang="http://vocab.getty.edu/language/"
+	xmlns:iso="http://purl.org/iso25964/skos-thes#"
+	xmlns:luc="http://www.ontotext.com/owlim/lucene#"
+	xmlns:ontogeo="http://www.ontotext.com/owlim/geo#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:prov="http://www.w3.org/ns/prov#"
+	xmlns:ptop="http://www.ontotext.com/proton/protontop#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:rr="http://www.w3.org/ns/r2rml#"
+	xmlns:rrx="http://purl.org/r2rml-ext/"
+	xmlns:schema="http://schema.org/"
+	xmlns:sd="http://www.w3.org/ns/sparql-service-description#"
+	xmlns:sesame="http://www.openrdf.org/schema/sesame#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:tgn="http://vocab.getty.edu/tgn/"
+	xmlns:tgn_contrib="http://vocab.getty.edu/tgn/contrib/"
+	xmlns:tgn_rel="http://vocab.getty.edu/tgn/rel/"
+	xmlns:tgn_rev="http://vocab.getty.edu/tgn/rev/"
+	xmlns:tgn_scopeNote="http://vocab.getty.edu/tgn/scopeNote/"
+	xmlns:tgn_source="http://vocab.getty.edu/tgn/source/"
+	xmlns:tgn_source_rev="http://vocab.getty.edu/tgn/source/rev/"
+	xmlns:tgn_term="http://vocab.getty.edu/tgn/term/"
+	xmlns:ulan="http://vocab.getty.edu/ulan/"
+	xmlns:ulan_bio="http://vocab.getty.edu/ulan/bio/"
+	xmlns:ulan_contrib="http://vocab.getty.edu/ulan/contrib/"
+	xmlns:ulan_event="http://vocab.getty.edu/ulan/event/"
+	xmlns:ulan_rel="http://vocab.getty.edu/ulan/rel/"
+	xmlns:ulan_rev="http://vocab.getty.edu/ulan/rev/"
+	xmlns:ulan_scopeNote="http://vocab.getty.edu/ulan/scopeNote/"
+	xmlns:ulan_source="http://vocab.getty.edu/ulan/source/"
+	xmlns:ulan_source_rev="http://vocab.getty.edu/ulan/source/rev/"
+	xmlns:ulan_term="http://vocab.getty.edu/ulan/term/"
+	xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
+	xmlns:vann="http://purl.org/vocab/vann/"
+	xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
+	xmlns:vdpp="http://data.lirmm.fr/ontologies/vdpp#"
+	xmlns:voaf="http://purl.org/vocommons/voaf#"
+	xmlns:voag="http://voag.linkedmodel.org/voag#"
+	xmlns:void="http://rdfs.org/ns/void#"
+	xmlns:wdrs="http://www.w3.org/2007/05/powder-s#"
+	xmlns:wgs="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	xmlns:wv="http://vocab.org/waiver/terms/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+    <gvp:Subject rdf:about="http://vocab.getty.edu/aat/300198626">
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdf:type rdf:resource="http://vocab.getty.edu/ontology#Concept"/>
+        <rdfs:label xml:lang="en">hourglasses</rdfs:label>
+        <rdfs:label xml:lang="en">hourglass</rdfs:label>
+        <rdfs:label xml:lang="en">hour-glasses</rdfs:label>
+        <rdfs:label xml:lang="nl">uurglazen</rdfs:label>
+        <rdfs:label xml:lang="nl">uurglas</rdfs:label>
+        <rdfs:label xml:lang="de">Stundengläser</rdfs:label>
+        <rdfs:label xml:lang="de">Stundenglas</rdfs:label>
+        <rdfs:label xml:lang="es">reloj de las horas</rdfs:label>
+        <rdfs:label xml:lang="es">reloj de arena</rdfs:label>
+        <rdfs:seeAlso rdf:resource="http://www.getty.edu/vow/AATFullDisplay?find=&amp;logic=AND&amp;note=&amp;subjectid=300198626"/>
+        <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-09-26T00:00:00</dct:created>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:03:37</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-23T06:42:29</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T12:16:55</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2016-09-23T09:26:19</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-23T06:42:30</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T12:16:56</dct:modified>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5000057049"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001145339"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001145340"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5001145341"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002506206"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002506207"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002637362"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002637363"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5004225065"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5004225066"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002506215"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5002637373"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/aat/rev/5004225078"/>
+        <gvp:broader rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300207870"/>
+        <gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300195701"/>
+        <gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300196327"/>
+        <gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300041573"/>
+        <gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300264092"/>
+        <gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300264551"/>
+        <gvp:broaderGenericExtended rdf:resource="http://vocab.getty.edu/aat/300207851"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300207870"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300195701"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300196327"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300041573"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300264092"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300264551"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/aat/300207851"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300207870"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300195701"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300196327"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300041573"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300264092"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300264551"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/aat/300207851"/>
+        <gvp:parentString>sandglasses, &lt;timepieces by form&gt;, timepieces, &lt;measuring devices for extent&gt;, measuring devices (instruments), Measuring Devices (hierarchy name), Furnishings and Equipment (hierarchy name), Objects Facet</gvp:parentString>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/35230"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/83329"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/77077"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/scopeNote/137183"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5000057049"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001145339"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001145340"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5001145341"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002506206"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002506207"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002637362"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002637363"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5004225065"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5004225066"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002506215"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5002637373"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/aat/rev/5004225078"/>
+        <gvp:parentStringAbbrev>sandglasses, &lt;timepieces by form&gt;, ... Objects Facet</gvp:parentStringAbbrev>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+        <skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000198626-en"/>
+        <skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000498844-nl"/>
+        <skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000659389-de"/>
+        <skosxl:prefLabel rdf:resource="http://vocab.getty.edu/aat/term/1000444855-es"/>
+        <skos:prefLabel xml:lang="en">hourglasses</skos:prefLabel>
+        <skos:prefLabel xml:lang="nl">uurglazen</skos:prefLabel>
+        <skos:prefLabel xml:lang="de">Stundenglas</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">reloj de las horas</skos:prefLabel>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000296778-en"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000206432-en"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000498845-nl"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000659388-de"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/aat/term/1000444856-es"/>
+        <skos:altLabel xml:lang="en">hourglass</skos:altLabel>
+        <skos:altLabel xml:lang="en">hour-glasses</skos:altLabel>
+        <skos:altLabel xml:lang="nl">uurglas</skos:altLabel>
+        <skos:altLabel xml:lang="de">Stundengläser</skos:altLabel>
+        <skos:altLabel xml:lang="es">reloj de arena</skos:altLabel>
+        <gvp:broaderGeneric rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <gvp:broaderPreferred rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <skos:broader rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <iso:broaderGeneric rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <gvp:prefLabelGVP rdf:resource="http://vocab.getty.edu/aat/term/1000198626-en"/>
+        <skos:inScheme rdf:resource="http://vocab.getty.edu/aat/"/>
+        <skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/35230"/>
+        <skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/83329"/>
+        <skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/77077"/>
+        <skos:scopeNote rdf:resource="http://vocab.getty.edu/aat/scopeNote/137183"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+        <dc:identifier>300198626</dc:identifier>
+        <skos:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300207870"/>
+        <skos:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300206197"/>
+        <skos:broaderTransitive rdf:resource="http://vocab.getty.edu/aat/300041573"/>
+        <void:inDataset rdf:resource="http://vocab.getty.edu/dataset/aat"/>
+        <dct:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+        <cc:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+        <prov:wasGeneratedBy>
+            <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5000057049">
+                <rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+                <dc:type>created</dc:type>
+                <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-09-26T00:00:00</prov:startedAtTime>
+            </prov:Activity>
+        </prov:wasGeneratedBy>
+    </gvp:Subject>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001145339">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:03:37</prov:startedAtTime>
+        <dc:description>hourglasses (1000198626);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001145340">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:03:37</prov:startedAtTime>
+        <dc:description>hourglass (1000296778);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5001145341">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2001-07-26T22:03:37</prov:startedAtTime>
+        <dc:description>hour-glasses (1000206432);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002506206">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-23T06:42:29</prov:startedAtTime>
+        <dc:description>reloj de las horas (1000444855);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002506207">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-23T06:42:29</prov:startedAtTime>
+        <dc:description>reloj de arena (1000444856);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002637362">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T12:16:55</prov:startedAtTime>
+        <dc:description>uurglazen (1000498844);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5002637363">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-07T12:16:55</prov:startedAtTime>
+        <dc:description>uurglas (1000498845);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5004225065">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2016-09-23T09:26:19</prov:startedAtTime>
+        <dc:description>Stundengläser (1000659388);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/aat/rev/5004225066">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2016-09-23T09:26:19</prov:startedAtTime>
+        <dc:description>Stundenglas (1000659389);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/aat/300198626"/>
+    </prov:Activity>
+    <gvp:ScopeNote rdf:about="http://vocab.getty.edu/aat/scopeNote/35230">
+        <rdf:value xml:lang="en">Sandglasses for which one hour is required for the given quantity to fall from the upper to the lower vessel.</rdf:value>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099620"/>
+        <dc:identifier>35230</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+    </gvp:ScopeNote>
+    <gvp:ScopeNote rdf:about="http://vocab.getty.edu/aat/scopeNote/83329">
+        <rdf:value xml:lang="nl">Zandlopers die één uur nodig hebben om de beschikbare hoeveelheid zand van het bovenste naar het onderste glas te laten stromen.</rdf:value>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+        <dc:identifier>83329</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+    </gvp:ScopeNote>
+    <gvp:ScopeNote rdf:about="http://vocab.getty.edu/aat/scopeNote/77077">
+        <rdf:value xml:lang="es">Relojes de arena que necesitan una hora para que la cantidad determinada caiga del recipiente superior al inferior.</rdf:value>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000051034"/>
+        <dc:identifier>77077</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300389311"/>
+    </gvp:ScopeNote>
+    <gvp:ScopeNote rdf:about="http://vocab.getty.edu/aat/scopeNote/137183">
+        <rdf:value xml:lang="de">Sanduhr, bei der die vorhandene Sandmenge eine Stunde benötigt, um vom oberen ins untere Gefäß zu fallen.</rdf:value>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000084808"/>
+        <dc:identifier>137183</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388344"/>
+    </gvp:ScopeNote>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000198626-en">
+        <gvp:term xml:lang="en">hourglasses</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="en">hourglasses</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/Descriptor"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/PluralNoun"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000027751"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000047206"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000046682-term-1000198626"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000027751"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000047206"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000046682-term-1000198626"/>
+        <dc:identifier>1000198626</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000498844-nl">
+        <gvp:term xml:lang="nl">uurglazen</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">4</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="nl">uurglazen</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/Descriptor"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+        <dc:identifier>1000498844</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000659389-de">
+        <gvp:term xml:lang="de">Stundenglas</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">7</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="de">Stundenglas</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/AlternateDescriptor"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/SingularNoun"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000083634-term-1000659389"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000083630-term-1000659389"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000083679-term-1000659389"/>
+        <dc:identifier>1000659389</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388344"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000444855-es">
+        <gvp:term xml:lang="es">reloj de las horas</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">8</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="es">reloj de las horas</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/Descriptor"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/PluralNoun"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000051034"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000051034"/>
+        <dc:identifier>1000444855</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300389311"/>
+    </skosxl:Label>
+    <bibo:Document rdf:about="http://vocab.getty.edu/aat/source/2000046682-term-1000198626">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000046682"/>
+        <bibo:locator>illustration</bibo:locator>
+    </bibo:Document>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000083634-term-1000659389">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000083634"/>
+        <bibo:locator>http://www.duden.de/node/699176/revisions/1158271/view</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000083630-term-1000659389">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000083630"/>
+        <bibo:locator>http://d-nb.info/gnd/4491371-0</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/aat/source/2000083679-term-1000659389">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000083679"/>
+        <bibo:locator>http://www.dwds.de/?view=1&amp;qu=Stundenglas</bibo:locator>
+    </bibo:DocumentPart>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000296778-en">
+        <gvp:term xml:lang="en">hourglass</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="en">hourglass</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/AlternateDescriptor"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/SingularNoun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000030301"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000030301"/>
+        <dc:identifier>1000296778</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000206432-en">
+        <gvp:term xml:lang="en">hour-glasses</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="en">hour-glasses</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/UsedForTerm"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000000"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000024811"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000024811"/>
+        <dc:identifier>1000206432</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000498845-nl">
+        <gvp:term xml:lang="nl">uurglas</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">5</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="nl">uurglas</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/AlternateDescriptor"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000205"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099099"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000099619"/>
+        <dc:identifier>1000498845</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000659388-de">
+        <gvp:term xml:lang="de">Stundengläser</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">6</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="de">Stundengläser</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/Descriptor"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/PluralNoun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000232"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/aat/source/2000083634-term-1000659388"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000083634-term-1000659388"/>
+        <dc:identifier>1000659388</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388344"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/aat/term/1000444856-es">
+        <gvp:term xml:lang="es">reloj de arena</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">9</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="es">reloj de arena</skosxl:literalForm>
+        <gvp:termType rdf:resource="http://vocab.getty.edu/term/type/AlternateDescriptor"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/SingularNoun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/aat/contrib/10000131"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/aat/source/2000051231"/>
+        <dc:identifier>1000444856</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300389311"/>
+    </skosxl:Label>
+    <bibo:Document rdf:about="http://vocab.getty.edu/aat/source/2000083634-term-1000659388">
+        <rdf:type rdf:resource="http://purl.org/ontology/bibo/DocumentPart"/>
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/aat/source/2000083634"/>
+        <bibo:locator>http://www.duden.de/node/699176/revisions/1158271/view</bibo:locator>
+    </bibo:Document>
+</rdf:RDF>

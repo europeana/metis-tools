@@ -80,6 +80,11 @@ public class ElementMappings {
       }
     }
 
+    // Sanity check
+    if (flatMappingSet.isEmpty()) {
+      throw new IllegalArgumentException("Found no mappings in this vocabulary.");
+    }
+
     // Check type
     final List<Type> types = flatMappingSet.stream().map(FlatElementMapping::getType).distinct()
         .collect(Collectors.toList());

@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:aat="http://vocab.getty.edu/aat/"
+	xmlns:aat_contrib="http://vocab.getty.edu/aat/contrib/"
+	xmlns:aat_rel="http://vocab.getty.edu/aat/rel/"
+	xmlns:aat_rev="http://vocab.getty.edu/aat/rev/"
+	xmlns:aat_scopeNote="http://vocab.getty.edu/aat/scopeNote/"
+	xmlns:aat_source="http://vocab.getty.edu/aat/source/"
+	xmlns:aat_source_rev="http://vocab.getty.edu/aat/source/rev/"
+	xmlns:aat_term="http://vocab.getty.edu/aat/term/"
+	xmlns:adms="http://www.w3.org/ns/adms#"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:bio="http://purl.org/vocab/bio/0.1/"
+	xmlns:cc="http://creativecommons.org/ns#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcat="http://www.w3.org/ns/dcat#"
+	xmlns:dct="http://purl.org/dc/terms/"
+	xmlns:dctype="http://purl.org/dc/dcmitype/"
+	xmlns:fmt="http://www.w3.org/ns/formats/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:gvp="http://vocab.getty.edu/ontology#"
+	xmlns:gvp_lang="http://vocab.getty.edu/language/"
+	xmlns:iso="http://purl.org/iso25964/skos-thes#"
+	xmlns:luc="http://www.ontotext.com/owlim/lucene#"
+	xmlns:ontogeo="http://www.ontotext.com/owlim/geo#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:prov="http://www.w3.org/ns/prov#"
+	xmlns:ptop="http://www.ontotext.com/proton/protontop#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:rr="http://www.w3.org/ns/r2rml#"
+	xmlns:rrx="http://purl.org/r2rml-ext/"
+	xmlns:schema="http://schema.org/"
+	xmlns:sd="http://www.w3.org/ns/sparql-service-description#"
+	xmlns:sesame="http://www.openrdf.org/schema/sesame#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#"
+	xmlns:tgn="http://vocab.getty.edu/tgn/"
+	xmlns:tgn_contrib="http://vocab.getty.edu/tgn/contrib/"
+	xmlns:tgn_rel="http://vocab.getty.edu/tgn/rel/"
+	xmlns:tgn_rev="http://vocab.getty.edu/tgn/rev/"
+	xmlns:tgn_scopeNote="http://vocab.getty.edu/tgn/scopeNote/"
+	xmlns:tgn_source="http://vocab.getty.edu/tgn/source/"
+	xmlns:tgn_source_rev="http://vocab.getty.edu/tgn/source/rev/"
+	xmlns:tgn_term="http://vocab.getty.edu/tgn/term/"
+	xmlns:ulan="http://vocab.getty.edu/ulan/"
+	xmlns:ulan_bio="http://vocab.getty.edu/ulan/bio/"
+	xmlns:ulan_contrib="http://vocab.getty.edu/ulan/contrib/"
+	xmlns:ulan_event="http://vocab.getty.edu/ulan/event/"
+	xmlns:ulan_rel="http://vocab.getty.edu/ulan/rel/"
+	xmlns:ulan_rev="http://vocab.getty.edu/ulan/rev/"
+	xmlns:ulan_scopeNote="http://vocab.getty.edu/ulan/scopeNote/"
+	xmlns:ulan_source="http://vocab.getty.edu/ulan/source/"
+	xmlns:ulan_source_rev="http://vocab.getty.edu/ulan/source/rev/"
+	xmlns:ulan_term="http://vocab.getty.edu/ulan/term/"
+	xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
+	xmlns:vann="http://purl.org/vocab/vann/"
+	xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
+	xmlns:vdpp="http://data.lirmm.fr/ontologies/vdpp#"
+	xmlns:voaf="http://purl.org/vocommons/voaf#"
+	xmlns:voag="http://voag.linkedmodel.org/voag#"
+	xmlns:void="http://rdfs.org/ns/void#"
+	xmlns:wdrs="http://www.w3.org/2007/05/powder-s#"
+	xmlns:wgs="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	xmlns:wv="http://vocab.org/waiver/terms/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+    <gvp:Subject rdf:about="http://vocab.getty.edu/tgn/7006810">
+        <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdf:type rdf:resource="http://vocab.getty.edu/ontology#AdminPlaceConcept"/>
+        <rdfs:label xml:lang="nl">Haag</rdfs:label>
+        <rdfs:label xml:lang="nl">'s-Gravenhage</rdfs:label>
+        <rdfs:label>Gravenhage, 's-</rdfs:label>
+        <rdfs:label>s Gravenhage</rdfs:label>
+        <rdfs:label>'s Gravenhage</rdfs:label>
+        <rdfs:label xml:lang="nl">Den Haag</rdfs:label>
+        <rdfs:label xml:lang="en">The Hague</rdfs:label>
+        <rdfs:label xml:lang="en">Hague, The</rdfs:label>
+        <rdfs:label xml:lang="nl">La Haye</rdfs:label>
+        <rdfs:label>Haye, La</rdfs:label>
+        <rdfs:label>Aia</rdfs:label>
+        <rdfs:label xml:lang="nl">The Haag</rdfs:label>
+        <rdfs:seeAlso rdf:resource="http://www.getty.edu/vow/TGNFullDisplay?find=&amp;place=&amp;nation=&amp;subjectid=7006810"/>
+        <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-09-13T03:22:00</dct:created>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-12-17T02:39:48</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2004-08-16T14:55:35</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-01-08T13:43:01</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-01-10T10:43:25</dct:modified>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-04T22:16:33</dct:modified>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5000767286"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5011874548"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5004612566"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5009359971"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5009361188"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5010310529"/>
+        <skos:changeNote rdf:resource="http://vocab.getty.edu/tgn/rev/5011874567"/>
+        <gvp:broader rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <gvp:broaderPartitiveExtended rdf:resource="http://vocab.getty.edu/tgn/1000003"/>
+        <gvp:broaderPartitiveExtended rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <gvp:broaderPartitiveExtended rdf:resource="http://vocab.getty.edu/tgn/7016845"/>
+        <gvp:broaderPartitiveExtended rdf:resource="http://vocab.getty.edu/tgn/7029392"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/tgn/1000003"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/tgn/7016845"/>
+        <gvp:broaderExtended rdf:resource="http://vocab.getty.edu/tgn/7029392"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/tgn/1000003"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/tgn/7016845"/>
+        <gvp:broaderPreferredExtended rdf:resource="http://vocab.getty.edu/tgn/7029392"/>
+        <gvp:parentString>Zuid-Holland, Nederland, Europe, World</gvp:parentString>
+        <skos:note rdf:resource="http://vocab.getty.edu/tgn/scopeNote/39975"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5000767286"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5011874548"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5004612566"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5009359971"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5009361188"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5010310529"/>
+        <skos:note rdf:resource="http://vocab.getty.edu/tgn/rev/5011874567"/>
+        <gvp:parentStringAbbrev>Zuid-Holland, Nederland, ... World</gvp:parentStringAbbrev>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">993</gvp:displayOrder>
+        <gvp:placeType rdf:resource="http://vocab.getty.edu/aat/300008347"/>
+        <gvp:placeType rdf:resource="http://vocab.getty.edu/aat/300008389"/>
+        <gvp:placeType rdf:resource="http://vocab.getty.edu/aat/300387219"/>
+        <gvp:placeType rdf:resource="http://vocab.getty.edu/aat/300387223"/>
+        <skosxl:prefLabel rdf:resource="http://vocab.getty.edu/tgn/term/157156-en"/>
+        <skos:prefLabel xml:lang="en">Hague, The</skos:prefLabel>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/48113-nl"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/147945"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/351258"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/163094"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/139841-nl"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/140051-nl"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/48114-en"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/140329-nl"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/140077"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/327976"/>
+        <skosxl:altLabel rdf:resource="http://vocab.getty.edu/tgn/term/1001497414-nl"/>
+        <skos:altLabel xml:lang="nl">Haag</skos:altLabel>
+        <skos:altLabel xml:lang="nl">'s-Gravenhage</skos:altLabel>
+        <skos:altLabel>Gravenhage, 's-</skos:altLabel>
+        <skos:altLabel>s Gravenhage</skos:altLabel>
+        <skos:altLabel>'s Gravenhage</skos:altLabel>
+        <skos:altLabel xml:lang="nl">Den Haag</skos:altLabel>
+        <skos:altLabel xml:lang="en">The Hague</skos:altLabel>
+        <skos:altLabel xml:lang="nl">La Haye</skos:altLabel>
+        <skos:altLabel>Haye, La</skos:altLabel>
+        <skos:altLabel>Aia</skos:altLabel>
+        <skos:altLabel xml:lang="nl">The Haag</skos:altLabel>
+        <gvp:broaderPartitive rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <gvp:broaderPreferred rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <skos:broader rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <iso:broaderPartitive rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <gvp:prefLabelGVP rdf:resource="http://vocab.getty.edu/tgn/term/48113-nl"/>
+        <skos:inScheme rdf:resource="http://vocab.getty.edu/tgn/"/>
+        <skos:scopeNote rdf:resource="http://vocab.getty.edu/tgn/scopeNote/39975"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000002"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000003"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006073"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006303"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006449"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007637"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9000014-subject-7006810"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009008541-subject-7006810"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006037-subject-7006810"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006267-subject-7006810"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006541-subject-7006810"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007144-subject-7006810"/>
+        <gvp:placeTypePreferred rdf:resource="http://vocab.getty.edu/aat/300008347"/>
+        <gvp:placeTypeNonPreferred rdf:resource="http://vocab.getty.edu/aat/300008389"/>
+        <gvp:placeTypeNonPreferred rdf:resource="http://vocab.getty.edu/aat/300387219"/>
+        <gvp:placeTypeNonPreferred rdf:resource="http://vocab.getty.edu/aat/300387223"/>
+        <dc:identifier>7006810</dc:identifier>
+        <skos:broaderTransitive rdf:resource="http://vocab.getty.edu/tgn/1000003"/>
+        <skos:broaderTransitive rdf:resource="http://vocab.getty.edu/tgn/7003632"/>
+        <skos:broaderTransitive rdf:resource="http://vocab.getty.edu/tgn/7016845"/>
+        <cc:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+        <void:inDataset rdf:resource="http://vocab.getty.edu/dataset/tgn"/>
+        <dct:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+        <prov:wasGeneratedBy rdf:resource="http://vocab.getty.edu/tgn/rev/5000767286"/>
+        <foaf:focus rdf:resource="http://vocab.getty.edu/tgn/7006810-place"/>
+    </gvp:Subject>
+    <prov:Activity rdf:about="http://vocab.getty.edu/tgn/rev/5000767286">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+        <dc:type>created</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-09-13T03:22:00</prov:startedAtTime>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/tgn/rev/5011874548">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>term added</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-12-17T02:39:48</prov:startedAtTime>
+        <dc:description>The Haag (1001497414);</dc:description>
+        <prov:used rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/tgn/rev/5004612566">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2004-08-16T14:55:35</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/tgn/rev/5009359971">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-01-08T13:43:01</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/tgn/rev/5009361188">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-01-10T10:43:25</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+    </prov:Activity>
+    <prov:Activity rdf:about="http://vocab.getty.edu/tgn/rev/5010310529">
+        <rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+        <dc:type>updated</dc:type>
+        <prov:startedAtTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-04-04T22:16:33</prov:startedAtTime>
+        <prov:used rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+    </prov:Activity>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9000014-subject-7006810">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9000014"/>
+        <bibo:locator>20</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/2009008541-subject-7006810">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/2009008541"/>
+        <bibo:locator>V, 615; 5:615</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006037-subject-7006810">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006037"/>
+        <bibo:locator>180</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006267-subject-7006810">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006267"/>
+        <bibo:locator>480</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006541-subject-7006810">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006541"/>
+        <bibo:locator>I-67; I-70; I-93</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/2009007144-subject-7006810">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <bibo:locator>-2152921</bibo:locator>
+    </bibo:DocumentPart>
+    <gvp:ScopeNote rdf:about="http://vocab.getty.edu/tgn/scopeNote/39975">
+        <rdf:value xml:lang="en">Originally located in woodland called Haghe ("hedge"), town grew around residence of counts of Holland. In 1248, Wilhelm II built a castle, which his successors have expanded into the present-day buildings. Grew economically in the late 14th century when the judiciary moved from Holland and Zeeland to the Hague and later it became the seat of the stadholders and the government under Maurice of Orange (1567-1625). At the turn of the 19th century, it became an important conference center and headquarters for many institutions, most notably the International Court of Justice of the United Nations.</rdf:value>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9005197-scopeNote-39975"/>
+        <dc:identifier>39975</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+    </gvp:ScopeNote>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9005197-scopeNote-39975">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9005197"/>
+        <bibo:locator>103</bibo:locator>
+    </bibo:DocumentPart>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/157156-en">
+        <gvp:term xml:lang="en">Hague, The</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">8</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="en">Hague, The</skosxl:literalForm>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009008541-term-157156"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006267-term-157156"/>
+        <dc:identifier>157156</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+    </skosxl:Label>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/2009008541-term-157156">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/2009008541"/>
+        <bibo:locator>V, 615</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006267-term-157156">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006267"/>
+        <bibo:locator>480</bibo:locator>
+    </bibo:DocumentPart>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/48113-nl">
+        <rdfs:comment>name refers to residence of counts of Holland, means "the counts' private dominion [in the Haghe woods]"</rdfs:comment>
+        <gvp:term xml:lang="nl">'s-Gravenhage</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1200</gvp:estStart>
+        <skosxl:literalForm xml:lang="nl">'s-Gravenhage</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <gvp:sourcePreferred rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009008541-term-48113"/>
+        <dc:identifier>48113</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/147945">
+        <gvp:term>Gravenhage, 's-</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+        <skosxl:literalForm>Gravenhage, 's-</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006303"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006449"/>
+        <dc:identifier>147945</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/351258">
+        <gvp:term>s Gravenhage</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</gvp:displayOrder>
+        <skosxl:literalForm>s Gravenhage</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006037-term-351258"/>
+        <dc:identifier>351258</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/163094">
+        <gvp:term>'s Gravenhage</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">4</gvp:displayOrder>
+        <skosxl:literalForm>'s Gravenhage</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000002"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000003"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000002"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000003"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006073"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006449"/>
+        <dc:identifier>163094</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/139841-nl">
+        <gvp:term xml:lang="nl">Den Haag</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">5</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="nl">Den Haag</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000003"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000003"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006449"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dc:identifier>139841</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/140051-nl">
+        <gvp:term xml:lang="nl">Haag</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">6</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="nl">Haag</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006541-term-140051"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dc:identifier>140051</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/48114-en">
+        <gvp:term xml:lang="en">The Hague</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">7</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="en">The Hague</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000002"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000003"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000002"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000003"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006449"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007637"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/tgn/source/2009007637"/>
+        <dc:identifier>48114</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/140329-nl">
+        <gvp:term xml:lang="nl">La Haye</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">9</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="nl">La Haye</skosxl:literalForm>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006541-term-140329"/>
+        <gvp:sourceNonPreferred rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dc:identifier>140329</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/140077">
+        <gvp:term>Haye, La</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">10</gvp:displayOrder>
+        <skosxl:literalForm>Haye, La</skosxl:literalForm>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000001"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9006541-term-140077"/>
+        <dc:identifier>140077</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/327976">
+        <gvp:term>Aia</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">11</gvp:displayOrder>
+        <skosxl:literalForm>Aia</skosxl:literalForm>
+        <gvp:termPOS rdf:resource="http://vocab.getty.edu/term/POS/Noun"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/9000014-term-327976"/>
+        <dc:identifier>327976</dc:identifier>
+    </skosxl:Label>
+    <skosxl:Label rdf:about="http://vocab.getty.edu/tgn/term/1001497414-nl">
+        <gvp:term xml:lang="nl">The Haag</gvp:term>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">12</gvp:displayOrder>
+        <skosxl:literalForm xml:lang="nl">The Haag</skosxl:literalForm>
+        <gvp:termFlag rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+        <dct:contributor rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <gvp:contributorNonPreferred rdf:resource="http://vocab.getty.edu/tgn/contrib/10000000"/>
+        <dct:source rdf:resource="http://vocab.getty.edu/tgn/source/2009007144"/>
+        <dc:identifier>1001497414</dc:identifier>
+        <dct:language rdf:resource="http://vocab.getty.edu/aat/300388256"/>
+    </skosxl:Label>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/2009008541-term-48113">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/2009008541"/>
+        <bibo:locator>5:615</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006037-term-351258">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006037"/>
+        <bibo:locator>180</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006541-term-140051">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006541"/>
+        <bibo:locator>I-67</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006541-term-140329">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006541"/>
+        <bibo:locator>I-93</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9006541-term-140077">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9006541"/>
+        <bibo:locator>I-70</bibo:locator>
+    </bibo:DocumentPart>
+    <bibo:DocumentPart rdf:about="http://vocab.getty.edu/tgn/source/9000014-term-327976">
+        <dct:isPartOf rdf:resource="http://vocab.getty.edu/tgn/source/9000014"/>
+        <bibo:locator>20</bibo:locator>
+    </bibo:DocumentPart>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/tgn/rel/7006810-placeType-300008347">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#placeTypePreferred"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/aat/300008347"/>
+        <rdfs:comment>originally site of the hunting lodge of the counts of Holland, settlement grew up around castle built in 1248</rdfs:comment>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</gvp:displayOrder>
+        <gvp:estStart rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1200</gvp:estStart>
+    </rdf:Statement>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/tgn/rel/7006810-placeType-300008389">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#placeTypeNonPreferred"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/aat/300008389"/>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</gvp:displayOrder>
+    </rdf:Statement>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/tgn/rel/7006810-placeType-300387219">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#placeTypeNonPreferred"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/aat/300387219"/>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</gvp:displayOrder>
+    </rdf:Statement>
+    <rdf:Statement rdf:about="http://vocab.getty.edu/tgn/rel/7006810-placeType-300387223">
+        <rdf:subject rdf:resource="http://vocab.getty.edu/tgn/7006810"/>
+        <rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#placeTypeNonPreferred"/>
+        <rdf:object rdf:resource="http://vocab.getty.edu/aat/300387223"/>
+        <gvp:displayOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">4</gvp:displayOrder>
+    </rdf:Statement>
+    <schema:Place rdf:about="http://vocab.getty.edu/tgn/7006810-place">
+        <rdf:type rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing"/>
+        <wgs:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">52.083333</wgs:lat>
+        <wgs:long rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">4.3</wgs:long>
+        <cc:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+        <void:inDataset rdf:resource="http://vocab.getty.edu/dataset/tgn"/>
+        <dct:license rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+        <schema:geo>
+            <schema:GeoCoordinates rdf:about="http://vocab.getty.edu/tgn/7006810-geometry">
+                <schema:latitude rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">52.083333</schema:latitude>
+                <schema:longitude rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">4.3</schema:longitude>
+            </schema:GeoCoordinates>
+        </schema:geo>
+    </schema:Place>
+</rdf:RDF>
