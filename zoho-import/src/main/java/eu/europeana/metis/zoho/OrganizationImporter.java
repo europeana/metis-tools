@@ -10,7 +10,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
@@ -113,9 +115,27 @@ public class OrganizationImporter {
 		int start = 1;
 		final int rows = 100;
 		boolean hasNext = true;
+		
+	    Map<String,String> searchCriteria = new HashMap<String,String>();
+	            
+        try {
+          Properties appProps = loadProperties(PROPERTIES_FILE);
+          String zohoSearchCriteriaRole = appProps.getProperty("zoho.search.criteria.role");
+          if (StringUtils.isNotEmpty(zohoSearchCriteriaRole)) {
+            LOGGER.info("apply filter for Zoho search criteria role: " + zohoSearchCriteriaRole);
+            searchCriteria.put(ZohoApiFields.ORGANIZATION_ROLE, zohoSearchCriteriaRole);   
+          }
+        } catch (FileNotFoundException e) {
+          throw new ZohoAccessException("Zoho import property file not found.", e);
+        } catch (URISyntaxException e) {
+          throw new ZohoAccessException("Zoho import syntax exception.", e);
+        } catch (IOException e) {
+          throw new ZohoAccessException("Zoho import IO exception.", e);
+        }
+		
 		//Zoho doesn't return the number of organizations in get response. 
 		while(hasNext){
-			orgList = zohoAccessService.getOrganizations(start, rows, lastRun);
+			orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
 			importedOrgs += storeOrganizations(orgList);
 			start += rows;
 			//if no more organizations exist in Zoho 

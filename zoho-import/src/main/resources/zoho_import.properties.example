@@ -6,3 +6,7 @@ mongo.port=
 #Zoho access
 zoho.base.url=
 zoho.authentication.token=
+
+#Filter settings for Zoho query
+#for multiple values e.g. roles - semicolon separated strings
+zoho.search.criteria.role=
