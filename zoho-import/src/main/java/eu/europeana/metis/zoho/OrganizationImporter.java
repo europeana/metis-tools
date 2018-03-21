@@ -120,7 +120,7 @@ public class OrganizationImporter {
 	            
         try {
           Properties appProps = loadProperties(PROPERTIES_FILE);
-          String zohoSearchCriteriaRole = appProps.getProperty("zoho.search.criteria.role");
+          String zohoSearchCriteriaRole = appProps.getProperty("zoho.organization.search.criteria.role");
           if (StringUtils.isNotEmpty(zohoSearchCriteriaRole)) {
             LOGGER.info("apply filter for Zoho search criteria role: " + zohoSearchCriteriaRole);
             searchCriteria.put(ZohoApiFields.ORGANIZATION_ROLE, zohoSearchCriteriaRole);   
