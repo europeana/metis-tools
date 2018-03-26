@@ -14,12 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import eu.europeana.corelib.definitions.edm.entity.Organization;
+import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
 import eu.europeana.enrichment.service.EntityService;
 import eu.europeana.enrichment.service.exception.ZohoAccessException;
 import eu.europeana.enrichment.service.zoho.ZohoAccessService;
@@ -111,7 +110,7 @@ public class OrganizationImporter {
 		if(incrementalImport)
 			lastRun = entityService.getLastOrganizationImportDate();
 		
-		List<Organization> orgList;
+		List<ZohoOrganization> orgList;
 		int start = 1;
 		final int rows = 100;
 		boolean hasNext = true;
@@ -146,15 +145,17 @@ public class OrganizationImporter {
 		LOGGER.info("Successfully imported organizations: " + importedOrgs);
 	}
 
-	private int storeOrganizations(List<Organization> orgList) {
+	private int storeOrganizations(List<ZohoOrganization> orgList) {
 		int count = 0;
-		for (Organization org : orgList) {
+		Organization edmOrg;
+		for (ZohoOrganization org : orgList) {
 			try{
-				entityService.storeOrganization(org);
+			    edmOrg = zohoAccessService.toEdmOrganization(org);
+				entityService.storeOrganization(edmOrg, org.getCreated(), org.getModified());
 				count++;
 			}catch(Exception e){
-				LOGGER.warn("Cannot import organization: " + org.getAbout(), e);
-				failedIports.add(org.getAbout());
+				LOGGER.warn("Cannot import organization: " + org.getZohoId(), e);
+				failedIports.add(org.getZohoId());
 			}
 		}
 		return count;
