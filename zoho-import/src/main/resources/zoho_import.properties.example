@@ -8,5 +8,5 @@ zoho.base.url=
 zoho.authentication.token=
 
 #Filter settings for Zoho query
-#for multiple values e.g. roles - semicolon separated strings
+#for multiple values e.g. roles - comma separated strings
 zoho.organization.search.criteria.role=

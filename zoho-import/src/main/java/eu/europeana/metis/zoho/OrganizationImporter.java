@@ -11,9 +11,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,7 @@ public class OrganizationImporter {
   private EntityService entityService;
   private ZohoAccessService zohoAccessService;
   private static final String PROPERTIES_FILE = "/zoho_import.properties";
-  List<String> failedIports = new ArrayList<String>();
+  List<String> failedImports = new ArrayList<String>();
   int importedOrgs = 0;
 
   public static final String IMPORT_FULL = "full";
@@ -48,6 +50,8 @@ public class OrganizationImporter {
   public static final String IMPORT_DATE = "date";
   private boolean incrementalImport = false;
   private String searchFilter;
+  Map<String, String> searchCriteria;
+  Set<String> allowedRoles;
 
   /**
    * The main method performing the vocabulary mappings.
@@ -115,8 +119,6 @@ public class OrganizationImporter {
     if (incrementalImport)
       lastRun = entityService.getLastOrganizationImportDate();
 
-    Map<String, String> searchCriteria = buildSearchCriteria();
-
     List<ZohoOrganization> orgList;
     int start = 1;
     final int rows = 100;
@@ -144,17 +146,49 @@ public class OrganizationImporter {
     return searchCriteria;
   }
 
+  /**
+   * This method validates that organization roles match to
+   * the filter criteria.
+   * @param orgList
+   * @return filtered and validated orgnization list
+   */
+  public boolean validateOrganizationsByFilterCriteria(
+      ZohoOrganization organization) {
+    
+    boolean res = false;
+    
+    if (searchCriteria == null || searchCriteria.isEmpty())
+      return true;
+    
+    //need to fix Zoho Bugg in API
+    if(!searchCriteria.containsKey(ZohoApiFields.ORGANIZATION_ROLE))
+      return true;
+        
+    String[] organizationRoles = organization.getRole().split(ZohoApiFields.SEMICOLON);
+    for (String organizationRole : organizationRoles) {
+      if (allowedRoles.contains(organizationRole))
+        res = true;
+      else
+        LOGGER.warn("{}", "Ignoring organization " + organization.getZohoId()
+          + "as the role doesn't match the role criteria: " + organization.getRole());
+    }
+    
+    return res;
+  }
+      
   private int storeOrganizations(List<ZohoOrganization> orgList) {
     int count = 0;
     Organization edmOrg;
     for (ZohoOrganization org : orgList) {
       try {
-        edmOrg = zohoAccessService.toEdmOrganization(org);
-        entityService.storeOrganization(edmOrg, org.getCreated(), org.getModified());
-        count++;
+        if (validateOrganizationsByFilterCriteria(org)) {
+          edmOrg = zohoAccessService.toEdmOrganization(org);
+          entityService.storeOrganization(edmOrg, org.getCreated(), org.getModified());
+          count++;
+        }
       } catch (Exception e) {
         LOGGER.warn("Cannot import organization: " + org.getZohoId(), e);
-        failedIports.add(org.getZohoId());
+        failedImports.add(org.getZohoId());
       }
     }
     return count;
@@ -178,6 +212,17 @@ public class OrganizationImporter {
     entityService = new EntityService(mongoHost, mongoPort);
 
     searchFilter = appProps.getProperty("zoho.organization.search.criteria.role");
+    initSearchCriteria();
+  }
+
+  private void initSearchCriteria() {
+    //build allowed roles
+    searchCriteria = buildSearchCriteria();
+    String[] roles = searchCriteria.get(ZohoApiFields.ORGANIZATION_ROLE).split(ZohoApiFields.DELIMITER_COMMA);
+    allowedRoles = new HashSet<String>();
+    for (int i = 0; i < roles.length; i++) {
+      allowedRoles.add(roles[i].trim());
+    }
   }
 
   protected Properties loadProperties(String propertiesFile)
