@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -348,8 +349,8 @@ public class OrganizationImporter {
   protected Properties loadProperties(String propertiesFile)
       throws URISyntaxException, IOException, FileNotFoundException {
     Properties appProps = new Properties();
-    URI propLocation = getClass().getResource(propertiesFile).toURI();
-    appProps.load(new FileInputStream(new File(propLocation)));
+    File propfile = getClasspathFile(propertiesFile);
+    appProps.load(new FileInputStream(propfile));
     return appProps;
   }
 
@@ -359,6 +360,23 @@ public class OrganizationImporter {
 
   public ZohoAccessService getZohoAccessService() {
     return zohoAccessService;
+  }
+  
+  /**
+   * This method returns the classpath file for the give path name
+   * @param fileName the name of the file to be searched in the classpath
+   * @return the File object 
+   * @throws URISyntaxException
+   * @throws IOException
+   * @throws FileNotFoundException
+   */
+  protected File getClasspathFile(String fileName)
+      throws URISyntaxException, IOException, FileNotFoundException {
+    URL resource = getClass().getResource(fileName);
+    if(resource == null)
+      return null;
+    URI fileLocation = resource.toURI();
+    return (new File(fileLocation));
   }
 
 }
