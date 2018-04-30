@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -24,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import eu.europeana.corelib.definitions.edm.entity.Organization;
 import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
 import eu.europeana.enrichment.service.EntityService;
+import eu.europeana.enrichment.service.WikidataAccessService;
+import eu.europeana.enrichment.service.dao.WikidataAccessDao;
 import eu.europeana.enrichment.service.dao.ZohoV2AccessDao;
 import eu.europeana.enrichment.service.exception.ZohoAccessException;
 import eu.europeana.enrichment.service.zoho.ZohoAccessService;
@@ -44,6 +45,8 @@ public class OrganizationImporter {
   private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationImporter.class);
   private EntityService entityService;
   private ZohoAccessService zohoAccessService;
+  private WikidataAccessService wikidataAccessService;
+  
   private static final String PROPERTIES_FILE = "/zoho_import.properties";
   List<String> failedImports = new ArrayList<String>();
   int importedOrgs = 0;
@@ -102,7 +105,7 @@ public class OrganizationImporter {
       importer.run(lastRun);
     } catch (Exception exception) {
       LOGGER.error("The import job failed!" + exception);
-      LOGGER.info("Successfully imported organizations: " + importer.importedOrgs);
+      LOGGER.info("Successfully imported organizations: {}", importer.importedOrgs);
     }
   }
 
@@ -123,8 +126,8 @@ public class OrganizationImporter {
       lastRun = entityService.getLastOrganizationImportDate();
 
     List<ZohoOrganization> orgList;
-    List<String> toDelete = new ArrayList<>();
-    List<ZohoOrganization> toUpdate = new ArrayList<>();
+    List<String> toDelete;
+    List<ZohoOrganization> toUpdate;
 
     int start = 1;
     final int rows = 100;
@@ -132,9 +135,9 @@ public class OrganizationImporter {
     // Zoho doesn't return the number of organizations in get response.
     while (hasNext) {
       // start with clear list of deletions for each Zoho page
-      toDelete.clear();
+      toDelete = new ArrayList<>();
       // start with clear list of updates for each Zoho page
-      toUpdate.clear();
+      toUpdate = new ArrayList<>();
 
       orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
       fillDeletionAndUpdateLists(orgList, toUpdate, toDelete);
@@ -152,10 +155,10 @@ public class OrganizationImporter {
       }
     }
 
-    LOGGER.info("Successfully imported organizations: " + importedOrgs);
+    LOGGER.info("Successfully imported organizations: {}", importedOrgs);
 
     int numberOfDeletedDbOrganizations = synchronizeDeletedZohoOrganizations();
-    LOGGER.info("Successfully deleted from DB organizations: " + numberOfDeletedDbOrganizations);
+    LOGGER.info("Successfully deleted from DB organizations: {}", numberOfDeletedDbOrganizations);
   }
 
   /**
@@ -170,32 +173,14 @@ public class OrganizationImporter {
   private void fillDeletionAndUpdateLists(final List<ZohoOrganization> orgList,
       List<ZohoOrganization> toUpdateList, List<String> toDeleteList) {
 
-    Organization dbOrganization;
-
     for (ZohoOrganization org : orgList) {
-      /* validate Zoho organization */
-      boolean zohoOrganizationValidation = hasRequiredRole(org);
-      /* retrieve related organization from database */
-      dbOrganization = entityService
-          .getOrganizationById(ZohoAccessService.URL_ORGANIZATION_PREFFIX + org.getZohoId());
-      /* extract roles from organization objects and compare them */
-      if (dbOrganization != null && dbOrganization.getEdmEuropeanaRole() != null
-          && org.getRole() != null) {
-        if (zohoOrganizationValidation && !dbOrganization.getEdmEuropeanaRole()
-            .get(Locale.ENGLISH.getLanguage()).equals(org.getRole())) {
-          /*
-           * if roles in Zoho match to the filter criteria add organization to the update list if
-           * they are different
-           */
-          toUpdateList.add(org);
-        }
-        if (!zohoOrganizationValidation) {
-          /*
-           * if roles in Zoho do not match to the filter criteria add organization to the delete
-           * list
-           */
-          toDeleteList.add(ZohoAccessService.URL_ORGANIZATION_PREFFIX + org.getZohoId());
-        }
+      // validate Zoho organization roles (workaround for Zoho API bug on role filtering)
+      if(!hasRequiredRole(org)){
+        //add organization to the delete
+        toDeleteList.add(ZohoAccessService.URL_ORGANIZATION_PREFFIX + org.getZohoId());
+      }else{
+        //create or update organization
+        toUpdateList.add(org);
       }
     }
   }
@@ -229,7 +214,7 @@ public class OrganizationImporter {
     Map<String, String> searchCriteria = null;
     if (StringUtils.isNotEmpty(searchFilter)) {
       searchCriteria = new HashMap<String, String>();
-      LOGGER.info("apply filter for Zoho search criteria role: " + searchFilter);
+      LOGGER.info("apply filter for Zoho search criteria role: {}", searchFilter);
       searchCriteria.put(ZohoApiFields.ORGANIZATION_ROLE, searchFilter);
     }
     return searchCriteria;
@@ -271,19 +256,46 @@ public class OrganizationImporter {
   private int storeOrganizations(List<ZohoOrganization> orgList) {
     int count = 0;
     Organization edmOrg;
+    
     for (ZohoOrganization org : orgList) {
       try {
-        if (hasRequiredRole(org)) {
           edmOrg = zohoAccessService.toEdmOrganization(org);
+          enrichWithWikidata(edmOrg);      
           entityService.storeOrganization(edmOrg, org.getCreated(), org.getModified());
-          count++;
-        }
+          count++;   
       } catch (Exception e) {
-        LOGGER.warn("Cannot import organization: " + org.getZohoId(), e);
+        LOGGER.warn("Cannot import organization: {}", org.getZohoId(), e);
         failedImports.add(org.getZohoId());
       }
     }
     return count;
+  }
+
+  private void enrichWithWikidata(Organization edmOrg){
+    Organization wikidataOrg;
+    String wikidataUri = getWikidataUri(edmOrg);
+    try{
+      if(wikidataUri != null){
+        wikidataOrg = wikidataAccessService.dereference(wikidataUri);
+        wikidataAccessService.mergePropsFromWikidata(edmOrg, wikidataOrg);    
+      }
+    }catch(Exception e){
+      LOGGER.warn("Cannot dereference organization from wikidata: {}", wikidataUri, e);
+    }
+  }
+
+  private String getWikidataUri(Organization edmOrg) {
+    String uri = null;
+    if(edmOrg.getOwlSameAs() == null)
+      return null;
+    
+    for (int i = 0; i < edmOrg.getOwlSameAs().length; i++) {
+      uri = edmOrg.getOwlSameAs()[i];
+      if (uri.startsWith(WikidataAccessService.WIKIDATA_BASE_URL)){
+        return uri;
+      }
+    }
+    return null;
   }
 
   /**
@@ -312,6 +324,7 @@ public class OrganizationImporter {
   }
 
   public void init() throws Exception {
+    //read properties
     Properties appProps = loadProperties(PROPERTIES_FILE);
     String zohoBaseUrl = appProps.getProperty("zoho.base.url");
     String zohoBaseUrlV2 = appProps.getProperty("zoho.base.url.v2");
@@ -322,17 +335,24 @@ public class OrganizationImporter {
       throw new IllegalArgumentException("zoho.authentication.token is invalid: " + token);
     LOGGER.info("using zoho zoho authentication token: " + token.substring(0, 3) + "...");
 
+    //initialize filtering options
+    searchFilter = appProps.getProperty("zoho.organization.search.criteria.role");
+    initSearchCriteria();
+    
+    //initialize ZohoAccessService
     ZohoAccessClientDao zohoAccessClientDao = new ZohoAccessClientDao(zohoBaseUrl, token);
     ZohoV2AccessDao zohoV2AccessDao = new ZohoV2AccessDao(zohoBaseUrlV2, token);
-
     zohoAccessService = new ZohoAccessService(zohoAccessClientDao, zohoV2AccessDao);
+    
+    //initialize WikidataAccessService
+    File xsltTemplate = getClasspathFile(WikidataAccessService.WIKIDATA_ORGANIZATION_XSL_FILE);
+    wikidataAccessService = new WikidataAccessService(new WikidataAccessDao(xsltTemplate));
 
+    //initialize EntityService
     String mongoHost = appProps.getProperty("mongo.hosts");
     int mongoPort = Integer.valueOf(appProps.getProperty("mongo.port"));
     entityService = new EntityService(mongoHost, mongoPort);
-
-    searchFilter = appProps.getProperty("zoho.organization.search.criteria.role");
-    initSearchCriteria();
+   
   }
 
   private void initSearchCriteria() {
