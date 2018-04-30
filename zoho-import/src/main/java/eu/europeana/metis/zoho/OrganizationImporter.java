@@ -346,6 +346,11 @@ public class OrganizationImporter {
     
     //initialize WikidataAccessService
     File xsltTemplate = getClasspathFile(WikidataAccessService.WIKIDATA_ORGANIZATION_XSL_FILE);
+    if(xsltTemplate == null || !xsltTemplate.exists())
+      LOGGER.info("Cannot find xsl template in classpath: {}", WikidataAccessService.WIKIDATA_ORGANIZATION_XSL_FILE);
+    else
+      LOGGER.info("Using xsl template: {}", xsltTemplate.getAbsolutePath());
+  
     wikidataAccessService = new WikidataAccessService(new WikidataAccessDao(xsltTemplate));
 
     //initialize EntityService
@@ -393,8 +398,10 @@ public class OrganizationImporter {
   protected File getClasspathFile(String fileName)
       throws URISyntaxException, IOException, FileNotFoundException {
     URL resource = getClass().getResource(fileName);
-    if(resource == null)
+    if(resource == null){
+      LOGGER.info("Cannot classpath file: {}", fileName);
       return null;
+    }
     URI fileLocation = resource.toURI();
     return (new File(fileLocation));
   }
