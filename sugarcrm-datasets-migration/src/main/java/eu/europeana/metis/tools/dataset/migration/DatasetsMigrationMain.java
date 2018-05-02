@@ -35,7 +35,7 @@ public class DatasetsMigrationMain {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder);
     mongoInitializer.initializeMongoClient();
     DatasetDao datasetDao = new DatasetDao(
-        new MorphiaDatastoreProvider(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb));
+        new MorphiaDatastoreProvider(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb), null);
     ExecutorManager executorManager = new ExecutorManager(propertiesHolder, datasetDao);
 
     switch (propertiesHolder.mode) {

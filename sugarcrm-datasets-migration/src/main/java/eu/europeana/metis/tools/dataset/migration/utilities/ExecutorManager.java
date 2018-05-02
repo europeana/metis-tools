@@ -66,7 +66,7 @@ public class ExecutorManager {
     try (Stream<String> stream = Files.lines(Paths.get(propertiesHolder.datasetIdsPath))) {
       stream.forEach(datasetId -> {
         deletedCounter++;
-        datasetDao.deleteByDatasetId(Integer.parseInt(datasetId));
+        datasetDao.deleteByDatasetId(datasetId);
         LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Counter: {}, datasetId: {}",
             deletedCounter, datasetId);
       });
@@ -85,7 +85,7 @@ public class ExecutorManager {
       String datasetIdString = null;
       if (dataset != null) {
         storedDataset = datasetDao.getDatasetByDatasetId(dataset.getDatasetId());
-        datasetIdString = Integer.toString(dataset.getDatasetId());
+        datasetIdString = dataset.getDatasetId();
       }
 
       if (dataset != null && storedDataset == null) {
@@ -121,7 +121,7 @@ public class ExecutorManager {
     Matcher matcher = pattern.matcher(line[Columns.NAME.getIndex()].trim());
     if (matcher.find()) {
       String datasetId = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
-      dataset.setDatasetId(Integer.parseInt(datasetId));
+      dataset.setDatasetId(datasetId);
       if (datasetId.charAt(0) == '0') {
         LOGGER.info(PropertiesHolder.LEADING_ZEROS_DATASET_IDS_MARKER, datasetId);
       }
@@ -139,6 +139,7 @@ public class ExecutorManager {
     dataset.setDescription(line[Columns.DESCRIPTION.getIndex()]);
     dataset.setNotes(line[Columns.NOTES.getIndex()]);
 
+    // TODO: 2-5-18 The workflow implementation has changed and the setting of harvesting plugins should be handled differently
     if (line[Columns.HARVEST_TYPE.getIndex()].trim().equals("oai_pmh")) {
       OaipmhHarvestPluginMetadata oaipmhHarvestPluginMetadata = new OaipmhHarvestPluginMetadata();
       oaipmhHarvestPluginMetadata.setUrl(line[Columns.HARVEST_URL.getIndex()].trim());
@@ -148,7 +149,7 @@ public class ExecutorManager {
           .setSetSpec(line[Columns.SETSPEC.getIndex()].trim().equals("-") ? null
               : line[Columns.SETSPEC.getIndex()].trim());
       oaipmhHarvestPluginMetadata.setMocked(false);
-      dataset.setHarvestingMetadata(oaipmhHarvestPluginMetadata);
+//      dataset.setHarvestingMetadata(oaipmhHarvestPluginMetadata);
     }
     return dataset;
   }
