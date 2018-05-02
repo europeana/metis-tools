@@ -1,6 +1,7 @@
 package eu.europeana.metis.endpoints.mapper;
 
 import eu.europeana.metis.core.dao.DatasetDao;
+import eu.europeana.metis.core.dao.WorkflowDao;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.endpoints.mapper.utilities.ExecutorManager;
 import eu.europeana.metis.endpoints.mapper.utilities.MongoInitializer;
@@ -34,31 +35,30 @@ public class EnpointsMapperMain {
     }
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder);
     mongoInitializer.initializeMongoClient();
-    DatasetDao datasetDaoOriginal = new DatasetDao(
-        new MorphiaDatastoreProvider(mongoInitializer.getMongoClient(),
-            propertiesHolder.mongoDbOriginal), null);
-    DatasetDao datasetDaoTemporary = new DatasetDao(
-        new MorphiaDatastoreProvider(mongoInitializer.getMongoClient(),
-            propertiesHolder.mongoDbTemporary), null);
-    ExecutorManager executorManager = new ExecutorManager(propertiesHolder, datasetDaoOriginal,
-        datasetDaoTemporary);
+    MorphiaDatastoreProvider morphiaDatastoreProviderOriginal = new MorphiaDatastoreProvider(
+        mongoInitializer.getMongoClient(), propertiesHolder.mongoDbOriginal);
+    MorphiaDatastoreProvider morphiaDatastoreProviderTemporary = new MorphiaDatastoreProvider(
+        mongoInitializer.getMongoClient(), propertiesHolder.mongoDbTemporary);
+    DatasetDao datasetDaoOriginal = new DatasetDao(morphiaDatastoreProviderOriginal, null);
+    WorkflowDao workflowDaoOriginal = new WorkflowDao(morphiaDatastoreProviderOriginal);
+    WorkflowDao workflowDaoTemporary = new WorkflowDao(morphiaDatastoreProviderTemporary);
+    ExecutorManager executorManager = new ExecutorManager(propertiesHolder, datasetDaoOriginal, workflowDaoOriginal, workflowDaoTemporary);
 
     switch (propertiesHolder.mode) {
       case CREATE_MAP:
         LOGGER
             .info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode {}", propertiesHolder.mode.name());
-        executorManager.createMode();
+        executorManager.createMapMode();
         break;
       case REVERSE_MAP:
         LOGGER
             .info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode {}", propertiesHolder.mode.name());
-        executorManager.deleteMode();
+        executorManager.reverseMapMode();
         break;
       default:
         LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode not supported.");
         break;
     }
-
     mongoInitializer.close();
   }
 }

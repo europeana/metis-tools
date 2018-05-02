@@ -1,3 +1,5 @@
+organization.id=
+europeana.oai.endpoint=
 #mode is CREATE_MAP or REVERSE_MAP
 mode=CREATE_MAP
 

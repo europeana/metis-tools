@@ -18,6 +18,8 @@ public class PropertiesHolder {
 
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
 
+  public final String organizationId;
+  public final String europeanaOaiEndpoint;
   public final Mode mode;
   public final String truststorePath;
   public final String truststorePassword;
@@ -38,6 +40,8 @@ public class PropertiesHolder {
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
+    organizationId = properties.getProperty("organization.id");
+    europeanaOaiEndpoint = properties.getProperty("europeana.oai.endpoint");
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
