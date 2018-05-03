@@ -6,7 +6,7 @@ package eu.europeana.metis.endpoints.mapper.utilities;
  * @since 2018-05-02
  */
 public enum Mode {
-  CREATE_MAP, REVERSE_MAP, NOT_VALID_MODE;
+  COPY_WORKFLOWS, CREATE_MAP, COPY_WORKFLOWS_AND_CREATE_MAP, REVERSE_MAP, NOT_VALID_MODE;
 
   public static Mode getModeFromEnumName(String enumName) {
     for (Mode mode : Mode.values()) {

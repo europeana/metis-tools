@@ -4,6 +4,7 @@ import eu.europeana.metis.core.dao.DatasetDao;
 import eu.europeana.metis.core.dao.WorkflowDao;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.endpoints.mapper.utilities.ExecutorManager;
+import eu.europeana.metis.endpoints.mapper.utilities.Mode;
 import eu.europeana.metis.endpoints.mapper.utilities.MongoInitializer;
 import eu.europeana.metis.endpoints.mapper.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
@@ -18,13 +19,18 @@ import org.slf4j.LoggerFactory;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2018-05-02
  */
-public class EnpointsMapperMain {
+public class EndpointsMapperMain {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(EnpointsMapperMain.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EndpointsMapperMain.class);
   private static final String CONFIGURATION_FILE = "application.properties";
 
   public static void main(String[] args) throws TrustStoreConfigurationException {
     PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
+    if (propertiesHolder.mode == Mode.NOT_VALID_MODE) {
+      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode not supported");
+      return;
+    }
+
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting migration script");
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "Append default truststore with custom truststore");
@@ -44,19 +50,21 @@ public class EnpointsMapperMain {
     WorkflowDao workflowDaoTemporary = new WorkflowDao(morphiaDatastoreProviderTemporary);
     ExecutorManager executorManager = new ExecutorManager(propertiesHolder, datasetDaoOriginal, workflowDaoOriginal, workflowDaoTemporary);
 
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode {}", propertiesHolder.mode.name());
     switch (propertiesHolder.mode) {
+      case COPY_WORKFLOWS:
+        executorManager.copyWorkflowsMode();
+        break;
       case CREATE_MAP:
-        LOGGER
-            .info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode {}", propertiesHolder.mode.name());
         executorManager.createMapMode();
         break;
+      case COPY_WORKFLOWS_AND_CREATE_MAP:
+        executorManager.copyWorkflowsAndCreateMap();
+        break;
       case REVERSE_MAP:
-        LOGGER
-            .info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode {}", propertiesHolder.mode.name());
         executorManager.reverseMapMode();
         break;
       default:
-        LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode not supported.");
         break;
     }
     mongoInitializer.close();
