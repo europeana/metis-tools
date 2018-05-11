@@ -17,4 +17,5 @@
 
 # Logs from scripts
 /endpoints-mapper/
+/datasets-execution/
 /logs/
