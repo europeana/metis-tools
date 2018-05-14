@@ -12,12 +12,17 @@
       <MarkerFilter marker="FINAL_DATASET_STATUS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n" />
     </File>
+    <File name="ProcessedDatasets" fileName="./datasets-execution/logs/processed-datasets.log">
+      <MarkerFilter marker="PROCESSED_DATASETS" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
   </Appenders>
   <Loggers>
     <Root level="INFO">
       <AppenderRef ref="Console"/>
       <AppenderRef ref="ExecutionLogs"/>
       <AppenderRef ref="FinalDatasetStatus"/>
+      <AppenderRef ref="ProcessedDatasets"/>
     </Root>
   </Loggers>
 </Configuration>

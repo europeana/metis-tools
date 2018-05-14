@@ -6,6 +6,7 @@ import eu.europeana.metis.datasets.execution.utilities.ExecutorManager;
 import eu.europeana.metis.datasets.execution.utilities.MongoInitializer;
 import eu.europeana.metis.datasets.execution.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class DatasetsExecutionMain {
   private static final String CONFIGURATION_FILE = "application.properties";
 
   public static void main( String[] args )
-      throws TrustStoreConfigurationException, InterruptedException {
+      throws TrustStoreConfigurationException, InterruptedException, IOException {
     PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting datasets execution script");
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,

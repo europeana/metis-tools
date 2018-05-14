@@ -1,5 +1,6 @@
 organization.id=
 metis.core.host=
+monitor.interval.in.secs=
 
 #Truststore
 truststore.path=

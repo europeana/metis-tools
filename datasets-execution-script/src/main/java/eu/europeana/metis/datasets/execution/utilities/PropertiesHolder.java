@@ -18,9 +18,11 @@ public class PropertiesHolder {
 
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker FINAL_DATASET_STATUS = MarkerFactory.getMarker("FINAL_DATASET_STATUS");
+  public static final Marker PROCESSED_DATASETS = MarkerFactory.getMarker("PROCESSED_DATASETS");
 
   public final String organizationId;
   public final String metisCoreHost;
+  public final int monitorIntervalInSecs;
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] mongoHosts;
@@ -41,6 +43,7 @@ public class PropertiesHolder {
     }
     organizationId = properties.getProperty("organization.id");
     metisCoreHost = properties.getProperty("metis.core.host");
+    monitorIntervalInSecs = Integer.parseInt(properties.getProperty("monitor.interval.in.secs"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");
