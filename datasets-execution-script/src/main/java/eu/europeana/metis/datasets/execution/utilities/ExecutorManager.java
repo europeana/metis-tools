@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Handles execution of the modes
@@ -132,8 +133,12 @@ public class ExecutorManager {
     Map<String, String> pathVariables = new HashMap<>();
     pathVariables.put("datasetId", datasetId);
 
+    // Query parameters
+    UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(startDatasetExecutionUrl)
+        .queryParam("enforcedPluginType", propertiesHolder.enforcedPluginType);
+
     return restTemplate
-        .postForObject(startDatasetExecutionUrl, null, WorkflowExecution.class, pathVariables);
+        .postForObject(builder.buildAndExpand(pathVariables).toUri().toString(), null, WorkflowExecution.class, pathVariables);
   }
 
   private WorkflowExecution monitorWorkflowExecution(String executionId) {

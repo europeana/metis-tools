@@ -23,6 +23,7 @@ public class PropertiesHolder {
   public final String organizationId;
   public final String metisCoreHost;
   public final int monitorIntervalInSecs;
+  public final String enforcedPluginType;
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] mongoHosts;
@@ -44,6 +45,7 @@ public class PropertiesHolder {
     organizationId = properties.getProperty("organization.id");
     metisCoreHost = properties.getProperty("metis.core.host");
     monitorIntervalInSecs = Integer.parseInt(properties.getProperty("monitor.interval.in.secs"));
+    enforcedPluginType = properties.getProperty("enforced.plugin.type");
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");
