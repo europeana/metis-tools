@@ -17,6 +17,7 @@ import org.slf4j.MarkerFactory;
 public class PropertiesHolder {
 
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
+  public static final Marker FINAL_DATASET_STATUS = MarkerFactory.getMarker("FINAL_DATASET_STATUS");
 
   public final String organizationId;
   public final String metisCoreHost;

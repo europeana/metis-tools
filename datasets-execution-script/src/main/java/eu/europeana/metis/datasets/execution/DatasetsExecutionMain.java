@@ -19,7 +19,8 @@ public class DatasetsExecutionMain {
   private static final Logger LOGGER = LoggerFactory.getLogger(DatasetsExecutionMain.class);
   private static final String CONFIGURATION_FILE = "application.properties";
 
-  public static void main( String[] args ) throws TrustStoreConfigurationException {
+  public static void main( String[] args )
+      throws TrustStoreConfigurationException, InterruptedException {
     PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting datasets execution script");
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
