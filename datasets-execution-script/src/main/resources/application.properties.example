@@ -1,0 +1,17 @@
+organization.id=
+metis.core.host=
+monitor.interval.in.secs=
+enforced.plugin.type=
+
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo
+mongo.hosts=
+mongo.port=
+mongo.authentication.db=
+mongo.username=
+mongo.password=
+mongo.enableSSL=
+mongo.db=
