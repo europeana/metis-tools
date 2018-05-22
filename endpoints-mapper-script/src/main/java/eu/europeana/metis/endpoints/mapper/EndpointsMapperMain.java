@@ -52,17 +52,16 @@ public class EndpointsMapperMain {
 
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode {}", propertiesHolder.mode.name());
     switch (propertiesHolder.mode) {
-      case COPY_WORKFLOWS:
+      case COPY_WORKFLOW:
         executorManager.copyWorkflowsMode();
         break;
-      case CREATE_MAP:
-        executorManager.createMapMode();
+      case CREATE_OAIPMH_WORKFLOWS:
+      case CREATE_PREVIEW_WORKFLOWS:
+      case CREATE_PUBLISH_WORKFLOWS:
+        executorManager.createWorkflows(propertiesHolder.mode);
         break;
-      case COPY_WORKFLOWS_AND_CREATE_MAP:
-        executorManager.copyWorkflowsAndCreateMap();
-        break;
-      case REVERSE_MAP:
-        executorManager.reverseMapMode();
+      case REVERSE_WORKFLOWS:
+        executorManager.reverseWorkflows();
         break;
       default:
         break;
