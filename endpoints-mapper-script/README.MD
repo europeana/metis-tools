@@ -15,11 +15,9 @@ After the CREATE_MAP execution, all datasets should be harvested and only then, 
 **Modes**  
 COPY_WORKFLOWS  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copies all original workflows to a temporary database.  
-CREATE_MAP  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overwrites all original workflows with only one oaipmh plugin and the corresponding europeana endpoint.  
-COPY_WORKFLOWS_AND_CREATE_MAP  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Performs COPY_WORKFLOWS and CREATE_MAP at the same time.    
-REVERSE_MAP  
+CREATE_OAIPMH_WORKFLOWS, CREATE_PREVIEW_WORKFLOWS, CREATE_PUBLISH_WORKFLOWS  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overwrites all original workflows with only one plugin(oaipmh and the corresponding europeana endpoint, preview, publish).      
+REVERSE_WORKFLOWS  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copies all workflows from the temporary database back to the original.  
 
 **Running the script**
