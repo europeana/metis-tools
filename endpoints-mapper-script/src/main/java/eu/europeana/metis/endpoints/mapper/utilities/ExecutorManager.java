@@ -83,7 +83,7 @@ public class ExecutorManager {
 
       //Overwrite workflow with europeana oai endpoint in original database
       responseListWrapper.getResults()
-          .forEach((workflow) -> overwriteWorkflowInDatabase(workflow, mode));
+          .forEach(workflow -> overwriteWorkflowInDatabase(workflow, mode));
       workflowProcessedCounter += responseListWrapper.getListSize();
       LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
           WORKFLOW_PROCESSED_COUNTER_TEMPLATE, workflowProcessedCounter);

@@ -1,6 +1,7 @@
 package eu.europeana.metis.tools.dataset.migration;
 
 import eu.europeana.metis.core.dao.DatasetDao;
+import eu.europeana.metis.core.dao.WorkflowDao;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.tools.dataset.migration.utilities.ExecutorManager;
 import eu.europeana.metis.tools.dataset.migration.utilities.MongoInitializer;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The Main method that starts the script.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2018-03-13
  */
@@ -35,8 +37,12 @@ public class DatasetsMigrationMain {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder);
     mongoInitializer.initializeMongoClient();
     DatasetDao datasetDao = new DatasetDao(
-        new MorphiaDatastoreProvider(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb), null);
-    ExecutorManager executorManager = new ExecutorManager(propertiesHolder, datasetDao);
+        new MorphiaDatastoreProvider(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb),
+        null);
+    WorkflowDao workflowDao = new WorkflowDao(
+        new MorphiaDatastoreProvider(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb));
+    ExecutorManager executorManager = new ExecutorManager(propertiesHolder, datasetDao,
+        workflowDao);
 
     switch (propertiesHolder.mode) {
       case CREATE:

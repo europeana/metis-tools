@@ -16,7 +16,6 @@ import org.slf4j.MarkerFactory;
 public class PropertiesHolder {
 
   public static final Marker FAILED_CSV_LINES_MARKER = MarkerFactory.getMarker("FAILED_CSV_LINES");
-  public static final Marker FAILED_CSV_LINES_LETTER_ON_ID_MARKER = MarkerFactory.getMarker("FAILED_CSV_LINES_LETTER_ON_ID");
   public static final Marker FAILED_CSV_LINES_DATASET_ALREADY_EXISTS_MARKER = MarkerFactory.getMarker("FAILED_CSV_LINES_DATASET_ALREADY_EXISTS");
   public static final Marker LEADING_ZEROS_DATASET_IDS_MARKER = MarkerFactory.getMarker("LEADING_ZEROS_DATASET_IDS");
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");

@@ -26,15 +26,14 @@ NM ?Language information not available -> language
 ("Notes" Column 64) -> notes
 
 If "Harvesting Type" Column 75 is "oai_pmh" The following will also be mapped.  
-("Harvest URL" Column 43) -> OaipmhHarvestPluginMetadata.url
+("Harvest URL" Column 43) -> OaipmhHarvestPluginMetadata.url (Checks if url is valid otherwise set to null)
 ("Metadata Format" Column 26) -> OaipmhHarvestPluginMetadata.metadataFormat
 ("Setspec" Column 58) If "-" then it will not be mapped -> OaipmhHarvestPluginMetadata.setSpec
 NM -> OaipmhHarvestPluginMetadata.fromDate
 NM -> OaipmhHarvestPluginMetadata.untilDate
 
-If "Harvesting Type" Column 75 is not "oai_pmh", then no harvesting information will be added
-since at the time of writing http metadata are not ready.
-
+If "Harvesting Type" Column 75 is not "oai_pmh" then only one field will be stored if it's a valid url  
+("HTTP URL" Column 49) -> HTTPHarvestPluginMetadata.url
 
 **Updating configuration**  
 A migration.properties file should be created under src/main/resources and the relative parameters should be populated.
@@ -51,5 +50,7 @@ The log configuration is controlled from the  `log4j2.xml` file under the resour
 When running the script, 3 log files will be generated based on timestamp:
 - `execution-{date}.log` -> Contains general logs of the execution
 - `failedCsvLines-{date}.log` -> Contains a String representation of the csv lines that failed
+- `failedCsvLinesDatasetAlreadyExists-{date}.log` -> Contais information of datasets that already existed in the system during creation
+- `leadingZerosDatasetIds-{date}.log` -> Contains dataset ids, one per line, that have leading zeros
 - `successfulDatasetIds-{date}.log` -> Contains all the successful identifiers, one per line. This can be used on the DELETE mode to delete everything that was added without impacting the rest of the database
 

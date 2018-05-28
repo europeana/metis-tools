@@ -3,15 +3,22 @@ package eu.europeana.metis.tools.dataset.migration.utilities;
 import com.opencsv.CSVReader;
 import eu.europeana.metis.core.common.Country;
 import eu.europeana.metis.core.dao.DatasetDao;
+import eu.europeana.metis.core.dao.WorkflowDao;
 import eu.europeana.metis.core.dataset.Dataset;
+import eu.europeana.metis.core.workflow.Workflow;
+import eu.europeana.metis.core.workflow.plugins.AbstractMetisPluginMetadata;
+import eu.europeana.metis.core.workflow.plugins.HTTPHarvestPluginMetadata;
 import eu.europeana.metis.core.workflow.plugins.OaipmhHarvestPluginMetadata;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,14 +38,17 @@ public class ExecutorManager {
 
   private final PropertiesHolder propertiesHolder;
   private final DatasetDao datasetDao;
+  private final WorkflowDao workflowDao;
   private int readCounter = 0;
   private int storedCounter = 0;
   private int failedCounter = 0;
   private int deletedCounter = 0;
 
-  public ExecutorManager(PropertiesHolder propertiesHolder, DatasetDao datasetDao) {
+  public ExecutorManager(PropertiesHolder propertiesHolder, DatasetDao datasetDao,
+      WorkflowDao workflowDao) {
     this.propertiesHolder = propertiesHolder;
     this.datasetDao = datasetDao;
+    this.workflowDao = workflowDao;
   }
 
   public void createMode() {
@@ -49,13 +59,14 @@ public class ExecutorManager {
       readCounter++;
       while ((line = reader.readNext()) != null) {
         readCounter++;
-        convertLineToDataset(line, datasetDao);
+        convertLineToDataset(line);
       }
     } catch (IOException e) {
       LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Reading csv file failed ", e);
     }
 
-    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total lines read(including title line): {} ", readCounter);
+    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER,
+        "Total lines read(including title line): {} ", readCounter);
     LOGGER
         .error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets stored: {} ", storedCounter);
     LOGGER
@@ -67,6 +78,7 @@ public class ExecutorManager {
       stream.forEach(datasetId -> {
         deletedCounter++;
         datasetDao.deleteByDatasetId(datasetId);
+        workflowDao.deleteWorkflow(datasetId);
         LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Counter: {}, datasetId: {}",
             deletedCounter, datasetId);
       });
@@ -77,10 +89,10 @@ public class ExecutorManager {
         deletedCounter);
   }
 
-  private void convertLineToDataset(String[] line, DatasetDao datasetDao) {
-    Dataset dataset;
+  private void convertLineToDataset(String[] line) {
     try {
-      dataset = extractColumnsFromArray(line);
+      Dataset dataset = extractDatasetColumnsFromArray(line);
+      Workflow workflow = extractWorkflowColumnsFromArray(line);
       Dataset storedDataset = null;
       String datasetIdString = null;
       if (dataset != null) {
@@ -88,8 +100,11 @@ public class ExecutorManager {
         datasetIdString = dataset.getDatasetId();
       }
 
-      if (dataset != null && storedDataset == null) {
+      if (dataset != null && storedDataset == null && workflow != null) {
+        workflow.setWorkflowOwner(propertiesHolder.organizationId);
+        workflow.setDatasetId(dataset.getDatasetId());
         datasetDao.create(dataset);
+        workflowDao.create(workflow);
         storedCounter++;
         LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
             "Line: {}, Dataset with datasetId: {}, created", readCounter, datasetIdString);
@@ -100,9 +115,8 @@ public class ExecutorManager {
             datasetIdString);
       } else {
         LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER,
-            "Line: {}, Failed to read dataset from csv line, probably a letter at the end of the id parsing",
+            "Line: {}, Failed to read dataset from csv line",
             readCounter);
-        LOGGER.warn(PropertiesHolder.FAILED_CSV_LINES_LETTER_ON_ID_MARKER, Arrays.toString(line));
         failedCounter++;
       }
     } catch (ParseException e) {
@@ -113,11 +127,11 @@ public class ExecutorManager {
     }
   }
 
-  private Dataset extractColumnsFromArray(String[] line) throws ParseException {
+  private Dataset extractDatasetColumnsFromArray(String[] line) throws ParseException {
     Dataset dataset = new Dataset();
     dataset.setEcloudDatasetId(String.format("NOT_CREATED_YET-%s", UUID.randomUUID().toString()));
     //Only get the first numeric part of the Columns.NAME field
-    Pattern pattern = Pattern.compile("^(\\d+)_.*|^(\\d+)$");
+    Pattern pattern = Pattern.compile("^(\\d+[a-zA-Z]*\\d?)_.*|^(\\d+[a-zA-Z]*\\d?)$");
     Matcher matcher = pattern.matcher(line[Columns.NAME.getIndex()].trim());
     if (matcher.find()) {
       String datasetId = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
@@ -138,20 +152,46 @@ public class ExecutorManager {
         Country.getCountryFromIsoCode(line[Columns.DATASET_COUNTRY_CODE.getIndex()].trim()));
     dataset.setDescription(line[Columns.DESCRIPTION.getIndex()]);
     dataset.setNotes(line[Columns.NOTES.getIndex()]);
+    return dataset;
+  }
 
-    // TODO: 2-5-18 The workflow implementation has changed and the setting of harvesting plugins should be handled differently
+  private Workflow extractWorkflowColumnsFromArray(String[] line) {
+    List<AbstractMetisPluginMetadata> abstractMetisPluginMetadata = new ArrayList<>(1);
     if (line[Columns.HARVEST_TYPE.getIndex()].trim().equals("oai_pmh")) {
       OaipmhHarvestPluginMetadata oaipmhHarvestPluginMetadata = new OaipmhHarvestPluginMetadata();
-      oaipmhHarvestPluginMetadata.setUrl(line[Columns.HARVEST_URL.getIndex()].trim());
+      oaipmhHarvestPluginMetadata.setUrl(
+          isValid(line[Columns.HARVEST_URL.getIndex()]) ? line[Columns.HARVEST_URL.getIndex()]
+              .trim() : null);
       oaipmhHarvestPluginMetadata
           .setMetadataFormat(line[Columns.METADATA_FORMAT.getIndex()].trim());
       oaipmhHarvestPluginMetadata
           .setSetSpec(line[Columns.SETSPEC.getIndex()].trim().equals("-") ? null
               : line[Columns.SETSPEC.getIndex()].trim());
       oaipmhHarvestPluginMetadata.setMocked(false);
-//      dataset.setHarvestingMetadata(oaipmhHarvestPluginMetadata);
+      oaipmhHarvestPluginMetadata.setEnabled(true);
+      abstractMetisPluginMetadata.add(oaipmhHarvestPluginMetadata);
+    } else { //Http type of any other, and create an http plugin with or without a valid url
+      HTTPHarvestPluginMetadata httpHarvestPluginMetadata = new HTTPHarvestPluginMetadata();
+      httpHarvestPluginMetadata.setUrl(
+          isValid(line[Columns.HTTP_URL.getIndex()]) ? line[Columns.HTTP_URL.getIndex()].trim()
+              : null);
+      httpHarvestPluginMetadata.setMocked(false);
+      httpHarvestPluginMetadata.setEnabled(true);
+      abstractMetisPluginMetadata.add(httpHarvestPluginMetadata);
     }
-    return dataset;
+
+    Workflow workflow = new Workflow();
+    workflow.setMetisPluginsMetadata(abstractMetisPluginMetadata);
+    return abstractMetisPluginMetadata.isEmpty() ? null : workflow;
+  }
+
+  private static boolean isValid(String url) {
+    try {
+      new URL(url).toURI();
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
 }
