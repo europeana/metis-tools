@@ -5,6 +5,7 @@ mongo.port=
 
 #Zoho access
 zoho.base.url=
+zoho.base.url.v2=
 zoho.authentication.token=
 
 #Filter settings for Zoho query
