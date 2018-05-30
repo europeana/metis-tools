@@ -345,13 +345,7 @@ public class OrganizationImporter {
     zohoAccessService = new ZohoAccessService(zohoAccessClientDao, zohoV2AccessDao);
     
     //initialize WikidataAccessService
-    File xsltTemplate = getClasspathFile(WikidataAccessService.WIKIDATA_ORGANIZATION_XSL_FILE);
-    if(xsltTemplate == null || !xsltTemplate.exists())
-      LOGGER.info("Cannot find xsl template in classpath: {}", WikidataAccessService.WIKIDATA_ORGANIZATION_XSL_FILE);
-    else
-      LOGGER.info("Using xsl template: {}", xsltTemplate.getAbsolutePath());
-  
-    wikidataAccessService = new WikidataAccessService(new WikidataAccessDao(xsltTemplate));
+    wikidataAccessService = new WikidataAccessService(new WikidataAccessDao());
 
     //initialize EntityService
     String mongoHost = appProps.getProperty("mongo.hosts");
