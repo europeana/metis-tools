@@ -1,17 +1,17 @@
 package eu.europeana.metis.endpoints.mapper;
 
-import eu.europeana.metis.core.dao.DatasetDao;
-import eu.europeana.metis.core.dao.WorkflowDao;
-import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
-import eu.europeana.metis.endpoints.mapper.utilities.ExecutorManager;
-import eu.europeana.metis.endpoints.mapper.utilities.Mode;
-import eu.europeana.metis.endpoints.mapper.utilities.MongoInitializer;
-import eu.europeana.metis.endpoints.mapper.utilities.PropertiesHolder;
-import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import eu.europeana.metis.core.dao.DatasetDao;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.endpoints.mapper.utilities.ExecutorManager;
+import eu.europeana.metis.endpoints.mapper.utilities.ExtendedWorkflowDao;
+import eu.europeana.metis.endpoints.mapper.utilities.Mode;
+import eu.europeana.metis.endpoints.mapper.utilities.MongoInitializer;
+import eu.europeana.metis.endpoints.mapper.utilities.PropertiesHolder;
+import eu.europeana.metis.utils.CustomTruststoreAppender;
 
 /**
  * The Main method that starts the script.
@@ -46,8 +46,8 @@ public class EndpointsMapperMain {
     MorphiaDatastoreProvider morphiaDatastoreProviderTemporary = new MorphiaDatastoreProvider(
         mongoInitializer.getMongoClient(), propertiesHolder.mongoDbTemporary);
     DatasetDao datasetDaoOriginal = new DatasetDao(morphiaDatastoreProviderOriginal, null);
-    WorkflowDao workflowDaoOriginal = new WorkflowDao(morphiaDatastoreProviderOriginal);
-    WorkflowDao workflowDaoTemporary = new WorkflowDao(morphiaDatastoreProviderTemporary);
+    ExtendedWorkflowDao workflowDaoOriginal = new ExtendedWorkflowDao(morphiaDatastoreProviderOriginal);
+    ExtendedWorkflowDao workflowDaoTemporary = new ExtendedWorkflowDao(morphiaDatastoreProviderTemporary);
     ExecutorManager executorManager = new ExecutorManager(propertiesHolder, datasetDaoOriginal, workflowDaoOriginal, workflowDaoTemporary);
 
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode {}", propertiesHolder.mode.name());
