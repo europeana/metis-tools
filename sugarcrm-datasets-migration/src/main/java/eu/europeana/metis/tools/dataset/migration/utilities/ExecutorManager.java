@@ -101,7 +101,6 @@ public class ExecutorManager {
       }
 
       if (dataset != null && storedDataset == null && workflow != null) {
-        workflow.setWorkflowOwner(propertiesHolder.organizationId);
         workflow.setDatasetId(dataset.getDatasetId());
         datasetDao.create(dataset);
         workflowDao.create(workflow);
