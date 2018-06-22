@@ -130,18 +130,19 @@ public class ExecutorManager {
     Dataset dataset = new Dataset();
     dataset.setEcloudDatasetId(String.format("NOT_CREATED_YET-%s", UUID.randomUUID().toString()));
     //Only get the first numeric part of the Columns.NAME field
-    Pattern pattern = Pattern.compile("^(\\d+[a-zA-Z]*\\d?)_.*|^(\\d+[a-zA-Z]*\\d?)$");
+    Pattern pattern = Pattern.compile("^(\\d+[a-zA-Z]*\\d?)_(.*)|^(\\d+[a-zA-Z]*\\d?)$");
     Matcher matcher = pattern.matcher(line[Columns.NAME.getIndex()].trim());
     if (matcher.find()) {
-      String datasetId = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+      String datasetId = matcher.group(1) != null ? matcher.group(1) : matcher.group(3);
       dataset.setDatasetId(datasetId);
+      //Use the parsed datasetName or datasetId if there was not name
+      dataset.setDatasetName(matcher.group(2) != null ? matcher.group(2) : datasetId);
       if (datasetId.charAt(0) == '0') {
         LOGGER.info(PropertiesHolder.LEADING_ZEROS_DATASET_IDS_MARKER, datasetId);
       }
     } else {
       return null;
     }
-    dataset.setDatasetName(line[Columns.NAME.getIndex()].trim());
     dataset.setOrganizationId(propertiesHolder.organizationId);
     dataset.setOrganizationName(propertiesHolder.organizationName);
     dataset.setCreatedByUserId(propertiesHolder.userId);
