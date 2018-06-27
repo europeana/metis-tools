@@ -89,7 +89,10 @@ public class ExecutorManager {
       OaipmhHarvestPluginMetadata oaipmhHarvestPluginMetadata = new OaipmhHarvestPluginMetadata();
       oaipmhHarvestPluginMetadata.setUrl(propertiesHolder.europeanaOaiEndpoint);
       oaipmhHarvestPluginMetadata.setMetadataFormat("edm");
-      oaipmhHarvestPluginMetadata.setSetSpec(dataset.getDatasetName());
+      oaipmhHarvestPluginMetadata.setSetSpec(dataset.getDatasetId() + "_" + dataset.getDatasetName());
+      oaipmhHarvestPluginMetadata.setDatasetId(workflow.getDatasetId());
+      oaipmhHarvestPluginMetadata.setUseDefaultIdentifiers(true);
+      oaipmhHarvestPluginMetadata.setIdentifierPrefixRemoval("http://data.europeana.eu/item");
       metisPluginsMetadata.add(oaipmhHarvestPluginMetadata);
       workflow.setMetisPluginsMetadata(metisPluginsMetadata);
     } else if (mode == Mode.CREATE_PREVIEW_WORKFLOWS) {
