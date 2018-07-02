@@ -8,8 +8,8 @@ CSV Column -> Dataset Field
 NM = Not Mapped  
   
 NM, Auto generated to NOT_CREATED_YET-UUID -> ecloudDatasetId  
-("Name" Column 0)Extracted from the first part of the string until "_" only numeric values -> datasetId  
-("Name" Column 0)Mapped column 0 -> datasetName  
+("Name" Column 0)Extracted from the first part of the string until "_" -> datasetId  
+("Name" Column 0)Extracted from the last part of the string after the first "_" character -> datasetName  
 NM, Harcoded from Zoho -> organizationId  
 NM, Harcoded from Zoho -> organizationName  
 NM -> provider  
@@ -20,7 +20,7 @@ NM, Harcoded from Zoho -> createdByUserId
 NM -> updatedDate  
 NM Some info on Notes column 64 "Notes", Not possible to be retrieved -> replacedBy  
 NM Some info on Notes column 64 "Notes", Not possible to be retrieved -> replaces  
-("Dataset Country" Column 68)(There are also similar columns 44 and 66) -> country  
+("Dataset Country" Column 68) -> country  
 NM ?Language information not available -> language  
 ("Descritpion" Column 10) -> description    
 ("Notes" Column 64) -> notes
