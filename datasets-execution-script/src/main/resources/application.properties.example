@@ -1,7 +1,10 @@
 organization.id=
 metis.core.host=
+metis.authentication.host=
 monitor.interval.in.secs=
 enforced.plugin.type=
+metis.username=
+metis.password=
 
 #Truststore
 truststore.path=

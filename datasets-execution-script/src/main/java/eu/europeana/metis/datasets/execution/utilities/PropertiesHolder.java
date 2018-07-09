@@ -22,8 +22,11 @@ public class PropertiesHolder {
 
   public final String organizationId;
   public final String metisCoreHost;
+  public final String metisAuthenticationHost;
   public final int monitorIntervalInSecs;
   public final String enforcedPluginType;
+  public final String metisUsername;
+  public final String metisPassword;
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] mongoHosts;
@@ -44,8 +47,11 @@ public class PropertiesHolder {
     }
     organizationId = properties.getProperty("organization.id");
     metisCoreHost = properties.getProperty("metis.core.host");
+    metisAuthenticationHost = properties.getProperty("metis.authentication.host");
     monitorIntervalInSecs = Integer.parseInt(properties.getProperty("monitor.interval.in.secs"));
     enforcedPluginType = properties.getProperty("enforced.plugin.type");
+    metisUsername = properties.getProperty("metis.username");
+    metisPassword = properties.getProperty("metis.password");
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");

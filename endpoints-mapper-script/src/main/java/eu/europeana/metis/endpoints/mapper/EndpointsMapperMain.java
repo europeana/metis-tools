@@ -52,7 +52,7 @@ public class EndpointsMapperMain {
 
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Mode {}", propertiesHolder.mode.name());
     switch (propertiesHolder.mode) {
-      case COPY_WORKFLOW:
+      case COPY_WORKFLOWS:
         executorManager.copyWorkflowsMode();
         break;
       case CREATE_OAIPMH_WORKFLOWS:

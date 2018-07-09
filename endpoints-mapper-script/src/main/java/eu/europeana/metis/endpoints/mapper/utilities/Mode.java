@@ -7,7 +7,7 @@ package eu.europeana.metis.endpoints.mapper.utilities;
  * @since 2018-05-02
  */
 public enum Mode {
-  COPY_WORKFLOW,
+  COPY_WORKFLOWS,
   CREATE_OAIPMH_WORKFLOWS,
   CREATE_PREVIEW_WORKFLOWS,
   CREATE_PUBLISH_WORKFLOWS,

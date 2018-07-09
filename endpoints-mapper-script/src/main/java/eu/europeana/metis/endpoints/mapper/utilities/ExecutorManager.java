@@ -89,7 +89,7 @@ public class ExecutorManager {
       OaipmhHarvestPluginMetadata oaipmhHarvestPluginMetadata = new OaipmhHarvestPluginMetadata();
       oaipmhHarvestPluginMetadata.setUrl(propertiesHolder.europeanaOaiEndpoint);
       oaipmhHarvestPluginMetadata.setMetadataFormat("edm");
-      oaipmhHarvestPluginMetadata.setSetSpec(dataset.getDatasetId() + "_" + dataset.getDatasetName());
+      oaipmhHarvestPluginMetadata.setSetSpec(dataset.getDatasetId());
       oaipmhHarvestPluginMetadata.setDatasetId(workflow.getDatasetId());
       oaipmhHarvestPluginMetadata.setUseDefaultIdentifiers(true);
       oaipmhHarvestPluginMetadata.setIdentifierPrefixRemoval("http://data.europeana.eu/item");

@@ -1,6 +1,7 @@
 package eu.europeana.metis.datasets.execution.utilities;
 
 import eu.europeana.metis.RestEndpoints;
+import eu.europeana.metis.authentication.user.MetisUser;
 import eu.europeana.metis.core.dao.DatasetDao;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.rest.ResponseListWrapper;
@@ -8,10 +9,12 @@ import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.WorkflowStatus;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -35,8 +41,10 @@ public class ExecutorManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
   private static final String NEXT_PAGE_WITH_DATASET_LIST_SIZE_TEMPLATE = "NextPage: {}, with dataset list size: {}";
   private static final String PATH_TO_PROCESSED_DATASETS_FILE = "./datasets-execution/logs/processed-datasets.log";
+  public static final String AUTHORIZATION = "Authorization";
   private final PropertiesHolder propertiesHolder;
   private final DatasetDao datasetDao;
+  private final String loginUserUrl;
   private final String startDatasetExecutionUrl;
   private final String getWorkflowExecutionUrl;
   private final RestTemplate restTemplate = new RestTemplate();
@@ -45,6 +53,8 @@ public class ExecutorManager {
   public ExecutorManager(PropertiesHolder propertiesHolder, DatasetDao datasetDao) {
     this.propertiesHolder = propertiesHolder;
     this.datasetDao = datasetDao;
+    loginUserUrl = this.propertiesHolder.metisAuthenticationHost
+        + RestEndpoints.AUTHENTICATION_LOGIN;
     startDatasetExecutionUrl = this.propertiesHolder.metisCoreHost
         + RestEndpoints.ORCHESTRATOR_WORKFLOWS_DATASETID_EXECUTE;
     getWorkflowExecutionUrl = this.propertiesHolder.metisCoreHost
@@ -93,7 +103,7 @@ public class ExecutorManager {
       LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
           "WorkflowExecution status info: datasetId: {}, EcloudDatasetId: {}, ExecutionId: {}, PluginType: {}, ExternalTaskId: {}, PluginStatus: {}, ExpectedRecords: {}, ProcessedRecords: {}, ErrorRecords: {}, TaskStatus: {}",
           dataset.getDatasetId(), dataset.getEcloudDatasetId(),
-          workflowExecution.getId().toString(),
+          workflowExecution.getId(),
           abstractMetisPlugin.getPluginType(), abstractMetisPlugin.getExternalTaskId(),
           abstractMetisPlugin.getPluginStatus(),
           abstractMetisPlugin.getExecutionProgress().getExpectedRecords(),
@@ -112,12 +122,12 @@ public class ExecutorManager {
         && workflowExecution.getWorkflowStatus() != WorkflowStatus.CANCELLED);
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "Ended datasetId: {} executionId: {} and final status: {}",
-        dataset.getDatasetId(), workflowExecution.getId().toString(),
+        dataset.getDatasetId(), workflowExecution.getId(),
         workflowExecution.getWorkflowStatus());
     AbstractMetisPlugin abstractMetisPlugin = workflowExecution.getMetisPlugins().get(0);
     LOGGER.info(PropertiesHolder.FINAL_DATASET_STATUS,
         "datasetId: {}, EcloudDatasetId: {}, ExecutionId: {}, PluginType: {}, ExternalTaskId: {}, PluginStatus: {}, ExpectedRecords: {}, ProcessedRecords: {}, ErrorRecords: {}, TaskStatus: {}",
-        dataset.getDatasetId(), dataset.getEcloudDatasetId(), workflowExecution.getId().toString(),
+        dataset.getDatasetId(), dataset.getEcloudDatasetId(), workflowExecution.getId(),
         abstractMetisPlugin.getPluginType(), abstractMetisPlugin.getExternalTaskId(),
         abstractMetisPlugin.getPluginStatus(),
         abstractMetisPlugin.getExecutionProgress().getExpectedRecords(),
@@ -130,6 +140,11 @@ public class ExecutorManager {
   }
 
   private WorkflowExecution sendDatasetForExecution(String datasetId) {
+
+    HttpHeaders accessTokenHeader = new HttpHeaders();
+    accessTokenHeader
+        .set(AUTHORIZATION, "Bearer " + loginAndGetAuthorizationToken());
+
     Map<String, String> pathVariables = new HashMap<>();
     pathVariables.put("datasetId", datasetId);
 
@@ -138,14 +153,33 @@ public class ExecutorManager {
         .queryParam("enforcedPluginType", propertiesHolder.enforcedPluginType);
 
     return restTemplate
-        .postForObject(builder.buildAndExpand(pathVariables).toUri().toString(), null, WorkflowExecution.class, pathVariables);
+        .postForObject(builder.buildAndExpand(pathVariables).toUri().toString(),
+            new HttpEntity<>(null, accessTokenHeader),
+            WorkflowExecution.class, pathVariables);
   }
 
   private WorkflowExecution monitorWorkflowExecution(String executionId) {
+    HttpHeaders accessTokenHeader = new HttpHeaders();
+    accessTokenHeader
+        .set(AUTHORIZATION, "Bearer " + loginAndGetAuthorizationToken());
     Map<String, String> pathVariables = new HashMap<>();
     pathVariables.put("executionId", executionId);
 
-    return restTemplate
-        .getForObject(getWorkflowExecutionUrl, WorkflowExecution.class, pathVariables);
+    return restTemplate.exchange
+        (getWorkflowExecutionUrl, HttpMethod.GET, new HttpEntity<>(null, accessTokenHeader),
+            WorkflowExecution.class, pathVariables).getBody();
+  }
+
+  private String loginAndGetAuthorizationToken() {
+    UriComponentsBuilder authenticationBuilder = UriComponentsBuilder.fromUriString(loginUserUrl);
+    HttpHeaders authenticationHttpHeaders = new HttpHeaders();
+    authenticationHttpHeaders.set(AUTHORIZATION, "Basic " + new String(Base64.getEncoder()
+        .encode((propertiesHolder.metisUsername + ":" + propertiesHolder.metisPassword).getBytes()),
+        Charset.forName("UTF-8")));
+
+    MetisUser metisUser = restTemplate
+        .postForObject(authenticationBuilder.build().toUri().toString(),
+            new HttpEntity<>(null, authenticationHttpHeaders), MetisUser.class);
+    return metisUser.getMetisUserAccessToken().getAccessToken();
   }
 }
