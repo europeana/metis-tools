@@ -48,6 +48,7 @@ public class ExecutorManager {
   private final String startDatasetExecutionUrl;
   private final String getWorkflowExecutionUrl;
   private final RestTemplate restTemplate = new RestTemplate();
+  private String accessToken;
   private List<String> processedDatasetIds = new ArrayList<>();
 
   public ExecutorManager(PropertiesHolder propertiesHolder, DatasetDao datasetDao) {
@@ -141,9 +142,10 @@ public class ExecutorManager {
 
   private WorkflowExecution sendDatasetForExecution(String datasetId) {
 
+    accessToken = loginAndGetAuthorizationToken();
     HttpHeaders accessTokenHeader = new HttpHeaders();
     accessTokenHeader
-        .set(AUTHORIZATION, "Bearer " + loginAndGetAuthorizationToken());
+        .set(AUTHORIZATION, "Bearer " + accessToken);
 
     Map<String, String> pathVariables = new HashMap<>();
     pathVariables.put("datasetId", datasetId);
@@ -161,7 +163,7 @@ public class ExecutorManager {
   private WorkflowExecution monitorWorkflowExecution(String executionId) {
     HttpHeaders accessTokenHeader = new HttpHeaders();
     accessTokenHeader
-        .set(AUTHORIZATION, "Bearer " + loginAndGetAuthorizationToken());
+        .set(AUTHORIZATION, "Bearer " + accessToken);
     Map<String, String> pathVariables = new HashMap<>();
     pathVariables.put("executionId", executionId);
 
