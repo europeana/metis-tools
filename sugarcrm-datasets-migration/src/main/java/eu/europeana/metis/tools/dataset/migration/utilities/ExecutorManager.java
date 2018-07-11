@@ -145,6 +145,7 @@ public class ExecutorManager {
     }
     dataset.setOrganizationId(propertiesHolder.organizationId);
     dataset.setOrganizationName(propertiesHolder.organizationName);
+    dataset.setProvider(line[Columns.ORGANIZATION_NAME.getIndex()].trim());
     dataset.setCreatedByUserId(propertiesHolder.userId);
     SimpleDateFormat dateFormat = new SimpleDateFormat(PropertiesHolder.SUGARCRM_DATE_FORMAT);
     dataset.setCreatedDate(dateFormat.parse(line[Columns.DATE_CREATED.getIndex()].trim()));
