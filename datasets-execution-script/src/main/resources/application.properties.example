@@ -5,6 +5,8 @@ monitor.interval.in.secs=
 enforced.plugin.type=
 metis.username=
 metis.password=
+#If number not set, it will get Integer.MAX_VALUE
+number.of.datasets.to.process=
 
 #Truststore
 truststore.path=

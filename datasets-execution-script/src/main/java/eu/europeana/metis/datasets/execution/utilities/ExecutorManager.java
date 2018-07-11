@@ -67,6 +67,7 @@ public class ExecutorManager {
   public void startExecutions() throws InterruptedException, IOException {
     initializeProcessedDatasetList(); //Read file that contains dataset ids that are already processed from previous executions
     int nextPage = 0;
+    int processedDatasetsCounter = 0;
     do {
       //Read pages from database
       ResponseListWrapper<Dataset> responseListWrapper = new ResponseListWrapper<>();
@@ -80,15 +81,22 @@ public class ExecutorManager {
       for (Dataset dataset : responseListWrapper.getResults()) {
         if (!processedDatasetIds.contains(dataset.getDatasetId())) {
           handleDatasetExecution(dataset);
+          processedDatasetsCounter++;
         }
       }
-    } while (nextPage != -1);
+    } while (nextPage != -1
+        && processedDatasetsCounter < propertiesHolder.numberOfDatasetsToProcess);
   }
 
   private void initializeProcessedDatasetList() throws IOException {
     try (Stream<String> stream = Files
         .lines(Paths.get(PATH_TO_PROCESSED_DATASETS_FILE), StandardCharsets.UTF_8)) {
       stream.forEach(line -> processedDatasetIds.add(line));
+      if (!processedDatasetIds.isEmpty()) {
+        LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
+            "Using Processed datasets file: {}. There are {} datasets that will be bypassed.",
+            PATH_TO_PROCESSED_DATASETS_FILE, processedDatasetIds.size());
+      }
     }
   }
 

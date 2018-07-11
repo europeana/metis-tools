@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Properties;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
@@ -27,6 +28,7 @@ public class PropertiesHolder {
   public final String enforcedPluginType;
   public final String metisUsername;
   public final String metisPassword;
+  public final int numberOfDatasetsToProcess;
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] mongoHosts;
@@ -52,6 +54,8 @@ public class PropertiesHolder {
     enforcedPluginType = properties.getProperty("enforced.plugin.type");
     metisUsername = properties.getProperty("metis.username");
     metisPassword = properties.getProperty("metis.password");
+    numberOfDatasetsToProcess = StringUtils.isNotBlank(properties.getProperty("number.of.datasets.to.process")) ? Integer
+        .parseInt(properties.getProperty("number.of.datasets.process")) : Integer.MAX_VALUE;
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");
