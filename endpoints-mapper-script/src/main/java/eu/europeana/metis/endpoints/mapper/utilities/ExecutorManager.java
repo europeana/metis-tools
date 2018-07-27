@@ -96,10 +96,14 @@ public class ExecutorManager {
       metisPluginsMetadata.add(oaipmhHarvestPluginMetadata);
       workflow.setMetisPluginsMetadata(metisPluginsMetadata);
     } else if (mode == Mode.CREATE_PREVIEW_WORKFLOWS) {
-      metisPluginsMetadata.add(new IndexToPreviewPluginMetadata());
+      IndexToPreviewPluginMetadata indexToPreviewPluginMetadata = new IndexToPreviewPluginMetadata();
+      indexToPreviewPluginMetadata.setPreserveTimestamps(true);
+      metisPluginsMetadata.add(indexToPreviewPluginMetadata);
       workflow.setMetisPluginsMetadata(metisPluginsMetadata);
     } else if (mode == Mode.CREATE_PUBLISH_WORKFLOWS) {
-      metisPluginsMetadata.add(new IndexToPublishPluginMetadata());
+      IndexToPublishPluginMetadata indexToPublishPluginMetadata = new IndexToPublishPluginMetadata();
+      indexToPublishPluginMetadata.setPreserveTimestamps(true);
+      metisPluginsMetadata.add(indexToPublishPluginMetadata);
       workflow.setMetisPluginsMetadata(metisPluginsMetadata);
     }
     metisPluginsMetadata.get(0).setMocked(false);
