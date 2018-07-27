@@ -105,20 +105,7 @@ public class ExecutorManager {
         dataset.getDatasetId());
     WorkflowExecution workflowExecution = sendDatasetForExecution(dataset.getDatasetId());
     do {
-      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
-          "Requesting WorkflowExecution for datasetId: {} execution.", dataset.getDatasetId());
-      workflowExecution = monitorWorkflowExecution(workflowExecution.getId().toString());
-      AbstractMetisPlugin abstractMetisPlugin = workflowExecution.getMetisPlugins().get(0);
-      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
-          "WorkflowExecution status info: datasetId: {}, EcloudDatasetId: {}, ExecutionId: {}, PluginType: {}, ExternalTaskId: {}, PluginStatus: {}, ExpectedRecords: {}, ProcessedRecords: {}, ErrorRecords: {}, TaskStatus: {}",
-          dataset.getDatasetId(), dataset.getEcloudDatasetId(),
-          workflowExecution.getId(),
-          abstractMetisPlugin.getPluginType(), abstractMetisPlugin.getExternalTaskId(),
-          abstractMetisPlugin.getPluginStatus(),
-          abstractMetisPlugin.getExecutionProgress().getExpectedRecords(),
-          abstractMetisPlugin.getExecutionProgress().getProcessedRecords(),
-          abstractMetisPlugin.getExecutionProgress().getErrors(),
-          abstractMetisPlugin.getExecutionProgress().getStatus());
+      monitorAndLog(dataset, workflowExecution);
       try {
         Thread.sleep(TimeUnit.SECONDS.toMillis(propertiesHolder.monitorIntervalInSecs));
       } catch (InterruptedException e) {
@@ -129,6 +116,27 @@ public class ExecutorManager {
     } while (workflowExecution.getWorkflowStatus() != WorkflowStatus.FINISHED
         && workflowExecution.getWorkflowStatus() != WorkflowStatus.FAILED
         && workflowExecution.getWorkflowStatus() != WorkflowStatus.CANCELLED);
+    updateLogsAfterExecution(dataset, workflowExecution);
+  }
+
+  private void monitorAndLog(Dataset dataset, WorkflowExecution workflowExecution) {
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
+        "Requesting WorkflowExecution for datasetId: {} execution.", dataset.getDatasetId());
+    workflowExecution = monitorWorkflowExecution(workflowExecution.getId().toString());
+    AbstractMetisPlugin abstractMetisPlugin = workflowExecution.getMetisPlugins().get(0);
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
+        "WorkflowExecution status info: datasetId: {}, EcloudDatasetId: {}, ExecutionId: {}, PluginType: {}, ExternalTaskId: {}, PluginStatus: {}, ExpectedRecords: {}, ProcessedRecords: {}, ErrorRecords: {}, TaskStatus: {}",
+        dataset.getDatasetId(), dataset.getEcloudDatasetId(),
+        workflowExecution.getId(),
+        abstractMetisPlugin.getPluginType(), abstractMetisPlugin.getExternalTaskId(),
+        abstractMetisPlugin.getPluginStatus(),
+        abstractMetisPlugin.getExecutionProgress().getExpectedRecords(),
+        abstractMetisPlugin.getExecutionProgress().getProcessedRecords(),
+        abstractMetisPlugin.getExecutionProgress().getErrors(),
+        abstractMetisPlugin.getExecutionProgress().getStatus());
+  }
+
+  private void updateLogsAfterExecution(Dataset dataset, WorkflowExecution workflowExecution) {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "Ended datasetId: {} executionId: {} and final status: {}",
         dataset.getDatasetId(), workflowExecution.getId(),
