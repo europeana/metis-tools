@@ -19,7 +19,9 @@ public class PropertiesHolder {
 
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker FINAL_DATASET_STATUS = MarkerFactory.getMarker("FINAL_DATASET_STATUS");
-  public static final Marker PROCESSED_DATASETS = MarkerFactory.getMarker("PROCESSED_DATASETS");
+  public static final Marker PROCESSED_DATASETS_HARVESTING = MarkerFactory.getMarker("PROCESSED_DATASETS_HARVESTING");
+  public static final Marker PROCESSED_DATASETS_PREVIEW = MarkerFactory.getMarker("PROCESSED_DATASETS_PREVIEW");
+  public static final Marker PROCESSED_DATASETS_PUBLISH = MarkerFactory.getMarker("PROCESSED_DATASETS_PUBLISH");
 
   public final String organizationId;
   public final String metisCoreHost;
@@ -29,6 +31,7 @@ public class PropertiesHolder {
   public final String metisUsername;
   public final String metisPassword;
   public final int numberOfDatasetsToProcess;
+  public final String suffixOfProcessedDatasetsLogFile;
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] mongoHosts;
@@ -55,7 +58,8 @@ public class PropertiesHolder {
     metisUsername = properties.getProperty("metis.username");
     metisPassword = properties.getProperty("metis.password");
     numberOfDatasetsToProcess = StringUtils.isNotBlank(properties.getProperty("number.of.datasets.to.process")) ? Integer
-        .parseInt(properties.getProperty("number.of.datasets.process")) : Integer.MAX_VALUE;
+        .parseInt(properties.getProperty("number.of.datasets.to.process")) : Integer.MAX_VALUE;
+    suffixOfProcessedDatasetsLogFile = properties.getProperty("suffix.of.processed.datasets.log.file");
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");

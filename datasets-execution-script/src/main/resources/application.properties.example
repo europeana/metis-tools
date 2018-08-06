@@ -2,11 +2,14 @@ organization.id=
 metis.core.host=
 metis.authentication.host=
 monitor.interval.in.secs=
+#Value can be OAIPMH_HARVEST for preview execution or empty for the other two
 enforced.plugin.type=
 metis.username=
 metis.password=
 #If number not set, it will get Integer.MAX_VALUE
 number.of.datasets.to.process=
+#Acceptable values -> harvesting, preview, publish
+suffix.of.processed.datasets.log.file=
 
 #Truststore
 truststore.path=

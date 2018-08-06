@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,7 +42,10 @@ public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
   private static final String NEXT_PAGE_WITH_DATASET_LIST_SIZE_TEMPLATE = "NextPage: {}, with dataset list size: {}";
-  private static final String PATH_TO_PROCESSED_DATASETS_FILE = "./datasets-execution/logs/processed-datasets.log";
+  private static final String PREFIX_OF_PROCESSED_DATASET_FILE = "./datasets-execution/logs/processed-datasets-";
+  private static final String LOG_FILE_EXTENSION = ".log";
+  private final Marker processedDatasetsMarker;
+  private final String pathToProcessedDatasetsFile;
   public static final String AUTHORIZATION = "Authorization";
   private final PropertiesHolder propertiesHolder;
   private final DatasetDao datasetDao;
@@ -50,6 +55,9 @@ public class ExecutorManager {
   private final RestTemplate restTemplate = new RestTemplate();
   private String accessToken;
   private List<String> processedDatasetIds = new ArrayList<>();
+  private long totalExpectedRecords = 0;
+  private long totalProcessedRecords = 0;
+  private long totalErrorRecords = 0;
 
   public ExecutorManager(PropertiesHolder propertiesHolder, DatasetDao datasetDao) {
     this.propertiesHolder = propertiesHolder;
@@ -62,6 +70,24 @@ public class ExecutorManager {
         + RestEndpoints.ORCHESTRATOR_WORKFLOWS_EXECUTIONS_EXECUTIONID;
     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
     restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+    pathToProcessedDatasetsFile =
+        PREFIX_OF_PROCESSED_DATASET_FILE + propertiesHolder.suffixOfProcessedDatasetsLogFile
+            + LOG_FILE_EXTENSION;
+    switch (propertiesHolder.suffixOfProcessedDatasetsLogFile) {
+      case "harvesting":
+        processedDatasetsMarker = PropertiesHolder.PROCESSED_DATASETS_HARVESTING;
+        break;
+      case "preview":
+        processedDatasetsMarker = PropertiesHolder.PROCESSED_DATASETS_PREVIEW;
+        break;
+      case "publish":
+        processedDatasetsMarker = PropertiesHolder.PROCESSED_DATASETS_PUBLISH;
+        break;
+      default:
+        processedDatasetsMarker = null;
+        throw new IllegalArgumentException(String
+            .format("Wrong log file suffix %s", propertiesHolder.suffixOfProcessedDatasetsLogFile));
+    }
   }
 
   public void startExecutions() throws InterruptedException, IOException {
@@ -83,19 +109,25 @@ public class ExecutorManager {
           handleDatasetExecution(dataset);
           processedDatasetsCounter++;
         }
+        if (processedDatasetsCounter >= propertiesHolder.numberOfDatasetsToProcess) {
+          break;
+        }
       }
     } while (nextPage != -1
         && processedDatasetsCounter < propertiesHolder.numberOfDatasetsToProcess);
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
+        "Total totalExpectedRecords: {}. Total totalProcessedRecords: {}. Total totalErrorRecords: {}.",
+        totalExpectedRecords, totalProcessedRecords, totalErrorRecords);
   }
 
   private void initializeProcessedDatasetList() throws IOException {
     try (Stream<String> stream = Files
-        .lines(Paths.get(PATH_TO_PROCESSED_DATASETS_FILE), StandardCharsets.UTF_8)) {
+        .lines(Paths.get(pathToProcessedDatasetsFile), StandardCharsets.UTF_8)) {
       stream.forEach(line -> processedDatasetIds.add(line));
       if (!processedDatasetIds.isEmpty()) {
         LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
             "Using Processed datasets file: {}. There are {} datasets that will be bypassed.",
-            PATH_TO_PROCESSED_DATASETS_FILE, processedDatasetIds.size());
+            pathToProcessedDatasetsFile, processedDatasetIds.size());
       }
     }
   }
@@ -104,8 +136,18 @@ public class ExecutorManager {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting datasetId {} execution.",
         dataset.getDatasetId());
     WorkflowExecution workflowExecution = sendDatasetForExecution(dataset.getDatasetId());
+    if (workflowExecution == null) {
+      LOGGER.info(processedDatasetsMarker,
+          dataset.getDatasetId()); //Gets appended and is not timestamp based
+      LOGGER.info(PropertiesHolder.FINAL_DATASET_STATUS,
+          "FAILED DATASET datasetId: {}",
+          dataset.getDatasetId());//Log only the status of the end result
+      return;
+    }
+    dataset.setEcloudDatasetId(
+        datasetDao.getDatasetByDatasetId(dataset.getDatasetId()).getEcloudDatasetId());
     do {
-      monitorAndLog(dataset, workflowExecution);
+      workflowExecution = monitorAndLog(dataset, workflowExecution.getId());
       try {
         Thread.sleep(TimeUnit.SECONDS.toMillis(propertiesHolder.monitorIntervalInSecs));
       } catch (InterruptedException e) {
@@ -119,21 +161,25 @@ public class ExecutorManager {
     updateLogsAfterExecution(dataset, workflowExecution);
   }
 
-  private void monitorAndLog(Dataset dataset, WorkflowExecution workflowExecution) {
+  private WorkflowExecution monitorAndLog(Dataset dataset, ObjectId objectId) {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "Requesting WorkflowExecution for datasetId: {} execution.", dataset.getDatasetId());
-    workflowExecution = monitorWorkflowExecution(workflowExecution.getId().toString());
-    AbstractMetisPlugin abstractMetisPlugin = workflowExecution.getMetisPlugins().get(0);
+    WorkflowExecution updatedWorkflowExecution = monitorWorkflowExecution(objectId.toString());
+    AbstractMetisPlugin abstractMetisPlugin = updatedWorkflowExecution.getMetisPlugins().get(0);
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "WorkflowExecution status info: datasetId: {}, EcloudDatasetId: {}, ExecutionId: {}, PluginType: {}, ExternalTaskId: {}, PluginStatus: {}, ExpectedRecords: {}, ProcessedRecords: {}, ErrorRecords: {}, TaskStatus: {}",
         dataset.getDatasetId(), dataset.getEcloudDatasetId(),
-        workflowExecution.getId(),
+        updatedWorkflowExecution.getId(),
         abstractMetisPlugin.getPluginType(), abstractMetisPlugin.getExternalTaskId(),
         abstractMetisPlugin.getPluginStatus(),
         abstractMetisPlugin.getExecutionProgress().getExpectedRecords(),
         abstractMetisPlugin.getExecutionProgress().getProcessedRecords(),
         abstractMetisPlugin.getExecutionProgress().getErrors(),
         abstractMetisPlugin.getExecutionProgress().getStatus());
+    totalExpectedRecords += abstractMetisPlugin.getExecutionProgress().getExpectedRecords();
+    totalProcessedRecords += abstractMetisPlugin.getExecutionProgress().getProcessedRecords();
+    totalErrorRecords += abstractMetisPlugin.getExecutionProgress().getErrors();
+    return updatedWorkflowExecution;
   }
 
   private void updateLogsAfterExecution(Dataset dataset, WorkflowExecution workflowExecution) {
@@ -152,7 +198,7 @@ public class ExecutorManager {
         abstractMetisPlugin.getExecutionProgress().getErrors(),
         abstractMetisPlugin.getExecutionProgress()
             .getStatus());//Log only the status of the end result
-    LOGGER.info(PropertiesHolder.PROCESSED_DATASETS,
+    LOGGER.info(processedDatasetsMarker,
         dataset.getDatasetId()); //Gets appended and is not timestamp based
   }
 
@@ -170,10 +216,16 @@ public class ExecutorManager {
     UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(startDatasetExecutionUrl)
         .queryParam("enforcedPluginType", propertiesHolder.enforcedPluginType);
 
-    return restTemplate
-        .postForObject(builder.buildAndExpand(pathVariables).toUri().toString(),
-            new HttpEntity<>(null, accessTokenHeader),
-            WorkflowExecution.class, pathVariables);
+    try {
+      return ExternalRequestUtilMigration.retryableExternalRequest(() -> restTemplate
+          .postForObject(builder.buildAndExpand(pathVariables).toUri().toString(),
+              new HttpEntity<>(null, accessTokenHeader),
+              WorkflowExecution.class, pathVariables));
+    } catch (Exception ex) {
+      LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER,
+          "Execution of DatasetId {}, failed to start because of remote call exception", datasetId);
+    }
+    return null;
   }
 
   private WorkflowExecution monitorWorkflowExecution(String executionId) {
@@ -183,9 +235,9 @@ public class ExecutorManager {
     Map<String, String> pathVariables = new HashMap<>();
     pathVariables.put("executionId", executionId);
 
-    return restTemplate.exchange
+    return ExternalRequestUtilMigration.retryableExternalRequest(() -> restTemplate.exchange
         (getWorkflowExecutionUrl, HttpMethod.GET, new HttpEntity<>(null, accessTokenHeader),
-            WorkflowExecution.class, pathVariables).getBody();
+            WorkflowExecution.class, pathVariables).getBody());
   }
 
   private String loginAndGetAuthorizationToken() {
@@ -195,9 +247,9 @@ public class ExecutorManager {
         .encode((propertiesHolder.metisUsername + ":" + propertiesHolder.metisPassword).getBytes()),
         Charset.forName("UTF-8")));
 
-    MetisUser metisUser = restTemplate
+    MetisUser metisUser = ExternalRequestUtilMigration.retryableExternalRequest(() -> restTemplate
         .postForObject(authenticationBuilder.build().toUri().toString(),
-            new HttpEntity<>(null, authenticationHttpHeaders), MetisUser.class);
+            new HttpEntity<>(null, authenticationHttpHeaders), MetisUser.class));
     return metisUser.getMetisUserAccessToken().getAccessToken();
   }
 }

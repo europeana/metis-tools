@@ -85,7 +85,7 @@ public class ExecutorManager {
     } catch (IOException e) {
       LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Reading dataset ids file failed ", e);
     }
-    LOGGER.error(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets deleted: {} ",
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total datasets deleted: {} ",
         deletedCounter);
   }
 

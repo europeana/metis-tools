@@ -1,6 +1,6 @@
 organization.id=
 europeana.oai.endpoint=
-#mode is CREATE_MAP or REVERSE_MAP
+# Values can be CREATE_OAIPMH_WORKFLOWS, CREATE_PREVIEW_WORKFLOWS, CREATE_PUBLISH_WORKFLOWS
 mode=CREATE_MAP
 
 #Truststore

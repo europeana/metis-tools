@@ -4,23 +4,23 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
     </Console>
-    <File name="ExecutionLogs" fileName="./sugarcrm-datasets-migration/logs/execution-${date:yyyy-MM-dd-HHmmss}.log">
+    <File name="ExecutionLogs" fileName="./sugarcrm-datasets/logs/execution-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="EXECUTION_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n" />
     </File>
-    <File name="FailedCsvLines" fileName="./sugarcrm-datasets-migration/logs/failedCsvLines-${date:yyyy-MM-dd-HHmmss}.log">
+    <File name="FailedCsvLines" fileName="./sugarcrm-datasets/logs/failedCsvLines-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="FAILED_CSV_LINES" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>
-    <File name="FailedCsvLinesDatasetAlreadyExists" fileName="./sugarcrm-datasets-migration/logs/failedCsvLinesDatasetAlreadyExists-${date:yyyy-MM-dd-HHmmss}.log">
+    <File name="FailedCsvLinesDatasetAlreadyExists" fileName="./sugarcrm-datasets/logs/failedCsvLinesDatasetAlreadyExists-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="FAILED_CSV_LINES_DATASET_ALREADY_EXISTS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>
-    <File name="LeadingZerosDatasetIds" fileName="./sugarcrm-datasets-migration/logs/leadingZerosDatasetIds-${date:yyyy-MM-dd-HHmmss}.log">
+    <File name="LeadingZerosDatasetIds" fileName="./sugarcrm-datasets/logs/leadingZerosDatasetIds-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="LEADING_ZEROS_DATASET_IDS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>
-    <File name="SuccessfulDatasetIds" fileName="./sugarcrm-datasets-migration/logs/successfulDatasetIds-${date:yyyy-MM-dd-HHmmss}.log">
+    <File name="SuccessfulDatasetIds" fileName="./sugarcrm-datasets/logs/successfulDatasetIds-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="SUCCESSFULL_DATASET_IDS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>

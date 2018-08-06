@@ -11,7 +11,8 @@ Most of the fields are self explanatory and the ones that require some attention
 - `monitor.interval.in.secs` -> Is the number of seconds to wait before each monitor call to metis-core
 - `metis.username` -> Is the email of a user in metis core that is part of the same organization id  
 - `metis.password` -> Is the password of the above mentioned user
-- `number.of.datasets.process` -> Is the number of datasets to process. It will only count datasets that have not been yet processed and are not part of the `processed-datasets.log` file. If the value is not filled in then `Integer.MAX_VALUE` will be set as the default. Script execution will stop when either there are no more datasets in the database or when the number of datasets to process has been reached    
+- `number.of.datasets.process` -> Is the number of datasets to process. It will only count datasets that have not been yet processed and are not part of the `processed-datasets.log` file. If the value is not filled in then `Integer.MAX_VALUE` will be set as the default. Script execution will stop when either there are no more datasets in the database or when the number of datasets to process has been reached
+- `suffix.of.processed.datasets.log.file` -> Should have one of the following values -> harvesting, preview, publish. These values are used to correctly identify the corresponding to the process processed datasets file.      
 - `enforced.plugin.type=` -> Can be used to enforce the source of plugin data for the execution. For example when running the PREVIEW plugin.
 - `metis.core.host` -> Is the base url with which core would this tool communicate 
 - `truststore.path/truststore.password` -> are used if the database to connect has self signed certificates and this trustore should contain that certificate
