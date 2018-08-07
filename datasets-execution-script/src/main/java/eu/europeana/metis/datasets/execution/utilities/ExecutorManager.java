@@ -44,6 +44,7 @@ public class ExecutorManager {
   private static final String NEXT_PAGE_WITH_DATASET_LIST_SIZE_TEMPLATE = "NextPage: {}, with dataset list size: {}";
   private static final String PREFIX_OF_PROCESSED_DATASET_FILE = "./datasets-execution/logs/processed-datasets-";
   private static final String LOG_FILE_EXTENSION = ".log";
+  public static final int DURATION_OF_NO_RECORD_CHANGE_IN_MINS = 30;
   private final Marker processedDatasetsMarker;
   private final String pathToProcessedDatasetsFile;
   public static final String AUTHORIZATION = "Authorization";
@@ -52,6 +53,7 @@ public class ExecutorManager {
   private final String loginUserUrl;
   private final String startDatasetExecutionUrl;
   private final String getWorkflowExecutionUrl;
+  private final String cancelWorkflowExecutionUrl;
   private final RestTemplate restTemplate = new RestTemplate();
   private String accessToken;
   private List<String> processedDatasetIds = new ArrayList<>();
@@ -67,6 +69,8 @@ public class ExecutorManager {
     startDatasetExecutionUrl = this.propertiesHolder.metisCoreHost
         + RestEndpoints.ORCHESTRATOR_WORKFLOWS_DATASETID_EXECUTE;
     getWorkflowExecutionUrl = this.propertiesHolder.metisCoreHost
+        + RestEndpoints.ORCHESTRATOR_WORKFLOWS_EXECUTIONS_EXECUTIONID;
+    cancelWorkflowExecutionUrl = this.propertiesHolder.metisCoreHost
         + RestEndpoints.ORCHESTRATOR_WORKFLOWS_EXECUTIONS_EXECUTIONID;
     restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
     restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
@@ -145,9 +149,30 @@ public class ExecutorManager {
       return;
     }
     dataset.setEcloudDatasetId(
-        datasetDao.getDatasetByDatasetId(dataset.getDatasetId()).getEcloudDatasetId());
+        ExternalRequestUtilMigration.retryableExternalRequest(
+            () -> datasetDao.getDatasetByDatasetId(dataset.getDatasetId())).getEcloudDatasetId());
+    int previousProcessedRecords = 0;
+    int processedRecords;
+    final long periodOfNoRecordCountChangeInSeconds = TimeUnit.MINUTES.toSeconds(
+        DURATION_OF_NO_RECORD_CHANGE_IN_MINS);
+    long stableRecordCountPeriodCounterInSeconds = 0;
     do {
       workflowExecution = monitorAndLog(dataset, workflowExecution.getId());
+
+      processedRecords = workflowExecution.getMetisPlugins().get(0).getExecutionProgress()
+          .getProcessedRecords();
+      //If we have progress update counters
+      if (previousProcessedRecords != processedRecords) {
+        stableRecordCountPeriodCounterInSeconds = 0;
+        previousProcessedRecords = processedRecords;
+      }
+      //Request to cancel execution if we haven't had an update for sometime
+      stableRecordCountPeriodCounterInSeconds += propertiesHolder.monitorIntervalInSecs;
+      if (stableRecordCountPeriodCounterInSeconds >= periodOfNoRecordCountChangeInSeconds) {
+        cancelWorkflowExecution(workflowExecution.getId().toString());
+        stableRecordCountPeriodCounterInSeconds = 0;
+      }
+
       try {
         Thread.sleep(TimeUnit.SECONDS.toMillis(propertiesHolder.monitorIntervalInSecs));
       } catch (InterruptedException e) {
@@ -238,6 +263,18 @@ public class ExecutorManager {
     return ExternalRequestUtilMigration.retryableExternalRequest(() -> restTemplate.exchange
         (getWorkflowExecutionUrl, HttpMethod.GET, new HttpEntity<>(null, accessTokenHeader),
             WorkflowExecution.class, pathVariables).getBody());
+  }
+
+  private void cancelWorkflowExecution(String executionId) {
+    HttpHeaders accessTokenHeader = new HttpHeaders();
+    accessTokenHeader
+        .set(AUTHORIZATION, "Bearer " + accessToken);
+    Map<String, String> pathVariables = new HashMap<>();
+    pathVariables.put("executionId", executionId);
+
+    ExternalRequestUtilMigration.retryableExternalRequest(() -> restTemplate.exchange
+        (cancelWorkflowExecutionUrl, HttpMethod.DELETE, new HttpEntity<>(null, accessTokenHeader),
+            Void.class, pathVariables));
   }
 
   private String loginAndGetAuthorizationToken() {
