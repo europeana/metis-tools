@@ -112,6 +112,8 @@ public class ExecutorManager {
         if (!processedDatasetIds.contains(dataset.getDatasetId())) {
           handleDatasetExecution(dataset);
           processedDatasetsCounter++;
+          LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "ProcessedDatasetsCounter: {}",
+              processedDatasetsCounter);
         }
         if (processedDatasetsCounter >= propertiesHolder.numberOfDatasetsToProcess) {
           break;
@@ -201,9 +203,6 @@ public class ExecutorManager {
         abstractMetisPlugin.getExecutionProgress().getProcessedRecords(),
         abstractMetisPlugin.getExecutionProgress().getErrors(),
         abstractMetisPlugin.getExecutionProgress().getStatus());
-    totalExpectedRecords += abstractMetisPlugin.getExecutionProgress().getExpectedRecords();
-    totalProcessedRecords += abstractMetisPlugin.getExecutionProgress().getProcessedRecords();
-    totalErrorRecords += abstractMetisPlugin.getExecutionProgress().getErrors();
     return updatedWorkflowExecution;
   }
 
@@ -225,6 +224,9 @@ public class ExecutorManager {
             .getStatus());//Log only the status of the end result
     LOGGER.info(processedDatasetsMarker,
         dataset.getDatasetId()); //Gets appended and is not timestamp based
+    totalExpectedRecords += abstractMetisPlugin.getExecutionProgress().getExpectedRecords();
+    totalProcessedRecords += abstractMetisPlugin.getExecutionProgress().getProcessedRecords();
+    totalErrorRecords += abstractMetisPlugin.getExecutionProgress().getErrors();
   }
 
   private WorkflowExecution sendDatasetForExecution(String datasetId) {
