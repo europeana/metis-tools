@@ -4,23 +4,23 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
     </Console>
-    <File name="ExecutionLogs" fileName="./datasets-execution/logs/execution-${date:yyyy-MM-dd-HHmmss}.log">
+    <File name="ExecutionLogs" fileName="/home/jochen/migration/datasets-execution/logs/execution-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="EXECUTION_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n" />
     </File>
-    <File name="FinalDatasetStatus" fileName="./datasets-execution/logs/final-dataset-status-${date:yyyy-MM-dd-HHmmss}.log">
+    <File name="FinalDatasetStatus" fileName="/home/jochen/migration/datasets-execution/logs/final-dataset-status-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="FINAL_DATASET_STATUS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n" />
     </File>
-    <File name="ProcessedDatasetsHarvesting" fileName="./datasets-execution/logs/processed-datasets-harvesting.log">
+    <File name="ProcessedDatasetsHarvesting" fileName="/home/jochen/migration/datasets-execution/logs/processed-datasets-harvesting.log">
       <MarkerFilter marker="PROCESSED_DATASETS_HARVESTING" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>
-    <File name="ProcessedDatasetsPreview" fileName="./datasets-execution/logs/processed-datasets-preview.log">
+    <File name="ProcessedDatasetsPreview" fileName="/home/jochen/migration/datasets-execution/logs/processed-datasets-preview.log">
       <MarkerFilter marker="PROCESSED_DATASETS_PREVIEW" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>
-    <File name="ProcessedDatasetsPublish" fileName="./datasets-execution/logs/processed-datasets-publish.log">
+    <File name="ProcessedDatasetsPublish" fileName="/home/jochen/migration/datasets-execution/logs/processed-datasets-publish.log">
       <MarkerFilter marker="PROCESSED_DATASETS_PUBLISH" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>
