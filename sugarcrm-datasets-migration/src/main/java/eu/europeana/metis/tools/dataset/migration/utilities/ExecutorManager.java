@@ -1,5 +1,6 @@
 package eu.europeana.metis.tools.dataset.migration.utilities;
 
+import com.mongodb.DuplicateKeyException;
 import com.opencsv.CSVReader;
 import eu.europeana.metis.core.common.Country;
 import eu.europeana.metis.core.dao.DatasetDao;
@@ -102,7 +103,24 @@ public class ExecutorManager {
 
       if (dataset != null && storedDataset == null && workflow != null) {
         workflow.setDatasetId(dataset.getDatasetId());
-        datasetDao.create(dataset);
+        boolean duplicateProblem;
+        int datasetSuffixNumber = 0;
+        do {
+          try {
+            datasetDao.create(dataset);
+            duplicateProblem = false;
+            //If the datasetName was the same we have to add a number at the end.
+          } catch (DuplicateKeyException e) {
+            if (e.getMessage().contains("organizationId_1_datasetName_1 dup")) {
+              datasetSuffixNumber++;
+              LOGGER.warn("Duplicate key problem, trying to add number {}", datasetSuffixNumber, e);
+              dataset.setDatasetName(dataset.getDatasetName() + datasetSuffixNumber);
+              duplicateProblem = true;
+            } else {
+              throw e;
+            }
+          }
+        } while (duplicateProblem);
         workflowDao.create(workflow);
         storedCounter++;
         LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
