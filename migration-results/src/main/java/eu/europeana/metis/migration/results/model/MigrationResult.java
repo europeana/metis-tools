@@ -183,6 +183,18 @@ public class MigrationResult {
   public boolean shouldDoAgain() {
     // For now, we don't ever redo a result. Later this should change to mean pretty much the same
     // as wasSuccessful.
+    if (pluginType == PluginType.OAIPMH_HARVEST) {
+      final Set<String> redo = Stream
+          .of("") // Add datasets to be re-harvested.
+          .collect(Collectors.toSet());
+      return redo.contains(datasetId);
+    }
+    if (pluginType == PluginType.PREVIEW) {
+      final Set<String> redo = Stream
+          .of("") // Add datasets to be re-indexed.
+          .collect(Collectors.toSet());
+      return redo.contains(datasetId);
+    }
     return false;
   }
 

@@ -16,7 +16,7 @@ public class InvalidatedResultsListerMain {
 
   private static final String INVALIDATED_REPORT = "/home/jochen/migration/new_batch_report/invalidated_report.csv";
 
-  private static final String SPLIT_RUN = MigrationResultParser.BATCH_4_FIRST_RUN_ID;
+  private static final String SPLIT_RUN = MigrationResultParser.BATCH_5_FIRST_RUN_ID;
 
   public static void main(String[] args) throws IOException {
 

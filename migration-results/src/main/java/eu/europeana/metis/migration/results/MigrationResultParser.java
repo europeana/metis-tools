@@ -37,6 +37,7 @@ class MigrationResultParser {
   static final String BATCH_2_FIRST_RUN_ID = "2018-08-13-170336";
   static final String BATCH_3_FIRST_RUN_ID = "2018-08-23-091718";
   static final String BATCH_4_FIRST_RUN_ID = "2018-08-27-162346";
+  static final String BATCH_5_FIRST_RUN_ID = "2018-08-31-124014";
   static final String FUTURE_RUN_ID = "9999-99-99-999999";
 
   private static Map<String, Integer> PRE_PROCESSED_DATASETS = new HashMap<>();

@@ -30,9 +30,9 @@ public class BatchReportCreatorMain {
   private static final String URL_FORMAT = "https://metis-preview-portal.eanadev.org/portal/en/search?q=edm_datasetName:%s";
 
   // Change this: add different run IDs after each batch. Note: it is inclusive.
-  private static final String FROM_RUN = MigrationResultParser.BATCH_4_FIRST_RUN_ID;
+  private static final String FROM_RUN = MigrationResultParser.PRE_HARVEST_RUN_ID;
   // Change this: add different run IDs after each batch. Note: it is exclusive.
-  private static final String TO_RUN = MigrationResultParser.FUTURE_RUN_ID;
+  private static final String TO_RUN = MigrationResultParser.BATCH_5_FIRST_RUN_ID;
 
   public static void main(String[] args) throws IOException {
 
