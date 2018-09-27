@@ -13,7 +13,10 @@ import java.util.stream.Stream;
 public class MigrationResult {
 
   private static final Set<String> IGNORE_HARVEST_ERRORS_DATASETS = new HashSet<>(Arrays.asList(
-      "0940408", "0940414", "0940429", "0940431", "0940433", "0940435", "0940442"
+      "0940408", "0940414", "0940429", "0940431", "0940433", "0940435", "0940442",
+      "2021802", "2021803", "2048437", "2051937",
+      "2064916","916113","916117","91659","91682","91694",
+      "9200231", "9200452"
   ));
 
   public enum ResultStatus implements Predicate<MigrationResult> {
@@ -190,6 +193,12 @@ public class MigrationResult {
       return redo.contains(datasetId);
     }
     if (pluginType == PluginType.PREVIEW) {
+      final Set<String> redo = Stream
+          .of("") // Add datasets to be re-indexed.
+          .collect(Collectors.toSet());
+      return redo.contains(datasetId);
+    }
+    if (pluginType == PluginType.PUBLISH) {
       final Set<String> redo = Stream
           .of("") // Add datasets to be re-indexed.
           .collect(Collectors.toSet());

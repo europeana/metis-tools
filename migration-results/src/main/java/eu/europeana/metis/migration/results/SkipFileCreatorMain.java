@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,18 +29,11 @@ public class SkipFileCreatorMain {
   private static final String PREVIEW_SKIP_FILE = "/home/jochen/migration/new_skip_lists/processed-datasets-preview.log";
   private static final String PUBLISH_SKIP_FILE = "/home/jochen/migration/new_skip_lists/processed-datasets-publish.log";
 
-  private static List<String> DATASETS_TO_BE_IGNORED = Arrays
-      .asList("2058621", "9200365", "2022608", "09404", "09407", "2048407", "9200386", "01004",
-          "2022621", "09407b", "11621", "15402", "2022701d", "2022609", "09414h", "08501",
-          "09435", "92096", "9200479", "03506", "9200384", "2048099", "2048087",
-          "09407d", "92034", "2058618", "11614", "03915", "11648", "11650", "11651",
-          "11654", "11649", "11652", "11656", "08504", "2020704", "2020702", "9200302", "2048212",
-          "08555", "2021010", "9200401", "03931", "9200520", "2048008", "11616", "11655", "03912");
-  // Datasets 11620, 9200359 are also large.
+  private static List<String> DATASETS_TO_BE_IGNORED = Collections.emptyList();
 
   public static void main(String[] args) throws IOException {
 
-    // Collect the migration results4
+    // Collect the migration results
     // NOTE: for skip files, must load ALL migration model!
     final MigrationResults migrationResults = MigrationResultParser
         .parse(MigrationResultParser.PRE_HARVEST_RUN_ID,

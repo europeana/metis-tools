@@ -32,7 +32,7 @@ public class BatchReportCreatorMain {
   // Change this: add different run IDs after each batch. Note: it is inclusive.
   private static final String FROM_RUN = MigrationResultParser.PRE_HARVEST_RUN_ID;
   // Change this: add different run IDs after each batch. Note: it is exclusive.
-  private static final String TO_RUN = MigrationResultParser.BATCH_5_FIRST_RUN_ID;
+  private static final String TO_RUN = MigrationResultParser.BATCH_6_FIRST_RUN_ID;
 
   public static void main(String[] args) throws IOException {
 
