@@ -30,9 +30,9 @@ public class BatchReportCreatorMain {
   private static final String URL_FORMAT = "https://metis-preview-portal.eanadev.org/portal/en/search?q=edm_datasetName:%s";
 
   // Change this: add different run IDs after each batch. Note: it is inclusive.
-  private static final String FROM_RUN = MigrationResultParser.PRE_HARVEST_RUN_ID;
+  private static final String FROM_RUN = MigrationResultParser.BATCH_6_FIRST_RUN_ID;
   // Change this: add different run IDs after each batch. Note: it is exclusive.
-  private static final String TO_RUN = MigrationResultParser.BATCH_6_FIRST_RUN_ID;
+  private static final String TO_RUN = MigrationResultParser.BATCH_7_FIRST_RUN_ID;
 
   public static void main(String[] args) throws IOException {
 
@@ -126,13 +126,14 @@ public class BatchReportCreatorMain {
     result[0] = datasetId;
     result[1] = harvest == null ? indexToPreview.getDatasetInfo().getNameInCsv()
         : harvest.getDatasetInfo().getNameInCsv();
+    result[3] = harvest == null ? indexToPreview.getProcessedRecords().toString()
+        : harvest.getProcessedRecords().toString();
 
     // Set harvest info
     if (harvest != null && !ResultStatus.DID_NOT_END_NORMALLY.test(harvest)) {
       // In case we have a valid result
       result[2] = ResultStatus.COMPLETED_WITH_ERRORS.test(harvest) ? "COMPLETED_WITH_ERRORS"
           : "SUCCEEDED";
-      result[3] = harvest.getProcessedRecords().toString();
       result[4] = harvest.getErrorRecords().toString();
     } else if (harvest != null) {
       // In case something went wrong
