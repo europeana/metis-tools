@@ -1,0 +1,14 @@
+#Mongo
+mongo.hosts=
+mongo.port=
+mongo.authentication.db=
+mongo.username=
+mongo.password=
+mongo.enableSSL=
+mongo.db=
+
+#eCloud
+ecloud.mcs.baseUrl=
+ecloud.provider=
+ecloud.username=
+ecloud.password=
