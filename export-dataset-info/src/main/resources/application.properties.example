@@ -7,12 +7,13 @@ mongo.password=
 mongo.enableSSL=
 mongo.db=
 
-#eCloud
-ecloud.mcs.baseUrl=
-ecloud.provider=
-ecloud.username=
-ecloud.password=
+#Metis
+metis.dataset.uri.prefix=
 
 #Truststore
 truststore.path=
 truststore.password=
+
+#Target file
+target.file=
+
