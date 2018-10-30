@@ -42,7 +42,7 @@ public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
   private static final String NEXT_PAGE_WITH_DATASET_LIST_SIZE_TEMPLATE = "NextPage: {}, with dataset list size: {}";
-  private static final String PREFIX_OF_PROCESSED_DATASET_FILE = "./datasets-execution/logs/processed-datasets-";
+  private static final String PREFIX_OF_PROCESSED_DATASET_FILE = "/home/jochen/migration/datasets-execution/logs/processed-datasets-";
   private static final String LOG_FILE_EXTENSION = ".log";
   public static final int DURATION_OF_NO_RECORD_CHANGE_IN_MINS = 30;
   private final Marker processedDatasetsMarker;

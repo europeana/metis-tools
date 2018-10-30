@@ -4,7 +4,7 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
     </Console>
-    <File name="ExecutionLogs" fileName="./endpoints-mapper/logs/execution-${date:yyyy-MM-dd-HHmmss}.log">
+    <File name="ExecutionLogs" fileName="/home/jochen/migration/endpoints-mapper/logs/execution-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="EXECUTION_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n" />
     </File>
