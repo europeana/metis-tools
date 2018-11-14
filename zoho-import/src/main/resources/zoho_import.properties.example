@@ -15,3 +15,4 @@ zoho.organization.search.criteria.role=
 #Entity API Solr Url
 entity.importer.solr.url=
 entity.api.solr.docs.folder=
+entity.api.solr.docs.generate.script=

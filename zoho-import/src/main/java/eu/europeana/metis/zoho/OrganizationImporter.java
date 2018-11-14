@@ -101,6 +101,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
 
       if (orgList.size() < rows) {
         // last page: if no more organizations exist in Zoho
+        //TODO: there is the "more_records":false flag in the zoho response, we should use it
         hasNext = false;
       } else {
         // go to next page
