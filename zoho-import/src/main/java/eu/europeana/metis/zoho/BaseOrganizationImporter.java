@@ -1,7 +1,6 @@
 package eu.europeana.metis.zoho;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -171,8 +170,7 @@ public class BaseOrganizationImporter {
   protected Properties loadProperties(String propertiesFile)
       throws URISyntaxException, IOException, FileNotFoundException {
     Properties appProps = new Properties();
-    File propfile = getClasspathFile(propertiesFile);
-    appProps.load(new FileInputStream(propfile));
+    appProps.load( getClass().getResourceAsStream(propertiesFile));
     return appProps;
   }
 
