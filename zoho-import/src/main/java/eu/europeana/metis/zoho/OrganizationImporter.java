@@ -1,13 +1,14 @@
 package eu.europeana.metis.zoho;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
+import org.jpy.PyLib;
+import org.jpy.PyModule;
+import org.jpy.PyObject;
 import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
 import eu.europeana.enrichment.service.exception.ZohoAccessException;
 import eu.europeana.metis.authentication.dao.ZohoApiFields;
@@ -164,7 +165,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     }
   }
 
-  void updateInEntityApi(String entityId) throws SolrServerException, IOException {
+  void updateInEntityApi(String entityId) throws Exception {
     getEntitySolrImporter().delete(entityId, false);
     // generate solrDoc
     File xmlFile = generateSolrDoc(entityId);
@@ -173,16 +174,27 @@ public class OrganizationImporter extends BaseOrganizationImporter {
   }
 
 
-  private File generateSolrDoc(String entityId) {
-    Process proc = null;
-    try {
-      proc = Runtime.getRuntime().exec("sh /home/shane/Documents/script.sh");
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+  protected File generateSolrDoc(String entityId) throws Exception {
+    //https://jpy.readthedocs.io/en/latest/install.html#running-python-from-java
+    //jpy.config
+    //https://github.com/bcdev/jpy/blob/master/src/test/java/org/jpy/PyObjectTest.java
+    //import module
+//configs    https://github.com/bcdev/jpy/issues/95
+    try{
+      String importPath = new File("E:/git/europeana/search/entity_collection/munge/mongo_import").getCanonicalPath();
+      PyLib.startPython(importPath);
+      
+      PyModule harvestersModule = PyModule.importModule("entities.ContextClassHarvesters");
+      //Get python object
+      PyObject ieb = harvestersModule.getAttribute("IndividualEntityBuilder");
+      //call method
+      PyObject entityFilePy = ieb.callMethod("build_individual_entity", entityId);
+      String path = entityFilePy.getStringValue();
+      return new File(path);
+    }catch(Exception e){
+      LOGGER.debug("cannot generate entity file using python: ", e);
+      throw e;
     }
-
-    return null;
   }
 
   /**
