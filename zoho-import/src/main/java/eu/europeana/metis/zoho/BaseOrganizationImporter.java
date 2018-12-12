@@ -33,16 +33,29 @@ import eu.europeana.metis.zoho.model.Operation;
 
 public class BaseOrganizationImporter {
 
+  public static final String PROP_ENTITY_API_SOLR_DOCS_FOLDER = "entity.api.solr.docs.folder";
+  public static final String PROP_ENTITY_IMPORTER_SOLR_URL = "entity.importer.solr.url";
+  public static final String PROP_MONGO_PORT = "mongo.port";
+  public static final String PROP_MONGO_HOSTS = "mongo.hosts";
+  public static final String PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE = "zoho.organization.search.criteria.role";
+  public static final String PROP_ZOHO_AUTHENTICATION_TOKEN = "zoho.authentication.token";
+  public static final String PROP_ZOHO_BASE_URL_V2 = "zoho.base.url.v2";
+  public static final String PROP_ZOHO_BASE_URL = "zoho.base.url";
+  static final String PROP_PYTHON = "entity.importer.docs.generator.python";
+  static final String PROP_PYTHON_PATH = "entity.importer.docs.generator.pythonpath";
+  static final String PROP_PYTHON_SCRIPT = "entity.importer.docs.generator.pythonscript";
+  static final String PROP_PYTHON_WORKDIR = "entity.importer.docs.generator.pythonworkdir";
+
   static final Logger LOGGER = LoggerFactory.getLogger(OrganizationImporter.class);
+  Properties appProps;
   EntityService entityService;
   ZohoAccessService zohoAccessService;
   WikidataAccessService wikidataAccessService;
   EntityApiSolrImporter entitySolrImporter;
   ImportStatus status = new ImportStatus();
-//  String pythonImportPath;
 
   static final String PROPERTIES_FILE = "/zoho_import.properties";
-
+  
   public static final String IMPORT_FULL = "full";
   public static final String IMPORT_INCREMENTAL = "incremental";
   public static final String IMPORT_DATE = "date";
@@ -130,18 +143,18 @@ public class BaseOrganizationImporter {
 
   public void init() throws Exception {
     // read properties
-    Properties appProps = loadProperties(PROPERTIES_FILE);
-    String zohoBaseUrl = appProps.getProperty("zoho.base.url");
-    String zohoBaseUrlV2 = appProps.getProperty("zoho.base.url.v2");
+    loadProperties(PROPERTIES_FILE);
+    String zohoBaseUrl = getProperty(PROP_ZOHO_BASE_URL);
+    String zohoBaseUrlV2 = getProperty(PROP_ZOHO_BASE_URL_V2);
     LOGGER.info("using zoho base URL: " + zohoBaseUrl);
     LOGGER.info("using zoho base URL V2: " + zohoBaseUrlV2);
-    String token = appProps.getProperty("zoho.authentication.token");
+    String token = getProperty(PROP_ZOHO_AUTHENTICATION_TOKEN);
     if (token == null || token.length() < 6)
       throw new IllegalArgumentException("zoho.authentication.token is invalid: " + token);
     LOGGER.info("using zoho zoho authentication token: " + token.substring(0, 3) + "...");
 
     // initialize filtering options
-    searchFilter = appProps.getProperty("zoho.organization.search.criteria.role");
+    searchFilter = getProperty(PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE);
     initSearchCriteria();
 
     // initialize ZohoAccessService
@@ -153,13 +166,13 @@ public class BaseOrganizationImporter {
     wikidataAccessService = new WikidataAccessService(new WikidataAccessDao());
 
     // initialize Metis EntityService
-    String mongoHost = appProps.getProperty("mongo.hosts");
-    int mongoPort = Integer.valueOf(appProps.getProperty("mongo.port"));
+    String mongoHost = getProperty(PROP_MONGO_HOSTS);
+    int mongoPort = Integer.valueOf(getProperty(PROP_MONGO_PORT));
     entityService = new EntityService(mongoHost, mongoPort);
 
     // initialize Entity API Solr Importer
-    String solrUrl = appProps.getProperty("entity.importer.solr.url");
-    String solrDocsFolderPath = appProps.getProperty("entity.api.solr.docs.folder");
+    String solrUrl = getProperty(PROP_ENTITY_IMPORTER_SOLR_URL);
+    String solrDocsFolderPath = getProperty(PROP_ENTITY_API_SOLR_DOCS_FOLDER);
     File solrDocsFolder = new File(solrDocsFolderPath);
     if(!solrDocsFolder.exists()){
       throw new IllegalArgumentException("Importer is not propertly initialized. The solr docs folder not found on file system: "+ solrDocsFolderPath);  
@@ -170,7 +183,7 @@ public class BaseOrganizationImporter {
 
   protected Properties loadProperties(String propertiesFile)
       throws URISyntaxException, IOException, FileNotFoundException {
-    Properties appProps = new Properties();
+    appProps = new Properties();
     appProps.load( getClass().getResourceAsStream(propertiesFile));
     return appProps;
   }
@@ -249,5 +262,9 @@ public class BaseOrganizationImporter {
 
   public EntityApiSolrImporter getEntitySolrImporter() {
     return entitySolrImporter;
+  }
+  
+  public String getProperty(String propertyName){
+    return appProps.getProperty(propertyName);
   }
 }

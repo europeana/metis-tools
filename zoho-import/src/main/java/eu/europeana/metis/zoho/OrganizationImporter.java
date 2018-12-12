@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
-import org.jpy.PyLib;
-import org.jpy.PyModule;
-import org.jpy.PyObject;
 import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
 import eu.europeana.enrichment.service.exception.ZohoAccessException;
 import eu.europeana.metis.authentication.dao.ZohoApiFields;
@@ -16,6 +13,7 @@ import eu.europeana.metis.zoho.exception.OrganizationImportException;
 import eu.europeana.metis.zoho.model.DeleteOperation;
 import eu.europeana.metis.zoho.model.Operation;
 import eu.europeana.metis.zoho.model.UpdateOperation;
+import eu.europeana.metis.zoho.python.SolrDocGeneratorPy;
 
 /**
  * This class performs the import of organizations from Zoho to Metis. The import type is mandatory
@@ -175,26 +173,12 @@ public class OrganizationImporter extends BaseOrganizationImporter {
 
 
   protected File generateSolrDoc(String entityId) throws Exception {
-    //https://jpy.readthedocs.io/en/latest/install.html#running-python-from-java
-    //jpy.config
-    //https://github.com/bcdev/jpy/blob/master/src/test/java/org/jpy/PyObjectTest.java
-    //import module
-//configs    https://github.com/bcdev/jpy/issues/95
-    try{
-      String importPath = new File("E:/git/europeana/search/entity_collection/munge/mongo_import").getCanonicalPath();
-      PyLib.startPython(importPath);
-      
-      PyModule harvestersModule = PyModule.importModule("entities.ContextClassHarvesters");
-      //Get python object
-      PyObject ieb = harvestersModule.getAttribute("IndividualEntityBuilder");
-      //call method
-      PyObject entityFilePy = ieb.callMethod("build_individual_entity", entityId);
-      String path = entityFilePy.getStringValue();
-      return new File(path);
-    }catch(Exception e){
-      LOGGER.debug("cannot generate entity file using python: ", e);
-      throw e;
-    }
+    SolrDocGeneratorPy generator = new SolrDocGeneratorPy(
+        getProperty(OrganizationImporter.PROP_PYTHON),
+        getProperty(OrganizationImporter.PROP_PYTHON_PATH),
+        getProperty(OrganizationImporter.PROP_PYTHON_SCRIPT),
+        getProperty(OrganizationImporter.PROP_PYTHON_WORKDIR));
+    return generator.generateSolrDoc(entityId);
   }
 
   /**
