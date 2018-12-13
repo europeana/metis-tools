@@ -41,10 +41,10 @@ public class BaseOrganizationImporter {
   public static final String PROP_ZOHO_AUTHENTICATION_TOKEN = "zoho.authentication.token";
   public static final String PROP_ZOHO_BASE_URL_V2 = "zoho.base.url.v2";
   public static final String PROP_ZOHO_BASE_URL = "zoho.base.url";
-  static final String PROP_PYTHON = "entity.importer.docs.generator.python";
-  static final String PROP_PYTHON_PATH = "entity.importer.docs.generator.pythonpath";
-  static final String PROP_PYTHON_SCRIPT = "entity.importer.docs.generator.pythonscript";
-  static final String PROP_PYTHON_WORKDIR = "entity.importer.docs.generator.pythonworkdir";
+  public static final String PROP_PYTHON = "entity.importer.docs.generator.python";
+  public static final String PROP_PYTHON_PATH = "entity.importer.docs.generator.pythonpath";
+  public static final String PROP_PYTHON_SCRIPT = "entity.importer.docs.generator.pythonscript";
+  public static final String PROP_PYTHON_WORKDIR = "entity.importer.docs.generator.pythonworkdir";
 
   static final Logger LOGGER = LoggerFactory.getLogger(OrganizationImporter.class);
   Properties appProps;
@@ -54,7 +54,7 @@ public class BaseOrganizationImporter {
   EntityApiSolrImporter entitySolrImporter;
   ImportStatus status = new ImportStatus();
 
-  static final String PROPERTIES_FILE = "/zoho_import.properties";
+  public static final String PROPERTIES_FILE = "/zoho_import.properties";
   
   public static final String IMPORT_FULL = "full";
   public static final String IMPORT_INCREMENTAL = "incremental";
@@ -181,7 +181,7 @@ public class BaseOrganizationImporter {
     
   }
 
-  protected Properties loadProperties(String propertiesFile)
+  public Properties loadProperties(String propertiesFile)
       throws URISyntaxException, IOException, FileNotFoundException {
     appProps = new Properties();
     appProps.load( getClass().getResourceAsStream(propertiesFile));

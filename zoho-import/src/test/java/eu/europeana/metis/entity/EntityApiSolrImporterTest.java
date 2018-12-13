@@ -10,9 +10,11 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import eu.europeana.metis.zoho.BaseImporterTest;
 
 /**
  * This class provides tests for add, commit and delete methods for Entity API Solr importer.
@@ -20,13 +22,10 @@ import org.slf4j.LoggerFactory;
  * @author GrafR
  *
  */
-public class EntityApiSolrImporterTest {
+@Ignore
+public class EntityApiSolrImporterTest extends BaseImporterTest{
   
   private static File xmlFile;
-  public static final String ENTITY_ID = "1482250000002112001";
-  public static final String XML_FILE = ENTITY_ID + ".xml";
-  public static final String ENTITY_ID_URL = "http://data.europeana.eu/organization/" + ENTITY_ID; 
-  public static final String PROPERTIES_FILE = "/zoho_import.properties";
   private static EntityApiSolrImporter entityApiSolrImporter;
   private static String docsFolder = "";
   
