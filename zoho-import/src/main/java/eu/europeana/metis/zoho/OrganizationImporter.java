@@ -186,8 +186,10 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       if (Operation.ACTION_DELETE.equals(operation.getAction())) {
         // delete and commit
         getEntitySolrImporter().delete(entityId, true);
+        getStatus().incrementdeletedEntityApi();
       } else if (Operation.ACTION_UPDATE.equals(operation.getAction())) {
         updateInEntityApi(entityId);
+        getStatus().incrementImportedEntityApi();
       }
     } catch (Exception ex) {
       // convert runtime to catched exception to log failed operation
