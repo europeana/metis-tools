@@ -59,6 +59,7 @@ public class BaseOrganizationImporter {
   public static final String IMPORT_FULL = "full";
   public static final String IMPORT_INCREMENTAL = "incremental";
   public static final String IMPORT_DATE = "date";
+  public static final String IMPORT_INDIVIDUAL = "individual";
   String searchFilter;
   Map<String, String> searchCriteria = new HashMap<String, String>();
   Set<String> allowedRoles = new HashSet<String>();

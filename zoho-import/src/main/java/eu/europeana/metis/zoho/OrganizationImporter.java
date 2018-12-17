@@ -1,6 +1,7 @@
 package eu.europeana.metis.zoho;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
@@ -8,6 +9,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
 import eu.europeana.enrichment.service.exception.ZohoAccessException;
+import eu.europeana.enrichment.service.zoho.ZohoAccessService;
 import eu.europeana.metis.authentication.dao.ZohoApiFields;
 import eu.europeana.metis.zoho.exception.OrganizationImportException;
 import eu.europeana.metis.zoho.model.DeleteOperation;
@@ -17,9 +19,11 @@ import eu.europeana.metis.zoho.python.SolrDocGeneratorPy;
 
 /**
  * This class performs the import of organizations from Zoho to Metis. The import type is mandatory
- * as first command line argument, using one of {@link #IMPORT_FULL}, {@link #IMPORT_INCREMENTAL} or
- * {@link #IMPORT_DATE} If type is {@link #IMPORT_DATE} second argument needs to be a date provided
- * in Zoho time format, see {@link ZohoApiFields#ZOHO_TIME_FORMAT}
+ * as first command line argument, using one of {@link #IMPORT_FULL}, {@link #IMPORT_INCREMENTAL},
+ * {@link #IMPORT_INDIVIDUAL} or {@link #IMPORT_DATE} If type is {@link #IMPORT_DATE} second
+ * argument needs to be a date provided in Zoho time format, see
+ * {@link ZohoApiFields#ZOHO_TIME_FORMAT}. If type is {@link #IMPORT_INDIVIDUAL}, the second
+ * parameter must be the id (URI) of the entity
  * 
  * @author GordeaS
  *
@@ -27,6 +31,8 @@ import eu.europeana.metis.zoho.python.SolrDocGeneratorPy;
 public class OrganizationImporter extends BaseOrganizationImporter {
 
   boolean incrementalImport = false;
+  boolean individualImport = false;
+  String individualEntityId;
 
   /**
    * The main method performing the vocabulary mappings.
@@ -51,6 +57,20 @@ public class OrganizationImporter extends BaseOrganizationImporter {
             throw new IllegalArgumentException(
                 "A date must be provided when import type is: " + IMPORT_DATE);
           lastRun = parseDate(args[1]);
+          break;
+        case IMPORT_INDIVIDUAL:
+          if (args.length == 1)
+            throw new IllegalArgumentException(
+                "The id (uri) needs to be provided as command line parameter when import type is: "
+                    + IMPORT_INDIVIDUAL);
+
+          importer.individualImport = true;
+          importer.individualEntityId = args[1];
+          if (!importer.individualEntityId.startsWith(ZohoAccessService.URL_ORGANIZATION_PREFFIX))
+            throw new IllegalArgumentException(
+                "Invalid entity id (uri). Entity id must start with: "
+                    + "http://data.europeana.eu");
+
           break;
         default:
           throw new IllegalArgumentException(
@@ -79,8 +99,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
   }
 
   public void run(Date lastRun) throws ZohoAccessException, OrganizationImportException {
-
-    if (incrementalImport)
+    if (incrementalImport || individualImport)
       lastRun = entityService.getLastOrganizationImportDate();
 
     List<ZohoOrganization> orgList;
@@ -92,7 +111,12 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     // Zoho doesn't return the number of organizations in get response.
     while (hasNext) {
       // retrieve modified organizations
-      orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
+      if (individualImport) {
+        orgList = getOneOrganizationAsList(individualEntityId);
+        hasNext = false;
+      } else{
+        orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
+      }
       // collect operations to be run on Metis and Entity API
       operations = fillOperationsSet(orgList);
       // perform operations on all systems
@@ -100,7 +124,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
 
       if (orgList.size() < rows) {
         // last page: if no more organizations exist in Zoho
-        //TODO: there is the "more_records":false flag in the zoho response, we should use it
+        // TODO: there is the "more_records":false flag in the zoho response, we should use it
         hasNext = false;
       } else {
         // go to next page
@@ -114,6 +138,14 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     synchronizeDeletedZohoOrganizations(lastRun);
     // log status
     LOGGER.info("Processed delete operations: {}", getStatus());
+  }
+
+  private List<ZohoOrganization> getOneOrganizationAsList(String entityId)
+      throws ZohoAccessException {
+    List<ZohoOrganization> res = new ArrayList<ZohoOrganization>();
+    String zohoId = entityId.substring(ZohoAccessService.URL_ORGANIZATION_PREFFIX.length());  
+    res.add(zohoAccessService.getOrganization(zohoId));
+    return res;
   }
 
   void performOperations(SortedSet<Operation> operations) throws OrganizationImportException {
@@ -171,13 +203,12 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     getEntitySolrImporter().add(xmlFile, true);
   }
 
-
   protected File generateSolrDoc(String entityId) throws Exception {
-    SolrDocGeneratorPy generator = new SolrDocGeneratorPy(
-        getProperty(OrganizationImporter.PROP_PYTHON),
-        getProperty(OrganizationImporter.PROP_PYTHON_PATH),
-        getProperty(OrganizationImporter.PROP_PYTHON_SCRIPT),
-        getProperty(OrganizationImporter.PROP_PYTHON_WORKDIR));
+    SolrDocGeneratorPy generator =
+        new SolrDocGeneratorPy(getProperty(OrganizationImporter.PROP_PYTHON),
+            getProperty(OrganizationImporter.PROP_PYTHON_PATH),
+            getProperty(OrganizationImporter.PROP_PYTHON_SCRIPT),
+            getProperty(OrganizationImporter.PROP_PYTHON_WORKDIR));
     return generator.generateSolrDoc(entityId);
   }
 
@@ -190,6 +221,10 @@ public class OrganizationImporter extends BaseOrganizationImporter {
    */
   public int synchronizeDeletedZohoOrganizations(Date lastRun)
       throws ZohoAccessException, OrganizationImportException {
+
+    // do not delete organizations for individual entity importer
+    if (individualImport)
+      return 0;
 
     List<String> orgIdsDeletedInZoho;
     int MAX_ITEMS_PER_PAGE = 200;
