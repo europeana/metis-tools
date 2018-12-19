@@ -4,14 +4,27 @@
 	<groupId>eu.europeana.metis</groupId>
 	<artifactId>zoho-import</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<repositories>
+		<repository>
+			<id>libs-release-local</id>
+			<name>europeana-releases</name>
+			<url>http://artifactory.eanadev.org/artifactory/libs-release-local/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
-		
-        <dependency>
-            <groupId>eu.europeana.metis</groupId>
-            <artifactId>metis-enrichment-service</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+			<groupId>eu.europeana.metis</groupId>
+			<artifactId>metis-enrichment-service</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.4</version>
+		</dependency>
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

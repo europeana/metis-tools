@@ -1,63 +1,38 @@
 package eu.europeana.metis.zoho;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import eu.europeana.corelib.definitions.edm.entity.Organization;
 import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
-import eu.europeana.enrichment.service.EntityService;
-import eu.europeana.enrichment.service.WikidataAccessService;
-import eu.europeana.enrichment.service.dao.WikidataAccessDao;
-import eu.europeana.enrichment.service.dao.ZohoV2AccessDao;
 import eu.europeana.enrichment.service.exception.ZohoAccessException;
 import eu.europeana.enrichment.service.zoho.ZohoAccessService;
-import eu.europeana.metis.authentication.dao.ZohoAccessClientDao;
 import eu.europeana.metis.authentication.dao.ZohoApiFields;
+import eu.europeana.metis.zoho.exception.OrganizationImportException;
+import eu.europeana.metis.zoho.model.DeleteOperation;
+import eu.europeana.metis.zoho.model.Operation;
+import eu.europeana.metis.zoho.model.UpdateOperation;
+import eu.europeana.metis.zoho.python.SolrDocGeneratorPy;
 
 /**
  * This class performs the import of organizations from Zoho to Metis. The import type is mandatory
- * as first command line argument, using one of {@link #IMPORT_FULL}, {@link #IMPORT_INCREMENTAL} or
- * {@link #IMPORT_DATE} If type is {@link #IMPORT_DATE} second argument needs to be a date provided
- * in Zoho time format, see {@link ZohoApiFields#ZOHO_TIME_FORMAT}
+ * as first command line argument, using one of {@link #IMPORT_FULL}, {@link #IMPORT_INCREMENTAL},
+ * {@link #IMPORT_INDIVIDUAL} or {@link #IMPORT_DATE} If type is {@link #IMPORT_DATE} second
+ * argument needs to be a date provided in Zoho time format, see
+ * {@link ZohoApiFields#ZOHO_TIME_FORMAT}. If type is {@link #IMPORT_INDIVIDUAL}, the second
+ * parameter must be the id (URI) of the entity
  * 
  * @author GordeaS
  *
  */
-public class OrganizationImporter {
+public class OrganizationImporter extends BaseOrganizationImporter {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationImporter.class);
-  private EntityService entityService;
-  private ZohoAccessService zohoAccessService;
-  private WikidataAccessService wikidataAccessService;
-  
-  private static final String PROPERTIES_FILE = "/zoho_import.properties";
-  List<String> failedImports = new ArrayList<String>();
-  int importedOrgs = 0;
-
-  public static final String IMPORT_FULL = "full";
-  public static final String IMPORT_INCREMENTAL = "incremental";
-  public static final String IMPORT_DATE = "date";
-  private boolean incrementalImport = false;
-  private String searchFilter;
-  Map<String, String> searchCriteria;
-  Set<String> allowedRoles;
+  boolean incrementalImport = false;
+  boolean individualImport = false;
+  String individualEntityId;
 
   /**
    * The main method performing the vocabulary mappings.
@@ -83,6 +58,20 @@ public class OrganizationImporter {
                 "A date must be provided when import type is: " + IMPORT_DATE);
           lastRun = parseDate(args[1]);
           break;
+        case IMPORT_INDIVIDUAL:
+          if (args.length == 1)
+            throw new IllegalArgumentException(
+                "The id (uri) needs to be provided as command line parameter when import type is: "
+                    + IMPORT_INDIVIDUAL);
+
+          importer.individualImport = true;
+          importer.individualEntityId = args[1];
+          if (!importer.individualEntityId.startsWith(ZohoAccessService.URL_ORGANIZATION_PREFFIX))
+            throw new IllegalArgumentException(
+                "Invalid entity id (uri). Entity id must start with: "
+                    + "http://data.europeana.eu");
+
+          break;
         default:
           throw new IllegalArgumentException(
               "Invalid import type. Check command line arguments: " + StringUtils.join(args, ' '));
@@ -104,61 +93,170 @@ public class OrganizationImporter {
     try {
       importer.run(lastRun);
     } catch (Exception exception) {
-      LOGGER.error("The import job failed!" + exception);
-      LOGGER.info("Successfully imported organizations: {}", importer.importedOrgs);
+      LOGGER.info("Import failed with status: {}", importer.getStatus());
+      LOGGER.error("The import job failed!", exception);
     }
   }
 
-  private static Date parseDate(String dateString) {
-    SimpleDateFormat format = new SimpleDateFormat(ZohoApiFields.ZOHO_TIME_FORMAT);
-    try {
-      return format.parse(dateString);
-    } catch (ParseException e) {
-      String message = "When first argument is: " + IMPORT_DATE
-          + "the second argument must be a date formated as: " + ZohoApiFields.ZOHO_TIME_FORMAT;
-      throw new IllegalArgumentException(message, e);
-    }
-  }
-
-  public void run(Date lastRun) throws ZohoAccessException {
-
-    if (incrementalImport)
+  public void run(Date lastRun) throws ZohoAccessException, OrganizationImportException {
+    if (incrementalImport || individualImport)
       lastRun = entityService.getLastOrganizationImportDate();
 
     List<ZohoOrganization> orgList;
-    List<String> toDelete;
-    List<ZohoOrganization> toUpdate;
+    SortedSet<Operation> operations;
 
     int start = 1;
     final int rows = 100;
     boolean hasNext = true;
     // Zoho doesn't return the number of organizations in get response.
     while (hasNext) {
-      // start with clear list of deletions for each Zoho page
-      toDelete = new ArrayList<>();
-      // start with clear list of updates for each Zoho page
-      toUpdate = new ArrayList<>();
-
-      orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
-      fillDeletionAndUpdateLists(orgList, toUpdate, toDelete);
-
-      /* store new and update organizations changed in Zoho */
-      importedOrgs += storeOrganizations(toUpdate);
-
-      /* delete organizations that do not match filter criteria due to change role in Zoho */
-      deleteOrganizations(toDelete);
-
-      start += rows;
-      // if no more organizations exist in Zoho
-      if (orgList.size() < rows) {
+      // retrieve modified organizations
+      if (individualImport) {
+        orgList = getOneOrganizationAsList(individualEntityId);
         hasNext = false;
+      } else{
+        orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
+      }
+      // collect operations to be run on Metis and Entity API
+      operations = fillOperationsSet(orgList);
+      // perform operations on all systems
+      performOperations(operations);
+
+      if (orgList.size() < rows) {
+        // last page: if no more organizations exist in Zoho
+        // TODO: there is the "more_records":false flag in the zoho response, we should use it
+        hasNext = false;
+      } else {
+        // go to next page
+        start += rows;
       }
     }
+    // log status
+    LOGGER.info("Processed update operations: {}", getStatus());
 
-    LOGGER.info("Successfully imported organizations: {}", importedOrgs);
+    // process organizations deleted in Zoho
+    synchronizeDeletedZohoOrganizations(lastRun);
+    // log status
+    LOGGER.info("Processed delete operations: {}", getStatus());
+  }
 
-    int numberOfDeletedDbOrganizations = synchronizeDeletedZohoOrganizations();
-    LOGGER.info("Successfully deleted from DB organizations: {}", numberOfDeletedDbOrganizations);
+  private List<ZohoOrganization> getOneOrganizationAsList(String entityId)
+      throws ZohoAccessException {
+    List<ZohoOrganization> res = new ArrayList<ZohoOrganization>();
+    String zohoId = entityId.substring(ZohoAccessService.URL_ORGANIZATION_PREFFIX.length());  
+    res.add(zohoAccessService.getOrganization(zohoId));
+    return res;
+  }
+
+  void performOperations(SortedSet<Operation> operations) throws OrganizationImportException {
+    for (Operation op : operations) {
+      // TODO: exception handling
+      if (Operation.ACTION_UPDATE.equals(op.getAction())) {
+        // convert to edmOrganization
+        convertToEdmOrganization(op);
+        // enrich with Wikidata
+        enrichWithWikidata(op);
+      }
+      // update Metis
+      performMetisOperation(op);
+      // update Entity Api
+      performEntityApiOperation(op);
+    }
+  }
+
+  void performMetisOperation(Operation operation) throws OrganizationImportException {
+    try {
+      String entityId = operation.getEdmOrganizationId();
+      if (Operation.ACTION_DELETE.equals(operation.getAction())) {
+        deleteFromMetis(entityId);
+      } else if (Operation.ACTION_UPDATE.equals(operation.getAction())) {
+        // store new and update organizations changed in Zoho
+        updateInMetis((UpdateOperation) operation);
+      }
+    } catch (Exception ex) {
+      // convert runtime to catched exception to log failed operation
+      throw new OrganizationImportException(operation, "performMetisOperation", ex);
+    }
+
+  }
+
+  void performEntityApiOperation(Operation operation) throws OrganizationImportException {
+    try {
+      String entityId = operation.getEdmOrganizationId();
+      if (Operation.ACTION_DELETE.equals(operation.getAction())) {
+        // delete and commit
+        getEntitySolrImporter().delete(entityId, true);
+        getStatus().incrementdeletedEntityApi();
+      } else if (Operation.ACTION_UPDATE.equals(operation.getAction())) {
+        updateInEntityApi(entityId);
+        getStatus().incrementImportedEntityApi();
+      }
+    } catch (Exception ex) {
+      // convert runtime to catched exception to log failed operation
+      throw new OrganizationImportException(operation, "performEntityApiOperation", ex);
+    }
+  }
+
+  void updateInEntityApi(String entityId) throws Exception {
+    getEntitySolrImporter().delete(entityId, false);
+    // generate solrDoc
+    File xmlFile = generateSolrDoc(entityId);
+    // update solrDoc
+    getEntitySolrImporter().add(xmlFile, true);
+  }
+
+  protected File generateSolrDoc(String entityId) throws Exception {
+    SolrDocGeneratorPy generator =
+        new SolrDocGeneratorPy(getProperty(OrganizationImporter.PROP_PYTHON),
+            getProperty(OrganizationImporter.PROP_PYTHON_PATH),
+            getProperty(OrganizationImporter.PROP_PYTHON_SCRIPT),
+            getProperty(OrganizationImporter.PROP_PYTHON_WORKDIR));
+    return generator.generateSolrDoc(entityId);
+  }
+
+  /**
+   * Retrieve deleted in Zoho organizations and removed from the Enrichment database
+   * 
+   * @return the number of deleted from Enrichment database organizations
+   * @throws ZohoAccessException
+   * @throws OrganizationImportException
+   */
+  public int synchronizeDeletedZohoOrganizations(Date lastRun)
+      throws ZohoAccessException, OrganizationImportException {
+
+    // do not delete organizations for individual entity importer
+    if (individualImport)
+      return 0;
+
+    List<String> orgIdsDeletedInZoho;
+    int MAX_ITEMS_PER_PAGE = 200;
+    int startPage = 1;
+    boolean hasNext = true;
+    int numberOfDeletedDbOrganizations = 0;
+    List<String> toDelete;
+    SortedSet<Operation> operations;
+
+    // Zoho doesn't return the total results
+    while (hasNext) {
+      // list of (europeana) organizations ids
+      orgIdsDeletedInZoho = zohoAccessService.getDeletedOrganizations(startPage);
+      // check exists in Metis (Note: zoho doesn't support filtering by lastModified for deleted
+      // entities)
+      toDelete = entityService.findExistingOrganizations(orgIdsDeletedInZoho);
+      // build delete operations set
+      operations = fillDeleteOperationsSet(toDelete, lastRun);
+      // execute delete operations
+      performOperations(operations);
+
+      // END LOOP: if no more organizations exist in Zoho
+      if (orgIdsDeletedInZoho.size() < MAX_ITEMS_PER_PAGE)
+        hasNext = false;
+
+      // go next page
+      startPage += 1;
+    }
+
+    return numberOfDeletedDbOrganizations;
   }
 
   /**
@@ -167,237 +265,39 @@ public class OrganizationImporter {
    * update from to delete types
    * 
    * @param orgList The list of retrieved Zoho objects
-   * @param toUpdateList The list of Zoho organizations to update
-   * @param toDeleteList The list of Zoho IDs to remove
    */
-  private void fillDeletionAndUpdateLists(final List<ZohoOrganization> orgList,
-      List<ZohoOrganization> toUpdateList, List<String> toDeleteList) {
+  protected SortedSet<Operation> fillOperationsSet(final List<ZohoOrganization> orgList) {
 
+    SortedSet<Operation> ret = new TreeSet<Operation>();
+    Operation operation;
     for (ZohoOrganization org : orgList) {
       // validate Zoho organization roles (workaround for Zoho API bug on role filtering)
-      if(!hasRequiredRole(org)){
-        //add organization to the delete
-        toDeleteList.add(ZohoAccessService.URL_ORGANIZATION_PREFFIX + org.getZohoId());
-      }else{
-        //create or update organization
-        toUpdateList.add(org);
+      if (hasRequiredRole(org)) {
+        // create or update organization
+        operation = new UpdateOperation(org);
+      } else {
+        // add organization to the delete
+        // toDeleteList.add(ZohoAccessService.URL_ORGANIZATION_PREFFIX + org.getZohoId());
+        operation = new DeleteOperation(org.getZohoId(), org.getModified());
+        // the organization doesn't have the
+        LOGGER.info("{}",
+            "The organization " + org.getZohoId()
+                + " will be deleted as it doesn't have the required roles anymore. "
+                + "organization role: " + org.getRole());
       }
-    }
-  }
-
-  /**
-   * Retrieve deleted in Zoho organizations and removed from the Enrichment database
-   * 
-   * @return the number of deleted from Enrichment database organizations
-   * @throws ZohoAccessException
-   */
-  public int synchronizeDeletedZohoOrganizations() throws ZohoAccessException {
-
-    List<String> deletedZohoOrganizationList;
-    int MAX_ITEMS_PER_PAGE = 200;
-    int startPage = 1;
-    boolean hasNext = true;
-    int numberOfDeletedDbOrganizations = 0;
-    while (hasNext) {
-      deletedZohoOrganizationList = zohoAccessService.getDeletedOrganizations(startPage);
-      numberOfDeletedDbOrganizations += deleteOrganizations(deletedZohoOrganizationList);
-      startPage += 1;
-      // if no more organizations exist in Zoho
-      if (deletedZohoOrganizationList.size() < MAX_ITEMS_PER_PAGE)
-        hasNext = false;
+      ret.add(operation);
     }
 
-    return numberOfDeletedDbOrganizations;
+    return ret;
   }
 
-  private Map<String, String> buildSearchCriteria() {
-    Map<String, String> searchCriteria = null;
-    if (StringUtils.isNotEmpty(searchFilter)) {
-      searchCriteria = new HashMap<String, String>();
-      LOGGER.info("apply filter for Zoho search criteria role: {}", searchFilter);
-      searchCriteria.put(ZohoApiFields.ORGANIZATION_ROLE, searchFilter);
+  private SortedSet<Operation> fillDeleteOperationsSet(List<String> orgIds, Date lastRun) {
+    SortedSet<Operation> ret = new TreeSet<Operation>();
+    Operation operation;
+    for (String orgId : orgIds) {
+      operation = new DeleteOperation(orgId, lastRun);
+      ret.add(operation);
     }
-    return searchCriteria;
+    return ret;
   }
-
-  /**
-   * This method validates that organization roles match to the filter criteria.
-   * 
-   * @param orgList
-   * @return filtered and validated orgnization list
-   */
-  public boolean hasRequiredRole(ZohoOrganization organization) {
-
-    boolean res = false;
-
-    if (searchCriteria == null || searchCriteria.isEmpty())
-      return true;
-
-    // need to fix Zoho Bugg in API
-    if (!searchCriteria.containsKey(ZohoApiFields.ORGANIZATION_ROLE))
-      return true;
-
-    if (organization.getRole() != null) {
-      String[] organizationRoles = organization.getRole().split(ZohoApiFields.SEMICOLON);
-      for (String organizationRole : organizationRoles) {
-        if (allowedRoles.contains(organizationRole)) {
-          res = true;
-          break;
-        } else {
-          LOGGER.warn("{}", "Ignoring organization " + organization.getZohoId()
-              + "as the role doesn't match the role criteria: " + organization.getRole());
-        }
-      }
-    }
-
-    return res;
-  }
-
-  private int storeOrganizations(List<ZohoOrganization> orgList) {
-    int count = 0;
-    Organization edmOrg;
-    
-    for (ZohoOrganization org : orgList) {
-      try {
-          edmOrg = zohoAccessService.toEdmOrganization(org);
-          enrichWithWikidata(edmOrg);      
-          entityService.storeOrganization(edmOrg, org.getCreated(), org.getModified());
-          count++;   
-      } catch (Exception e) {
-        LOGGER.warn("Cannot import organization: {}", org.getZohoId(), e);
-        failedImports.add(org.getZohoId());
-      }
-    }
-    return count;
-  }
-
-  private void enrichWithWikidata(Organization edmOrg){
-    Organization wikidataOrg;
-    String wikidataUri = getWikidataUri(edmOrg);
-    try{
-      if(wikidataUri != null){
-        wikidataOrg = wikidataAccessService.dereference(wikidataUri);
-        wikidataAccessService.mergePropsFromWikidata(edmOrg, wikidataOrg);    
-      }
-    }catch(Exception e){
-      LOGGER.warn("Cannot dereference organization from wikidata: {}", wikidataUri, e);
-    }
-  }
-
-  private String getWikidataUri(Organization edmOrg) {
-    String uri = null;
-    if(edmOrg.getOwlSameAs() == null)
-      return null;
-    
-    for (int i = 0; i < edmOrg.getOwlSameAs().length; i++) {
-      uri = edmOrg.getOwlSameAs()[i];
-      if (uri.startsWith(WikidataAccessService.WIKIDATA_BASE_URL)){
-        return uri;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * This method removes organizations from database
-   * using IDs from given list that exist in database
-   * 
-   * @param orgList The list of organizations to remove
-   * @return The number of removed organizations
-   */
-  private int deleteOrganizations(List<String> orgList) {
-    int count = 0;
-
-    if (!orgList.isEmpty()) {
-      try {
-        // get organizations existing in database
-        List<String> dbOrgList = entityService.findExistingOrganizations(orgList);
-        if(!dbOrgList.isEmpty()) {
-          entityService.deleteOrganizations(dbOrgList);
-          count = dbOrgList.size(); 
-        }
-      } catch (Exception e) {
-        LOGGER.warn("Cannot delete organizations. ", e);
-      }
-    }
-    return count;
-  }
-
-  public void init() throws Exception {
-    //read properties
-    Properties appProps = loadProperties(PROPERTIES_FILE);
-    String zohoBaseUrl = appProps.getProperty("zoho.base.url");
-    String zohoBaseUrlV2 = appProps.getProperty("zoho.base.url.v2");
-    LOGGER.info("using zoho base URL: " + zohoBaseUrl);
-    LOGGER.info("using zoho base URL V2: " + zohoBaseUrlV2);
-    String token = appProps.getProperty("zoho.authentication.token");
-    if (token == null || token.length() < 6)
-      throw new IllegalArgumentException("zoho.authentication.token is invalid: " + token);
-    LOGGER.info("using zoho zoho authentication token: " + token.substring(0, 3) + "...");
-
-    //initialize filtering options
-    searchFilter = appProps.getProperty("zoho.organization.search.criteria.role");
-    initSearchCriteria();
-    
-    //initialize ZohoAccessService
-    ZohoAccessClientDao zohoAccessClientDao = new ZohoAccessClientDao(zohoBaseUrl, token);
-    ZohoV2AccessDao zohoV2AccessDao = new ZohoV2AccessDao(zohoBaseUrlV2, token);
-    zohoAccessService = new ZohoAccessService(zohoAccessClientDao, zohoV2AccessDao);
-    
-    //initialize WikidataAccessService
-    wikidataAccessService = new WikidataAccessService(new WikidataAccessDao());
-
-    //initialize EntityService
-    String mongoHost = appProps.getProperty("mongo.hosts");
-    int mongoPort = Integer.valueOf(appProps.getProperty("mongo.port"));
-    entityService = new EntityService(mongoHost, mongoPort);
-   
-  }
-
-  private void initSearchCriteria() {
-    // build allowed roles
-    searchCriteria = buildSearchCriteria();
-    String[] roles =
-        searchCriteria.get(ZohoApiFields.ORGANIZATION_ROLE).split(ZohoApiFields.DELIMITER_COMMA);
-    allowedRoles = new HashSet<String>();
-    for (int i = 0; i < roles.length; i++) {
-      allowedRoles.add(roles[i].trim());
-    }
-  }
-
-  protected Properties loadProperties(String propertiesFile)
-      throws URISyntaxException, IOException, FileNotFoundException {
-    Properties appProps = new Properties();
-    File propfile = getClasspathFile(propertiesFile);
-    appProps.load(new FileInputStream(propfile));
-    return appProps;
-  }
-
-  public EntityService getEntityService() {
-    return entityService;
-  }
-
-  public ZohoAccessService getZohoAccessService() {
-    return zohoAccessService;
-  }
-  
-  /**
-   * This method returns the classpath file for the give path name
-   * @param fileName the name of the file to be searched in the classpath
-   * @return the File object 
-   * @throws URISyntaxException
-   * @throws IOException
-   * @throws FileNotFoundException
-   */
-  protected File getClasspathFile(String fileName)
-      throws URISyntaxException, IOException, FileNotFoundException {
-    URL resource = getClass().getResource(fileName);
-    if(resource == null){
-      LOGGER.info("Cannot classpath file: {}", fileName);
-      return null;
-    }
-    URI fileLocation = resource.toURI();
-    return (new File(fileLocation));
-  }
-
 }

@@ -11,3 +11,14 @@ zoho.authentication.token=
 #Filter settings for Zoho query
 #for multiple values e.g. roles - comma separated strings
 zoho.organization.search.criteria.role=
+
+#Entity API Solr Url
+entity.importer.solr.url=
+#deprecated, used just for testing purposes
+entity.api.solr.docs.folder=
+
+#Solr Doc Generator
+entity.importer.docs.generator.python=
+entity.importer.docs.generator.pythonpath=
+entity.importer.docs.generator.pythonscript=
+entity.importer.docs.generator.pythonworkdir=
