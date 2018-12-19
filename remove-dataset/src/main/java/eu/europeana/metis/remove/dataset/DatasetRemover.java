@@ -61,7 +61,7 @@ public class DatasetRemover {
     LOGGER.info("  * Starting removal of dataset {} ({}) with eCloud ID {}.", metisDatasetId,
         dataset.getDatasetName(), ecloudDatasetId);
 
-    // JV: Check if the ecloud ID exists (has been created): otherwise, skip next steps.
+    // JV: Check whether the ecloud ID exists (has been created): otherwise, skip next steps.
 
     // Remove all representations of this dataset in eCloud
     LOGGER.info("  * Removing all representations in eCloud.");
@@ -89,6 +89,8 @@ public class DatasetRemover {
     workflowDao.deleteWorkflow(metisDatasetId);
     datasetXsltDao.deleteAllByDatasetId(metisDatasetId);
     datasetDao.delete(dataset);
+
+    // JV: Delete all records from preview and publish Mongo and Solr
   }
 
   private static void regularCountLog(RecordDeleter recordDeleter) {

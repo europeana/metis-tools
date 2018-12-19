@@ -6,7 +6,7 @@
 
   <groupId>eu.europeana.metis</groupId>
   <artifactId>remove-dataset</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
 
   <name>remove-dataset</name>
   <build>
@@ -40,7 +40,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.metis>1.0-SNAPSHOT</version.metis>
+    <version.metis>1.1.0-SNAPSHOT</version.metis>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.25</version.slf4j>
     <version.log4j>2.9.1</version.log4j>

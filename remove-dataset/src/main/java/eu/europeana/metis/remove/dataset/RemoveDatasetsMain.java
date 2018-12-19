@@ -56,8 +56,7 @@ public class RemoveDatasetsMain {
         propertiesHolder.ecloudPassword);
 
     final DatasetRemover datasetRemover = new DatasetRemover(morphiaDatastoreProvider,
-        datasetServiceClient, recordServiceClient,
-        propertiesHolder.ecloudProvider);
+        datasetServiceClient, recordServiceClient, propertiesHolder.ecloudProvider);
 
     int count = 0;
     for (String datasetId : datasetIds) {
