@@ -87,7 +87,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       importer.init();
     } catch (Exception e) {
       LOGGER.error("Cannot initialize importer!", e);
-      return;// the job cannot be run
+      System.exit(-2); // the job cannot be run
+      //return;
     }
 
     try {
@@ -95,6 +96,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     } catch (Exception exception) {
       LOGGER.info("Import failed with status: {}", importer.getStatus());
       LOGGER.error("The import job failed!", exception);
+      System.exit(-1);// the import job failed
     }
   }
 
