@@ -53,25 +53,29 @@ public class OrganizationImporter extends BaseOrganizationImporter {
           importer.incrementalImport = true;
           break;
         case IMPORT_DATE:
-          if (args.length == 1)
+          if (args.length == 1){
             throw new IllegalArgumentException(
                 "A date must be provided when import type is: " + IMPORT_DATE);
+          }
           lastRun = parseDate(args[1]);
           break;
         case IMPORT_INDIVIDUAL:
-          if (args.length == 1)
+          if (args.length == 1){
             throw new IllegalArgumentException(
                 "The id (uri) needs to be provided as command line parameter when import type is: "
                     + IMPORT_INDIVIDUAL);
+          }
 
           importer.individualImport = true;
           importer.individualEntityId = args[1];
-          if (!importer.individualEntityId.startsWith(ZohoAccessService.URL_ORGANIZATION_PREFFIX))
+          if (!importer.individualEntityId.startsWith(ZohoAccessService.URL_ORGANIZATION_PREFFIX)){
             throw new IllegalArgumentException(
                 "Invalid entity id (uri). Entity id must start with: "
                     + "http://data.europeana.eu");
+          }
 
           break;
+
         default:
           throw new IllegalArgumentException(
               "Invalid import type. Check command line arguments: " + StringUtils.join(args, ' '));
