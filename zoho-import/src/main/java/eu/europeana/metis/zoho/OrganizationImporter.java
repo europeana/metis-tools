@@ -53,35 +53,32 @@ public class OrganizationImporter extends BaseOrganizationImporter {
           importer.incrementalImport = true;
           break;
         case IMPORT_DATE:
-          if (args.length == 1){
-            throw new IllegalArgumentException(
-                "A date must be provided when import type is: " + IMPORT_DATE);
+          if (args.length == 1) {
+            logAndExit("A date must be provided when import type is: " + IMPORT_DATE);
           }
+
           lastRun = parseDate(args[1]);
           break;
         case IMPORT_INDIVIDUAL:
-          if (args.length == 1){
-            throw new IllegalArgumentException(
+          if (args.length == 1) {
+            logAndExit(
                 "The id (uri) needs to be provided as command line parameter when import type is: "
                     + IMPORT_INDIVIDUAL);
           }
-
           importer.individualImport = true;
           importer.individualEntityId = args[1];
-          if (!importer.individualEntityId.startsWith(ZohoAccessService.URL_ORGANIZATION_PREFFIX)){
-            throw new IllegalArgumentException(
-                "Invalid entity id (uri). Entity id must start with: "
-                    + "http://data.europeana.eu");
+          if (!importer.individualEntityId.startsWith(ZohoAccessService.URL_ORGANIZATION_PREFFIX)) {
+            logAndExit("Invalid entity id (uri). Entity id must start with: "
+                + "http://data.europeana.eu");
           }
-
           break;
 
         default:
-          throw new IllegalArgumentException(
+          logAndExit(
               "Invalid import type. Check command line arguments: " + StringUtils.join(args, ' '));
       }
     } else {
-      throw new IllegalArgumentException(
+      logAndExit(
           "The import type is mandatory! Please provide one of the following as command like argument: "
               + args);
     }
@@ -89,21 +86,33 @@ public class OrganizationImporter extends BaseOrganizationImporter {
 
     try {
       importer.init();
-    } catch (Exception e) {
-      LOGGER.error("Cannot initialize importer!", e);
-      System.exit(-2); // the job cannot be run
-      //return;
+    } catch (Throwable th) {
+      logAndExit("Cannot initialize importer!", th);
     }
 
     try {
       importer.run(lastRun);
-    } catch (Exception exception) {
+    } catch (Throwable th) {
       LOGGER.info("Import failed with status: {}", importer.getStatus());
-      LOGGER.error("The import job failed!", exception);
-      System.exit(-1);// the import job failed
+      logAndExit("The import job failed!", th);
     }
   }
 
+  private static void logAndExit(String message, Throwable th) {
+    if(th == null){
+      LOGGER.error(message);
+    } else {
+      LOGGER.error(message, th);
+    }
+    // jenkins job failure is indicated trough a predefined value of the exit code, we set it too 3
+    // (same as for runtime exceptions)
+    System.exit(3);
+  }
+
+  private static void logAndExit(String message) {
+    logAndExit(message, null);
+  }
+  
   public void run(Date lastRun) throws ZohoAccessException, OrganizationImportException {
     if (incrementalImport || individualImport)
       lastRun = entityService.getLastOrganizationImportDate();
@@ -120,7 +129,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       if (individualImport) {
         orgList = getOneOrganizationAsList(individualEntityId);
         hasNext = false;
-      } else{
+      } else {
         orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
       }
       // collect operations to be run on Metis and Entity API
@@ -149,7 +158,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
   private List<ZohoOrganization> getOneOrganizationAsList(String entityId)
       throws ZohoAccessException {
     List<ZohoOrganization> res = new ArrayList<ZohoOrganization>();
-    String zohoId = entityId.substring(ZohoAccessService.URL_ORGANIZATION_PREFFIX.length());  
+    String zohoId = entityId.substring(ZohoAccessService.URL_ORGANIZATION_PREFFIX.length());
     res.add(zohoAccessService.getOrganization(zohoId));
     return res;
   }
@@ -183,7 +192,6 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       // convert runtime to catched exception to log failed operation
       throw new OrganizationImportException(operation, "performMetisOperation", ex);
     }
-
   }
 
   void performEntityApiOperation(Operation operation) throws OrganizationImportException {
