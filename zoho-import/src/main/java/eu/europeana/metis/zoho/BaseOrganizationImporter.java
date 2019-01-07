@@ -173,11 +173,6 @@ public class BaseOrganizationImporter {
 
     // initialize Entity API Solr Importer
     String solrUrl = getProperty(PROP_ENTITY_IMPORTER_SOLR_URL);
-    String solrDocsFolderPath = getProperty(PROP_ENTITY_API_SOLR_DOCS_FOLDER);
-    File solrDocsFolder = new File(solrDocsFolderPath);
-    if(!solrDocsFolder.exists()){
-      throw new IllegalArgumentException("Importer is not propertly initialized. The solr docs folder not found on file system: "+ solrDocsFolderPath);  
-    }
     entitySolrImporter = new EntityApiSolrImporter(solrUrl);
     
   }
