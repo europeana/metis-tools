@@ -17,6 +17,12 @@
 			<groupId>eu.europeana.metis</groupId>
 			<artifactId>metis-enrichment-service</artifactId>
 			<version>1.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xalan</groupId>
+					<artifactId>xalan</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
