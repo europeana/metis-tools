@@ -1,7 +1,7 @@
 package eu.europeana.metis.remove.dataset.utils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -13,6 +13,8 @@ import java.util.Properties;
  * @since 2018-05-02
  */
 public class PropertiesHolder {
+
+  private static final String CONFIGURATION_FILE = "application.properties";
 
   public final String[] mongoHosts;
   public final int[] mongoPorts;
@@ -30,11 +32,10 @@ public class PropertiesHolder {
   public final String truststorePath;
   public final String truststorePassword;
 
-  public PropertiesHolder(String configurationFileName) {
+  public PropertiesHolder() {
     Properties properties = new Properties();
-    try {
-      properties.load(new FileInputStream(Thread.currentThread().getContextClassLoader()
-          .getResource(configurationFileName).getFile()));
+    try (final InputStream stream = PropertiesHolder.class.getClassLoader().getResourceAsStream(CONFIGURATION_FILE)) {
+      properties.load(stream);
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }

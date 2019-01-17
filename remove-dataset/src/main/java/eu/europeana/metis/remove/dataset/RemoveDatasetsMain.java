@@ -24,16 +24,14 @@ public class RemoveDatasetsMain {
 
   private static final String DATASET_IDS_FILE = "/home/jochen/Desktop/invalid_dataset_ids.log";
 
-  private static final String CONFIGURATION_FILE = "application.properties";
-
   public static void main(String[] args)
       throws IOException, MCSException, TrustStoreConfigurationException {
 
-    final List<String> datasetIds = FileUtils
-        .readLines(new File(DATASET_IDS_FILE), StandardCharsets.UTF_8).stream()
+    final List<String> datasetIds = //Arrays.asList("2021655", "2048044", "2020728", "2020722");
+        FileUtils.readLines(new File(DATASET_IDS_FILE), StandardCharsets.UTF_8).stream()
         .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
 
-    final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
+    final PropertiesHolder propertiesHolder = new PropertiesHolder();
 
     LOGGER.info("Append default truststore with custom truststore");
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
