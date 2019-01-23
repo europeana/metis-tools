@@ -40,7 +40,7 @@ public class VocabularyConversion {
     // Create object and set simple properties
     final Vocabulary vocabulary = new Vocabulary();
     vocabulary.setId(uimVocabulary.getId().toString());
-    vocabulary.setUri(uimVocabulary.getURI());
+    vocabulary.setUri(uimVocabulary.getURI().trim());
     vocabulary.setIterations(uimVocabulary.getIterations());
     vocabulary.setName(uimVocabulary.getName());
     vocabulary.setSuffix(uimVocabulary.getSuffix());

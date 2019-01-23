@@ -56,7 +56,7 @@ public class MigrationProperties {
 
     final String fileNameForMessages = propertiesFilePath != null ? propertiesFilePath
         : (DEFAULT_PROPERTIES_NAME + " (default properties file)");
-    LogUtils.logInfoMessage("Reading property file: " + propertiesFilePath);
+    LogUtils.logInfoMessage("Reading property file: " + fileNameForMessages);
 
     final Properties properties = new Properties();
     final InputStream input;

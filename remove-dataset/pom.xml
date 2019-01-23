@@ -28,7 +28,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>eu.europeana.metis.remove.dataset.RemoveDatasetsMain</mainClass>
+              <mainClass>eu.europeana.metis.remove.dataset.CountRecordsMain</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

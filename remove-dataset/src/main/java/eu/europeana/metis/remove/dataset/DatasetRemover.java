@@ -54,14 +54,16 @@ public class DatasetRemover {
       return;
     }
 
-    // JV: Check that no processing is currently happening on this dataset (or cancel all tasks).
+    // TODO JV: Check that no processing is currently happening on this dataset (or cancel all tasks).
+    LOGGER.error("TODO: Check that no processing is currently happening on this dataset (or cancel all tasks).");
 
     // Get eCloud dataset ID
     final String ecloudDatasetId = dataset.getEcloudDatasetId();
     LOGGER.info("  * Starting removal of dataset {} ({}) with eCloud ID {}.", metisDatasetId,
         dataset.getDatasetName(), ecloudDatasetId);
 
-    // JV: Check whether the ecloud ID exists (has been created): otherwise, skip next steps.
+    // TODO JV: Check whether the ecloud ID exists (has been created): otherwise, skip next steps.
+    LOGGER.error("TODO: Check whether the ecloud ID exists (has been created): otherwise, skip next steps.");
 
     // Remove all representations of this dataset in eCloud
     LOGGER.info("  * Removing all representations in eCloud.");
@@ -90,7 +92,8 @@ public class DatasetRemover {
     datasetXsltDao.deleteAllByDatasetId(metisDatasetId);
     datasetDao.delete(dataset);
 
-    // JV: Delete all records from preview and publish Mongo and Solr
+    // TODO JV: Delete all records from preview and publish Mongo and Solr
+    LOGGER.error("TODO: Delete all records from preview and publish Mongo and Solr.");
   }
 
   private static void regularCountLog(RecordDeleter recordDeleter) {
