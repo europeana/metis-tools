@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>eu.europeana.metis</groupId>
 			<artifactId>metis-enrichment-service</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>xalan</groupId>
@@ -28,6 +28,12 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.3.4</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

@@ -62,13 +62,13 @@ public class EntityApiSolrImporterTest extends BaseImporterTest{
   @Test
   public void testAdd() throws SolrServerException, IOException {
     entityApiSolrImporter.add(xmlFile, true);
-    assertTrue(entityApiSolrImporter.exists(ENTITY_ID_URL));
+    assertTrue(entityApiSolrImporter.exists(BNF_ENTITY_ID_URI));
   }
 
   @Test
   public void testDelete() throws SolrServerException, IOException {
-    entityApiSolrImporter.delete(ENTITY_ID_URL, true);
-    assertFalse(entityApiSolrImporter.exists(ENTITY_ID_URL));
+    entityApiSolrImporter.delete(BNF_ENTITY_ID_URI, true);
+    assertFalse(entityApiSolrImporter.exists(BNF_ENTITY_ID_URI));
   }
 
   /**

@@ -155,7 +155,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     LOGGER.info("Processed delete operations: {}", getStatus());
   }
 
-  private List<ZohoOrganization> getOneOrganizationAsList(String entityId)
+  List<ZohoOrganization> getOneOrganizationAsList(String entityId)
       throws ZohoAccessException {
     List<ZohoOrganization> res = new ArrayList<ZohoOrganization>();
     String zohoId = entityId.substring(ZohoAccessService.URL_ORGANIZATION_PREFFIX.length());
