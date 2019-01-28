@@ -2,16 +2,14 @@ package eu.europeana.metis.zoho;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import java.util.Date;
 import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
 import eu.europeana.corelib.definitions.edm.entity.Organization;
 import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
-import eu.europeana.enrichment.service.zoho.model.ZohoOrganizationAdapter;
 import eu.europeana.metis.zoho.model.UpdateOperation;
 
-//@Ignore
+@Ignore
 public class OrganizationImporterTest extends BaseImporterTest{
 
   @Test
@@ -39,4 +37,17 @@ public class OrganizationImporterTest extends BaseImporterTest{
     
     //assertTrue(importer.getEntitySolrImporter().exists(ENTITY_ID_URL));
   }
+  
+  
+  @Test
+  public void testRunIndividualReimport() throws Exception{
+    //SSA
+    String entityId = "http://data.europeana.eu/organization/1482250000004513401";
+    OrganizationImporter.main(new String[]{"individual", entityId});
+   
+    OrganizationImporter importer = new OrganizationImporter();
+    importer.init();
+    assertTrue(importer.getEntitySolrImporter().exists(entityId));
+  }
+  
 }
