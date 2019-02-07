@@ -32,6 +32,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
 
   boolean incrementalImport = false;
   boolean individualImport = false;
+  boolean fullImport = false;
+  
   String individualEntityId;
 
   /**
@@ -48,6 +50,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       switch (args[0]) {
         case IMPORT_FULL:
           lastRun = new Date(0);
+          importer.fullImport = true;
           break;
         case IMPORT_INCREMENTAL:
           importer.incrementalImport = true;
@@ -131,6 +134,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
         hasNext = false;
       } else {
         orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
+        LOGGER.debug("Processing organizations set: {}", ""+start+"-"+(start+rows));
       }
       // collect operations to be run on Metis and Entity API
       operations = fillOperationsSet(orgList);
@@ -239,7 +243,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       throws ZohoAccessException, OrganizationImportException {
 
     // do not delete organizations for individual entity importer
-    if (individualImport)
+    // in case of full import the database should be manually cleaned. No need to delete organizations
+    if (individualImport || fullImport)
       return 0;
 
     List<String> orgIdsDeletedInZoho;
