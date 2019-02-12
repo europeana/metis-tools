@@ -43,7 +43,7 @@ public class BaseOrganizationImporter {
    * @deprecated
    */
   public static final String PROP_MONGO_HOSTS = "mongo.hosts";
-  public static final String PROP_MONGO_CONNECTION_URL = "mongo.metis.connectionUrl";
+  public static final String PROP_MONGO_CONNECTION_URL = "mongo.connectionUrl";
   
   public static final String PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE = "zoho.organization.search.criteria.role";
   public static final String PROP_ZOHO_AUTHENTICATION_TOKEN = "zoho.authentication.token";

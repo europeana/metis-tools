@@ -2,7 +2,7 @@
 #deprecated mongo.hosts=
 #deprecated mongo.port=
 #mongo connection url
-mongo.metis.connectionUrl=mongodb://localhost:27017
+mongo.connectionUrl=mongodb://localhost:27017
 
 #Zoho access
 zoho.base.url=

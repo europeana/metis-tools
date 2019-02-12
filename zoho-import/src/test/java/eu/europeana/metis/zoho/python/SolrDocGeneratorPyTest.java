@@ -1,13 +1,12 @@
 package eu.europeana.metis.zoho.python;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import eu.europeana.metis.zoho.OrganizationImporter;
-import eu.europeana.metis.zoho.python.SolrDocGeneratorPy;
 
-@Ignore
+@Disabled
 public class SolrDocGeneratorPyTest {
 
   @Test
