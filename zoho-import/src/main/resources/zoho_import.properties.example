@@ -1,7 +1,8 @@
 #Mongo
-mongo.hosts=
-#mongo.hosts=
-mongo.port=
+#deprecated mongo.hosts=
+#deprecated mongo.port=
+#mongo connection url
+mongo.connectionUrl=mongodb://localhost:27017
 
 #Zoho access
 zoho.base.url=

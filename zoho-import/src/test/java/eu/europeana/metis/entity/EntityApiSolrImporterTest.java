@@ -1,17 +1,17 @@
 package eu.europeana.metis.entity;
 
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Properties;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europeana.metis.zoho.BaseImporterTest;
@@ -20,9 +20,10 @@ import eu.europeana.metis.zoho.BaseImporterTest;
  * This class provides tests for add, commit and delete methods for Entity API Solr importer.
  * 
  * @author GrafR
+ * @author GordeaS
  *
  */
-@Ignore
+@Disabled
 public class EntityApiSolrImporterTest extends BaseImporterTest{
   
   private static File xmlFile;
@@ -31,8 +32,8 @@ public class EntityApiSolrImporterTest extends BaseImporterTest{
   
   static final Logger LOGGER = LoggerFactory.getLogger(EntityApiSolrImporterTest.class);
 
-  @Before
-  public void setUp() throws IOException, URISyntaxException {
+  @BeforeAll
+  public static void setUp() throws IOException, URISyntaxException {
     Properties appProps = null;
     String solrUrl = "";
     
@@ -49,26 +50,26 @@ public class EntityApiSolrImporterTest extends BaseImporterTest{
     }
     
     entityApiSolrImporter = new EntityApiSolrImporter(solrUrl);
-    xmlFile = getOrganizationXmlExampleFile(XML_FILE);
   }
 
-  protected Properties loadProperties(String propertiesFile)
+  protected static Properties loadProperties(String propertiesFile)
       throws URISyntaxException, IOException, FileNotFoundException {
     Properties appProps = new Properties();
-    appProps.load( getClass().getResourceAsStream(propertiesFile));
+    appProps.load( EntityApiSolrImporterTest.class.getResourceAsStream(propertiesFile));
     return appProps;
   }
 
   @Test
-  public void testAdd() throws SolrServerException, IOException {
+  public void testAdd() throws SolrServerException, IOException, URISyntaxException {
+    xmlFile = getOrganizationXmlExampleFile(XML_FILE);
     entityApiSolrImporter.add(xmlFile, true);
-    assertTrue(entityApiSolrImporter.exists(ENTITY_ID_URL));
+    assertTrue(entityApiSolrImporter.exists(BNF_ENTITY_ID_URI));
   }
 
   @Test
   public void testDelete() throws SolrServerException, IOException {
-    entityApiSolrImporter.delete(ENTITY_ID_URL, true);
-    assertFalse(entityApiSolrImporter.exists(ENTITY_ID_URL));
+    entityApiSolrImporter.delete(BNF_ENTITY_ID_URI, true);
+    assertFalse(entityApiSolrImporter.exists(BNF_ENTITY_ID_URI));
   }
 
   /**

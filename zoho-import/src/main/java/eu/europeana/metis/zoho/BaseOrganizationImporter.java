@@ -35,8 +35,16 @@ public class BaseOrganizationImporter {
 
   public static final String PROP_ENTITY_API_SOLR_DOCS_FOLDER = "entity.api.solr.docs.folder";
   public static final String PROP_ENTITY_IMPORTER_SOLR_URL = "entity.importer.solr.url";
+  /**
+   * @deprecated
+   */
   public static final String PROP_MONGO_PORT = "mongo.port";
+  /**
+   * @deprecated
+   */
   public static final String PROP_MONGO_HOSTS = "mongo.hosts";
+  public static final String PROP_MONGO_CONNECTION_URL = "mongo.connectionUrl";
+  
   public static final String PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE = "zoho.organization.search.criteria.role";
   public static final String PROP_ZOHO_AUTHENTICATION_TOKEN = "zoho.authentication.token";
   public static final String PROP_ZOHO_BASE_URL_V2 = "zoho.base.url.v2";
@@ -167,9 +175,8 @@ public class BaseOrganizationImporter {
     wikidataAccessService = new WikidataAccessService(new WikidataAccessDao());
 
     // initialize Metis EntityService
-    String mongoHost = getProperty(PROP_MONGO_HOSTS);
-    int mongoPort = Integer.valueOf(getProperty(PROP_MONGO_PORT));
-    entityService = new EntityService(mongoHost, mongoPort);
+    String mongoConnectionUrl = getProperty(PROP_MONGO_CONNECTION_URL);
+    entityService = new EntityService(mongoConnectionUrl);
 
     // initialize Entity API Solr Importer
     String solrUrl = getProperty(PROP_ENTITY_IMPORTER_SOLR_URL);
