@@ -16,6 +16,6 @@
 **/target/
 
 # Logs from scripts
-/endpoints-mapper/
-/datasets-execution/
-/logs/
+**/endpoints-mapper/
+**/datasets-execution/
+**/logs/
