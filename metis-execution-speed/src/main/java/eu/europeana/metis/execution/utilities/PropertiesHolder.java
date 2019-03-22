@@ -1,9 +1,12 @@
 package eu.europeana.metis.execution.utilities;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
@@ -16,6 +19,7 @@ import org.slf4j.MarkerFactory;
  */
 public class PropertiesHolder {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesHolder.class);
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
@@ -33,9 +37,21 @@ public class PropertiesHolder {
 
   public PropertiesHolder(String configurationFileName) {
     Properties properties = new Properties();
+    final String filePathInResources = Thread.currentThread().getContextClassLoader()
+        .getResource(configurationFileName).getFile();
+    String filePath;
+    if (new File(filePathInResources).exists()) {
+      LOGGER.info("Will try to load {} properties file", filePathInResources);
+      filePath = filePathInResources;
+    } else {
+      LOGGER.info(
+          "{} properties file does NOT exist, probably running in standalone .jar mode where the properties file should be on the same directory "
+              + "as the .jar file is. Will try to load {} properties file",
+          filePathInResources, configurationFileName);
+      filePath = configurationFileName;
+    }
     try {
-      properties.load(new FileInputStream(Thread.currentThread().getContextClassLoader()
-          .getResource(configurationFileName).getFile()));
+      properties.load(new FileInputStream(filePath));
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
