@@ -17,11 +17,10 @@ import org.slf4j.MarkerFactory;
 public class PropertiesHolder {
 
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
+  public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
-  public final String metisCoreHost;
-  public final String metisAuthenticationHost;
-  public final String metisUsername;
-  public final String metisPassword;
+  public final int startNumberOfDaysAgo;
+  public final int endNumberOfDaysAgo;
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] mongoHosts;
@@ -40,10 +39,8 @@ public class PropertiesHolder {
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
-    metisCoreHost = properties.getProperty("metis.core.host");
-    metisAuthenticationHost = properties.getProperty("metis.authentication.host");
-    metisUsername = properties.getProperty("metis.username");
-    metisPassword = properties.getProperty("metis.password");
+    startNumberOfDaysAgo = Integer.parseInt(properties.getProperty("start.number.of.days.ago"));
+    endNumberOfDaysAgo = Integer.parseInt(properties.getProperty("end.number.of.days.ago"));
 
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");

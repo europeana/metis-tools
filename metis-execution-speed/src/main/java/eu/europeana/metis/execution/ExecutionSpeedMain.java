@@ -1,8 +1,7 @@
 package eu.europeana.metis.execution;
 
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
-import eu.europeana.metis.core.workflow.plugins.PluginType;
-import eu.europeana.metis.execution.utilities.AverageMaintainer;
+import eu.europeana.metis.exception.BadContentException;
 import eu.europeana.metis.execution.utilities.ExecutorManager;
 import eu.europeana.metis.execution.utilities.MongoInitializer;
 import eu.europeana.metis.execution.utilities.PropertiesHolder;
@@ -22,25 +21,28 @@ public class ExecutionSpeedMain {
   private static final String CONFIGURATION_FILE = "application.properties";
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
-  public static void main(String[] args) throws TrustStoreConfigurationException {
+  public static void main(String[] args)
+      throws TrustStoreConfigurationException, BadContentException {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting execution speed script");
+    if (propertiesHolder.endNumberOfDaysAgo < 0
+        || propertiesHolder.startNumberOfDaysAgo < propertiesHolder.endNumberOfDaysAgo) {
+      throw new BadContentException(
+          "Both startNumberOfDaysAgo and endNumberOfDaysAgo must be a positive number and startNumberOfDaysAgo has to be a higher or equal number than endNumberOfDaysAgo");
+    }
+
     final MongoInitializer mongoInitializer = prepareConfiguration();
     final MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProvider(
         mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
     final ExecutorManager executorManager = new ExecutorManager(morphiaDatastoreProvider);
-    for (PluginType pluginType : PluginType.values()) {
-      final AverageMaintainer averageMaintainer = executorManager
-          .startCalculation(pluginType, 10, 0);
-      LOGGER.info("PluginType: {} - Total Samples: {}, Total Average: {}", pluginType,
-          averageMaintainer.getTotalSamples(), averageMaintainer.getTotalAverageInSecs());
-    }
+    executorManager.startCalculationForAllPluginTypes(propertiesHolder.startNumberOfDaysAgo,
+        propertiesHolder.endNumberOfDaysAgo);
 
     mongoInitializer.close();
 
   }
 
-  public static MongoInitializer prepareConfiguration() throws TrustStoreConfigurationException {
+  private static MongoInitializer prepareConfiguration() throws TrustStoreConfigurationException {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "Append default truststore with custom truststore");
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
