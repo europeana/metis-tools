@@ -62,6 +62,10 @@ public class ExecutorManager {
           startNumberOfDaysAgo, dateFormat.format(fromDate), endNumberOfDaysAgo,
           dateFormat.format(toDate));
     }
+    LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER,
+        "Calculation for all pluginTypes with starting {} days ago which is the date of(UTC): {}, to ending {} days ago which is the date of(UTC): {}",
+        startNumberOfDaysAgo, dateFormat.format(fromDate), endNumberOfDaysAgo,
+        dateFormat.format(toDate));
 
     final AverageMaintainer averageMaintainerFinished = calculationForFinalPluginStatus(
         PluginStatus.FINISHED, fromDate, toDate);
@@ -111,7 +115,8 @@ public class ExecutorManager {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "All {} pluginTypes and pluginStatus {} together - {}",
         PluginType.values().length, pluginStatus, allPluginsAverageMaintainer);
-    LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER, "All {} pluginTypes together - {}", pluginStatus,
+    LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER, "All {} pluginTypes together - {}",
+        pluginStatus,
         allPluginsAverageMaintainer);
     return allPluginsAverageMaintainer;
   }
