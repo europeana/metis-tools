@@ -5,12 +5,12 @@
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
     </Console>
     <File name="ExecutionLogs"
-      fileName="/home/tzan/IdeaProjects/metis-tools/metis-execution-speed/logs/execution-${date:yyyy-MM-dd-HHmmss}.log">
+      fileName="logs/metis-execution-speed/execution-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="EXECUTION_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
     </File>
     <File name="StatisticsLogs"
-      fileName="/home/tzan/IdeaProjects/metis-tools/metis-execution-speed/logs/statistics-${date:yyyy-MM-dd-HHmmss}.log">
+      fileName="logs/metis-execution-speed/statistics-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="STATISTICS_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>

@@ -3,6 +3,7 @@ package eu.europeana.metis.execution.utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Properties;
 import org.slf4j.Logger;
@@ -37,10 +38,10 @@ public class PropertiesHolder {
 
   public PropertiesHolder(String configurationFileName) {
     Properties properties = new Properties();
-    final String filePathInResources = Thread.currentThread().getContextClassLoader()
-        .getResource(configurationFileName).getFile();
+    final URL resource = getClass().getClassLoader().getResource(configurationFileName);
+    final String filePathInResources = resource == null ? null : resource.getFile();
     String filePath;
-    if (new File(filePathInResources).exists()) {
+    if (filePathInResources != null && new File(filePathInResources).exists()) {
       LOGGER.info("Will try to load {} properties file", filePathInResources);
       filePath = filePathInResources;
     } else {
