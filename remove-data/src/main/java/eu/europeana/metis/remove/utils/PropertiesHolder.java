@@ -1,4 +1,4 @@
-package eu.europeana.metis.remove.dataset.utils;
+package eu.europeana.metis.remove.utils;
 
 import java.io.IOException;
 import java.io.InputStream;

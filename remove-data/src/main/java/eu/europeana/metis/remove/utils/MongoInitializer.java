@@ -1,4 +1,4 @@
-package eu.europeana.metis.remove.dataset.utils;
+package eu.europeana.metis.remove.utils;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions.Builder;
