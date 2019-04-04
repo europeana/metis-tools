@@ -33,12 +33,14 @@ public class PropertiesHolder {
   public final String truststorePassword;
 
   public PropertiesHolder() {
-    Properties properties = new Properties();
+
+    final Properties properties = new Properties();
     try (final InputStream stream = PropertiesHolder.class.getClassLoader().getResourceAsStream(CONFIGURATION_FILE)) {
       properties.load(stream);
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
+
     mongoHosts = properties.getProperty("mongo.hosts").split(",");
     mongoPorts = Arrays.stream(properties.getProperty("mongo.port").split(","))
         .mapToInt(Integer::parseInt).toArray();
@@ -48,7 +50,7 @@ public class PropertiesHolder {
     mongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.enableSSL"));
     mongoDb = properties.getProperty("mongo.db");
 
-    ecloudMcsBaseUrl = properties.getProperty("ecloud.baseUrl");
+    ecloudMcsBaseUrl = properties.getProperty("ecloud.mcs.baseUrl");
     ecloudProvider = properties.getProperty("ecloud.provider");
     ecloudUsername = properties.getProperty("ecloud.username");
     ecloudPassword = properties.getProperty("ecloud.password");
