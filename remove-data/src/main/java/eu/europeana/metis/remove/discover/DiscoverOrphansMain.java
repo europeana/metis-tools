@@ -4,6 +4,7 @@ import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.remove.utils.MongoInitializer;
 import eu.europeana.metis.remove.utils.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
@@ -13,7 +14,9 @@ public class DiscoverOrphansMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DiscoverOrphansMain.class);
 
-  public static void main(String[] args) throws TrustStoreConfigurationException {
+  private static final String OUTPUT_FILE = "/home/jochen/Documents/orphans.csv";
+
+  public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
 
     final PropertiesHolder propertiesHolder = new PropertiesHolder();
 
@@ -31,7 +34,7 @@ public class DiscoverOrphansMain {
 
     final DiscoverOrphans discoverOrphans = new DiscoverOrphans(morphiaDatastoreProvider);
 
-    discoverOrphans.discoverOrphans();
+    discoverOrphans.discoverOrphans(OUTPUT_FILE);
 
     mongoInitializer.close();
   }

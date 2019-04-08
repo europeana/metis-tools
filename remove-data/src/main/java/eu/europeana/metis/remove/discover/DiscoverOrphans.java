@@ -1,12 +1,19 @@
 package eu.europeana.metis.remove.discover;
 
 import com.mongodb.DBCollection;
+import com.opencsv.CSVWriter;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.ExecutionProgress;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.utils.ExternalRequestUtil;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -33,7 +40,7 @@ class DiscoverOrphans {
     this.morphiaDatastoreProvider = morphiaDatastoreProvider;
   }
 
-  void discoverOrphans() {
+  void discoverOrphans(String outputFile) throws IOException {
 
     // Compute all iterations
     final List<List<ExecutionPluginNode>> iterations = new ArrayList<>();
@@ -47,6 +54,12 @@ class DiscoverOrphans {
       }
       nodesToRemove.stream().map(ExecutionPluginNode::getId).forEach(idsToSkip::add);
       iterations.add(nodesToRemove);
+    }
+
+    // If there is nothing to do
+    if (iterations.isEmpty()) {
+      LOGGER.info("Nothing to do: no orphans/leaf nodes found.");
+      return;
     }
 
     // Print all iterations to the log.
@@ -65,14 +78,47 @@ class DiscoverOrphans {
           linkCheckingExecutions);
     }
 
-    // Return just the result of the first iteration.
-    if (!iterations.isEmpty()) {
-      saveOrphansToFile(iterations.get(0));
-    }
+    // Write just the first iteration to a CSV.
+    saveOrphansToFile(iterations.get(0), outputFile);
   }
 
-  private void saveOrphansToFile(List<ExecutionPluginNode> nodesToRemove) {
+  private void saveOrphansToFile(List<ExecutionPluginNode> nodesToRemove, String outputFile)
+      throws IOException {
+    final Path path = Paths.get(outputFile);
+    try (final BufferedWriter fileWriter = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+        final CSVWriter writer = new CSVWriter(fileWriter)) {
 
+      // Write header
+      writer.writeNext(new String[]{
+          "Execution ID",
+          "Execution creation date",
+          "Metis Dataset ID",
+          "eCloud Dataset ID",
+          "Plugin ID",
+          "Plugin type",
+          "Plugin status",
+          "Plugin start date",
+          "Plugin external task ID",
+          "Processed records"
+      });
+
+      // Write records
+      nodesToRemove.forEach(node ->
+          writer.writeNext(new String[]{
+              node.getExecution().getId().toString(),
+              node.getExecution().getCreatedDate().toString(),
+              node.getExecution().getDatasetId(),
+              node.getExecution().getEcloudDatasetId(),
+              node.getPlugin().getId(),
+              node.getPlugin().getPluginType().name(),
+              node.getPlugin().getPluginStatus().name(),
+              node.getPlugin().getStartedDate().toString(),
+              node.getPlugin().getExternalTaskId(),
+              node.getPlugin().getExecutionProgress() == null ? ""
+                  : ("" + node.getPlugin().getExecutionProgress().getProcessedRecords())
+          })
+      );
+    }
   }
 
   private List<ExecutionPluginNode> discoverOrphans(String datasetId, Set<String> idsToSkip) {
