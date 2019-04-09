@@ -14,10 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,13 +26,18 @@ import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class DiscoverOrphans {
+/**
+ * This class acts as an engine for discovering orphans. Individual cleanup actions can extend this
+ * class and provide the functionality to identify the orphans given an instance of {@link
+ * ExecutionPluginForest}.
+ */
+abstract class AbstractOrphanIdentification {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DiscoverOrphans.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOrphanIdentification.class);
 
   private final MorphiaDatastoreProvider morphiaDatastoreProvider;
 
-  DiscoverOrphans(MorphiaDatastoreProvider morphiaDatastoreProvider) {
+  AbstractOrphanIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider) {
     this.morphiaDatastoreProvider = morphiaDatastoreProvider;
   }
 
@@ -69,9 +70,8 @@ class DiscoverOrphans {
     LOGGER.info("{} iterations are needed:", iterations.size());
     for (int i = 0; i < iterations.size(); i++) {
       final List<ExecutionPluginNode> nodesToRemove = iterations.get(i);
-      final long linkCheckingExecutions = nodesToRemove.stream().map(ExecutionPluginNode::getPlugin)
-          .map(AbstractMetisPlugin::getPluginType).filter(type -> type == PluginType.LINK_CHECKING)
-          .count();
+      final long linkCheckingExecutions = nodesToRemove.stream().map(ExecutionPluginNode::getType)
+          .filter(type -> type == PluginType.LINK_CHECKING).count();
       LOGGER.info(
           " ... Iteration {}: remove {} nodes ({} records). {} of these are link checking executions.",
           i, nodesToRemove.size(), nodesToRemove.stream().mapToInt(recordCounter).sum(),
@@ -110,7 +110,7 @@ class DiscoverOrphans {
               node.getExecution().getDatasetId(),
               node.getExecution().getEcloudDatasetId(),
               node.getPlugin().getId(),
-              node.getPlugin().getPluginType().name(),
+              node.getType().name(),
               node.getPlugin().getPluginStatus().name(),
               node.getPlugin().getStartedDate().toString(),
               node.getPlugin().getExternalTaskId(),
@@ -132,14 +132,11 @@ class DiscoverOrphans {
       return Collections.emptyList();
     }
 
-    // Analyze the forest
-    final List<ExecutionPluginNode> result = new ArrayList<>();
-    final Instant cutoffDate = LocalDateTime.of(2018, Month.OCTOBER, 13, 0, 0)
-        .atZone(ZoneId.systemDefault()).toInstant();
-    result.addAll(forest.getFailedOrCancelledLeafs(cutoffDate));
-    result.addAll(forest.getFinishedSupersededLeafs(cutoffDate));
-    return result;
+    // Identify the orphans
+    return identifyOrphans(forest);
   }
+
+  abstract List<ExecutionPluginNode> identifyOrphans(ExecutionPluginForest forest);
 
   private Set<String> getDatasetIds() {
     final DBCollection collection = morphiaDatastoreProvider.getDatastore()

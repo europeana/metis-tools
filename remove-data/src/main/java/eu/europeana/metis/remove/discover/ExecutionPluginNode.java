@@ -9,8 +9,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * For details on the functionality of this class, see the description of {@link
+ * ExecutionPluginForest}.
+ */
 class ExecutionPluginNode {
 
   private final WorkflowExecution execution;
@@ -28,6 +33,10 @@ class ExecutionPluginNode {
 
   final String getId() {
     return this.plugin.getId();
+  }
+
+  final PluginType getType() {
+    return this.plugin.getPluginType();
   }
 
   WorkflowExecution getExecution() {
@@ -54,11 +63,40 @@ class ExecutionPluginNode {
     this.children.add(child);
   }
 
-  boolean hasOnlyLinkCheckingDescendants() {
+  /**
+   * @return Whether this node is a leaf node, as defined in the description of {@link
+   * ExecutionPluginForest}.
+   */
+  boolean isLeaf() {
+    final Predicate<ExecutionPluginNode> isNotLinkChecking = node -> node.getType()
+        != PluginType.LINK_CHECKING;
+    final boolean parentIsNotLinkChecking = parent == null || isNotLinkChecking.test(parent);
+    final boolean siblingsIncludeNonLinkChecking = parent == null || parent.children.stream()
+        .anyMatch(isNotLinkChecking);
+    return parentIsNotLinkChecking && siblingsIncludeNonLinkChecking
+        && hasOnlyLinkCheckingDescendants();
+  }
+
+  private boolean hasOnlyLinkCheckingDescendants() {
     final Predicate<ExecutionPluginNode> childTest = child ->
-        child.getPlugin().getPluginType() == PluginType.LINK_CHECKING
-            && child.hasOnlyLinkCheckingDescendants();
+        child.getType() == PluginType.LINK_CHECKING && child.hasOnlyLinkCheckingDescendants();
     return children.stream().allMatch(childTest);
+  }
+
+  /**
+   * This method finds subtrees of this tree (a node including it's children may be considered a
+   * tree) that satisfy the given predicate. The subtrees (also identified by their top node) are
+   * returned by calling the given consumer.
+   *
+   * @param test The predicate with which to test the subtrees.
+   * @param result The consumer that accepts the results.
+   */
+  void findSubtrees(Predicate<ExecutionPluginNode> test, Consumer<ExecutionPluginNode> result) {
+    if (test.test(this)) {
+      result.accept(this);
+    } else {
+      children.forEach(child -> child.findSubtrees(test, result));
+    }
   }
 
   /**
@@ -84,7 +122,7 @@ class ExecutionPluginNode {
 
     // Process all the nodes. Start with this one.
     toProcess.add(this);
-    while(true) {
+    while (true) {
 
       // Get the node: take from the front (remove from the queue).
       final ExecutionPluginNode node = toProcess.pollFirst();

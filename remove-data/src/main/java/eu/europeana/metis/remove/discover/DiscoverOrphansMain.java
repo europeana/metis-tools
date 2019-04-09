@@ -14,7 +14,7 @@ public class DiscoverOrphansMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DiscoverOrphansMain.class);
 
-  private static final String OUTPUT_FILE = "/home/jochen/Documents/orphans.csv";
+  private static final String OUTPUT_FILE = "/home/jochen/Desktop/orphans.csv";
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
 
@@ -32,7 +32,8 @@ public class DiscoverOrphansMain {
     MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProvider(
         mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
-    final DiscoverOrphans discoverOrphans = new DiscoverOrphans(morphiaDatastoreProvider);
+    final AbstractOrphanIdentification discoverOrphans = new MigrationCleanupIdentification(
+        morphiaDatastoreProvider);
 
     discoverOrphans.discoverOrphans(OUTPUT_FILE);
 
