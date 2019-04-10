@@ -7,7 +7,7 @@ mongo.connectionUrl=mongodb://localhost:27017
 #Zoho access
 zoho.base.url=
 zoho.base.url.v2=
-zoho.authentication.token=
+zoho.authentication.grant.token=1000.xxx
 
 #Filter settings for Zoho query
 #for multiple values e.g. roles - comma separated strings

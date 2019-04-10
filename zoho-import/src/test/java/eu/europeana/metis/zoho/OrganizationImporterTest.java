@@ -2,15 +2,19 @@ package eu.europeana.metis.zoho;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import com.zoho.crm.library.crud.ZCRMRecord;
+
 import eu.europeana.corelib.definitions.edm.entity.Organization;
-import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
 import eu.europeana.metis.zoho.model.UpdateOperation;
 
 @Disabled
-public class OrganizationImporterTest extends BaseImporterTest{
+public class OrganizationImporterTest extends BaseImporterTest {
 
   @Test
   public void testUpdateInEntityAPI() throws Exception{
@@ -26,7 +30,7 @@ public class OrganizationImporterTest extends BaseImporterTest{
     OrganizationImporter importer = new OrganizationImporter();
     importer.init();
     
-    List<ZohoOrganization> orgs = importer.getOneOrganizationAsList(BNF_ENTITY_ID_URI);
+    List<ZCRMRecord> orgs = importer.getOneOrganizationAsList(BNF_ENTITY_ID_URI);
     UpdateOperation operation = new UpdateOperation(orgs.get(0));
     importer.convertToEdmOrganization(operation);
     // enrich with Wikidata

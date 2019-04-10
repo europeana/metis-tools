@@ -1,9 +1,10 @@
 package eu.europeana.metis.zoho.model;
 
 import java.util.Date;
+
+import com.zoho.crm.library.crud.ZCRMRecord;
+
 import eu.europeana.corelib.definitions.edm.entity.Organization;
-import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
-import eu.europeana.enrichment.service.zoho.ZohoAccessService;
 
 public class DeleteOperation extends BaseOperation{
 
@@ -14,7 +15,7 @@ public class DeleteOperation extends BaseOperation{
   public DeleteOperation(String zohoId, Date modified){
     this.zohoId=zohoId;
     this.modified = modified;
-    this.edmOrganizationId = ZohoAccessService.URL_ORGANIZATION_PREFFIX + zohoId;
+    this.edmOrganizationId = Operation.URL_ORGANIZATION_PREFFIX + zohoId;
     setAction(ACTION_DELETE);
   }
 
@@ -33,7 +34,7 @@ public class DeleteOperation extends BaseOperation{
   }
 
   @Override
-  public ZohoOrganization getZohoOrganization() {
+  public ZCRMRecord getZohoOrganization() {
     // Not used in delete operations
     return null;
   }

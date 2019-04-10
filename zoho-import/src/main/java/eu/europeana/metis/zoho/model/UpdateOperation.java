@@ -1,39 +1,43 @@
 package eu.europeana.metis.zoho.model;
 
 import java.util.Date;
+
+import com.zoho.crm.library.crud.ZCRMRecord;
+
 import eu.europeana.corelib.definitions.edm.entity.Organization;
-import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
+import eu.europeana.metis.zoho.DateUtils;
+import eu.europeana.metis.zoho.ZohoConstants;
 
 public class UpdateOperation extends BaseOperation implements  Operation {
 
-  private ZohoOrganization zohoOrganization;
+  private ZCRMRecord zohoOrganization;
   private Organization edmOrganization;
 
   @Override
   public Date getModified() {
-    return getZohoOrganization().getModified();
+    return DateUtils.parseDate(getZohoOrganization().getModifiedTime());
   }
 
-  public UpdateOperation(ZohoOrganization org) {
+  public UpdateOperation(ZCRMRecord org) {
     this.zohoOrganization = org;
     setAction(ACTION_UPDATE); 
   }
 
   @Override
   public String getZohoId() {
-    return getZohoOrganization().getZohoId();
+    return getZohoOrganization().getEntityId().toString();
   }
-
+  
   @Override
   public String getEdmOrganizationId() {
     return getEdmOrganization().getAbout();
   }
   
-  public ZohoOrganization getZohoOrganization() {
+  public ZCRMRecord getZohoOrganization() {
     return zohoOrganization;
   }
 
-  public void setZohoOrganization(ZohoOrganization zohoOrganization) {
+  public void setZohoOrganization(ZCRMRecord zohoOrganization) {
     this.zohoOrganization = zohoOrganization;
   }
 
@@ -58,6 +62,6 @@ public class UpdateOperation extends BaseOperation implements  Operation {
   
   @Override
   public String toString() {
-    return super.toString() + "; Acronym: " + getZohoOrganization().getAcronym();
+    return super.toString() + "; Acronym: " + getZohoOrganization().getData().get(ZohoConstants.ACRONYM_FIELD);
   }
 }

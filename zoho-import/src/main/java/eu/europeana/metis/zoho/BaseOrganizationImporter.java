@@ -11,21 +11,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.zoho.crm.library.crud.ZCRMRecord;
+
 import eu.europeana.corelib.definitions.edm.entity.Organization;
-import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
+import eu.europeana.enrichment.service.EntityConverterUtils;
 import eu.europeana.enrichment.service.EntityService;
 import eu.europeana.enrichment.service.WikidataAccessService;
 import eu.europeana.enrichment.service.dao.WikidataAccessDao;
-import eu.europeana.enrichment.service.dao.ZohoV2AccessDao;
-import eu.europeana.enrichment.service.zoho.ZohoAccessService;
-import eu.europeana.metis.authentication.dao.ZohoAccessClientDao;
-import eu.europeana.metis.authentication.dao.ZohoApiFields;
 import eu.europeana.metis.entity.EntityApiSolrImporter;
 import eu.europeana.metis.zoho.exception.OrganizationImportException;
 import eu.europeana.metis.zoho.model.ImportStatus;
@@ -46,7 +47,7 @@ public class BaseOrganizationImporter {
   public static final String PROP_MONGO_CONNECTION_URL = "mongo.connectionUrl";
   
   public static final String PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE = "zoho.organization.search.criteria.role";
-  public static final String PROP_ZOHO_AUTHENTICATION_TOKEN = "zoho.authentication.token";
+  public static final String PROP_ZOHO_AUTHENTICATION_GRANT_TOKEN = "zoho.authentication.grant.token";
   public static final String PROP_ZOHO_BASE_URL_V2 = "zoho.base.url.v2";
   public static final String PROP_ZOHO_BASE_URL = "zoho.base.url";
   public static final String PROP_PYTHON = "entity.importer.docs.generator.python";
@@ -57,10 +58,11 @@ public class BaseOrganizationImporter {
   static final Logger LOGGER = LoggerFactory.getLogger(OrganizationImporter.class);
   Properties appProps;
   EntityService entityService;
-  ZohoAccessService zohoAccessService;
+  ZohoAccessClient zohoAccessService;
   WikidataAccessService wikidataAccessService;
   EntityApiSolrImporter entitySolrImporter;
   ImportStatus status = new ImportStatus();
+  EntityConverterUtils entityConverterUtils = new EntityConverterUtils();
 
   public static final String PROPERTIES_FILE = "/zoho_import.properties";
   
@@ -77,7 +79,7 @@ public class BaseOrganizationImporter {
     // build allowed roles
     if (StringUtils.isNotEmpty(searchFilter)) {
       LOGGER.info("apply filter for Zoho search criteria role: {}", searchFilter);
-      searchCriteria.put(ZohoApiFields.ORGANIZATION_ROLE, searchFilter);
+      searchCriteria.put(ZohoConstants.ORGANIZATION_ROLE_FIELD, searchFilter);
       //also init allowed roles, due to the Zoho bug on not using filtering (e.g. Provider, includes Data Provider)
       initAllowedRoles();
     }
@@ -85,7 +87,7 @@ public class BaseOrganizationImporter {
 
   private void initAllowedRoles() {
     String[] roles =
-        searchFilter.split(ZohoApiFields.DELIMITER_COMMA);
+        searchFilter.split(ZohoConstants.DELIMITER_COMMA);
     for (int i = 0; i < roles.length; i++) {
       allowedRoles.add(roles[i].trim());
     }
@@ -99,7 +101,7 @@ public class BaseOrganizationImporter {
    * @param orgList
    * @return filtered and validated orgnization list
    */
-  public boolean hasRequiredRole(ZohoOrganization organization) {
+  public boolean hasRequiredRole(ZCRMRecord organization) {
 
     boolean res = false;
 
@@ -107,11 +109,11 @@ public class BaseOrganizationImporter {
       return true;
 
     // need to fix Zoho Bugg in API
-    if (!searchCriteria.containsKey(ZohoApiFields.ORGANIZATION_ROLE))
+    if (!searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD))
       return true;
 
-    if (organization.getRole() != null) {
-      String[] organizationRoles = organization.getRole().split(ZohoApiFields.SEMICOLON);
+    if (organization.getData().get(ZohoConstants.ORGANIZATION_ROLE_FIELD) != null) {
+      List<String> organizationRoles = (List<String>) organization.getData().get(ZohoConstants.ORGANIZATION_ROLE_FIELD);
       for (String organizationRole : organizationRoles) {
         if (allowedRoles.contains(organizationRole)) {
           res = true;
@@ -157,7 +159,7 @@ public class BaseOrganizationImporter {
     String zohoBaseUrlV2 = getProperty(PROP_ZOHO_BASE_URL_V2);
     LOGGER.info("using zoho base URL: " + zohoBaseUrl);
     LOGGER.info("using zoho base URL V2: " + zohoBaseUrlV2);
-    String token = getProperty(PROP_ZOHO_AUTHENTICATION_TOKEN);
+    String token = getProperty(PROP_ZOHO_AUTHENTICATION_GRANT_TOKEN);
     if (token == null || token.length() < 6)
       throw new IllegalArgumentException("zoho.authentication.token is invalid: " + token);
     LOGGER.info("using zoho zoho authentication token: " + token.substring(0, 3) + "...");
@@ -167,9 +169,7 @@ public class BaseOrganizationImporter {
     initSearchCriteria();
 
     // initialize ZohoAccessService
-    ZohoAccessClientDao zohoAccessClientDao = new ZohoAccessClientDao(zohoBaseUrl, token);
-    ZohoV2AccessDao zohoV2AccessDao = new ZohoV2AccessDao(zohoBaseUrlV2, token);
-    zohoAccessService = new ZohoAccessService(zohoAccessClientDao, zohoV2AccessDao);
+    zohoAccessService = new ZohoAccessClient(token);
 
     // initialize WikidataAccessService
     wikidataAccessService = new WikidataAccessService(new WikidataAccessDao());
@@ -195,7 +195,7 @@ public class BaseOrganizationImporter {
     return entityService;
   }
 
-  public ZohoAccessService getZohoAccessService() {
+  public ZohoAccessClient getZohoAccessService() {
     return zohoAccessService;
   }
 
@@ -237,7 +237,7 @@ public class BaseOrganizationImporter {
 
   protected void convertToEdmOrganization(Operation op) throws OrganizationImportException {
     try {
-      op.setEdmOrganization(zohoAccessService.toEdmOrganization(op.getZohoOrganization()));
+      op.setEdmOrganization(entityConverterUtils.toEdmOrganization(op.getZohoOrganization()));
     } catch (Exception ex) {
       //convert runtime to catched exception to log failed operation
       throw new OrganizationImportException(op, "convertToEdmOrganization", ex);
@@ -246,21 +246,9 @@ public class BaseOrganizationImporter {
 
   protected void updateInMetis(Operation operation) {
     // create or update in Metis
-    entityService.storeOrganization(operation.getEdmOrganization(),
-        operation.getZohoOrganization().getCreated(), operation.getModified());
+    entityService.storeOrganization(operation.getEdmOrganization(), DateUtils.parseDate(operation.getZohoOrganization().getCreatedTime()), operation.getModified());
     //NOTE: at this point we could differentiate between create and update if needed
     status.incrementImportedMetis();
-  }
-
-  static Date parseDate(String dateString) {
-    SimpleDateFormat format = new SimpleDateFormat(ZohoApiFields.ZOHO_TIME_FORMAT);
-    try {
-      return format.parse(dateString);
-    } catch (ParseException e) {
-      String message = "When first argument is: " + IMPORT_DATE
-          + "the second argument must be a date formated as: " + ZohoApiFields.ZOHO_TIME_FORMAT;
-      throw new IllegalArgumentException(message, e);
-    }
   }
 
   public EntityApiSolrImporter getEntitySolrImporter() {
