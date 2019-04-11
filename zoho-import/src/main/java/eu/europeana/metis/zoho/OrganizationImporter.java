@@ -125,8 +125,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     List<ZCRMRecord> orgList;
     SortedSet<Operation> operations;
 
-    int start = 1;
-    final int rows = 100;
+    int page = 1;
+    final int rows = 200;
     boolean hasNext = true;
     // Zoho doesn't return the number of organizations in get response.
     while (hasNext) {
@@ -135,8 +135,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
         orgList = getOneOrganizationAsList(individualEntityId);
         hasNext = false;
       } else {
-        orgList = zohoAccessService.getZcrmRecordOrganizations(start, rows, lastRun, searchCriteria);
-        LOGGER.debug("Processing organizations set: {}", ""+start+"-"+(start+rows));
+        orgList = zohoAccessService.getZcrmRecordOrganizations(page, rows, lastRun);
+        LOGGER.info("Processing organizations set: {}", ""+page+"-"+(page+rows));
       }
       // collect operations to be run on Metis and Entity API
       operations = fillOperationsSet(orgList);
@@ -149,7 +149,7 @@ public class OrganizationImporter extends BaseOrganizationImporter {
         hasNext = false;
       } else {
         // go to next page
-        start += rows;
+        page++;
       }
     }
     // log status
@@ -298,17 +298,19 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       if (hasRequiredRole(org)) {
         // create or update organization
         operation = new UpdateOperation(org);
-      } else {
+        ret.add(operation);
+      } else if(incrementalImport) {
         // add organization to the delete
         // toDeleteList.add(ZohoAccessService.URL_ORGANIZATION_PREFFIX + org.getZohoId());
         operation = new DeleteOperation(org.getEntityId().toString(), DateUtils.parseDate(org.getModifiedTime()));
+        ret.add(operation);
         // the organization doesn't have the
         LOGGER.info("{}",
             "The organization " + org.getEntityId().toString()
                 + " will be deleted as it doesn't have the required roles anymore. "
                 + "organization role: " + org.getEntityId().toString());
       }
-      ret.add(operation);
+      
     }
 
     return ret;
