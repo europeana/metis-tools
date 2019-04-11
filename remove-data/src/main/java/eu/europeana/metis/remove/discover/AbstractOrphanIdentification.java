@@ -45,19 +45,42 @@ abstract class AbstractOrphanIdentification {
 
     // Compute all iterations
     final List<List<ExecutionPluginNode>> iterations = new ArrayList<>();
-    final Set<String> idsToSkip = new HashSet<>();
+    final Set<String> datasetIds = getDatasetIds();
+    final Set<String> datasetIdsToSkip = new HashSet<>();
+    final Set<String> nodeIdsToSkip = new HashSet<>();
     while (true) {
+
+      // Perform one iteration. Compute which nodes to remove for this iteration.
       final List<ExecutionPluginNode> nodesToRemove = new ArrayList<>();
-      getDatasetIds().stream().map(id -> discoverOrphans(id, idsToSkip)).flatMap(List::stream)
-          .map(ExecutionPluginNode::getAllInOrderOfRemoval).forEach(nodesToRemove::addAll);
+      for (String datasetId : datasetIds) {
+
+        // If we can skip this dataset, do so.
+        if (datasetIdsToSkip.contains(datasetId)) {
+          continue;
+        }
+
+        // Obtain the orphans for this dataset. If we find none, we mark this dataset to skip.
+        final List<ExecutionPluginNode> orphans = discoverOrphans(datasetId, nodeIdsToSkip);
+        if (orphans.isEmpty()) {
+          datasetIdsToSkip.add(datasetId);
+        }
+
+        // Add all orphans and their children in the right order to the list for removal.
+        orphans.stream().map(ExecutionPluginNode::getAllInOrderOfRemoval)
+            .forEach(nodesToRemove::addAll);
+      }
+
+      // If we have no more nodes to remove, we are done.
       if (nodesToRemove.isEmpty()) {
         break;
       }
-      nodesToRemove.stream().map(ExecutionPluginNode::getId).forEach(idsToSkip::add);
+
+      // Add all nodes to remove to the node skip list: we can ignore them in the next iteration.
+      nodesToRemove.stream().map(ExecutionPluginNode::getId).forEach(nodeIdsToSkip::add);
       iterations.add(nodesToRemove);
     }
 
-    // If there is nothing to do
+    // If there is nothing to do we print a message and we are done.
     if (iterations.isEmpty()) {
       LOGGER.info("Nothing to do: no orphans/leaf nodes found.");
       return;

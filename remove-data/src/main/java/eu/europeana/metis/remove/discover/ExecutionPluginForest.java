@@ -37,17 +37,16 @@ import java.util.stream.Stream;
  * It doesn't have descendants, or, if it does, all descendants are link checking executions.
  * </li>
  * <li>
- * It doesn't have a parent, or, if it does, the parent is not a link checking execution.
- * </li>
- * <li>
- * It doesn't have a parent, or, if it does, it or at least one of the siblings is not a link
- * checking execution.
+ * It doesn't have a parent, or, if it does, the parent <b>does</b> have at least one descendant
+ * that is a regular plugin execution (possibly this node itself). I.e. the parent or any of its
+ * ancestors do not qualify as leaf under the first condition.
  * </li>
  * </ol>
- * Note that this means that a leaf can be either a link checking execution (if at least one of its
- * siblings is not) or a regular plugin execution. Also, leafs are not descendants or ancestors of
- * other leafs. And, most importantly: All nodes without children are either leafs or descendants of
- * leafs (i.e. no nodes that are leafs in the traditional sense are forgotten).
+ * Note that this means that a leaf can be either a regular plugin execution or a link checking
+ * execution (e.g. if one of its siblings is a regular plugin execution). Also, leafs are not
+ * descendants or ancestors of other leafs. And, most importantly: All nodes without children are
+ * either leafs or descendants of leafs (i.e. no nodes that are leafs in the traditional sense are
+ * forgotten).
  * </p>
  * <p>
  * The reason why we define leafs this way is that the criteria for removing executions should be

@@ -22,6 +22,7 @@ class ExecutionPluginNode {
   private final AbstractMetisPlugin plugin;
   private final List<ExecutionPluginNode> children = new ArrayList<>();
   private ExecutionPluginNode parent;
+  private boolean hasNonLinkCheckingDescendant = false;
 
   ExecutionPluginNode(WorkflowExecution execution, AbstractMetisPlugin plugin) {
     this.execution = execution;
@@ -61,26 +62,26 @@ class ExecutionPluginNode {
     }
     child.parent = this;
     this.children.add(child);
+    if (child.hasNonLinkCheckingDescendant || child.getType() != PluginType.LINK_CHECKING) {
+      registerNonLinkCheckingDescendant();
+    }
+  }
+
+  private void registerNonLinkCheckingDescendant() {
+    if (!hasNonLinkCheckingDescendant) {
+      hasNonLinkCheckingDescendant = true;
+      if (parent != null) {
+        parent.registerNonLinkCheckingDescendant();
+      }
+    }
   }
 
   /**
-   * @return Whether this node is a leaf node, as defined in the description of {@link
-   * ExecutionPluginForest}.
+   * @return Whether this node is a leaf node, in accordance with the definition in the description
+   * of {@link ExecutionPluginForest}.
    */
   boolean isLeaf() {
-    final Predicate<ExecutionPluginNode> isNotLinkChecking = node -> node.getType()
-        != PluginType.LINK_CHECKING;
-    final boolean parentIsNotLinkChecking = parent == null || isNotLinkChecking.test(parent);
-    final boolean siblingsIncludeNonLinkChecking = parent == null || parent.children.stream()
-        .anyMatch(isNotLinkChecking);
-    return parentIsNotLinkChecking && siblingsIncludeNonLinkChecking
-        && hasOnlyLinkCheckingDescendants();
-  }
-
-  private boolean hasOnlyLinkCheckingDescendants() {
-    final Predicate<ExecutionPluginNode> childTest = child ->
-        child.getType() == PluginType.LINK_CHECKING && child.hasOnlyLinkCheckingDescendants();
-    return children.stream().allMatch(childTest);
+    return !hasNonLinkCheckingDescendant && (parent == null || parent.hasNonLinkCheckingDescendant);
   }
 
   /**
