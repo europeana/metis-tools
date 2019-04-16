@@ -1,3 +1,4 @@
+file.with.resources.path=
 #Truststore
 truststore.path=
 truststore.password=

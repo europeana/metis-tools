@@ -16,13 +16,15 @@ import org.slf4j.MarkerFactory;
  * <p>During construction will read properties from the specified file from the classpath.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-03-21
+ * @since 2019-04-16
  */
 public class PropertiesHolder {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesHolder.class);
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
+
+  public final File fileWithResourcesPath;
 
   public final String truststorePath;
   public final String truststorePassword;
@@ -55,6 +57,7 @@ public class PropertiesHolder {
       throw new ExceptionInInitializerError(e);
     }
 
+    fileWithResourcesPath = new File(properties.getProperty("file.with.resources.path"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");

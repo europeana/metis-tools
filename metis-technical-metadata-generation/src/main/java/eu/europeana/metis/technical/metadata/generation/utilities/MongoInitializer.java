@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
  * Initialize MongoClient
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-03-21
+ * @since 2019-04-16
  */
 public class MongoInitializer {
 

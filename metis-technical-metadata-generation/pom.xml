@@ -62,6 +62,12 @@
       <version>${version.metis}</version>
     </dependency>
 
+    <dependency>
+      <artifactId>metis-media-service</artifactId>
+      <groupId>eu.europeana.metis</groupId>
+      <version>${version.metis}</version>
+    </dependency>
+
     <!--Logging-->
     <dependency>
       <groupId>org.slf4j</groupId>

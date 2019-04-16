@@ -1,10 +1,13 @@
 package eu.europeana.metis.technical.metadata.generation;
 
 import com.mongodb.MongoClient;
+import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManager;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
+import eu.europeana.metis.technical.metadata.generation.utilities.TechnicalMetadataWrapper;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.mongodb.morphia.Datastore;
@@ -14,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-03-21
+ * @since 2019-04-16
  */
 public class TechnicalMetadataGenerationMain {
 
@@ -24,15 +27,17 @@ public class TechnicalMetadataGenerationMain {
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args)
-      throws TrustStoreConfigurationException {
+      throws TrustStoreConfigurationException, IOException, MediaProcessorException {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting script");
 
     final MongoInitializer mongoInitializer = prepareConfiguration();
     final Datastore datastore = createDatastore(mongoInitializer.getMongoClient(),
         propertiesHolder.mongoDb);
 
-    final ExecutorManager executorManager = new ExecutorManager(datastore);
+    final ExecutorManager executorManager = new ExecutorManager(datastore,
+        propertiesHolder.fileWithResourcesPath);
     executorManager.startTechnicalMetadataGeneration();
+    executorManager.close();
     mongoInitializer.close();
 
   }
@@ -52,7 +57,10 @@ public class TechnicalMetadataGenerationMain {
 
   private static Datastore createDatastore(MongoClient mongoClient, String databaseName) {
     Morphia morphia = new Morphia();
-    return morphia.createDatastore(mongoClient, databaseName);
+    morphia.map(TechnicalMetadataWrapper.class);
+    final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
+    datastore.ensureIndexes();
+    return datastore;
   }
 
 }
