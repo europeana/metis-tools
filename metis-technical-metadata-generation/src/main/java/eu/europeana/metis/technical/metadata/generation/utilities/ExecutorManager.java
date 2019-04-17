@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
+  public static final String PROCESSED_FILES_STR = "Processed files: {}";
   private final MongoDao mongoDao;
   private final File directoryWithResourcesPerDataset;
   private final MediaExtractor mediaExtractor;
@@ -49,7 +50,7 @@ public class ExecutorManager {
     completionService = new ExecutorCompletionService<>(threadPool);
   }
 
-  public void startTechnicalMetadataGeneration() throws Exception {
+  public void startTechnicalMetadataGeneration() throws IOException, InterruptedException {
     final File[] filesPerDataset = directoryWithResourcesPerDataset.listFiles();
     final boolean allFiles =
         filesPerDataset != null && Arrays.stream(filesPerDataset).allMatch(File::isFile);
@@ -68,7 +69,7 @@ public class ExecutorManager {
         completionService.take();
         threadCounter--;
         processedFiles++;
-        LOGGER.info(EXECUTION_LOGS_MARKER, "Processed files: {}", processedFiles);
+        LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
       } else {
         completionService.submit(mediaExtractorForFile);
         threadCounter++;
@@ -79,11 +80,11 @@ public class ExecutorManager {
     for (int i = 0; i < threadCounter; i++) {
       completionService.take();
       processedFiles++;
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Processed files: {}", processedFiles);
+      LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
     }
     LOGGER.info(EXECUTION_LOGS_MARKER, "Total failed resources in db {}", mongoDao.getTotalFailedResources());
 
-    LOGGER.info(STATISTICS_LOGS_MARKER, "Processed files: {}", processedFiles);
+    LOGGER.info(STATISTICS_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
     LOGGER.info(STATISTICS_LOGS_MARKER, "Total processed resources in db {}", mongoDao.getTotalProcessedResources());
     LOGGER.info(STATISTICS_LOGS_MARKER, "Total failed resources in db {}", mongoDao.getTotalFailedResources());
   }

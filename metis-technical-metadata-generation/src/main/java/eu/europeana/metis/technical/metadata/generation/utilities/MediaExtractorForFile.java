@@ -26,18 +26,18 @@ public class MediaExtractorForFile implements Callable<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MediaExtractorForFile.class);
   private final File datasetFile;
-  private static MongoDao mongoDao;
-  private static MediaExtractor mediaExtractor;
-  private static boolean startFromBeginningOfFiles;
-  private static boolean retryFailedResources;
+  private MongoDao mongoDao;
+  private MediaExtractor mediaExtractor;
+  private boolean startFromBeginningOfFiles;
+  private boolean retryFailedResources;
 
   MediaExtractorForFile(File datasetFile, MongoDao mongoDao, MediaExtractor mediaExtractor,
       boolean startFromBeginningOfFiles, boolean retryFailedResources) {
     this.datasetFile = datasetFile;
-    MediaExtractorForFile.mongoDao = mongoDao;
-    MediaExtractorForFile.mediaExtractor = mediaExtractor;
-    MediaExtractorForFile.startFromBeginningOfFiles = startFromBeginningOfFiles;
-    MediaExtractorForFile.retryFailedResources = retryFailedResources;
+    this.mongoDao = mongoDao;
+    this.mediaExtractor = mediaExtractor;
+    this.startFromBeginningOfFiles = startFromBeginningOfFiles;
+    this.retryFailedResources = retryFailedResources;
   }
 
   @Override
@@ -45,7 +45,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return parseMediaForFile(datasetFile);
   }
 
-  static Void parseMediaForFile(File datasetFile) throws IOException {
+  private Void parseMediaForFile(File datasetFile) throws IOException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Parsing: {}", datasetFile);
     final FileStatus fileStatus = getFileStatus(datasetFile.getName(), startFromBeginningOfFiles,
         retryFailedResources);
@@ -86,7 +86,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return null;
   }
 
-  private static ResourceExtractionResult performMediaExtraction(String resourceUrl)
+  private ResourceExtractionResult performMediaExtraction(String resourceUrl)
       throws MediaExtractionException {
     //Use all url types to get metadata and thumbnails for all. Later we decide what to use.
     RdfResourceEntry resourceEntry = new RdfResourceEntry(resourceUrl,
@@ -96,7 +96,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return mediaExtractor.performMediaExtraction(resourceEntry);
   }
 
-  private static void clearThumbnails(ResourceExtractionResult resourceExtractionResult)
+  private void clearThumbnails(ResourceExtractionResult resourceExtractionResult)
       throws IOException {
     //At the end clear thumbnails
     LOGGER.info(EXECUTION_LOGS_MARKER, "Removing thumbnails for {}.",
@@ -108,7 +108,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     }
   }
 
-  private static boolean eligibleForProcessing(String resourceUrl) {
+  private boolean eligibleForProcessing(String resourceUrl) {
     final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
         .getTechnicalMetadataWrapper(resourceUrl);
     final boolean isMetadataNullAndRetryFailedResourceFalse =
@@ -121,7 +121,7 @@ public class MediaExtractorForFile implements Callable<Void> {
         || isMetadataNonNullAndRetryFailedResourcesTrue;
   }
 
-  private static boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
+  private boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
     if (fileStatus.isEndOfFileReached()) {
       LOGGER.warn(EXECUTION_LOGS_MARKER, "On a previous execution, we have already reached the end of file {}",
           fileStatus.getFileName());
@@ -140,7 +140,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return true;
   }
 
-  private static FileStatus getFileStatus(String fileName, boolean startFromBeginningOfFiles,
+  private FileStatus getFileStatus(String fileName, boolean startFromBeginningOfFiles,
       boolean retryFailedResources) {
     FileStatus fileStatus = mongoDao.getFileStatus(fileName);
     if (fileStatus == null) {

@@ -57,10 +57,6 @@ public class FileStatus implements HasMongoObjectId {
     this.lineReached = lineReached;
   }
 
-  private void incrementLineReached() {
-    this.lineReached++;
-  }
-
   public boolean isEndOfFileReached() {
     return endOfFileReached;
   }
