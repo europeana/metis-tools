@@ -5,7 +5,7 @@ import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManager;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
-import eu.europeana.metis.technical.metadata.generation.utilities.TechnicalMetadataWrapper;
+import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;

@@ -1,4 +1,4 @@
-package eu.europeana.metis.technical.metadata.generation.utilities;
+package eu.europeana.metis.technical.metadata.generation.model;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)

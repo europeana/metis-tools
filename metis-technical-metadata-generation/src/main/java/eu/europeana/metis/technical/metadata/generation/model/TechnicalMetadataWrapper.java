@@ -1,4 +1,4 @@
-package eu.europeana.metis.technical.metadata.generation.utilities;
+package eu.europeana.metis.technical.metadata.generation.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import eu.europeana.metis.core.workflow.HasMongoObjectId;

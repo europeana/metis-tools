@@ -8,6 +8,8 @@ import eu.europeana.metis.mediaprocessing.model.RdfResourceEntry;
 import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
+import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
+import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
