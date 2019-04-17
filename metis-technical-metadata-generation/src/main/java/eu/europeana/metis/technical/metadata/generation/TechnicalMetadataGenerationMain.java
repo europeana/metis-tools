@@ -2,6 +2,7 @@ package eu.europeana.metis.technical.metadata.generation;
 
 import com.mongodb.MongoClient;
 import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
+import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManager;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
@@ -58,6 +59,7 @@ public class TechnicalMetadataGenerationMain {
   private static Datastore createDatastore(MongoClient mongoClient, String databaseName) {
     Morphia morphia = new Morphia();
     morphia.map(TechnicalMetadataWrapper.class);
+    morphia.map(FileStatus.class);
     final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
     datastore.ensureIndexes();
     return datastore;

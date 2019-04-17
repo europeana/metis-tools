@@ -8,17 +8,15 @@ import eu.europeana.metis.mediaprocessing.model.RdfResourceEntry;
 import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
+import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.TimeZone;
 import org.apache.commons.io.IOUtils;
 import org.mongodb.morphia.Datastore;
 import org.slf4j.Logger;
@@ -33,20 +31,13 @@ public class ExecutorManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
   private static final String RESOURCE_URL = "resourceUrl";
   private static final String ID = "_id";
+  private static final String FILE_PATH = "filePath";
   private static final String PLUGIN_STATUS = "pluginStatus";
   private static final String FINISHED_DATE = "finishedDate";
   private static final String UPDATED_DATE = "updatedDate";
   private final Datastore datastore;
   private final File directoryWithResourcesPerDataset;
-
-  private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-  private static final DateFormat dateFormat;
   private final MediaExtractor mediaExtractor;
-
-  static {
-    dateFormat = new SimpleDateFormat(DATE_FORMAT);
-    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-  }
 
   public ExecutorManager(Datastore datastore, File directoryWithResourcesPerDataset)
       throws MediaProcessorException {
@@ -74,27 +65,66 @@ public class ExecutorManager {
 
   private void parseMediaForFile(File datasetFile) throws IOException {
     LOGGER.info("Starting parsing file {}", datasetFile);
-    int lineIndex = 0;
+    final FileStatus fileStatus = getFileStatus(datasetFile.getPath());
+
+    int lineIndex = 1;
     try (Scanner scanner = new Scanner(datasetFile, "UTF-8")) {
-      while (scanner.hasNextLine()) {
-        String resourceUrl = scanner.nextLine();
-        //Only generate if non existent
-        if (!doesMediaAlreadyExist(resourceUrl)) {
-          final ResourceExtractionResult resourceExtractionResult;
-          try {
-            resourceExtractionResult = performMediaExtraction(resourceUrl);
-            storeMediaResultInDb(resourceExtractionResult);
-            clearThumbnails(resourceExtractionResult);
-          } catch (MediaExtractionException e) {
-            LOGGER.warn("Media extraction failed for resourceUrl {}", resourceUrl);
-            storeFailedMediaInDb(resourceUrl);
+      if (moveScannerToLine(scanner, fileStatus)) {
+        while (scanner.hasNextLine()) {
+          String resourceUrl = scanner.nextLine();
+          //Only generate if non existent
+          if (!doesMediaAlreadyExist(resourceUrl)) {
+            final ResourceExtractionResult resourceExtractionResult;
+            try {
+              resourceExtractionResult = performMediaExtraction(resourceUrl);
+              storeMediaResultInDb(resourceExtractionResult);
+              clearThumbnails(resourceExtractionResult);
+            } catch (MediaExtractionException e) {
+              LOGGER.warn("Media extraction failed for resourceUrl {}", resourceUrl);
+              storeFailedMediaInDb(resourceUrl);
+            }
+          } else {
+            LOGGER.info("ResourceUrl already exists in db: {}", resourceUrl);
           }
-        } else {
-          LOGGER.info("ResourceUrl already exists in db: {}", resourceUrl);
+          fileStatus.setLineReached(lineIndex);
+          storeFileStatusToDb(fileStatus);
+          lineIndex++;
         }
-        lineIndex++;
+        fileStatus.setEndOfFileReached(true);
+        storeFileStatusToDb(fileStatus);
       }
     }
+  }
+
+  private boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
+    if (fileStatus.isEndOfFileReached()) {
+      LOGGER.warn("On a previous execution, we have already reached the end of file {}",
+          fileStatus.getFilePath());
+      return false;
+    }
+    final int lineReached = fileStatus.getLineReached();
+    LOGGER.info("Will try to move to the line {} and continue from there for file {}", lineReached,
+        fileStatus.getFilePath());
+    for (int i = 0; i <= lineReached; i++) {
+      if (scanner.hasNextLine()) {
+        scanner.nextLine();
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void storeFileStatusToDb(FileStatus fileStatus) {
+    datastore.save(fileStatus);
+  }
+
+  private FileStatus getFileStatus(String filePath) {
+    FileStatus fileStatus = datastore.find(FileStatus.class).filter(FILE_PATH, filePath).get();
+    if (fileStatus == null) {
+      fileStatus = new FileStatus(filePath, 0);
+    }
+    return fileStatus;
   }
 
   private boolean doesMediaAlreadyExist(String resourceUrl) {
