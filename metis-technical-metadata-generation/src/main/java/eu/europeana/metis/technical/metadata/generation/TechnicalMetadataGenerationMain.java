@@ -1,14 +1,12 @@
 package eu.europeana.metis.technical.metadata.generation;
 
 import com.mongodb.MongoClient;
-import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
+import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManager;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
-import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
-import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.mongodb.morphia.Datastore;
@@ -28,7 +26,7 @@ public class TechnicalMetadataGenerationMain {
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args)
-      throws TrustStoreConfigurationException, IOException, MediaProcessorException {
+      throws Exception {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting script");
 
     final MongoInitializer mongoInitializer = prepareConfiguration();
