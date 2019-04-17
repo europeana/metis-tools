@@ -35,7 +35,7 @@ public class ExecutorManager {
   private static final String FINISHED_DATE = "finishedDate";
   private static final String UPDATED_DATE = "updatedDate";
   private final Datastore datastore;
-  private final File fileWithResources;
+  private final File directoryWithResourcesPerDataset;
 
   private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
   private static final DateFormat dateFormat;
@@ -46,10 +46,10 @@ public class ExecutorManager {
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
-  public ExecutorManager(Datastore datastore, File fileWithResources)
+  public ExecutorManager(Datastore datastore, File directoryWithResourcesPerDataset)
       throws MediaProcessorException {
     this.datastore = datastore;
-    this.fileWithResources = fileWithResources;
+    this.directoryWithResourcesPerDataset = directoryWithResourcesPerDataset;
     final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
     this.mediaExtractor = processorFactory.createMediaExtractor();
   }
@@ -57,8 +57,23 @@ public class ExecutorManager {
   public void startTechnicalMetadataGeneration() throws IOException {
     //Is same file flag? Then continue from line stored in db, otherwise from the beginning of the file.
 
+    final File[] filesPerDataset = this.directoryWithResourcesPerDataset.listFiles();
+    final boolean allFiles =
+        filesPerDataset != null && Arrays.stream(filesPerDataset).allMatch(File::isFile);
+    if (!allFiles) {
+      LOGGER.error("There are non file items under {}", this.directoryWithResourcesPerDataset);
+      throw new IOException("There are non file items under the specified directory");
+    }
+
+    for (File datasetFile : filesPerDataset) {
+      parseMediaForFile(datasetFile);
+    }
+  }
+
+  private void parseMediaForFile(File datasetFile) throws IOException {
+    LOGGER.info("Starting parsing file {}", datasetFile);
     int lineIndex = 0;
-    try (Scanner scanner = new Scanner(this.fileWithResources, "UTF-8")) {
+    try (Scanner scanner = new Scanner(datasetFile, "UTF-8")) {
       while (scanner.hasNextLine()) {
         String resourceUrl = scanner.nextLine();
         //Only generate if non existent

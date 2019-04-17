@@ -24,7 +24,7 @@ public class PropertiesHolder {
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
-  public final File fileWithResourcesPath;
+  public final File directoryWithResourcesPerDatasetPath;
 
   public final String truststorePath;
   public final String truststorePassword;
@@ -57,7 +57,7 @@ public class PropertiesHolder {
       throw new ExceptionInInitializerError(e);
     }
 
-    fileWithResourcesPath = new File(properties.getProperty("file.with.resources.path"));
+    directoryWithResourcesPerDatasetPath = new File(properties.getProperty("directory.with.resources.per.dataset.path"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");

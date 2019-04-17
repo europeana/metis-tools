@@ -35,7 +35,7 @@ public class TechnicalMetadataGenerationMain {
         propertiesHolder.mongoDb);
 
     final ExecutorManager executorManager = new ExecutorManager(datastore,
-        propertiesHolder.fileWithResourcesPath);
+        propertiesHolder.directoryWithResourcesPerDatasetPath);
     executorManager.startTechnicalMetadataGeneration();
     executorManager.close();
     mongoInitializer.close();
