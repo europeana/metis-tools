@@ -12,6 +12,8 @@ import org.apache.commons.io.IOUtils;
 import org.mongodb.morphia.Datastore;
 
 /**
+ * Mongo functionality required for the current script.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-17
  */

@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Contains the {@link ExecutorService} class and handles the parallelization of the tasks.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-16
  */
@@ -55,7 +57,8 @@ public class ExecutorManager {
     final boolean allFiles =
         filesPerDataset != null && Arrays.stream(filesPerDataset).allMatch(File::isFile);
     if (!allFiles) {
-      LOGGER.error(EXECUTION_LOGS_MARKER, "There are non file items under {}", directoryWithResourcesPerDataset);
+      LOGGER.error(EXECUTION_LOGS_MARKER, "There are non file items under {}",
+          directoryWithResourcesPerDataset);
       throw new IOException("There are non file items under the specified directory");
     }
     LOGGER.info(EXECUTION_LOGS_MARKER, "Total files to process: {}", filesPerDataset.length);
@@ -82,11 +85,14 @@ public class ExecutorManager {
       processedFiles++;
       LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
     }
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Total failed resources in db {}", mongoDao.getTotalFailedResources());
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Total failed resources in db {}",
+        mongoDao.getTotalFailedResources());
 
     LOGGER.info(STATISTICS_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
-    LOGGER.info(STATISTICS_LOGS_MARKER, "Total processed resources in db {}", mongoDao.getTotalProcessedResources());
-    LOGGER.info(STATISTICS_LOGS_MARKER, "Total failed resources in db {}", mongoDao.getTotalFailedResources());
+    LOGGER.info(STATISTICS_LOGS_MARKER, "Total processed resources in db {}",
+        mongoDao.getTotalProcessedResources());
+    LOGGER.info(STATISTICS_LOGS_MARKER, "Total failed resources in db {}",
+        mongoDao.getTotalFailedResources());
   }
 
   public void close() throws IOException {

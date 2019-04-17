@@ -11,6 +11,13 @@ import org.mongodb.morphia.annotations.IndexOptions;
 import org.mongodb.morphia.annotations.Indexed;
 
 /**
+ * Model class that contains the {@link ResourceMetadata} and a list containing {@link
+ * ThumbnailWrapper} that in turn contain the thumbnails.
+ * <p>The {@link #resourceMetadata} and the {@link #thumbnailWrappers} will be present in case of a
+ * successful media extraction and the {@link #successExtraction} will be set to true. If the media
+ * extraction failed, these fields will be empty and the {@link #successExtraction} will be set to
+ * false </p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-16
  */

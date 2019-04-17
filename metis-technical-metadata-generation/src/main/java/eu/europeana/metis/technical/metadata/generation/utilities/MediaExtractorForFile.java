@@ -19,6 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * {@link Callable} that will go through a initialized dataset file and parse each resource per
+ * line.
+ * <p>This implementation saves the status of the file in the database so that on a subsequent
+ * execution, depending on the configuration, it will skip an X amount of lines. It can re-process
+ * failed resources or reset the reading of the file from the beginning, if set in the
+ * configuration.</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-17
  */
@@ -64,7 +71,8 @@ public class MediaExtractorForFile implements Callable<Void> {
               mongoDao.storeMediaResultInDb(resourceExtractionResult);
               clearThumbnails(resourceExtractionResult);
             } catch (MediaExtractionException e) {
-              LOGGER.warn(EXECUTION_LOGS_MARKER, "Media extraction failed for resourceUrl {}", resourceUrl);
+              LOGGER.warn(EXECUTION_LOGS_MARKER, "Media extraction failed for resourceUrl {}",
+                  resourceUrl);
               mongoDao.storeFailedMediaInDb(resourceUrl);
             }
           } else {
@@ -75,7 +83,8 @@ public class MediaExtractorForFile implements Callable<Void> {
           mongoDao.storeFileStatusToDb(fileStatus);
 
           if (lineIndex % 100 == 0) {
-            LOGGER.info(EXECUTION_LOGS_MARKER, "Processing file: {}, reached line {}", datasetFile.getName(), lineIndex);
+            LOGGER.info(EXECUTION_LOGS_MARKER, "Processing file: {}, reached line {}",
+                datasetFile.getName(), lineIndex);
           }
         }
         fileStatus.setEndOfFileReached(true);
@@ -123,12 +132,14 @@ public class MediaExtractorForFile implements Callable<Void> {
 
   private boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
     if (fileStatus.isEndOfFileReached()) {
-      LOGGER.warn(EXECUTION_LOGS_MARKER, "On a previous execution, we have already reached the end of file {}",
+      LOGGER.warn(EXECUTION_LOGS_MARKER,
+          "On a previous execution, we have already reached the end of file {}",
           fileStatus.getFileName());
       return false;
     }
     final int lineReached = fileStatus.getLineReached();
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Will try to move to line {} and continue from there for file: {}", lineReached,
+    LOGGER.info(EXECUTION_LOGS_MARKER,
+        "Will try to move to line {} and continue from there for file: {}", lineReached,
         fileStatus.getFileName());
     for (int i = 0; i < lineReached; i++) {
       if (scanner.hasNextLine()) {

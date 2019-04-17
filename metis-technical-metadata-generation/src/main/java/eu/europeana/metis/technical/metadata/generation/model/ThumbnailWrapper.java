@@ -1,6 +1,9 @@
 package eu.europeana.metis.technical.metadata.generation.model;
 
 /**
+ * Model class that contains the thumbnail bytes the target name of the thumbnail, that needs to
+ * identify the thumbnail (e.g. in S3).
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-16
  */
