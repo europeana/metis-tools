@@ -25,6 +25,7 @@ public class PropertiesHolder {
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
   public final File directoryWithResourcesPerDatasetPath;
+  public final boolean startFromBeginningOfFiles;
   public final boolean retryFailedResources;
 
   public final String truststorePath;
@@ -59,6 +60,7 @@ public class PropertiesHolder {
     }
 
     directoryWithResourcesPerDatasetPath = new File(properties.getProperty("directory.with.resources.per.dataset.path"));
+    startFromBeginningOfFiles = Boolean.parseBoolean(properties.getProperty("start.from.beginning.of.files"));
     retryFailedResources = Boolean.parseBoolean(properties.getProperty("retry.failed.resources"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");

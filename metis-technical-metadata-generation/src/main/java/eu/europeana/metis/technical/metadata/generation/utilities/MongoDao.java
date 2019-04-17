@@ -38,7 +38,8 @@ public class MongoDao {
 
   TechnicalMetadataWrapper getTechnicalMetadataWrapper(String resourceUrl) {
     return datastore.find(TechnicalMetadataWrapper.class)
-        .filter(RESOURCE_URL, resourceUrl).project(ID, true).project(SUCCESS_EXTRACTION, true).get();
+        .filter(RESOURCE_URL, resourceUrl).project(ID, true).project(SUCCESS_EXTRACTION, true)
+        .get();
   }
 
   void storeMediaResultInDb(ResourceExtractionResult resourceExtractionResult)
@@ -64,7 +65,11 @@ public class MongoDao {
 
   void storeFailedMediaInDb(String resourceUrl) {
     //Keep track of the failed ones to bypass them on a second execution if needed
-    final TechnicalMetadataWrapper technicalMetadataWrapper = new TechnicalMetadataWrapper();
+    TechnicalMetadataWrapper technicalMetadataWrapper = getTechnicalMetadataWrapper(
+        resourceUrl);
+    if (technicalMetadataWrapper == null) {
+      technicalMetadataWrapper = new TechnicalMetadataWrapper();
+    }
     technicalMetadataWrapper.setResourceUrl(resourceUrl);
     technicalMetadataWrapper.setSuccessExtraction(false);
     datastore.save(technicalMetadataWrapper);

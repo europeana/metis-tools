@@ -1,4 +1,10 @@
-file.with.resources.path=
+#Directory that contains one file per dataset, and each file contains a resource url per line
+directory.with.resources.per.dataset.path=
+#If true, this will start parsing the file from the beginning and only try the ones that are not generated already and bypassing the failed ones
+start.from.beginning.of.files=
+#If true, this will start parsing the file from the beginning and only retry the ones that have previously failed
+#If both "start.from.beginning.of.files" and "retry.failed.resources" are true then the functionality of "retry.failed.resources" precedes
+retry.failed.resources=
 #Truststore
 truststore.path=
 truststore.password=

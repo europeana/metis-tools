@@ -28,15 +28,17 @@ public class ExecutorManager {
   private final MongoDao mongoDao;
   private final File directoryWithResourcesPerDataset;
   private final MediaExtractor mediaExtractor;
+  private final boolean startFromBeginningOfFiles;
   private final boolean retryFailedResources;
 
   public ExecutorManager(Datastore datastore, File directoryWithResourcesPerDataset,
-      boolean retryFailedResources)
+      boolean startFromBeginningOfFiles, boolean retryFailedResources)
       throws MediaProcessorException {
     this.mongoDao = new MongoDao(datastore);
     this.directoryWithResourcesPerDataset = directoryWithResourcesPerDataset;
     final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
     this.mediaExtractor = processorFactory.createMediaExtractor();
+    this.startFromBeginningOfFiles = startFromBeginningOfFiles;
     this.retryFailedResources = retryFailedResources;
   }
 
@@ -56,7 +58,8 @@ public class ExecutorManager {
 
   private void parseMediaForFile(File datasetFile) throws IOException {
     LOGGER.info("Starting parsing file {}", datasetFile);
-    final FileStatus fileStatus = getFileStatus(datasetFile.getName(), retryFailedResources);
+    final FileStatus fileStatus = getFileStatus(datasetFile.getName(), startFromBeginningOfFiles,
+        retryFailedResources);
 
     int lineIndex = fileStatus.getLineReached();
     try (Scanner scanner = new Scanner(datasetFile, "UTF-8")) {
@@ -90,8 +93,14 @@ public class ExecutorManager {
   private boolean eligibleForProcessing(String resourceUrl) {
     final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
         .getTechnicalMetadataWrapper(resourceUrl);
-    return technicalMetadataWrapper == null || (!technicalMetadataWrapper.isSuccessExtraction()
-        && retryFailedResources);
+    final boolean isMetadataNullAndRetryFailedResourceFalse =
+        technicalMetadataWrapper == null && !retryFailedResources;
+    final boolean isMetadataNonNullAndRetryFailedResourcesTrue =
+        technicalMetadataWrapper != null && !technicalMetadataWrapper.isSuccessExtraction()
+            && retryFailedResources;
+
+    return isMetadataNullAndRetryFailedResourceFalse
+        || isMetadataNonNullAndRetryFailedResourcesTrue;
   }
 
   private boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
@@ -113,13 +122,14 @@ public class ExecutorManager {
     return true;
   }
 
-  private FileStatus getFileStatus(String fileName, boolean retryFailedResources) {
+  private FileStatus getFileStatus(String fileName, boolean startFromBeginningOfFiles,
+      boolean retryFailedResources) {
     FileStatus fileStatus = mongoDao.getFileStatus(fileName);
     if (fileStatus == null) {
       fileStatus = new FileStatus(fileName, 0);
-    } else if (retryFailedResources) {
+    } else if (startFromBeginningOfFiles || retryFailedResources) {
       LOGGER.info(
-          "Since retryFailedResources == true, then we'll start from the beginning of the file");
+          "Since startFromBeginningOfFiles or retryFailedResources is true, then we'll start from the beginning of the file");
       fileStatus.setEndOfFileReached(false);
       fileStatus.setLineReached(0);
     }
