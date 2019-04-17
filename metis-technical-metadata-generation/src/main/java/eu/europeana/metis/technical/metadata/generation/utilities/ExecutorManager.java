@@ -9,6 +9,7 @@ import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
+import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -27,18 +28,19 @@ public class ExecutorManager {
   private final MongoDao mongoDao;
   private final File directoryWithResourcesPerDataset;
   private final MediaExtractor mediaExtractor;
+  private final boolean retryFailedResources;
 
-  public ExecutorManager(Datastore datastore, File directoryWithResourcesPerDataset)
+  public ExecutorManager(Datastore datastore, File directoryWithResourcesPerDataset,
+      boolean retryFailedResources)
       throws MediaProcessorException {
     this.mongoDao = new MongoDao(datastore);
     this.directoryWithResourcesPerDataset = directoryWithResourcesPerDataset;
     final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
     this.mediaExtractor = processorFactory.createMediaExtractor();
+    this.retryFailedResources = retryFailedResources;
   }
 
   public void startTechnicalMetadataGeneration() throws IOException {
-    //Is same file flag? Then continue from line stored in db, otherwise from the beginning of the file.
-
     final File[] filesPerDataset = this.directoryWithResourcesPerDataset.listFiles();
     final boolean allFiles =
         filesPerDataset != null && Arrays.stream(filesPerDataset).allMatch(File::isFile);
@@ -54,7 +56,7 @@ public class ExecutorManager {
 
   private void parseMediaForFile(File datasetFile) throws IOException {
     LOGGER.info("Starting parsing file {}", datasetFile);
-    final FileStatus fileStatus = getFileStatus(datasetFile.getName());
+    final FileStatus fileStatus = getFileStatus(datasetFile.getName(), retryFailedResources);
 
     int lineIndex = fileStatus.getLineReached();
     try (Scanner scanner = new Scanner(datasetFile, "UTF-8")) {
@@ -62,7 +64,7 @@ public class ExecutorManager {
         while (scanner.hasNextLine()) {
           String resourceUrl = scanner.nextLine();
           //Only generate if non existent
-          if (!mongoDao.doesMediaAlreadyExist(resourceUrl)) {
+          if (eligibleForProcessing(resourceUrl)) {
             final ResourceExtractionResult resourceExtractionResult;
             try {
               resourceExtractionResult = performMediaExtraction(resourceUrl);
@@ -85,6 +87,13 @@ public class ExecutorManager {
     }
   }
 
+  private boolean eligibleForProcessing(String resourceUrl) {
+    final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
+        .getTechnicalMetadataWrapper(resourceUrl);
+    return technicalMetadataWrapper == null || (!technicalMetadataWrapper.isSuccessExtraction()
+        && retryFailedResources);
+  }
+
   private boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
     if (fileStatus.isEndOfFileReached()) {
       LOGGER.warn("On a previous execution, we have already reached the end of file {}",
@@ -104,11 +113,17 @@ public class ExecutorManager {
     return true;
   }
 
-  private FileStatus getFileStatus(String fileName) {
+  private FileStatus getFileStatus(String fileName, boolean retryFailedResources) {
     FileStatus fileStatus = mongoDao.getFileStatus(fileName);
     if (fileStatus == null) {
       fileStatus = new FileStatus(fileName, 0);
+    } else if (retryFailedResources) {
+      LOGGER.info(
+          "Since retryFailedResources == true, then we'll start from the beginning of the file");
+      fileStatus.setEndOfFileReached(false);
+      fileStatus.setLineReached(0);
     }
+    mongoDao.storeFileStatusToDb(fileStatus);
     return fileStatus;
   }
 

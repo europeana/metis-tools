@@ -20,6 +20,7 @@ public class MongoDao {
   private static final String ID = "_id";
   private static final String RESOURCE_URL = "resourceUrl";
   private static final String FILE_NAME = "fileName";
+  private static final String SUCCESS_EXTRACTION = "successExtraction";
 
   private Datastore datastore;
 
@@ -35,9 +36,9 @@ public class MongoDao {
     datastore.save(fileStatus);
   }
 
-  boolean doesMediaAlreadyExist(String resourceUrl) {
+  TechnicalMetadataWrapper getTechnicalMetadataWrapper(String resourceUrl) {
     return datastore.find(TechnicalMetadataWrapper.class)
-        .filter(RESOURCE_URL, resourceUrl).project(ID, true).get() != null;
+        .filter(RESOURCE_URL, resourceUrl).project(ID, true).project(SUCCESS_EXTRACTION, true).get();
   }
 
   void storeMediaResultInDb(ResourceExtractionResult resourceExtractionResult)

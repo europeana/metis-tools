@@ -25,6 +25,7 @@ public class PropertiesHolder {
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
   public final File directoryWithResourcesPerDatasetPath;
+  public final boolean retryFailedResources;
 
   public final String truststorePath;
   public final String truststorePassword;
@@ -58,6 +59,7 @@ public class PropertiesHolder {
     }
 
     directoryWithResourcesPerDatasetPath = new File(properties.getProperty("directory.with.resources.per.dataset.path"));
+    retryFailedResources = Boolean.parseBoolean(properties.getProperty("retry.failed.resources"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");
