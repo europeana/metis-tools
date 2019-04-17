@@ -9,15 +9,10 @@ import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
-import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
-import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
-import org.apache.commons.io.IOUtils;
 import org.mongodb.morphia.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +24,13 @@ import org.slf4j.LoggerFactory;
 public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
-  private static final String RESOURCE_URL = "resourceUrl";
-  private static final String ID = "_id";
-  private static final String FILE_PATH = "filePath";
-  private static final String PLUGIN_STATUS = "pluginStatus";
-  private static final String FINISHED_DATE = "finishedDate";
-  private static final String UPDATED_DATE = "updatedDate";
-  private final Datastore datastore;
+  private final MongoDao mongoDao;
   private final File directoryWithResourcesPerDataset;
   private final MediaExtractor mediaExtractor;
 
   public ExecutorManager(Datastore datastore, File directoryWithResourcesPerDataset)
       throws MediaProcessorException {
-    this.datastore = datastore;
+    this.mongoDao = new MongoDao(datastore);
     this.directoryWithResourcesPerDataset = directoryWithResourcesPerDataset;
     final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
     this.mediaExtractor = processorFactory.createMediaExtractor();
@@ -65,33 +54,33 @@ public class ExecutorManager {
 
   private void parseMediaForFile(File datasetFile) throws IOException {
     LOGGER.info("Starting parsing file {}", datasetFile);
-    final FileStatus fileStatus = getFileStatus(datasetFile.getPath());
+    final FileStatus fileStatus = getFileStatus(datasetFile.getName());
 
-    int lineIndex = 1;
+    int lineIndex = fileStatus.getLineReached();
     try (Scanner scanner = new Scanner(datasetFile, "UTF-8")) {
       if (moveScannerToLine(scanner, fileStatus)) {
         while (scanner.hasNextLine()) {
           String resourceUrl = scanner.nextLine();
           //Only generate if non existent
-          if (!doesMediaAlreadyExist(resourceUrl)) {
+          if (!mongoDao.doesMediaAlreadyExist(resourceUrl)) {
             final ResourceExtractionResult resourceExtractionResult;
             try {
               resourceExtractionResult = performMediaExtraction(resourceUrl);
-              storeMediaResultInDb(resourceExtractionResult);
+              mongoDao.storeMediaResultInDb(resourceExtractionResult);
               clearThumbnails(resourceExtractionResult);
             } catch (MediaExtractionException e) {
               LOGGER.warn("Media extraction failed for resourceUrl {}", resourceUrl);
-              storeFailedMediaInDb(resourceUrl);
+              mongoDao.storeFailedMediaInDb(resourceUrl);
             }
           } else {
             LOGGER.info("ResourceUrl already exists in db: {}", resourceUrl);
           }
-          fileStatus.setLineReached(lineIndex);
-          storeFileStatusToDb(fileStatus);
           lineIndex++;
+          fileStatus.setLineReached(lineIndex);
+          mongoDao.storeFileStatusToDb(fileStatus);
         }
         fileStatus.setEndOfFileReached(true);
-        storeFileStatusToDb(fileStatus);
+        mongoDao.storeFileStatusToDb(fileStatus);
       }
     }
   }
@@ -99,13 +88,13 @@ public class ExecutorManager {
   private boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
     if (fileStatus.isEndOfFileReached()) {
       LOGGER.warn("On a previous execution, we have already reached the end of file {}",
-          fileStatus.getFilePath());
+          fileStatus.getFileName());
       return false;
     }
     final int lineReached = fileStatus.getLineReached();
     LOGGER.info("Will try to move to the line {} and continue from there for file {}", lineReached,
-        fileStatus.getFilePath());
-    for (int i = 0; i <= lineReached; i++) {
+        fileStatus.getFileName());
+    for (int i = 0; i < lineReached; i++) {
       if (scanner.hasNextLine()) {
         scanner.nextLine();
       } else {
@@ -115,50 +104,12 @@ public class ExecutorManager {
     return true;
   }
 
-  private void storeFileStatusToDb(FileStatus fileStatus) {
-    datastore.save(fileStatus);
-  }
-
-  private FileStatus getFileStatus(String filePath) {
-    FileStatus fileStatus = datastore.find(FileStatus.class).filter(FILE_PATH, filePath).get();
+  private FileStatus getFileStatus(String fileName) {
+    FileStatus fileStatus = mongoDao.getFileStatus(fileName);
     if (fileStatus == null) {
-      fileStatus = new FileStatus(filePath, 0);
+      fileStatus = new FileStatus(fileName, 0);
     }
     return fileStatus;
-  }
-
-  private boolean doesMediaAlreadyExist(String resourceUrl) {
-    return datastore.find(TechnicalMetadataWrapper.class)
-        .filter(RESOURCE_URL, resourceUrl).project(ID, true).get() != null;
-  }
-
-  private void storeMediaResultInDb(ResourceExtractionResult resourceExtractionResult)
-      throws IOException {
-
-    final TechnicalMetadataWrapper technicalMetadataWrapper = new TechnicalMetadataWrapper();
-    technicalMetadataWrapper
-        .setResourceUrl(resourceExtractionResult.getMetadata().getResourceUrl());
-    technicalMetadataWrapper.setResourceMetadata(resourceExtractionResult.getMetadata());
-
-    List<ThumbnailWrapper> thumbnailWrappers = new ArrayList<>(2);
-    for (Thumbnail thumbnail : resourceExtractionResult.getThumbnails()) {
-      final ThumbnailWrapper thumbnailWrapper = new ThumbnailWrapper();
-      thumbnailWrapper.setTargetName(thumbnail.getTargetName());
-      thumbnailWrapper.setThumbnailBytes(IOUtils.toByteArray(thumbnail.getContentStream()));
-      thumbnailWrappers.add(thumbnailWrapper);
-    }
-    technicalMetadataWrapper.setThumbnailWrappers(thumbnailWrappers);
-    technicalMetadataWrapper.setSuccessExtraction(true);
-
-    datastore.save(technicalMetadataWrapper);
-  }
-
-  private void storeFailedMediaInDb(String resourceUrl) {
-    //Keep track of the failed ones to bypass them on a second execution if needed
-    final TechnicalMetadataWrapper technicalMetadataWrapper = new TechnicalMetadataWrapper();
-    technicalMetadataWrapper.setResourceUrl(resourceUrl);
-    technicalMetadataWrapper.setSuccessExtraction(false);
-    datastore.save(technicalMetadataWrapper);
   }
 
   private void clearThumbnails(ResourceExtractionResult resourceExtractionResult)
