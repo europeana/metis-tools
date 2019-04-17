@@ -1,5 +1,7 @@
 package eu.europeana.metis.technical.metadata.generation;
 
+import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+
 import com.mongodb.MongoClient;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
@@ -27,7 +29,7 @@ public class TechnicalMetadataGenerationMain {
 
   public static void main(String[] args)
       throws Exception {
-    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting script");
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script");
 
     final MongoInitializer mongoInitializer = prepareConfiguration();
     final Datastore datastore = createDatastore(mongoInitializer.getMongoClient(),
@@ -45,7 +47,7 @@ public class TechnicalMetadataGenerationMain {
   private static MongoInitializer prepareConfiguration() throws TrustStoreConfigurationException {
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
         .isNotEmpty(propertiesHolder.truststorePassword)) {
-      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
+      LOGGER.info(EXECUTION_LOGS_MARKER,
           "Append default truststore with custom truststore");
       CustomTruststoreAppender.appendCustomTrustoreToDefault(propertiesHolder.truststorePath,
           propertiesHolder.truststorePassword);

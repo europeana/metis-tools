@@ -1,5 +1,8 @@
 package eu.europeana.metis.technical.metadata.generation.utilities;
 
+import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.STATISTICS_LOGS_MARKER;
+
 import eu.europeana.metis.mediaprocessing.MediaExtractor;
 import eu.europeana.metis.mediaprocessing.MediaProcessorFactory;
 import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
@@ -51,10 +54,10 @@ public class ExecutorManager {
     final boolean allFiles =
         filesPerDataset != null && Arrays.stream(filesPerDataset).allMatch(File::isFile);
     if (!allFiles) {
-      LOGGER.error("There are non file items under {}", directoryWithResourcesPerDataset);
+      LOGGER.error(EXECUTION_LOGS_MARKER, "There are non file items under {}", directoryWithResourcesPerDataset);
       throw new IOException("There are non file items under the specified directory");
     }
-    LOGGER.info("Total files to process: {}", filesPerDataset.length);
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Total files to process: {}", filesPerDataset.length);
 
     int threadCounter = 0;
     int processedFiles = 0;
@@ -65,7 +68,7 @@ public class ExecutorManager {
         completionService.take();
         threadCounter--;
         processedFiles++;
-        LOGGER.info("Processed files: {}", processedFiles);
+        LOGGER.info(EXECUTION_LOGS_MARKER, "Processed files: {}", processedFiles);
       } else {
         completionService.submit(mediaExtractorForFile);
         threadCounter++;
@@ -76,10 +79,13 @@ public class ExecutorManager {
     for (int i = 0; i < threadCounter; i++) {
       completionService.take();
       processedFiles++;
-      LOGGER.info("Processed files: {}", processedFiles);
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Processed files: {}", processedFiles);
     }
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Total failed resources in db {}", mongoDao.getTotalFailedResources());
 
-    LOGGER.info("Total failed resources in db {}", mongoDao.getTotalFailedResources());
+    LOGGER.info(STATISTICS_LOGS_MARKER, "Processed files: {}", processedFiles);
+    LOGGER.info(STATISTICS_LOGS_MARKER, "Total processed resources in db {}", mongoDao.getTotalProcessedResources());
+    LOGGER.info(STATISTICS_LOGS_MARKER, "Total failed resources in db {}", mongoDao.getTotalFailedResources());
   }
 
   public void close() throws IOException {

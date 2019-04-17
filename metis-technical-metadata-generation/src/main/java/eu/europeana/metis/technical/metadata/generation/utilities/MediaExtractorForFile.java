@@ -1,5 +1,7 @@
 package eu.europeana.metis.technical.metadata.generation.utilities;
 
+import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+
 import eu.europeana.metis.mediaprocessing.MediaExtractor;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.mediaprocessing.model.RdfResourceEntry;
@@ -44,7 +46,7 @@ public class MediaExtractorForFile implements Callable<Void> {
   }
 
   static Void parseMediaForFile(File datasetFile) throws IOException {
-    LOGGER.info("Parsing: {}", datasetFile);
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Parsing: {}", datasetFile);
     final FileStatus fileStatus = getFileStatus(datasetFile.getName(), startFromBeginningOfFiles,
         retryFailedResources);
 
@@ -53,7 +55,7 @@ public class MediaExtractorForFile implements Callable<Void> {
       if (moveScannerToLine(scanner, fileStatus)) {
         while (scanner.hasNextLine()) {
           String resourceUrl = scanner.nextLine();
-          LOGGER.info("Processing resource: {}", resourceUrl);
+          LOGGER.info(EXECUTION_LOGS_MARKER, "Processing resource: {}", resourceUrl);
           //Only generate if non existent
           if (eligibleForProcessing(resourceUrl)) {
             final ResourceExtractionResult resourceExtractionResult;
@@ -62,25 +64,25 @@ public class MediaExtractorForFile implements Callable<Void> {
               mongoDao.storeMediaResultInDb(resourceExtractionResult);
               clearThumbnails(resourceExtractionResult);
             } catch (MediaExtractionException e) {
-              LOGGER.warn("Media extraction failed for resourceUrl {}", resourceUrl);
+              LOGGER.warn(EXECUTION_LOGS_MARKER, "Media extraction failed for resourceUrl {}", resourceUrl);
               mongoDao.storeFailedMediaInDb(resourceUrl);
             }
           } else {
-            LOGGER.info("ResourceUrl already exists in db: {}", resourceUrl);
+            LOGGER.info(EXECUTION_LOGS_MARKER, "ResourceUrl already exists in db: {}", resourceUrl);
           }
           lineIndex++;
           fileStatus.setLineReached(lineIndex);
           mongoDao.storeFileStatusToDb(fileStatus);
 
           if (lineIndex % 100 == 0) {
-            LOGGER.info("File: {}, reached line {}", datasetFile.getName(), lineIndex);
+            LOGGER.info(EXECUTION_LOGS_MARKER, "Processing file: {}, reached line {}", datasetFile.getName(), lineIndex);
           }
         }
         fileStatus.setEndOfFileReached(true);
         mongoDao.storeFileStatusToDb(fileStatus);
       }
     }
-    LOGGER.info("Finished: {}", datasetFile);
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Finished: {}", datasetFile);
     return null;
   }
 
@@ -90,14 +92,14 @@ public class MediaExtractorForFile implements Callable<Void> {
     RdfResourceEntry resourceEntry = new RdfResourceEntry(resourceUrl,
         Arrays.asList(UrlType.OBJECT, UrlType.HAS_VIEW, UrlType.IS_SHOWN_BY, UrlType.IS_SHOWN_AT));
     // Perform metadata extraction
-    LOGGER.info("Processing: {}", resourceEntry.getResourceUrl());
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Processing: {}", resourceEntry.getResourceUrl());
     return mediaExtractor.performMediaExtraction(resourceEntry);
   }
 
   private static void clearThumbnails(ResourceExtractionResult resourceExtractionResult)
       throws IOException {
     //At the end clear thumbnails
-    LOGGER.info("Removing thumbnails for {}.",
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Removing thumbnails for {}.",
         resourceExtractionResult.getMetadata().getResourceUrl());
     if (resourceExtractionResult.getThumbnails() != null) {
       for (Thumbnail thumbnail : resourceExtractionResult.getThumbnails()) {
@@ -121,12 +123,12 @@ public class MediaExtractorForFile implements Callable<Void> {
 
   private static boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
     if (fileStatus.isEndOfFileReached()) {
-      LOGGER.warn("On a previous execution, we have already reached the end of file {}",
+      LOGGER.warn(EXECUTION_LOGS_MARKER, "On a previous execution, we have already reached the end of file {}",
           fileStatus.getFileName());
       return false;
     }
     final int lineReached = fileStatus.getLineReached();
-    LOGGER.info("Will try to move to the line {} and continue from there for file {}", lineReached,
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Will try to move to line {} and continue from there for file: {}", lineReached,
         fileStatus.getFileName());
     for (int i = 0; i < lineReached; i++) {
       if (scanner.hasNextLine()) {
@@ -144,7 +146,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     if (fileStatus == null) {
       fileStatus = new FileStatus(fileName, 0);
     } else if (startFromBeginningOfFiles || retryFailedResources) {
-      LOGGER.info(
+      LOGGER.info(EXECUTION_LOGS_MARKER,
           "Since startFromBeginningOfFiles or retryFailedResources is true, then we'll start from the beginning of the file");
       fileStatus.setEndOfFileReached(false);
       fileStatus.setLineReached(0);

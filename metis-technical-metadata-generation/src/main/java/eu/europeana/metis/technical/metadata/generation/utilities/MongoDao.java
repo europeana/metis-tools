@@ -78,4 +78,8 @@ public class MongoDao {
   long getTotalFailedResources() {
     return datastore.find(TechnicalMetadataWrapper.class).filter(SUCCESS_EXTRACTION, false).count();
   }
+
+  long getTotalProcessedResources() {
+    return datastore.find(TechnicalMetadataWrapper.class).count();
+  }
 }
