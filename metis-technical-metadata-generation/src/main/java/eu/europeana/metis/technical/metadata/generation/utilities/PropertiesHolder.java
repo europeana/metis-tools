@@ -27,6 +27,7 @@ public class PropertiesHolder {
   public final File directoryWithResourcesPerDatasetPath;
   public final boolean startFromBeginningOfFiles;
   public final boolean retryFailedResources;
+  public final int maxParallelThreads;
 
   public final String truststorePath;
   public final String truststorePassword;
@@ -62,6 +63,7 @@ public class PropertiesHolder {
     directoryWithResourcesPerDatasetPath = new File(properties.getProperty("directory.with.resources.per.dataset.path"));
     startFromBeginningOfFiles = Boolean.parseBoolean(properties.getProperty("start.from.beginning.of.files"));
     retryFailedResources = Boolean.parseBoolean(properties.getProperty("retry.failed.resources"));
+    maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");

@@ -53,6 +53,7 @@ public class MediaExtractorForFile implements Callable<Void> {
       if (moveScannerToLine(scanner, fileStatus)) {
         while (scanner.hasNextLine()) {
           String resourceUrl = scanner.nextLine();
+          LOGGER.info("Processing resource: {}", resourceUrl);
           //Only generate if non existent
           if (eligibleForProcessing(resourceUrl)) {
             final ResourceExtractionResult resourceExtractionResult;
@@ -70,11 +71,16 @@ public class MediaExtractorForFile implements Callable<Void> {
           lineIndex++;
           fileStatus.setLineReached(lineIndex);
           mongoDao.storeFileStatusToDb(fileStatus);
+
+          if (lineIndex % 100 == 0) {
+            LOGGER.info("File: {}, reached line {}", datasetFile.getName(), lineIndex);
+          }
         }
         fileStatus.setEndOfFileReached(true);
         mongoDao.storeFileStatusToDb(fileStatus);
       }
     }
+    LOGGER.info("Finished: {}", datasetFile);
     return null;
   }
 

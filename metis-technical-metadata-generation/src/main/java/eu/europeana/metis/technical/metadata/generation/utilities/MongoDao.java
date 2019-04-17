@@ -74,4 +74,8 @@ public class MongoDao {
     technicalMetadataWrapper.setSuccessExtraction(false);
     datastore.save(technicalMetadataWrapper);
   }
+
+  long getTotalFailedResources() {
+    return datastore.find(TechnicalMetadataWrapper.class).filter(SUCCESS_EXTRACTION, false).count();
+  }
 }

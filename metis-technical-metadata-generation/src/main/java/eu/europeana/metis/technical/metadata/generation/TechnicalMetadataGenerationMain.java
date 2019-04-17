@@ -34,7 +34,7 @@ public class TechnicalMetadataGenerationMain {
         propertiesHolder.mongoDb);
 
     final ExecutorManager executorManager = new ExecutorManager(datastore,
-        propertiesHolder.directoryWithResourcesPerDatasetPath,
+        propertiesHolder.maxParallelThreads, propertiesHolder.directoryWithResourcesPerDatasetPath,
         propertiesHolder.startFromBeginningOfFiles, propertiesHolder.retryFailedResources);
     executorManager.startTechnicalMetadataGeneration();
     executorManager.close();
