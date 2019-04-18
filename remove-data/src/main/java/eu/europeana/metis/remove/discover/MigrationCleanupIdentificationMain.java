@@ -2,12 +2,9 @@ package eu.europeana.metis.remove.discover;
 
 import com.opencsv.CSVWriter;
 import eu.europeana.metis.CommonStringValues;
-import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import eu.europeana.metis.remove.discover.AbstractOrphanIdentification.DiscoveryMode;
-import eu.europeana.metis.remove.utils.MongoInitializer;
-import eu.europeana.metis.remove.utils.PropertiesHolder;
-import eu.europeana.metis.utils.CustomTruststoreAppender;
+import eu.europeana.metis.remove.utils.Application;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,45 +15,48 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MigrationCleanupIdentificationMain {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(MigrationCleanupIdentificationMain.class);
-
+  private static final String FILE_FOR_PLUGIN_REMOVAL = "/home/jochen/Desktop/plugins_to_remove.csv";
   private static final String FILE_FOR_REVISION_REMOVAL = "/home/jochen/Desktop/revisions_to_remove.csv";
   private static final String FILE_FOR_TASK_REMOVAL = "/home/jochen/Desktop/tasks_to_remove.csv";
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
-
-    final PropertiesHolder propertiesHolder = new PropertiesHolder();
-
-    LOGGER.info("Append default truststore with custom truststore");
-    if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
-        .isNotEmpty(propertiesHolder.truststorePassword)) {
-      CustomTruststoreAppender.appendCustomTrustoreToDefault(propertiesHolder.truststorePath,
-          propertiesHolder.truststorePassword);
+    try (final Application application = Application.initialize()) {
+      final AbstractOrphanIdentification discoverOrphans = new MigrationCleanupIdentification(
+          application.getDatastoreProvider(), DiscoveryMode.DISCOVER_ONLY_CHILDLESS_ORPHANS);
+      final List<ExecutionPluginNode> orphans = discoverOrphans.discoverOrphans();
+      saveFileForPluginRemoval(orphans);
+      saveFileForRevisionRemoval(orphans, application.getProperties().ecloudProvider);
+      saveFileForTaskRemoval(orphans);
     }
+  }
 
-    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder);
-    mongoInitializer.initializeMongoClient();
-    MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProvider(
-        mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
+  private static void saveFileForPluginRemoval(List<ExecutionPluginNode> nodesToRemove)
+      throws IOException {
+    final Path path = Paths.get(FILE_FOR_PLUGIN_REMOVAL);
+    try (final BufferedWriter fileWriter = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+        final CSVWriter writer = new CSVWriter(fileWriter)) {
 
-    final AbstractOrphanIdentification discoverOrphans = new MigrationCleanupIdentification(
-        morphiaDatastoreProvider, DiscoveryMode.DISCOVER_ONLY_CHILDLESS_ORPHANS);
+      // Write header
+      writer.writeNext(new String[]{
+          "executionId",
+          "pluginId",
+          "pluginType"
+      });
 
-    final List<ExecutionPluginNode> orphans = discoverOrphans.discoverOrphans();
-
-    saveFileForRevisionRemoval(orphans, propertiesHolder.ecloudProvider);
-    saveFileForTaskRemoval(orphans);
-
-    mongoInitializer.close();
+      // Write records
+      nodesToRemove.forEach(node ->
+          writer.writeNext(new String[]{
+              node.getExecution().getId().toString(),
+              node.getPlugin().getId(),
+              node.getPlugin().getPluginType().name()
+          })
+      );
+    }
   }
 
   private static void saveFileForRevisionRemoval(List<ExecutionPluginNode> nodesToRemove,
