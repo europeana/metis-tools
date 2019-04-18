@@ -59,11 +59,12 @@ public class MediaExtractorForFile implements Callable<Void> {
 
     int lineIndex = fileStatus.getLineReached();
     try (Scanner scanner = new Scanner(datasetFile, "UTF-8")) {
+      //Bypass lines until the reached one, from a previous execution
       if (moveScannerToLine(scanner, fileStatus)) {
         while (scanner.hasNextLine()) {
           String resourceUrl = scanner.nextLine();
           LOGGER.info(EXECUTION_LOGS_MARKER, "Processing resource: {}", resourceUrl);
-          //Only generate if non existent
+          //Should this resource be processed according to status and configuration parameters
           if (eligibleForProcessing(resourceUrl)) {
             final ResourceExtractionResult resourceExtractionResult;
             try {
@@ -153,7 +154,10 @@ public class MediaExtractorForFile implements Callable<Void> {
 
   private FileStatus getFileStatus(String fileName, boolean startFromBeginningOfFiles,
       boolean retryFailedResources) {
+    //From Mongo
     FileStatus fileStatus = mongoDao.getFileStatus(fileName);
+
+    //Or reset
     if (fileStatus == null) {
       fileStatus = new FileStatus(fileName, 0);
     } else if (startFromBeginningOfFiles || retryFailedResources) {
@@ -162,6 +166,7 @@ public class MediaExtractorForFile implements Callable<Void> {
       fileStatus.setEndOfFileReached(false);
       fileStatus.setLineReached(0);
     }
+    //Re-store the status in db
     mongoDao.storeFileStatusToDb(fileStatus);
     return fileStatus;
   }
