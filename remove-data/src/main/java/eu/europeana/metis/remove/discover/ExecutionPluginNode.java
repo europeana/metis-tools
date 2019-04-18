@@ -86,8 +86,8 @@ class ExecutionPluginNode {
 
   /**
    * This method finds subtrees of this tree (a node including it's children may be considered a
-   * tree) that satisfy the given predicate. The subtrees (also identified by their top node) are
-   * returned by calling the given consumer.
+   * tree) that satisfy the given predicate. The subtrees (identified by their top node) are
+   * returned by calling the given consumer. The subtrees don't overlap.
    *
    * @param test The predicate with which to test the subtrees.
    * @param result The consumer that accepts the results.

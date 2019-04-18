@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -167,75 +168,40 @@ class ExecutionPluginForest {
   }
 
   /**
-   * This method returns all leafs that have plugin status {@link PluginStatus#FAILED} or {@link
-   * PluginStatus#CANCELLED} and started execution before the given cutoff date. These leafs (along
-   * with any descendants) can be safely removed. Note that if the leaf itself does not meet the
-   * criteria, maybe one of the descendants does, and then we return that.
-   *
-   * @param startedBeforeDate The cutoff date.
-   * @return The nodes.
+   * This method returns all nodes (leafs or otherwise) that satisfy the given test.
+   * @param test The test that the nodes need to satisfy.
+   * @return The list of nodes that satisfy the given test.
    */
-  List<ExecutionPluginNode> getFailedOrCancelledLeafs(Instant startedBeforeDate) {
-
-    // Build the criteria checks: one for the state and one for the time.
-    final Predicate<ExecutionPluginNode> failedOrCancelledCheck = node ->
-        node.getPlugin().getPluginStatus() == PluginStatus.FAILED
-            || node.getPlugin().getPluginStatus() == PluginStatus.CANCELLED;
-    final Predicate<ExecutionPluginNode> startedBeforeCheck = node -> node
-        .wasStartedBefore(startedBeforeDate);
-
-    // Collect all leafs or descendants of leafs that satisfy the criteria. Optimize by checking the
-    // time before even considering the leaf node: all descendants must have started later.
-    final List<ExecutionPluginNode> result = new ArrayList<>();
-    leafNodeIds.stream().map(nodesById::get).filter(startedBeforeCheck).forEach(
-        node -> node.findSubtrees(failedOrCancelledCheck.and(startedBeforeCheck), result::add));
-    return result;
+  List<ExecutionPluginNode> getNodes(Predicate<ExecutionPluginNode> test) {
+    return nodesById.values().stream().filter(test).collect(Collectors.toList());
   }
 
   /**
-   * <p>
-   * This method returns all leafs that satisfy the following conditions:
-   * <ol>
-   * <li>The leaf has plugin status {@link PluginStatus#FINISHED}</li>
-   * <li>The leaf started execution before the given cutoff date.</li>
-   * <li>There is another execution (not necessarily a leaf) of the same type that started
-   * execution later, but still before the cutoff date. This execution effectively supersedes the
-   * leaf.</li>
-   * </ol>
-   * These leafs (and all their descendants) can be safely removed. Note that if the leaf itself
-   * does not meet the criteria, maybe one of the descendants does, and then we return that.
-   * </p>
-   * <p>
-   * Note: this method does not find executions that are superseded by an execution that happened
-   * AFTER the cutoff date.
-   * </p>
+   * This method returns all non-overlapping subtrees of leafs (identified by top node and
+   * potentially including leafs themselves) that satisfy the given test.
    *
-   * @param startedBeforeDate The cutoff date.
-   * @return The nodes.
+   * @param subtreeTest The test that the subtrees of the leaf (including the leaf itself) need to
+   * satisfy (see {@link ExecutionPluginNode#findSubtrees(Predicate, Consumer)}).
+   * @return The list of non-overlapping subtrees of leafs that satisfy the given test.
    */
-  List<ExecutionPluginNode> getFinishedSupersededLeafs(Instant startedBeforeDate) {
+  List<ExecutionPluginNode> getOrphanLeafSubtrees(Predicate<ExecutionPluginNode> subtreeTest) {
+    return getOrphanLeafSubtrees(node -> true, subtreeTest);
+  }
 
-    // Get all finished executions (not necessarily leafs) before the cutoff date, grouped by type.
-    final Predicate<ExecutionPluginNode> finishedCheck = node -> node.getPlugin().getPluginStatus()
-        == PluginStatus.FINISHED;
-    final Map<PluginType, List<ExecutionPluginNode>> finishedPluginsByType = nodesById.values()
-        .stream().filter(node -> node.wasStartedBefore(startedBeforeDate)).filter(finishedCheck)
-        .collect(Collectors.groupingBy(ExecutionPluginNode::getType));
-
-    // Find the superseded executions by removing the last execution.
-    final Comparator<ExecutionPluginNode> reverseStartedDateComparator = Comparator.<ExecutionPluginNode, Date>comparing(
-        node -> node.getPlugin().getStartedDate()).reversed();
-    final Function<List<ExecutionPluginNode>, Stream<ExecutionPluginNode>> removeLatestExecution = nodes ->
-        nodes.stream().sorted(reverseStartedDateComparator).skip(1);
-    final Set<String> supersededExecutions = finishedPluginsByType.values().stream()
-        .flatMap(removeLatestExecution).map(ExecutionPluginNode::getId).collect(Collectors.toSet());
-
-    // Find the leafs or descendants of leafs that are marked as superseded.
+  /**
+   * This method returns all non-overlapping subtrees of leafs (identified by top node and
+   * potentially including leafs themselves) that satisfy the given tests.
+   *
+   * @param leafTest The test that the leaf itself needs to satisfy.
+   * @param subtreeTest The test that the subtrees of the leaf (including the leaf itself) need to
+   * satisfy (see {@link ExecutionPluginNode#findSubtrees(Predicate, Consumer)}).
+   * @return The list of non-overlapping subtrees of leafs that satisfy the given tests.
+   */
+  List<ExecutionPluginNode> getOrphanLeafSubtrees(Predicate<ExecutionPluginNode> leafTest,
+      Predicate<ExecutionPluginNode> subtreeTest) {
     final List<ExecutionPluginNode> result = new ArrayList<>();
-    final Predicate<ExecutionPluginNode> isSuperseded = node -> supersededExecutions
-        .contains(node.getId());
-    leafNodeIds.stream().map(nodesById::get)
-        .forEach(node -> node.findSubtrees(isSuperseded, result::add));
+    leafNodeIds.stream().map(nodesById::get).filter(leafTest)
+        .forEach(node -> node.findSubtrees(subtreeTest, result::add));
     return result;
   }
 }
