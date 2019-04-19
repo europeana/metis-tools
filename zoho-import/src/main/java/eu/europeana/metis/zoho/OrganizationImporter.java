@@ -121,9 +121,13 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     Date modifiedSince = lastRun;
     if (incrementalImport || individualImport) {
       lastRun = entityService.getLastOrganizationImportDate();
-      //EA-1466 lastModified is inclusive, add one second to avoid re-import of last modified entity 
-      int one_second = 1000;
-      modifiedSince = new Date(lastRun.getTime() + one_second);
+      //EA-1466 lastModified is inclusive, add one second to avoid re-import of last modified entity
+      long lastRunTimestamp = 0;
+      if(lastRun != null) {             
+          lastRunTimestamp = lastRun.getTime();
+      }
+      int one_second = 1000;          
+      modifiedSince = new Date(lastRunTimestamp + one_second);
     }
     
     List<ZohoOrganization> orgList;
