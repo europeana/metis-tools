@@ -6,6 +6,7 @@ import static eu.europeana.metis.technical.metadata.generation.utilities.Propert
 import eu.europeana.metis.mediaprocessing.MediaExtractor;
 import eu.europeana.metis.mediaprocessing.MediaProcessorFactory;
 import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
+import eu.europeana.metis.technical.metadata.generation.model.Mode;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -29,8 +30,7 @@ public class ExecutorManager {
   private final MongoDao mongoDao;
   private final File directoryWithResourcesPerDataset;
   private final MediaExtractor mediaExtractor;
-  private final boolean startFromBeginningOfFiles;
-  private final boolean retryFailedResources;
+  private final Mode mode;
   private final int maxParallelThreads;
 
   private final ExecutorService threadPool;
@@ -38,15 +38,14 @@ public class ExecutorManager {
 
   public ExecutorManager(Datastore datastore, int maxParallelThreads,
       File directoryWithResourcesPerDataset,
-      boolean startFromBeginningOfFiles, boolean retryFailedResources)
+      Mode mode)
       throws MediaProcessorException {
     this.mongoDao = new MongoDao(datastore);
     this.maxParallelThreads = maxParallelThreads;
     this.directoryWithResourcesPerDataset = directoryWithResourcesPerDataset;
     final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
     this.mediaExtractor = processorFactory.createMediaExtractor();
-    this.startFromBeginningOfFiles = startFromBeginningOfFiles;
-    this.retryFailedResources = retryFailedResources;
+    this.mode = mode;
 
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
@@ -67,16 +66,15 @@ public class ExecutorManager {
     int processedFiles = 0;
     for (File datasetFile : filesPerDataset) {
       final MediaExtractorForFile mediaExtractorForFile = new MediaExtractorForFile(datasetFile,
-          mongoDao, mediaExtractor, startFromBeginningOfFiles, retryFailedResources);
+          mongoDao, mediaExtractor, mode);
       if (threadCounter >= maxParallelThreads) {
         completionService.take();
         threadCounter--;
         processedFiles++;
         LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
-      } else {
-        completionService.submit(mediaExtractorForFile);
-        threadCounter++;
       }
+      completionService.submit(mediaExtractorForFile);
+      threadCounter++;
     }
 
     //Final cleanup of futures

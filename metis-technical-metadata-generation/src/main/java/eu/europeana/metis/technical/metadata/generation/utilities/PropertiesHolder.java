@@ -1,5 +1,6 @@
 package eu.europeana.metis.technical.metadata.generation.utilities;
 
+import eu.europeana.metis.technical.metadata.generation.model.Mode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,8 +26,7 @@ public class PropertiesHolder {
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
   public final File directoryWithResourcesPerDatasetPath;
-  public final boolean startFromBeginningOfFiles;
-  public final boolean retryFailedResources;
+  public final Mode mode;
   public final int maxParallelThreads;
 
   public final String truststorePath;
@@ -61,8 +61,7 @@ public class PropertiesHolder {
     }
 
     directoryWithResourcesPerDatasetPath = new File(properties.getProperty("directory.with.resources.per.dataset.path"));
-    startFromBeginningOfFiles = Boolean.parseBoolean(properties.getProperty("start.from.beginning.of.files"));
-    retryFailedResources = Boolean.parseBoolean(properties.getProperty("retry.failed.resources"));
+    mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
     maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
