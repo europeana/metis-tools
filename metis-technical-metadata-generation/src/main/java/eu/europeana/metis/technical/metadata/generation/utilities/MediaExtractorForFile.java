@@ -6,16 +6,19 @@ import eu.europeana.metis.mediaprocessing.MediaExtractor;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.mediaprocessing.model.RdfResourceEntry;
 import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
-import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.Mode;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
+import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +58,10 @@ public class MediaExtractorForFile implements Callable<Void> {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Parsing: {}", datasetFile);
     final FileStatus fileStatus = getFileStatus(datasetFile.getName());
 
+    InputStream inputStream = getInputStreamForFilePath(datasetFile);
+
     int lineIndex = fileStatus.getLineReached();
-    try (Scanner scanner = new Scanner(datasetFile, "UTF-8")) {
+    try (Scanner scanner = new Scanner(inputStream, "UTF-8")) {
       //Bypass lines until the reached one, from a previous execution
       if (moveScannerToLine(scanner, fileStatus)) {
         while (scanner.hasNextLine()) {
@@ -92,6 +97,16 @@ public class MediaExtractorForFile implements Callable<Void> {
     return null;
   }
 
+  private InputStream getInputStreamForFilePath(File datasetFile) throws IOException {
+    InputStream inputStream;
+    if (isGZipped(datasetFile)) {
+      inputStream = new GZIPInputStream(new FileInputStream(datasetFile));
+    } else {
+      inputStream = new FileInputStream(datasetFile);
+    }
+    return inputStream;
+  }
+
   private ResourceExtractionResult performMediaExtraction(String resourceUrl)
       throws MediaExtractionException {
     //Use all url types to get metadata and thumbnails for all. Later we decide what to use.
@@ -100,18 +115,6 @@ public class MediaExtractorForFile implements Callable<Void> {
     // Perform metadata extraction
     LOGGER.info(EXECUTION_LOGS_MARKER, "Processing: {}", resourceEntry.getResourceUrl());
     return mediaExtractor.performMediaExtraction(resourceEntry);
-  }
-
-  private void clearThumbnails(ResourceExtractionResult resourceExtractionResult)
-      throws IOException {
-    //At the end clear thumbnails
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Removing thumbnails for {}.",
-        resourceExtractionResult.getMetadata().getResourceUrl());
-    if (resourceExtractionResult.getThumbnails() != null) {
-      for (Thumbnail thumbnail : resourceExtractionResult.getThumbnails()) {
-        thumbnail.close();
-      }
-    }
   }
 
   private boolean eligibleForProcessing(String resourceUrl) {
@@ -162,6 +165,18 @@ public class MediaExtractorForFile implements Callable<Void> {
     //Re-store the status in db
     mongoDao.storeFileStatusToDb(fileStatus);
     return fileStatus;
+  }
+
+  private boolean isGZipped(File file) {
+    int magic = 0;
+    try {
+      RandomAccessFile raf = new RandomAccessFile(file, "r");
+      magic = raf.read() & 0xff | ((raf.read() << 8) & 0xff00);
+      raf.close();
+    } catch (Throwable e) {
+      e.printStackTrace(System.err);
+    }
+    return magic == GZIPInputStream.GZIP_MAGIC;
   }
 
 }
