@@ -1,25 +1,19 @@
 package eu.europeana.metis.remove.discover;
 
 import com.mongodb.DBCollection;
-import com.opencsv.CSVWriter;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.ExecutionProgress;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.utils.ExternalRequestUtil;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import org.mongodb.morphia.query.Query;
@@ -37,11 +31,47 @@ abstract class AbstractOrphanIdentification {
 
   private final MorphiaDatastoreProvider morphiaDatastoreProvider;
 
-  AbstractOrphanIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider) {
-    this.morphiaDatastoreProvider = morphiaDatastoreProvider;
+  private final DiscoveryMode discoveryMode;
+
+  enum DiscoveryMode {
+
+    /**
+     * This mode removes all orphans and their descendants.
+     */
+    DISCOVER_ALL_ORPHANS(node -> true),
+
+    /**
+     * This mode removes only orphans or their descendants that have no children.
+     */
+    DISCOVER_ONLY_CHILDLESS_ORPHANS(node -> node.getChildren().isEmpty());
+
+    private final Predicate<ExecutionPluginNode> test;
+
+    DiscoveryMode(Predicate<ExecutionPluginNode> test) {
+      this.test = test;
+    }
   }
 
-  void discoverOrphans(String outputFile) throws IOException {
+  /**
+   * Constructor.
+   *
+   * @param morphiaDatastoreProvider Access to the database.
+   * @param discoveryMode The discoveryMode in which to operate.
+   */
+  AbstractOrphanIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider, DiscoveryMode discoveryMode) {
+    this.morphiaDatastoreProvider = morphiaDatastoreProvider;
+    this.discoveryMode = discoveryMode;
+  }
+
+  /**
+   * This method computes all remove iterations. This means that it repeatedly compute the nodes to
+   * remove, and simulates removing these nodes before computing the next batch. This continue until
+   * no more nodes can be removed. It prints the iterations to the log, and returns only the nodes
+   * to remove for the FIRST iteration (i.e. the nodes that can currently be removed).
+   *
+   * @return The nodes that can currently be removed.
+   */
+  final List<ExecutionPluginNode> discoverOrphans() {
 
     // Compute all iterations
     final List<List<ExecutionPluginNode>> iterations = new ArrayList<>();
@@ -65,9 +95,9 @@ abstract class AbstractOrphanIdentification {
           datasetIdsToSkip.add(datasetId);
         }
 
-        // Add all orphans and their children in the right order to the list for removal.
-        orphans.stream().map(ExecutionPluginNode::getAllInOrderOfRemoval)
-            .forEach(nodesToRemove::addAll);
+        // Add orphans and their descendants in the right order to the list for removal.
+        orphans.stream().map(ExecutionPluginNode::getAllInOrderOfRemoval).flatMap(List::stream)
+            .filter(discoveryMode.test).forEach(nodesToRemove::add);
       }
 
       // If we have no more nodes to remove, we are done.
@@ -75,15 +105,17 @@ abstract class AbstractOrphanIdentification {
         break;
       }
 
+      // Save the nodes to remove as an iteration.
+      iterations.add(nodesToRemove);
+
       // Add all nodes to remove to the node skip list: we can ignore them in the next iteration.
       nodesToRemove.stream().map(ExecutionPluginNode::getId).forEach(nodeIdsToSkip::add);
-      iterations.add(nodesToRemove);
     }
 
     // If there is nothing to do we print a message and we are done.
     if (iterations.isEmpty()) {
       LOGGER.info("Nothing to do: no orphans/leaf nodes found.");
-      return;
+      return Collections.emptyList();
     }
 
     // Print all iterations to the log.
@@ -101,47 +133,8 @@ abstract class AbstractOrphanIdentification {
           linkCheckingExecutions);
     }
 
-    // Write just the first iteration to a CSV.
-    saveOrphansToFile(iterations.get(0), outputFile);
-  }
-
-  private void saveOrphansToFile(List<ExecutionPluginNode> nodesToRemove, String outputFile)
-      throws IOException {
-    final Path path = Paths.get(outputFile);
-    try (final BufferedWriter fileWriter = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
-        final CSVWriter writer = new CSVWriter(fileWriter)) {
-
-      // Write header
-      writer.writeNext(new String[]{
-          "Execution ID",
-          "Execution creation date",
-          "Metis Dataset ID",
-          "eCloud Dataset ID",
-          "Plugin ID",
-          "Plugin type",
-          "Plugin status",
-          "Plugin start date",
-          "Plugin external task ID",
-          "Processed records"
-      });
-
-      // Write records
-      nodesToRemove.forEach(node ->
-          writer.writeNext(new String[]{
-              node.getExecution().getId().toString(),
-              node.getExecution().getCreatedDate().toString(),
-              node.getExecution().getDatasetId(),
-              node.getExecution().getEcloudDatasetId(),
-              node.getPlugin().getId(),
-              node.getType().name(),
-              node.getPlugin().getPluginStatus().name(),
-              node.getPlugin().getStartedDate().toString(),
-              node.getPlugin().getExternalTaskId(),
-              node.getPlugin().getExecutionProgress() == null ? ""
-                  : ("" + node.getPlugin().getExecutionProgress().getProcessedRecords())
-          })
-      );
-    }
+    // Return just the first iteration.
+    return iterations.get(0);
   }
 
   private List<ExecutionPluginNode> discoverOrphans(String datasetId, Set<String> idsToSkip) {
