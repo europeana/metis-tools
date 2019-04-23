@@ -72,7 +72,7 @@ public class MediaExtractorForFile implements Callable<Void> {
             try (final ResourceExtractionResult resourceExtractionResult = performMediaExtraction(
                 resourceUrl)) {
               mongoDao.storeMediaResultInDb(resourceExtractionResult);
-            } catch (MediaExtractionException e) {
+            } catch (MediaExtractionException | RuntimeException e) {
               LOGGER.warn(EXECUTION_LOGS_MARKER, "Media extraction failed for resourceUrl {}",
                   resourceUrl);
               mongoDao.storeFailedMediaInDb(resourceUrl);
@@ -174,7 +174,7 @@ public class MediaExtractorForFile implements Callable<Void> {
       magic = raf.read() & 0xff | ((raf.read() << 8) & 0xff00);
       raf.close();
     } catch (Throwable e) {
-      e.printStackTrace(System.err);
+      LOGGER.error("Could not determine if file is gzip", e);
     }
     return magic == GZIPInputStream.GZIP_MAGIC;
   }
