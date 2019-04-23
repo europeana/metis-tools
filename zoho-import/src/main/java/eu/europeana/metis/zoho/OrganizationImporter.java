@@ -134,10 +134,15 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       if (individualImport) {
         orgList = getOneOrganizationAsList(individualEntityId);
         hasNext = false;
-      } else {
+      } else if(incrementalImport) {
         orgList = zohoAccessService.getZcrmRecordOrganizations(page, rows, lastRun);
         LOGGER.info("Processing organizations set: {}", ""+page+"-"+(page+rows));
-      }
+      }else {
+          //full import
+    	  orgList = zohoAccessService.getZcrmRecordOrganizations(page, rows, null, searchCriteria);
+          int start = (page -1) * rows +1 ;
+		LOGGER.info("Processing organizations set: {}", ""+ start +"-"+(start+rows));
+        }
       // collect operations to be run on Metis and Entity API
       operations = fillOperationsSet(orgList);
       // perform operations on all systems
@@ -309,6 +314,12 @@ public class OrganizationImporter extends BaseOrganizationImporter {
             "The organization " + org.getEntityId().toString()
                 + " will be deleted as it doesn't have the required roles anymore. "
                 + "organization role: " + org.getEntityId().toString());
+      } else {
+    	  LOGGER.info("{}",
+    	            "The organization " + org.getEntityId().toString()
+    	                + " will be ignored by importer as it doesn't have the required roles anymore. "
+    	                + "organization role: " + org.getEntityId().toString());
+    	  
       }
       
     }
