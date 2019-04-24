@@ -3,7 +3,9 @@ package eu.europeana.metis.technical.metadata.generation.utilities;
 import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 
 import eu.europeana.metis.mediaprocessing.MediaExtractor;
+import eu.europeana.metis.mediaprocessing.MediaProcessorFactory;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
+import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.mediaprocessing.model.RdfResourceEntry;
 import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
@@ -41,16 +43,16 @@ public class MediaExtractorForFile implements Callable<Void> {
   private MediaExtractor mediaExtractor;
   private Mode mode;
 
-  MediaExtractorForFile(File datasetFile, MongoDao mongoDao, MediaExtractor mediaExtractor,
-      Mode mode) {
+  MediaExtractorForFile(File datasetFile, MongoDao mongoDao, MediaProcessorFactory mediaProcessorFactory,
+      Mode mode) throws MediaProcessorException {
     this.datasetFile = datasetFile;
     this.mongoDao = mongoDao;
-    this.mediaExtractor = mediaExtractor;
+    this.mediaExtractor = mediaProcessorFactory.createMediaExtractor();
     this.mode = mode;
   }
 
   @Override
-  public Void call() throws Exception {
+  public Void call() throws IOException {
     return parseMediaForFile(datasetFile);
   }
 
@@ -58,7 +60,13 @@ public class MediaExtractorForFile implements Callable<Void> {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Parsing: {}", datasetFile);
     final FileStatus fileStatus = getFileStatus(datasetFile.getName());
 
-    InputStream inputStream = getInputStreamForFilePath(datasetFile);
+    InputStream inputStream;
+    try {
+      inputStream = getInputStreamForFilePath(datasetFile);
+    } catch (IOException e) {
+      LOGGER.warn(EXECUTION_LOGS_MARKER, "Something went wrong when reading file: {}", datasetFile);
+      return null;
+    }
 
     int lineIndex = fileStatus.getLineReached();
     try (Scanner scanner = new Scanner(inputStream, "UTF-8")) {
@@ -66,15 +74,16 @@ public class MediaExtractorForFile implements Callable<Void> {
       if (moveScannerToLine(scanner, fileStatus)) {
         while (scanner.hasNextLine()) {
           String resourceUrl = scanner.nextLine();
-          LOGGER.info(EXECUTION_LOGS_MARKER, "Processing resource: {}", resourceUrl);
+          LOGGER.info(EXECUTION_LOGS_MARKER, "Processing datasetFile {},  resource: {}",
+              datasetFile.getName(), resourceUrl);
           //Should this resource be processed according to status and configuration parameters
           if (eligibleForProcessing(resourceUrl)) {
             try (final ResourceExtractionResult resourceExtractionResult = performMediaExtraction(
                 resourceUrl)) {
               mongoDao.storeMediaResultInDb(resourceExtractionResult);
-            } catch (MediaExtractionException | RuntimeException e) {
+            } catch (Exception e) {
               LOGGER.warn(EXECUTION_LOGS_MARKER, "Media extraction failed for resourceUrl {}",
-                  resourceUrl);
+                  resourceUrl, e);
               mongoDao.storeFailedMediaInDb(resourceUrl);
             }
           } else {
@@ -94,6 +103,7 @@ public class MediaExtractorForFile implements Callable<Void> {
       }
     }
     LOGGER.info(EXECUTION_LOGS_MARKER, "Finished: {}", datasetFile);
+    mediaExtractor.close();
     return null;
   }
 
@@ -173,7 +183,7 @@ public class MediaExtractorForFile implements Callable<Void> {
       RandomAccessFile raf = new RandomAccessFile(file, "r");
       magic = raf.read() & 0xff | ((raf.read() << 8) & 0xff00);
       raf.close();
-    } catch (Throwable e) {
+    } catch (Exception e) {
       LOGGER.error("Could not determine if file is gzip", e);
     }
     return magic == GZIPInputStream.GZIP_MAGIC;

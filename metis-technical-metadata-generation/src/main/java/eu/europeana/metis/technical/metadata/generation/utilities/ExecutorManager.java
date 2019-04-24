@@ -3,7 +3,6 @@ package eu.europeana.metis.technical.metadata.generation.utilities;
 import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.STATISTICS_LOGS_MARKER;
 
-import eu.europeana.metis.mediaprocessing.MediaExtractor;
 import eu.europeana.metis.mediaprocessing.MediaProcessorFactory;
 import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.technical.metadata.generation.model.Mode;
@@ -26,10 +25,10 @@ import org.slf4j.LoggerFactory;
 public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
-  public static final String PROCESSED_FILES_STR = "Processed files: {}";
+  private static final String PROCESSED_FILES_STR = "Processed files: {}";
   private final MongoDao mongoDao;
   private final File directoryWithResourcesPerDataset;
-  private final MediaExtractor mediaExtractor;
+  private final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
   private final Mode mode;
   private final int maxParallelThreads;
 
@@ -38,13 +37,10 @@ public class ExecutorManager {
 
   public ExecutorManager(Datastore datastore, int maxParallelThreads,
       File directoryWithResourcesPerDataset,
-      Mode mode)
-      throws MediaProcessorException {
+      Mode mode) {
     this.mongoDao = new MongoDao(datastore);
     this.maxParallelThreads = maxParallelThreads;
     this.directoryWithResourcesPerDataset = directoryWithResourcesPerDataset;
-    final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
-    this.mediaExtractor = processorFactory.createMediaExtractor();
     this.mode = mode;
 
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
@@ -65,16 +61,20 @@ public class ExecutorManager {
     int threadCounter = 0;
     int processedFiles = 0;
     for (File datasetFile : filesPerDataset) {
-      final MediaExtractorForFile mediaExtractorForFile = new MediaExtractorForFile(datasetFile,
-          mongoDao, mediaExtractor, mode);
-      if (threadCounter >= maxParallelThreads) {
-        completionService.take();
-        threadCounter--;
-        processedFiles++;
-        LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
+      try {
+        final MediaExtractorForFile mediaExtractorForFile = new MediaExtractorForFile(datasetFile,
+            mongoDao, processorFactory, mode);
+        if (threadCounter >= maxParallelThreads) {
+          completionService.take();
+          threadCounter--;
+          processedFiles++;
+          LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
+        }
+        completionService.submit(mediaExtractorForFile);
+        threadCounter++;
+      } catch (MediaProcessorException e) {
+        LOGGER.warn("Could not create mediaExtractor during datasetFile {}", datasetFile);
       }
-      completionService.submit(mediaExtractorForFile);
-      threadCounter++;
     }
 
     //Final cleanup of futures
@@ -93,9 +93,8 @@ public class ExecutorManager {
         mongoDao.getTotalFailedResources());
   }
 
-  public void close() throws IOException {
+  public void close() {
     threadPool.shutdown();
-    mediaExtractor.close();
   }
 
 }

@@ -53,11 +53,13 @@ public class MongoDao {
     technicalMetadataWrapper.setResourceMetadata(resourceExtractionResult.getMetadata());
 
     List<ThumbnailWrapper> thumbnailWrappers = new ArrayList<>(2);
-    for (Thumbnail thumbnail : resourceExtractionResult.getThumbnails()) {
-      final ThumbnailWrapper thumbnailWrapper = new ThumbnailWrapper();
-      thumbnailWrapper.setTargetName(thumbnail.getTargetName());
-      thumbnailWrapper.setThumbnailBytes(IOUtils.toByteArray(thumbnail.getContentStream()));
-      thumbnailWrappers.add(thumbnailWrapper);
+    if(resourceExtractionResult.getThumbnails() != null) {
+      for (Thumbnail thumbnail : resourceExtractionResult.getThumbnails()) {
+        final ThumbnailWrapper thumbnailWrapper = new ThumbnailWrapper();
+        thumbnailWrapper.setTargetName(thumbnail.getTargetName());
+        thumbnailWrapper.setThumbnailBytes(IOUtils.toByteArray(thumbnail.getContentStream()));
+        thumbnailWrappers.add(thumbnailWrapper);
+      }
     }
     technicalMetadataWrapper.setThumbnailWrappers(thumbnailWrappers);
     technicalMetadataWrapper.setSuccessExtraction(true);
