@@ -67,7 +67,7 @@ public class MongoDao {
     datastore.save(technicalMetadataWrapper);
   }
 
-  void storeFailedMediaInDb(String resourceUrl) {
+  void storeFailedMediaInDb(String resourceUrl, String errorTrace) {
     //Keep track of the failed ones to bypass them on a second execution if needed
     TechnicalMetadataWrapper technicalMetadataWrapper = getTechnicalMetadataWrapper(
         resourceUrl);
@@ -76,6 +76,7 @@ public class MongoDao {
     }
     technicalMetadataWrapper.setResourceUrl(resourceUrl);
     technicalMetadataWrapper.setSuccessExtraction(false);
+    technicalMetadataWrapper.setErrorStackTrace(errorTrace);
     datastore.save(technicalMetadataWrapper);
   }
 

@@ -61,6 +61,10 @@ public class ExecutorManager {
     int threadCounter = 0;
     int processedFiles = 0;
     for (File datasetFile : filesPerDataset) {
+      // TODO: 24-4-19 Remove the bypassing datasets
+      if ("0940425.csv.gz".equals(datasetFile.getName())) {
+        continue;
+      }
       try {
         final MediaExtractorForFile mediaExtractorForFile = new MediaExtractorForFile(datasetFile,
             mongoDao, processorFactory, mode);

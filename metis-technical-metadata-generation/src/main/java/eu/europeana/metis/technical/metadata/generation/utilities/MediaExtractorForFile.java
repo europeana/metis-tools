@@ -12,10 +12,12 @@ import eu.europeana.metis.mediaprocessing.model.UrlType;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.Mode;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -84,7 +86,7 @@ public class MediaExtractorForFile implements Callable<Void> {
             } catch (Exception e) {
               LOGGER.warn(EXECUTION_LOGS_MARKER, "Media extraction failed for resourceUrl {}",
                   resourceUrl, e);
-              mongoDao.storeFailedMediaInDb(resourceUrl);
+              mongoDao.storeFailedMediaInDb(resourceUrl, exceptionStacktraceToString(e));
             }
           } else {
             LOGGER.info(EXECUTION_LOGS_MARKER, "ResourceUrl already exists in db: {}", resourceUrl);
@@ -105,6 +107,15 @@ public class MediaExtractorForFile implements Callable<Void> {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Finished: {}", datasetFile);
     mediaExtractor.close();
     return null;
+  }
+
+  private static String exceptionStacktraceToString(Exception e)
+  {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    PrintStream ps = new PrintStream(baos);
+    e.printStackTrace(ps);
+    ps.close();
+    return baos.toString();
   }
 
   private InputStream getInputStreamForFilePath(File datasetFile) throws IOException {

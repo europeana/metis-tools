@@ -32,6 +32,7 @@ public class TechnicalMetadataWrapper implements HasMongoObjectId {
   private boolean successExtraction;
   private ResourceMetadata resourceMetadata;
   private List<ThumbnailWrapper> thumbnailWrappers;
+  private String errorStackTrace;
 
   @Override
   public ObjectId getId() {
@@ -75,5 +76,13 @@ public class TechnicalMetadataWrapper implements HasMongoObjectId {
   public void setThumbnailWrappers(
       List<ThumbnailWrapper> thumbnailWrappers) {
     this.thumbnailWrappers = thumbnailWrappers;
+  }
+
+  public String getErrorStackTrace() {
+    return errorStackTrace;
+  }
+
+  public void setErrorStackTrace(String errorStackTrace) {
+    this.errorStackTrace = errorStackTrace;
   }
 }
