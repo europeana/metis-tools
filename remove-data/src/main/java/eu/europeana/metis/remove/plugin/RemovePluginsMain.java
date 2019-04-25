@@ -42,9 +42,9 @@ public class RemovePluginsMain {
       LOGGER.info("Removing {} plugins.", plugins.size());
       final WorkflowExecutionDao dao = new WorkflowExecutionDao(application.getDatastoreProvider());
       plugins.stream().map(plugin -> RemovePluginsMain.findPlugin(plugin, dao))
-          .filter(Objects::nonNull).filter(plugin -> canEditWorkflow(plugin.getLeft()))
-          .filter(plugin -> canDeletePlugin(plugin, application.getDatastoreProvider()))
-          .forEach(plugin -> deletePlugin(plugin, application.getDatastoreProvider()));
+          .filter(Objects::nonNull).filter(pluginPair -> canEditWorkflow(pluginPair.getLeft()))
+          .filter(pluginPair -> canDeletePlugin(pluginPair, application.getDatastoreProvider()))
+          .forEach(pluginPair -> deletePlugin(pluginPair, application.getDatastoreProvider()));
       LOGGER.info("Done.");
     }
   }
@@ -57,25 +57,25 @@ public class RemovePluginsMain {
       LOGGER.warn("Skipping first line: [{}].", String.join(", ", reader.readNext()));
       for (String[] line : reader) {
         if (line.length != 3) {
-          throw new IllegalStateException(
-              "Problem in line " + result.size() + " with data [" + String.join(", ", line)
-                  + "]: not expecting " + line.length + " columns.");
+          throwExceptionForLine(result.size(), line, "not expecting " + line.length + " columns");
         }
         if (StringUtils.isBlank(line[0]) || StringUtils.isBlank(line[1])) {
-          throw new IllegalStateException(
-              "Problem in line " + result.size() + " with data [" + String.join(", ", line)
-                  + "]: not expecting blank values.");
+          throwExceptionForLine(result.size(), line, "not expecting blank values");
         }
         final PluginType pluginType = PluginType.getPluginTypeFromEnumName(line[2]);
         if (pluginType == null) {
-          throw new IllegalStateException(
-              "Problem in line " + result.size() + " with data [" + String.join(", ", line)
-                  + "]: not expecting plugin type value.");
+          throwExceptionForLine(result.size(), line, "not expecting plugin type value");
         }
         result.add(new PluginToRemove(line[0], line[1], pluginType));
       }
     }
     return result;
+  }
+
+  private static void throwExceptionForLine(int lineNumber, String[] line, String message) {
+    final String exception = String.format("Problem in line %s with data [%s]: %s.", lineNumber,
+        String.join(", ", line), message);
+    throw new IllegalStateException(exception);
   }
 
   private static boolean canEditWorkflow(WorkflowExecution execution) {
