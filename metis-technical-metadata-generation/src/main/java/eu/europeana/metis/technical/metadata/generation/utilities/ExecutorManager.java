@@ -31,17 +31,19 @@ public class ExecutorManager {
   private final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
   private final Mode mode;
   private final int maxParallelThreads;
+  private final int startFromFileIndexInDirectory;
+  private final int endAtFileIndexInDirectory;
 
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Void> completionService;
 
-  public ExecutorManager(Datastore datastore, int maxParallelThreads,
-      File directoryWithResourcesPerDataset,
-      Mode mode) {
+  public ExecutorManager(Datastore datastore, PropertiesHolder propertiesHolder) {
     this.mongoDao = new MongoDao(datastore);
-    this.maxParallelThreads = maxParallelThreads;
-    this.directoryWithResourcesPerDataset = directoryWithResourcesPerDataset;
-    this.mode = mode;
+    this.maxParallelThreads = propertiesHolder.maxParallelThreads;
+    this.startFromFileIndexInDirectory = propertiesHolder.startFromFileIndexInDirectory;
+    this.endAtFileIndexInDirectory = propertiesHolder.endAtFileIndexInDirectory;
+    this.directoryWithResourcesPerDataset = propertiesHolder.directoryWithResourcesPerDatasetPath;
+    this.mode = propertiesHolder.mode;
 
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
@@ -60,10 +62,14 @@ public class ExecutorManager {
 
     int threadCounter = 0;
     int processedFiles = 0;
+    int fileIndexInDirectory = 0;
     for (File datasetFile : filesPerDataset) {
-      // TODO: 24-4-19 Remove the bypassing datasets
-      if ("0940425.csv.gz".equals(datasetFile.getName())) {
+      fileIndexInDirectory++;
+      if (fileIndexInDirectory < startFromFileIndexInDirectory) {
         continue;
+      }
+      if (fileIndexInDirectory > endAtFileIndexInDirectory) {
+        break;
       }
       try {
         final MediaExtractorForFile mediaExtractorForFile = new MediaExtractorForFile(datasetFile,

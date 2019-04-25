@@ -37,9 +37,7 @@ public class TechnicalMetadataGenerationMain {
     final Datastore datastore = createDatastore(mongoInitializer.getMongoClient(),
         propertiesHolder.mongoDb);
 
-    final ExecutorManager executorManager = new ExecutorManager(datastore,
-        propertiesHolder.maxParallelThreads, propertiesHolder.directoryWithResourcesPerDatasetPath,
-        propertiesHolder.mode);
+    final ExecutorManager executorManager = new ExecutorManager(datastore, propertiesHolder);
     executorManager.startTechnicalMetadataGeneration();
     executorManager.close();
     mongoInitializer.close();

@@ -28,6 +28,8 @@ public class PropertiesHolder {
   public final File directoryWithResourcesPerDatasetPath;
   public final Mode mode;
   public final int maxParallelThreads;
+  public final int startFromFileIndexInDirectory;
+  public final int endAtFileIndexInDirectory;
 
   public final String truststorePath;
   public final String truststorePassword;
@@ -63,6 +65,8 @@ public class PropertiesHolder {
     directoryWithResourcesPerDatasetPath = new File(properties.getProperty("directory.with.resources.per.dataset.path"));
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
     maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
+    startFromFileIndexInDirectory = Integer.parseInt(properties.getProperty("start.from.file.index.in.directory"));
+    endAtFileIndexInDirectory = Integer.parseInt(properties.getProperty("end.at.file.index.in.directory"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");

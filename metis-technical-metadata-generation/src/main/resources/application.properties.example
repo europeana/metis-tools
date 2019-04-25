@@ -7,6 +7,10 @@ directory.with.resources.per.dataset.path=
 mode=DEFAULT
 #The number of parallel executions, each thread will take care of one dataset. Should be up to the total number of cpu cores
 max.parallel.threads=
+#The index of the file in the directory to start from. Starting from 1
+start.from.file.index.in.directory=
+#The index of the file in the directory to end at. The file on that index is processed.
+end.at.file.index.in.directory=
 #Truststore
 truststore.path=
 truststore.password=
