@@ -9,6 +9,7 @@ import eu.europeana.metis.technical.metadata.generation.model.Mode;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,6 +59,7 @@ public class ExecutorManager {
           directoryWithResourcesPerDataset);
       throw new IOException("There are non file items under the specified directory");
     }
+    Arrays.sort(filesPerDataset, Comparator.comparing(File::getName));
     LOGGER.info(EXECUTION_LOGS_MARKER, "Total files to process: {}", filesPerDataset.length);
 
     int threadCounter = 0;
@@ -83,7 +85,7 @@ public class ExecutorManager {
         completionService.submit(mediaExtractorForFile);
         threadCounter++;
       } catch (MediaProcessorException e) {
-        LOGGER.warn("Could not create mediaExtractor during datasetFile {}", datasetFile);
+        LOGGER.warn("Could not create mediaExtractor during datasetFile {}", datasetFile, e);
       }
     }
 
