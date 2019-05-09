@@ -2,6 +2,7 @@ package eu.europeana.metis.remove.discover;
 
 import com.opencsv.CSVWriter;
 import eu.europeana.metis.CommonStringValues;
+import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import eu.europeana.metis.remove.discover.AbstractOrphanIdentification.DiscoveryMode;
 import eu.europeana.metis.remove.utils.Application;
@@ -77,7 +78,8 @@ public class MigrationCleanupIdentificationMain {
 
       // Write records
       final DateFormat dateFormat = new SimpleDateFormat(CommonStringValues.DATE_FORMAT, Locale.US);
-      nodesToRemove.forEach(node ->
+      nodesToRemove.stream().filter(node -> node.getPlugin() instanceof AbstractExecutablePlugin)
+          .forEach(node ->
           writer.writeNext(new String[]{
               node.getExecution().getEcloudDatasetId(),
               providerId,
@@ -103,7 +105,9 @@ public class MigrationCleanupIdentificationMain {
 
       // Write records
       nodesToRemove.stream().map(ExecutionPluginNode::getPlugin)
-          .map(AbstractMetisPlugin::getExternalTaskId).filter(StringUtils::isNotBlank)
+          .filter(plugin -> plugin instanceof AbstractExecutablePlugin)
+          .map(plugin -> (AbstractExecutablePlugin) plugin)
+          .map(AbstractExecutablePlugin::getExternalTaskId).filter(StringUtils::isNotBlank)
           .forEach(taskId -> writer.writeNext(new String[]{taskId}, false));
     }
   }

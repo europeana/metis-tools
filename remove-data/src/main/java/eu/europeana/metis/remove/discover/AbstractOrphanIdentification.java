@@ -3,7 +3,7 @@ package eu.europeana.metis.remove.discover;
 import com.mongodb.DBCollection;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
-import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.ExecutionProgress;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.utils.ExternalRequestUtil;
@@ -120,17 +120,21 @@ abstract class AbstractOrphanIdentification {
 
     // Print all iterations to the log.
     final ToIntFunction<ExecutionPluginNode> recordCounter = node -> Optional
-        .ofNullable(node.getPlugin()).map(AbstractMetisPlugin::getExecutionProgress)
+        .ofNullable(node.getPlugin()).filter(plugin -> plugin instanceof AbstractExecutablePlugin)
+        .map(plugin -> (AbstractExecutablePlugin) plugin)
+        .map(AbstractExecutablePlugin::getExecutionProgress)
         .map(ExecutionProgress::getProcessedRecords).orElse(0);
     LOGGER.info("{} iterations are needed:", iterations.size());
     for (int i = 0; i < iterations.size(); i++) {
       final List<ExecutionPluginNode> nodesToRemove = iterations.get(i);
       final long linkCheckingExecutions = nodesToRemove.stream().map(ExecutionPluginNode::getType)
           .filter(type -> type == PluginType.LINK_CHECKING).count();
+      final long nonExecutablePlugins = nodesToRemove.stream().map(ExecutionPluginNode::getPlugin)
+          .filter(plugin -> !(plugin instanceof AbstractExecutablePlugin)).count();
       LOGGER.info(
-          " ... Iteration {}: remove {} nodes ({} records). {} of these are link checking executions.",
+          " ... Iteration {}: remove {} nodes ({} records). This includes {} link checking plugins and {} non-executable plugins.",
           i, nodesToRemove.size(), nodesToRemove.stream().mapToInt(recordCounter).sum(),
-          linkCheckingExecutions);
+          linkCheckingExecutions, nonExecutablePlugins);
     }
 
     // Return just the first iteration.

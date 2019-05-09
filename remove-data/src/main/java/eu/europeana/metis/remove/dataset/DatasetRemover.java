@@ -65,6 +65,7 @@ public class DatasetRemover {
     // TODO JV: Check whether the ecloud ID exists (has been created): otherwise, skip next steps.
     LOGGER.error("TODO: Check whether the ecloud ID exists (has been created): otherwise, skip next steps.");
 
+    // TODO JV: Replace this by calling the two services that will be implemented in eCloud: one for removing tasks, one for removing representations.
     // Remove all representations of this dataset in eCloud
     LOGGER.info("  * Removing all representations in eCloud.");
     final Iterator<Representation> representations = datasetServiceClient
