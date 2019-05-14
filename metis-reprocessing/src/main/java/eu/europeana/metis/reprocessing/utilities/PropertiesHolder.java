@@ -24,6 +24,10 @@ public class PropertiesHolder {
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
+  public final int maxParallelThreads;
+  public final int startFromDatasetIndex;
+  public final int endAtDatasetIndex;
+
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] metisCoreMongoHosts;
@@ -70,6 +74,10 @@ public class PropertiesHolder {
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
+
+    maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
+    startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
+    endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
 
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");

@@ -21,6 +21,7 @@ public class DatasetStatus implements HasMongoObjectId {
   @Indexed(options = @IndexOptions(unique = true))
   private String datasetId;
   private int totalProcessed;
+  private int totalRecords;
 
   public DatasetStatus() {
   }
@@ -49,5 +50,13 @@ public class DatasetStatus implements HasMongoObjectId {
 
   public void setTotalProcessed(int totalProcessed) {
     this.totalProcessed = totalProcessed;
+  }
+
+  public int getTotalRecords() {
+    return totalRecords;
+  }
+
+  public void setTotalRecords(int totalRecords) {
+    this.totalRecords = totalRecords;
   }
 }

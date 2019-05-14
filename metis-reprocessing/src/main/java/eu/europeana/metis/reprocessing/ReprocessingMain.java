@@ -41,7 +41,8 @@ public class ReprocessingMain {
   private static final String CONFIGURATION_FILE = "application.properties";
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
-  public static void main(String[] args) throws TrustStoreConfigurationException {
+  public static void main(String[] args)
+      throws TrustStoreConfigurationException, InterruptedException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script");
 
     //Metis Core Datastore
@@ -61,7 +62,7 @@ public class ReprocessingMain {
         mongoDestinationMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
 
     final ExecutorManager executorManager = new ExecutorManager(metisCoreDatastore,
-        mongoSourceDatastore, mongoDestinationDatastore);
+        mongoSourceDatastore, mongoDestinationDatastore, propertiesHolder);
     executorManager.startReprocessing();
 
     executorManager.close();
@@ -136,21 +137,6 @@ public class ReprocessingMain {
   private static Datastore createMongoDestinationDatastore(MongoClient mongoClient,
       String databaseName) {
     Morphia morphia = new Morphia();
-    morphia.map(FullBeanImpl.class);
-    morphia.map(ProvidedCHOImpl.class);
-    morphia.map(AgentImpl.class);
-    morphia.map(AggregationImpl.class);
-    morphia.map(ConceptImpl.class);
-    morphia.map(ProxyImpl.class);
-    morphia.map(PlaceImpl.class);
-    morphia.map(TimespanImpl.class);
-    morphia.map(WebResourceImpl.class);
-    morphia.map(EuropeanaAggregationImpl.class);
-    morphia.map(EventImpl.class);
-    morphia.map(PhysicalThingImpl.class);
-    morphia.map(ConceptSchemeImpl.class);
-    morphia.map(BasicProxyImpl.class);
-
     morphia.map(DatasetStatus.class);
     final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
     //Ensure indexes, to create them in destination only
