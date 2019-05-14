@@ -1,0 +1,25 @@
+#Directory that contains one file per dataset, and each file contains a resource url per line
+directory.with.resources.per.dataset.path=
+#Possible values DEFAULT, START_FROM_BEGINNING_IGNORE_PROCESSED, START_FROM_BEGINNING_RETRY_FAILED.
+#The DEFAULT value will continue from the point where the last execution reached.
+#The other two values will start from the beginning of the file and will either ignore everything that
+#was already processed(failed or successful), or ignore only the successfully processed and retry the failed resources.
+mode=DEFAULT
+#The number of parallel executions, each thread will take care of one dataset. Should be up to the total number of cpu cores
+max.parallel.threads=
+#The index of the file in the directory to start from. Starting from 1
+start.from.file.index.in.directory=
+#The index of the file in the directory to end at. The file on that index is processed.
+end.at.file.index.in.directory=
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo
+mongo.hosts=
+mongo.port=
+mongo.authentication.db=
+mongo.username=
+mongo.password=
+mongo.enableSSL=
+mongo.db=
