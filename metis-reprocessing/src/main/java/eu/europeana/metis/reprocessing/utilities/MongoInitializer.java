@@ -16,40 +16,54 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class MongoInitializer {
 
-  private final PropertiesHolder propertiesHolder;
+  public final String[] mongoHosts;
+  public final int[] mongoPorts;
+  public final String mongoAuthenticationDb;
+  public final String mongoUsername;
+  public final String mongoPassword;
+  public final boolean mongoEnablessl;
+  public final String mongoDb;
   private MongoClient mongoClient;
 
-  public MongoInitializer(PropertiesHolder propertiesHolder) {
-    this.propertiesHolder = propertiesHolder;
+  public MongoInitializer(String[] mongoHosts, int[] mongoPorts, String mongoAuthenticationDb,
+      String mongoUsername, String mongoPassword, boolean mongoEnablessl, String mongoDb) {
+    this.mongoHosts = mongoHosts;
+    this.mongoPorts = mongoPorts;
+    this.mongoAuthenticationDb = mongoAuthenticationDb;
+    this.mongoUsername = mongoUsername;
+    this.mongoPassword = mongoPassword;
+
+    this.mongoEnablessl = mongoEnablessl;
+    this.mongoDb = mongoDb;
   }
 
   public void initializeMongoClient() {
-    if (propertiesHolder.mongoHosts.length != propertiesHolder.mongoPorts.length
-        && propertiesHolder.mongoPorts.length != 1) {
+    if (mongoHosts.length != mongoPorts.length
+        && mongoPorts.length != 1) {
       throw new IllegalArgumentException("Mongo hosts and ports are not properly configured.");
     }
 
     List<ServerAddress> serverAddresses = new ArrayList<>();
-    for (int i = 0; i < propertiesHolder.mongoHosts.length; i++) {
+    for (int i = 0; i < mongoHosts.length; i++) {
       ServerAddress address;
-      if (propertiesHolder.mongoHosts.length == propertiesHolder.mongoPorts.length) {
-        address = new ServerAddress(propertiesHolder.mongoHosts[i], propertiesHolder.mongoPorts[i]);
+      if (mongoHosts.length == mongoPorts.length) {
+        address = new ServerAddress(mongoHosts[i], mongoPorts[i]);
       } else { // Same port for all
-        address = new ServerAddress(propertiesHolder.mongoHosts[i], propertiesHolder.mongoPorts[0]);
+        address = new ServerAddress(mongoHosts[i], mongoPorts[0]);
       }
       serverAddresses.add(address);
     }
 
     Builder optionsBuilder = new Builder();
-    optionsBuilder.sslEnabled(propertiesHolder.mongoEnablessl);
-    if (StringUtils.isEmpty(propertiesHolder.mongoDb) || StringUtils
-        .isEmpty(propertiesHolder.mongoUsername) || StringUtils
-        .isEmpty(propertiesHolder.mongoPassword)) {
+    optionsBuilder.sslEnabled(mongoEnablessl);
+    if (StringUtils.isEmpty(mongoDb) || StringUtils
+        .isEmpty(mongoUsername) || StringUtils
+        .isEmpty(mongoPassword)) {
       mongoClient = new MongoClient(serverAddresses, optionsBuilder.build());
     } else {
       MongoCredential mongoCredential = MongoCredential
-          .createCredential(propertiesHolder.mongoUsername, propertiesHolder.mongoAuthenticationDb,
-              propertiesHolder.mongoPassword.toCharArray());
+          .createCredential(mongoUsername, mongoAuthenticationDb,
+              mongoPassword.toCharArray());
       mongoClient = new MongoClient(serverAddresses, mongoCredential, optionsBuilder.build());
     }
   }

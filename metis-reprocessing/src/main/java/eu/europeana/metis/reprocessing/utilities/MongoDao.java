@@ -1,10 +1,13 @@
 package eu.europeana.metis.reprocessing.utilities;
 
+import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.core.dataset.Dataset;
+import eu.europeana.metis.core.workflow.OrderField;
 import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 
 /**
@@ -16,19 +19,39 @@ import org.mongodb.morphia.query.Query;
 public class MongoDao {
 
   private static final String DATASET_ID = "datasetId";
+  private static final int PAGE_SIZE = 200;
 
-  private Datastore datastore;
+  private Datastore metisCoreDatastore;
+  private Datastore mongoSourceDatastore;
 
-  MongoDao(Datastore datastore) {
-    this.datastore = datastore;
+  MongoDao(Datastore metisCoreDatastore, Datastore mongoSourceDatastore) {
+    this.metisCoreDatastore = metisCoreDatastore;
+    this.mongoSourceDatastore = mongoSourceDatastore;
   }
 
-  List<String> getAllDatasetIdsOrdered() {
-    Query<Dataset> query = datastore.createQuery(Dataset.class);
+  public List<String> getAllDatasetIdsOrdered() {
+    Query<Dataset> query = metisCoreDatastore.createQuery(Dataset.class);
     //Order by dataset id which is a String order not a number order.
     query.order(DATASET_ID);
     final List<Dataset> datasets = ExternalRequestUtil
         .retryableExternalRequestConnectionReset(query::asList);
     return datasets.stream().map(Dataset::getDatasetId).collect(Collectors.toList());
   }
+
+  public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
+    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
+    query.field("about").startsWith("/" + datasetId + "/");
+    query.order(OrderField.ID.getOrderFieldName());
+    return ExternalRequestUtil.retryableExternalRequestConnectionReset(() -> query.asList(
+        new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE)));
+  }
+
+  public FullBeanImpl getRecord(String about)
+  {
+    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
+    query.field("about").equal(about);
+    return ExternalRequestUtil.retryableExternalRequestConnectionReset(query::get);
+  }
+
+
 }

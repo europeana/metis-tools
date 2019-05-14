@@ -26,13 +26,21 @@ public class PropertiesHolder {
 
   public final String truststorePath;
   public final String truststorePassword;
-  public final String[] mongoHosts;
-  public final int[] mongoPorts;
-  public final String mongoAuthenticationDb;
-  public final String mongoUsername;
-  public final String mongoPassword;
-  public final boolean mongoEnablessl;
-  public final String mongoDb;
+  public final String[] metisCoreMongoHosts;
+  public final int[] metisCoreMongoPorts;
+  public final String metisCoreMongoAuthenticationDb;
+  public final String metisCoreMongoUsername;
+  public final String metisCoreMongoPassword;
+  public final boolean metisCoreMongoEnablessl;
+  public final String metisCoreMongoDb;
+  //Mongo Source
+  public final String[] sourceMongoHosts;
+  public final int[] sourceMongoPorts;
+  public final String sourceMongoAuthenticationDb;
+  public final String sourceMongoUsername;
+  public final String sourceMongoPassword;
+  public final boolean sourceMongoEnablessl;
+  public final String sourceMongoDb;
 
   public PropertiesHolder(String configurationFileName) {
     Properties properties = new Properties();
@@ -57,13 +65,23 @@ public class PropertiesHolder {
 
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
-    mongoHosts = properties.getProperty("mongo.hosts").split(",");
-    mongoPorts = Arrays.stream(properties.getProperty("mongo.port").split(","))
+    metisCoreMongoHosts = properties.getProperty("mongo.metis.core.hosts").split(",");
+    metisCoreMongoPorts = Arrays.stream(properties.getProperty("mongo.metis.core.port").split(","))
         .mapToInt(Integer::parseInt).toArray();
-    mongoAuthenticationDb = properties.getProperty("mongo.authentication.db");
-    mongoUsername = properties.getProperty("mongo.username");
-    mongoPassword = properties.getProperty("mongo.password");
-    mongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.enableSSL"));
-    mongoDb = properties.getProperty("mongo.db");
+    metisCoreMongoAuthenticationDb = properties.getProperty("mongo.metis.core.authentication.db");
+    metisCoreMongoUsername = properties.getProperty("mongo.metis.core.username");
+    metisCoreMongoPassword = properties.getProperty("mongo.metis.core.password");
+    metisCoreMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
+    metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
+
+    //Mongo Source
+    sourceMongoHosts = properties.getProperty("mongo.source.hosts").split(",");
+    sourceMongoPorts = Arrays.stream(properties.getProperty("mongo.source.port").split(","))
+        .mapToInt(Integer::parseInt).toArray();
+    sourceMongoAuthenticationDb = properties.getProperty("mongo.source.authentication.db");
+    sourceMongoUsername = properties.getProperty("mongo.source.username");
+    sourceMongoPassword = properties.getProperty("mongo.source.password");
+    sourceMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
+    sourceMongoDb = properties.getProperty("mongo.source.db");
   }
 }
