@@ -41,6 +41,14 @@ public class PropertiesHolder {
   public final String sourceMongoPassword;
   public final boolean sourceMongoEnablessl;
   public final String sourceMongoDb;
+  //Mongo Destination
+  public final String[] destinationMongoHosts;
+  public final int[] destinationMongoPorts;
+  public final String destinationMongoAuthenticationDb;
+  public final String destinationMongoUsername;
+  public final String destinationMongoPassword;
+  public final boolean destinationMongoEnablessl;
+  public final String destinationMongoDb;
 
   public PropertiesHolder(String configurationFileName) {
     Properties properties = new Properties();
@@ -83,5 +91,15 @@ public class PropertiesHolder {
     sourceMongoPassword = properties.getProperty("mongo.source.password");
     sourceMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
     sourceMongoDb = properties.getProperty("mongo.source.db");
+
+    //Mongo Destination
+    destinationMongoHosts = properties.getProperty("mongo.destination.hosts").split(",");
+    destinationMongoPorts = Arrays.stream(properties.getProperty("mongo.destination.port").split(","))
+        .mapToInt(Integer::parseInt).toArray();
+    destinationMongoAuthenticationDb = properties.getProperty("mongo.destination.authentication.db");
+    destinationMongoUsername = properties.getProperty("mongo.destination.username");
+    destinationMongoPassword = properties.getProperty("mongo.destination.password");
+    destinationMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
+    destinationMongoDb = properties.getProperty("mongo.destination.db");
   }
 }

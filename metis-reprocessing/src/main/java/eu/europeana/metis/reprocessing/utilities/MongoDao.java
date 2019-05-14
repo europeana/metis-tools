@@ -3,6 +3,7 @@ package eu.europeana.metis.reprocessing.utilities;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.workflow.OrderField;
+import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,10 +24,13 @@ public class MongoDao {
 
   private Datastore metisCoreDatastore;
   private Datastore mongoSourceDatastore;
+  private Datastore mongoDestinationDatastore;
 
-  MongoDao(Datastore metisCoreDatastore, Datastore mongoSourceDatastore) {
+  MongoDao(Datastore metisCoreDatastore, Datastore mongoSourceDatastore,
+      Datastore mongoDestinationDatastore) {
     this.metisCoreDatastore = metisCoreDatastore;
     this.mongoSourceDatastore = mongoSourceDatastore;
+    this.mongoDestinationDatastore = mongoDestinationDatastore;
   }
 
   public List<String> getAllDatasetIdsOrdered() {
@@ -46,11 +50,12 @@ public class MongoDao {
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE)));
   }
 
-  public FullBeanImpl getRecord(String about)
-  {
-    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
-    query.field("about").equal(about);
-    return ExternalRequestUtil.retryableExternalRequestConnectionReset(query::get);
+  DatasetStatus getDatasetStatus(String datasetId) {
+    return mongoDestinationDatastore.find(DatasetStatus.class).filter(DATASET_ID, datasetId).get();
+  }
+
+  void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
+    mongoDestinationDatastore.save(datasetStatus);
   }
 
 

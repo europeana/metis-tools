@@ -1,6 +1,7 @@
 package eu.europeana.metis.reprocessing.utilities;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import org.mongodb.morphia.Datastore;
@@ -19,14 +20,15 @@ public class ExecutorManager {
   private final MongoDao mongoDao;
 
   public ExecutorManager(Datastore metisCoreDatastore, Datastore mongoSourceDatastore,
-      PropertiesHolder propertiesHolder) {
-    this.mongoDao = new MongoDao(metisCoreDatastore, mongoSourceDatastore);
+      Datastore mongoDestinationDatastore) {
+    this.mongoDao = new MongoDao(metisCoreDatastore, mongoSourceDatastore, mongoDestinationDatastore);
   }
 
   public void startReprocessing() {
 //    final List<String> allDatasetIds = mongoDao.getAllDatasetIdsOrdered();
+    String datasetId = "03915";
     final long startTime = System.nanoTime();
-    List<FullBeanImpl> nextPageOfRecords = mongoDao.getNextPageOfRecords("03915", 0);
+    List<FullBeanImpl> nextPageOfRecords = mongoDao.getNextPageOfRecords(datasetId, 0);
 //    List<FullBeanImpl> nextPageOfRecords = new ArrayList<>();
 //    for (int i = 0; i < 1000; i++) {
 //      nextPageOfRecords.add(mongoDao.getRecord(
@@ -35,6 +37,10 @@ public class ExecutorManager {
     System.out.println(nextPageOfRecords.size());
     final long endTime = System.nanoTime();
     System.out.println("Total time: " + (double) (endTime - startTime) / 1_000_000_000.0);
+    final DatasetStatus datasetStatus = new DatasetStatus();
+    datasetStatus.setDatasetId(datasetId);
+    datasetStatus.setTotalProcessed(200);
+    mongoDao.storeDatasetStatusToDb(datasetStatus);
   }
 
   public void close() {

@@ -2,7 +2,7 @@
 truststore.path=
 truststore.password=
 
-#Mongo
+#Mongo Metis Core
 mongo.metis.core.hosts=
 mongo.metis.core.port=
 mongo.metis.core.authentication.db=
@@ -11,7 +11,7 @@ mongo.metis.core.password=
 mongo.metis.core.enableSSL=false
 mongo.metis.core.db=
 
-#Mongo
+#Mongo Source
 mongo.source.hosts=
 mongo.source.port=
 mongo.source.authentication.db=
@@ -19,3 +19,19 @@ mongo.source.username=
 mongo.source.password=
 mongo.source.enableSSL=false
 mongo.source.db=
+
+#Mongo Destination
+mongo.destination.hosts=
+mongo.destination.port=
+mongo.destination.authentication.db=
+mongo.destination.username=
+mongo.destination.password=
+mongo.destination.enableSSL=false
+mongo.destination.db=
+
+#Solr/Zookeeper Destination
+solr.destination.hosts=
+zookeeper.destination.hosts=
+zookeeper.destination.port=
+zookeeper.destination.chroot=
+zookeeper.destination.defaultCollection=

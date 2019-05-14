@@ -18,6 +18,7 @@ import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.core.dataset.Dataset;
+import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.utilities.ExecutorManager;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
@@ -49,18 +50,24 @@ public class ReprocessingMain {
         metisCoreMongoInitializer.getMongoClient(),
         propertiesHolder.metisCoreMongoDb);
 
+    //Mongo source
     final MongoInitializer mongoSourceMongoInitializer = prepareMongoSourceConfiguration();
     final Datastore mongoSourceDatastore = createMongoSourceDatastore(
         mongoSourceMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
 
-    final ExecutorManager executorManager = new ExecutorManager(metisCoreDatastore, mongoSourceDatastore,
-        propertiesHolder);
+    //Mongo destination
+    final MongoInitializer mongoDestinationMongoInitializer = prepareMongoDestinationConfiguration();
+    final Datastore mongoDestinationDatastore = createMongoDestinationDatastore(
+        mongoDestinationMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
+
+    final ExecutorManager executorManager = new ExecutorManager(metisCoreDatastore,
+        mongoSourceDatastore, mongoDestinationDatastore);
     executorManager.startReprocessing();
 
     executorManager.close();
     metisCoreMongoInitializer.close();
     mongoSourceMongoInitializer.close();
-
+    mongoDestinationMongoInitializer.close();
   }
 
   private static MongoInitializer prepareMetisCoreConfiguration()
@@ -85,6 +92,15 @@ public class ReprocessingMain {
         propertiesHolder.sourceMongoPorts, propertiesHolder.sourceMongoAuthenticationDb,
         propertiesHolder.sourceMongoUsername, propertiesHolder.sourceMongoPassword,
         propertiesHolder.sourceMongoEnablessl, propertiesHolder.sourceMongoDb);
+    mongoInitializer.initializeMongoClient();
+    return mongoInitializer;
+  }
+
+  private static MongoInitializer prepareMongoDestinationConfiguration() {
+    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.destinationMongoHosts,
+        propertiesHolder.destinationMongoPorts, propertiesHolder.destinationMongoAuthenticationDb,
+        propertiesHolder.destinationMongoUsername, propertiesHolder.destinationMongoPassword,
+        propertiesHolder.destinationMongoEnablessl, propertiesHolder.destinationMongoDb);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }
@@ -114,7 +130,30 @@ public class ReprocessingMain {
     morphia.map(PhysicalThingImpl.class);
     morphia.map(ConceptSchemeImpl.class);
     morphia.map(BasicProxyImpl.class);
+    return morphia.createDatastore(mongoClient, databaseName);
+  }
+
+  private static Datastore createMongoDestinationDatastore(MongoClient mongoClient,
+      String databaseName) {
+    Morphia morphia = new Morphia();
+    morphia.map(FullBeanImpl.class);
+    morphia.map(ProvidedCHOImpl.class);
+    morphia.map(AgentImpl.class);
+    morphia.map(AggregationImpl.class);
+    morphia.map(ConceptImpl.class);
+    morphia.map(ProxyImpl.class);
+    morphia.map(PlaceImpl.class);
+    morphia.map(TimespanImpl.class);
+    morphia.map(WebResourceImpl.class);
+    morphia.map(EuropeanaAggregationImpl.class);
+    morphia.map(EventImpl.class);
+    morphia.map(PhysicalThingImpl.class);
+    morphia.map(ConceptSchemeImpl.class);
+    morphia.map(BasicProxyImpl.class);
+
+    morphia.map(DatasetStatus.class);
     final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
+    //Ensure indexes, to create them in destination only
     datastore.ensureIndexes();
     return datastore;
   }
