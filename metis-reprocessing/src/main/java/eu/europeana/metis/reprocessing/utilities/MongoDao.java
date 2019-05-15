@@ -1,9 +1,12 @@
 package eu.europeana.metis.reprocessing.utilities;
 
+import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.workflow.OrderField;
+import eu.europeana.metis.mediaprocessing.model.ResourceMetadata;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
+import eu.europeana.metis.reprocessing.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,16 +22,21 @@ import org.mongodb.morphia.query.Query;
  */
 public class MongoDao {
 
+  public static final String ID = "_id";
   private static final String DATASET_ID = "datasetId";
+  private static final String RESOURCE_URL = "resourceUrl";
   public static final int PAGE_SIZE = 200;
 
   private Datastore metisCoreDatastore;
+  private Datastore mongoCacheDatastore;
   private Datastore mongoSourceDatastore;
   private Datastore mongoDestinationDatastore;
 
-  public MongoDao(Datastore metisCoreDatastore, Datastore mongoSourceDatastore,
+  public MongoDao(Datastore metisCoreDatastore, Datastore mongoCacheDatastore,
+      Datastore mongoSourceDatastore,
       Datastore mongoDestinationDatastore) {
     this.metisCoreDatastore = metisCoreDatastore;
+    this.mongoCacheDatastore = mongoCacheDatastore;
     this.mongoSourceDatastore = mongoSourceDatastore;
     this.mongoDestinationDatastore = mongoDestinationDatastore;
   }
@@ -62,6 +70,21 @@ public class MongoDao {
 
   public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
     mongoDestinationDatastore.save(datasetStatus);
+  }
+
+  public boolean doTechnicalMetadataExistInSource(String resourceUrlInMd5) {
+    final Query<WebResourceMetaInfoImpl> query = mongoSourceDatastore
+        .createQuery(WebResourceMetaInfoImpl.class);
+    return query.field(ID).equal(resourceUrlInMd5).project(ID, true).get() != null;
+  }
+
+  public TechnicalMetadataWrapper getTechnicalMetadataWrapper(String resourceUrl) {
+    return mongoCacheDatastore.find(TechnicalMetadataWrapper.class)
+        .filter(RESOURCE_URL, resourceUrl).get();
+  }
+
+  public void storeTechnicalMetadataInDestination(ResourceMetadata resourceMetadata) {
+//    mongoDestinationDatastore.save(resourceMetadata);
   }
 
 

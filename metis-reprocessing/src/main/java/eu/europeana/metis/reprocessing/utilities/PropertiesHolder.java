@@ -37,6 +37,14 @@ public class PropertiesHolder {
   public final String metisCoreMongoPassword;
   public final boolean metisCoreMongoEnablessl;
   public final String metisCoreMongoDb;
+  //Mongo Cache
+  public final String[] cacheMongoHosts;
+  public final int[] cacheMongoPorts;
+  public final String cacheMongoAuthenticationDb;
+  public final String cacheMongoUsername;
+  public final String cacheMongoPassword;
+  public final boolean cacheMongoEnablessl;
+  public final String cacheMongoDb;
   //Mongo Source
   public final String[] sourceMongoHosts;
   public final int[] sourceMongoPorts;
@@ -89,6 +97,16 @@ public class PropertiesHolder {
     metisCoreMongoPassword = properties.getProperty("mongo.metis.core.password");
     metisCoreMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
     metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
+
+    //Mongo Cache
+    cacheMongoHosts = properties.getProperty("mongo.cache.hosts").split(",");
+    cacheMongoPorts = Arrays.stream(properties.getProperty("mongo.cache.port").split(","))
+        .mapToInt(Integer::parseInt).toArray();
+    cacheMongoAuthenticationDb = properties.getProperty("mongo.cache.authentication.db");
+    cacheMongoUsername = properties.getProperty("mongo.cache.username");
+    cacheMongoPassword = properties.getProperty("mongo.cache.password");
+    cacheMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.cache.enableSSL"));
+    cacheMongoDb = properties.getProperty("mongo.cache.db");
 
     //Mongo Source
     sourceMongoHosts = properties.getProperty("mongo.source.hosts").split(",");

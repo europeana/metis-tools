@@ -18,8 +18,9 @@ import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.core.dataset.Dataset;
-import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.execution.ExecutorManager;
+import eu.europeana.metis.reprocessing.model.DatasetStatus;
+import eu.europeana.metis.reprocessing.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
@@ -51,17 +52,24 @@ public class ReprocessingMain {
         metisCoreMongoInitializer.getMongoClient(),
         propertiesHolder.metisCoreMongoDb);
 
-    //Mongo source
+    //Mongo Cache
+    // TODO: 15-5-19 Enable cache database connection when ready
+//    final MongoInitializer mongoCacheMongoInitializer = prepareMongoCacheConfiguration();
+//    final Datastore mongoCacheDatastore = createMongoCacheDatastore(
+//        mongoCacheMongoInitializer.getMongoClient(), propertiesHolder.cacheMongoDb);
+    final Datastore mongoCacheDatastore = null;
+
+    //Mongo Source
     final MongoInitializer mongoSourceMongoInitializer = prepareMongoSourceConfiguration();
     final Datastore mongoSourceDatastore = createMongoSourceDatastore(
         mongoSourceMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
 
-    //Mongo destination
+    //Mongo Destination
     final MongoInitializer mongoDestinationMongoInitializer = prepareMongoDestinationConfiguration();
     final Datastore mongoDestinationDatastore = createMongoDestinationDatastore(
         mongoDestinationMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
 
-    final ExecutorManager executorManager = new ExecutorManager(metisCoreDatastore,
+    final ExecutorManager executorManager = new ExecutorManager(metisCoreDatastore, mongoCacheDatastore,
         mongoSourceDatastore, mongoDestinationDatastore, propertiesHolder);
     executorManager.startReprocessing();
 
@@ -84,6 +92,15 @@ public class ReprocessingMain {
         propertiesHolder.metisCoreMongoPorts, propertiesHolder.metisCoreMongoAuthenticationDb,
         propertiesHolder.metisCoreMongoUsername, propertiesHolder.metisCoreMongoPassword,
         propertiesHolder.metisCoreMongoEnablessl, propertiesHolder.metisCoreMongoDb);
+    mongoInitializer.initializeMongoClient();
+    return mongoInitializer;
+  }
+
+  private static MongoInitializer prepareMongoCacheConfiguration() {
+    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.cacheMongoHosts,
+        propertiesHolder.cacheMongoPorts, propertiesHolder.cacheMongoAuthenticationDb,
+        propertiesHolder.cacheMongoUsername, propertiesHolder.cacheMongoPassword,
+        propertiesHolder.cacheMongoEnablessl, propertiesHolder.cacheMongoDb);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }
@@ -112,6 +129,13 @@ public class ReprocessingMain {
     final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
     datastore.ensureIndexes();
     return datastore;
+  }
+
+  private static Datastore createMongoCacheDatastore(MongoClient mongoClient,
+      String databaseName) {
+    Morphia morphia = new Morphia();
+    morphia.map(TechnicalMetadataWrapper.class);
+    return morphia.createDatastore(mongoClient, databaseName);
   }
 
   private static Datastore createMongoSourceDatastore(MongoClient mongoClient,

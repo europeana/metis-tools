@@ -34,8 +34,9 @@ public class ReprocessForDataset implements Callable<Void> {
     LOGGER.info("Processing DatasetId: {} started", datasetId);
     final DatasetStatus datasetStatus = retrieveOrInitializeDatasetStatus();
     if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
-      LOGGER.info("Processing DatasetId: {} not started because it was already completely processed",
-          datasetId);
+      LOGGER
+          .info("Processing DatasetId: {} not started because it was already completely processed",
+              datasetId);
       return null;
     }
     final long startTime = System.nanoTime();
@@ -81,8 +82,10 @@ public class ReprocessForDataset implements Callable<Void> {
     List<FullBeanImpl> nextPageOfRecords = mongoDao.getNextPageOfRecords(datasetId, nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("Processing number of records: {}", nextPageOfRecords.size());
-      //ProcessRecords
-      //IndexRecords
+      for (FullBeanImpl fullBean : nextPageOfRecords) {
+//        processRecord(fullBean);
+//        indexRecord(fullBean);
+      }
       datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + nextPageOfRecords.size());
       mongoDao.storeDatasetStatusToDb(datasetStatus);
       nextPage++;
@@ -90,4 +93,11 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
+  private void processRecord(FullBeanImpl fullBean) {
+    ProcessingUtilities.updateTechnicalMetadata(fullBean, mongoDao);
+    ProcessingUtilities.tierCalculation(fullBean);
+  }
+
+  private void indexRecord(FullBeanImpl fullBean) {
+  }
 }

@@ -28,12 +28,13 @@ public class ExecutorManager {
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Void> completionService;
 
-  public ExecutorManager(Datastore metisCoreDatastore, Datastore mongoSourceDatastore,
-      Datastore mongoDestinationDatastore, PropertiesHolder propertiesHolder) {
+  public ExecutorManager(Datastore metisCoreDatastore, Datastore mongoCacheDatastore,
+      Datastore mongoSourceDatastore, Datastore mongoDestinationDatastore,
+      PropertiesHolder propertiesHolder) {
     this.maxParallelThreads = propertiesHolder.maxParallelThreads;
     this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
     this.endAtDataseteIndex = propertiesHolder.endAtDatasetIndex;
-    this.mongoDao = new MongoDao(metisCoreDatastore, mongoSourceDatastore,
+    this.mongoDao = new MongoDao(metisCoreDatastore, mongoCacheDatastore, mongoSourceDatastore,
         mongoDestinationDatastore);
 
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
