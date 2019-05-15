@@ -19,7 +19,7 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
-import eu.europeana.metis.reprocessing.utilities.ExecutorManager;
+import eu.europeana.metis.reprocessing.execution.ExecutorManager;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;

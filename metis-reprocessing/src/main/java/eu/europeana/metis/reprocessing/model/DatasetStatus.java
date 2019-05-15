@@ -20,8 +20,8 @@ public class DatasetStatus implements HasMongoObjectId {
 
   @Indexed(options = @IndexOptions(unique = true))
   private String datasetId;
-  private int totalProcessed;
-  private int totalRecords;
+  private long totalProcessed;
+  private long totalRecords;
 
   public DatasetStatus() {
   }
@@ -44,19 +44,19 @@ public class DatasetStatus implements HasMongoObjectId {
     this.datasetId = datasetId;
   }
 
-  public int getTotalProcessed() {
+  public long getTotalProcessed() {
     return totalProcessed;
   }
 
-  public void setTotalProcessed(int totalProcessed) {
+  public void setTotalProcessed(long totalProcessed) {
     this.totalProcessed = totalProcessed;
   }
 
-  public int getTotalRecords() {
+  public long getTotalRecords() {
     return totalRecords;
   }
 
-  public void setTotalRecords(int totalRecords) {
+  public void setTotalRecords(long totalRecords) {
     this.totalRecords = totalRecords;
   }
 }

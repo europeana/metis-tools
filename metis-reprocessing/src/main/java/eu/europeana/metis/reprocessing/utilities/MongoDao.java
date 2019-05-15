@@ -20,13 +20,13 @@ import org.mongodb.morphia.query.Query;
 public class MongoDao {
 
   private static final String DATASET_ID = "datasetId";
-  private static final int PAGE_SIZE = 200;
+  public static final int PAGE_SIZE = 200;
 
   private Datastore metisCoreDatastore;
   private Datastore mongoSourceDatastore;
   private Datastore mongoDestinationDatastore;
 
-  MongoDao(Datastore metisCoreDatastore, Datastore mongoSourceDatastore,
+  public MongoDao(Datastore metisCoreDatastore, Datastore mongoSourceDatastore,
       Datastore mongoDestinationDatastore) {
     this.metisCoreDatastore = metisCoreDatastore;
     this.mongoSourceDatastore = mongoSourceDatastore;
@@ -50,11 +50,17 @@ public class MongoDao {
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE)));
   }
 
-  DatasetStatus getDatasetStatus(String datasetId) {
+  public long getTotalRecordsForDataset(String datasetId) {
+    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
+    query.field("about").startsWith("/" + datasetId + "/");
+    return ExternalRequestUtil.retryableExternalRequestConnectionReset(query::count);
+  }
+
+  public DatasetStatus getDatasetStatus(String datasetId) {
     return mongoDestinationDatastore.find(DatasetStatus.class).filter(DATASET_ID, datasetId).get();
   }
 
-  void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
+  public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
     mongoDestinationDatastore.save(datasetStatus);
   }
 
