@@ -1,19 +1,18 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import eu.europeana.corelib.definitions.edm.entity.WebResource;
-import eu.europeana.corelib.definitions.edm.model.metainfo.ImageOrientation;
 import eu.europeana.corelib.definitions.jibx.ColorSpaceType;
+import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.edm.model.metainfo.AudioMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.ImageMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.TextMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.VideoMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
+import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
-import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
-import eu.europeana.metis.mediaprocessing.model.AbstractResourceMetadata;
 import eu.europeana.metis.mediaprocessing.model.AudioResourceMetadata;
+import eu.europeana.metis.mediaprocessing.model.EnrichedRdfImpl;
 import eu.europeana.metis.mediaprocessing.model.ImageResourceMetadata;
 import eu.europeana.metis.mediaprocessing.model.ResourceMetadata;
 import eu.europeana.metis.mediaprocessing.model.TextResourceMetadata;
@@ -25,10 +24,8 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -45,7 +42,10 @@ public class ProcessingUtilities {
   private ProcessingUtilities() {
   }
 
-  static void updateTechnicalMetadata(final FullBeanImpl fullBean, final MongoDao mongoDao) {
+  static RDF updateTechnicalMetadata(final FullBeanImpl fullBean, final MongoDao mongoDao) {
+    final RDF rdf = EdmUtils.toRDF(fullBean);
+    final EnrichedRdfImpl enrichedRdf = new EnrichedRdfImpl(rdf);
+
     for (AggregationImpl aggregation : fullBean.getAggregations()) {
       //Get all urls that should have webResources
       List<String> urlsForWebResources = Stream
@@ -53,35 +53,33 @@ public class ProcessingUtilities {
               aggregation.getEdmIsShownBy()).collect(Collectors.toList());
 
       for (String resourceUrl : urlsForWebResources) {
-        technicalMetadataForResource(mongoDao, aggregation, resourceUrl);
+        technicalMetadataForResource(mongoDao, enrichedRdf, resourceUrl);
       }
     }
+    return enrichedRdf.finalizeRdf();
   }
 
   private static void technicalMetadataForResource(final MongoDao mongoDao,
-      final AggregationImpl aggregation, final String resourceUrl) {
+      final EnrichedRdfImpl enrichedRdf, final String resourceUrl) {
     try {
       final String md5Hex = ProcessingUtilities.md5Hex(resourceUrl);
-      if (!mongoDao.doTechnicalMetadataExistInSource(md5Hex)) {
+      final WebResourceMetaInfoImpl webResourceMetaInfoImplFromSource = mongoDao
+          .getTechnicalMetadataFromSource(md5Hex);
+      if (webResourceMetaInfoImplFromSource == null) {
         //If it does not exist already check cache
         final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
             .getTechnicalMetadataWrapper(resourceUrl);
         if (technicalMetadataWrapper != null) {
-          //Convert technical metadata to WebResourceMetaInfo
-          final WebResourceMetaInfoImpl webresourceMetaInfo = ProcessingUtilities
-              .createWebresourceMetaInfo(md5Hex,
-                  technicalMetadataWrapper.getResourceMetadata());
-          //Create WebResource in record
-          createWebResourceInAggregationIfNotExistent(aggregation, resourceUrl);
-          //Store technical metadata to database.
+          enrichedRdf.enrichResource(technicalMetadataWrapper.getResourceMetadata());
           //Get all Thumbnails and store to S3
         }
       } else {
-        //If technical metadata exist, add the web resource in case it doesn't already exist
-        createWebResourceInAggregationIfNotExistent(aggregation, resourceUrl);
+        final ResourceMetadata resourceMetadata = convertWebResourceMetaInfoImpl(
+            webResourceMetaInfoImplFromSource, resourceUrl);
+        enrichedRdf.enrichResource(resourceMetadata);
       }
     } catch (MediaExtractionException e) {
-      LOGGER.warn("MD5 Hash for resourceUrl could not be generated: {}", resourceUrl, e);
+      LOGGER.warn("Could not enrich with technical metadata of resourceUrl: {}", resourceUrl, e);
     }
   }
 
@@ -98,94 +96,43 @@ public class ProcessingUtilities {
     }
   }
 
-  static void createWebResourceInAggregationIfNotExistent(final AggregationImpl aggregation,
-      final String resourceUrl) {
-    final List<WebResourceImpl> webResources = castWebResourceList(aggregation.getWebResources());
-    if (Objects.requireNonNull(webResources).stream()
-        .noneMatch(c -> c.getAbout().equals(resourceUrl))) {
-      final WebResourceImpl webResource = new WebResourceImpl();
-      webResource.setAbout(resourceUrl);
-      webResources.add(webResource);
+  static ResourceMetadata convertWebResourceMetaInfoImpl(
+      WebResourceMetaInfoImpl webResourceMetaInfo, String resourceUrl)
+      throws MediaExtractionException {
+    final AudioMetaInfoImpl audioMetaInfo = webResourceMetaInfo.getAudioMetaInfo();
+    final ImageMetaInfoImpl imageMetaInfo = webResourceMetaInfo.getImageMetaInfo();
+    final TextMetaInfoImpl textMetaInfo = webResourceMetaInfo.getTextMetaInfo();
+    final VideoMetaInfoImpl videoMetaInfo = webResourceMetaInfo.getVideoMetaInfo();
+    ResourceMetadata resourceMetadata = null;
+
+    if (audioMetaInfo != null) {
+      final AudioResourceMetadata audioResourceMetadata = new AudioResourceMetadata(
+          audioMetaInfo.getMimeType(), resourceUrl, audioMetaInfo.getFileSize(),
+          audioMetaInfo.getDuration(), audioMetaInfo.getBitRate(), audioMetaInfo.getChannels(),
+          audioMetaInfo.getSampleRate(), audioMetaInfo.getBitDepth());
+      resourceMetadata = new ResourceMetadata(audioResourceMetadata);
+    } else if (imageMetaInfo != null) {
+      // TODO: 16-5-19 Create Thumbnail with -LARGE target name if exists
+//      final ThumbnailImpl thumbnail = new ThumbnailImpl(resourceUrl, "");
+      final ImageResourceMetadata imageResourceMetadata = new ImageResourceMetadata(
+          imageMetaInfo.getMimeType(), resourceUrl, imageMetaInfo.getFileSize(),
+          imageMetaInfo.getWidth(), imageMetaInfo.getHeight(),
+          ColorSpaceType.convert(imageMetaInfo.getColorSpace()),
+          Arrays.asList(imageMetaInfo.getColorPalette()), null);
+      resourceMetadata = new ResourceMetadata(imageResourceMetadata);
+    } else if (textMetaInfo != null) {
+      // TODO: 16-5-19 Create Thumbnail with -LARGE target name if exists
+      final TextResourceMetadata textResourceMetadata = new TextResourceMetadata(
+          textMetaInfo.getMimeType(), resourceUrl, textMetaInfo.getFileSize(),
+          textMetaInfo.getIsSearchable(), textMetaInfo.getResolution(), null);
+      resourceMetadata = new ResourceMetadata(textResourceMetadata);
+    } else if (videoMetaInfo != null) {
+      final VideoResourceMetadata videoResourceMetadata = new VideoResourceMetadata(
+          videoMetaInfo.getMimeType(), resourceUrl, videoMetaInfo.getFileSize(),
+          videoMetaInfo.getDuration(), videoMetaInfo.getBitRate(), videoMetaInfo.getWidth(),
+          videoMetaInfo.getHeight(), videoMetaInfo.getCodec(), videoMetaInfo.getFrameRate());
+      resourceMetadata = new ResourceMetadata(videoResourceMetadata);
     }
-  }
-
-  static WebResourceMetaInfoImpl createWebresourceMetaInfo(final String md5Hex,
-      final ResourceMetadata resourceMetadata) {
-    final WebResourceMetaInfoImpl webResourceMetaInfoImpl = new WebResourceMetaInfoImpl(md5Hex,
-        null, null, null, null);
-    final AbstractResourceMetadata metaData = resourceMetadata.getMetaData();
-    if (metaData instanceof AudioResourceMetadata) {
-      AudioResourceMetadata audioResourceMetadata = (AudioResourceMetadata) metaData;
-      AudioMetaInfoImpl metaInfo = new AudioMetaInfoImpl();
-
-      metaInfo.setMimeType(audioResourceMetadata.getMimeType());
-      metaInfo.setFileSize(audioResourceMetadata.getContentSize());
-
-      metaInfo.setDuration((long) audioResourceMetadata.getDuration());
-      metaInfo.setSampleRate(audioResourceMetadata.getSampleRate());
-      metaInfo.setBitRate(audioResourceMetadata.getBitRate());
-      metaInfo.setBitDepth(audioResourceMetadata.getSampleSize());
-      metaInfo.setChannels(audioResourceMetadata.getChannels());
-
-      webResourceMetaInfoImpl.setAudioMetaInfo(metaInfo);
-    } else if (metaData instanceof ImageResourceMetadata) {
-      ImageResourceMetadata imageResourceMetadata = (ImageResourceMetadata) metaData;
-      ImageMetaInfoImpl metaInfo = new ImageMetaInfoImpl();
-
-      metaInfo.setMimeType(imageResourceMetadata.getMimeType());
-      metaInfo.setFileSize(imageResourceMetadata.getContentSize());
-
-      metaInfo.setHeight(imageResourceMetadata.getHeight());
-      metaInfo.setWidth(imageResourceMetadata.getWidth());
-
-      final Function<ColorSpaceType, String> colorSpaceToString = value ->
-          value == ColorSpaceType.GRAYSCALE ? "Gray" : value.xmlValue();
-      metaInfo.setColorSpace(
-          Optional.ofNullable(imageResourceMetadata.getColorSpace()).map(colorSpaceToString)
-              .orElse(null));
-      final String[] targetColors = imageResourceMetadata.getDominantColors()
-          .toArray(new String[0]);
-      metaInfo.setColorPalette(targetColors.length == 0 ? null : targetColors);
-
-      final ImageOrientation targetOrientation =
-          imageResourceMetadata.getWidth() > imageResourceMetadata.getHeight()
-              ? ImageOrientation.LANDSCAPE : ImageOrientation.PORTRAIT;
-      metaInfo.setOrientation(targetOrientation);
-
-      webResourceMetaInfoImpl.setImageMetaInfo(metaInfo);
-    } else if (metaData instanceof TextResourceMetadata) {
-      TextResourceMetadata textResourceMetadata = (TextResourceMetadata) metaData;
-      TextMetaInfoImpl metaInfo = new TextMetaInfoImpl();
-
-      metaInfo.setMimeType(textResourceMetadata.getMimeType());
-      metaInfo.setFileSize(textResourceMetadata.getContentSize());
-      metaInfo.setResolution(textResourceMetadata.getResolution());
-      metaInfo.setRdfType(textResourceMetadata.getResourceUrl());
-
-      webResourceMetaInfoImpl.setTextMetaInfo(metaInfo);
-    } else if (metaData instanceof VideoResourceMetadata) {
-      VideoResourceMetadata videoResourceMetadata = (VideoResourceMetadata) metaData;
-      VideoMetaInfoImpl metaInfo = new VideoMetaInfoImpl();
-
-      metaInfo.setMimeType(videoResourceMetadata.getMimeType());
-      metaInfo.setFileSize(videoResourceMetadata.getContentSize());
-
-      metaInfo.setCodec(videoResourceMetadata.getCodecName());
-      metaInfo.setWidth(videoResourceMetadata.getWidth());
-      metaInfo.setHeight(videoResourceMetadata.getHeight());
-      metaInfo.setBitRate(videoResourceMetadata.getBitRate());
-      metaInfo.setFrameRate(videoResourceMetadata.getFrameRate());
-      metaInfo.setDuration((long) videoResourceMetadata.getDuration());
-
-      webResourceMetaInfoImpl.setVideoMetaInfo(metaInfo);
-    }
-    return webResourceMetaInfoImpl;
-  }
-
-  private static List<WebResourceImpl> castWebResourceList(
-      final List<? extends WebResource> input) {
-    return input == null ? null
-        : input.stream().map(webResource -> ((WebResourceImpl) webResource))
-            .collect(Collectors.toList());
+    return resourceMetadata;
   }
 }

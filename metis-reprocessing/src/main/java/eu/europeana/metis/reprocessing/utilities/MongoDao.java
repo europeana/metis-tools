@@ -72,10 +72,10 @@ public class MongoDao {
     mongoDestinationDatastore.save(datasetStatus);
   }
 
-  public boolean doTechnicalMetadataExistInSource(String resourceUrlInMd5) {
+  public WebResourceMetaInfoImpl getTechnicalMetadataFromSource(String resourceUrlInMd5) {
     final Query<WebResourceMetaInfoImpl> query = mongoSourceDatastore
         .createQuery(WebResourceMetaInfoImpl.class);
-    return query.field(ID).equal(resourceUrlInMd5).project(ID, true).get() != null;
+    return query.field(ID).equal(resourceUrlInMd5).get();
   }
 
   public TechnicalMetadataWrapper getTechnicalMetadataWrapper(String resourceUrl) {
