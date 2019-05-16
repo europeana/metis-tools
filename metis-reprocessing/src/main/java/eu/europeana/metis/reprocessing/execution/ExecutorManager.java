@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.execution;
 
+import com.amazonaws.services.s3.AmazonS3;
 import eu.europeana.metis.reprocessing.utilities.MongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.util.List;
@@ -21,6 +22,8 @@ public class ExecutorManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
   private static final String PROCESSED_FILES_STR = "Processed datasets: {}";
   private final MongoDao mongoDao;
+  private final AmazonS3 amazonS3Client;
+  private final String s3Bucket;
   private final int maxParallelThreads;
   private final int startFromDatasetIndex;
   private final int endAtDataseteIndex;
@@ -28,14 +31,16 @@ public class ExecutorManager {
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Void> completionService;
 
-  public ExecutorManager(Datastore metisCoreDatastore, Datastore mongoCacheDatastore,
-      Datastore mongoSourceDatastore, Datastore mongoDestinationDatastore,
-      PropertiesHolder propertiesHolder) {
+  public ExecutorManager(Datastore metisCoreDatastore, Datastore mongoSourceDatastore,
+      Datastore mongoDestinationDatastore, Datastore mongoCacheDatastore,
+      AmazonS3 amazonS3Client, PropertiesHolder propertiesHolder) {
     this.maxParallelThreads = propertiesHolder.maxParallelThreads;
     this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
     this.endAtDataseteIndex = propertiesHolder.endAtDatasetIndex;
     this.mongoDao = new MongoDao(metisCoreDatastore, mongoCacheDatastore, mongoSourceDatastore,
         mongoDestinationDatastore);
+    this.amazonS3Client = amazonS3Client;
+    s3Bucket = propertiesHolder.s3Bucket;
 
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
@@ -54,7 +59,8 @@ public class ExecutorManager {
       if (datasetIndex > endAtDataseteIndex) {
         break;
       }
-      final ReprocessForDataset reprocessForDataset = new ReprocessForDataset(datasetId, mongoDao);
+      final ReprocessForDataset reprocessForDataset = new ReprocessForDataset(datasetId, mongoDao,
+          amazonS3Client, s3Bucket);
       if (threadCounter >= maxParallelThreads) {
         completionService.take();
         threadCounter--;

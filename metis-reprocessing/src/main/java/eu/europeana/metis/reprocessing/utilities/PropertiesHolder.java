@@ -37,14 +37,6 @@ public class PropertiesHolder {
   public final String metisCoreMongoPassword;
   public final boolean metisCoreMongoEnablessl;
   public final String metisCoreMongoDb;
-  //Mongo Cache
-  public final String[] cacheMongoHosts;
-  public final int[] cacheMongoPorts;
-  public final String cacheMongoAuthenticationDb;
-  public final String cacheMongoUsername;
-  public final String cacheMongoPassword;
-  public final boolean cacheMongoEnablessl;
-  public final String cacheMongoDb;
   //Mongo Source
   public final String[] sourceMongoHosts;
   public final int[] sourceMongoPorts;
@@ -61,6 +53,22 @@ public class PropertiesHolder {
   public final String destinationMongoPassword;
   public final boolean destinationMongoEnablessl;
   public final String destinationMongoDb;
+
+  //EXTRA CONFIGURATION
+  //Mongo Cache
+  public final String[] cacheMongoHosts;
+  public final int[] cacheMongoPorts;
+  public final String cacheMongoAuthenticationDb;
+  public final String cacheMongoUsername;
+  public final String cacheMongoPassword;
+  public final boolean cacheMongoEnablessl;
+  public final String cacheMongoDb;
+
+  //S3
+  public final String s3AccessKey;
+  public final String s3SecretKey;
+  public final String s3Endpoint;
+  public final String s3Bucket;
 
   public PropertiesHolder(String configurationFileName) {
     Properties properties = new Properties();
@@ -98,16 +106,6 @@ public class PropertiesHolder {
     metisCoreMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
     metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
 
-    //Mongo Cache
-    cacheMongoHosts = properties.getProperty("mongo.cache.hosts").split(",");
-    cacheMongoPorts = Arrays.stream(properties.getProperty("mongo.cache.port").split(","))
-        .mapToInt(Integer::parseInt).toArray();
-    cacheMongoAuthenticationDb = properties.getProperty("mongo.cache.authentication.db");
-    cacheMongoUsername = properties.getProperty("mongo.cache.username");
-    cacheMongoPassword = properties.getProperty("mongo.cache.password");
-    cacheMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.cache.enableSSL"));
-    cacheMongoDb = properties.getProperty("mongo.cache.db");
-
     //Mongo Source
     sourceMongoHosts = properties.getProperty("mongo.source.hosts").split(",");
     sourceMongoPorts = Arrays.stream(properties.getProperty("mongo.source.port").split(","))
@@ -127,5 +125,22 @@ public class PropertiesHolder {
     destinationMongoPassword = properties.getProperty("mongo.destination.password");
     destinationMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
+
+    //EXTRA CONFIGURATION
+    //Mongo Cache
+    cacheMongoHosts = properties.getProperty("mongo.cache.hosts").split(",");
+    cacheMongoPorts = Arrays.stream(properties.getProperty("mongo.cache.port").split(","))
+        .mapToInt(Integer::parseInt).toArray();
+    cacheMongoAuthenticationDb = properties.getProperty("mongo.cache.authentication.db");
+    cacheMongoUsername = properties.getProperty("mongo.cache.username");
+    cacheMongoPassword = properties.getProperty("mongo.cache.password");
+    cacheMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.cache.enableSSL"));
+    cacheMongoDb = properties.getProperty("mongo.cache.db");
+
+    //S3
+    s3AccessKey = properties.getProperty("s3.access.key");
+    s3SecretKey = properties.getProperty("s3.secret.key");
+    s3Endpoint = properties.getProperty("s3.endpoint");
+    s3Bucket = properties.getProperty("s3.bucket");
   }
 }

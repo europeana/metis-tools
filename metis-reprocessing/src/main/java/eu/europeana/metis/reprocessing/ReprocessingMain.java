@@ -2,6 +2,9 @@ package eu.europeana.metis.reprocessing;
 
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.mongodb.MongoClient;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
@@ -52,13 +55,6 @@ public class ReprocessingMain {
         metisCoreMongoInitializer.getMongoClient(),
         propertiesHolder.metisCoreMongoDb);
 
-    //Mongo Cache
-    // TODO: 15-5-19 Enable cache database connection when ready
-//    final MongoInitializer mongoCacheMongoInitializer = prepareMongoCacheConfiguration();
-//    final Datastore mongoCacheDatastore = createMongoCacheDatastore(
-//        mongoCacheMongoInitializer.getMongoClient(), propertiesHolder.cacheMongoDb);
-    final Datastore mongoCacheDatastore = null;
-
     //Mongo Source
     final MongoInitializer mongoSourceMongoInitializer = prepareMongoSourceConfiguration();
     final Datastore mongoSourceDatastore = createMongoSourceDatastore(
@@ -69,8 +65,21 @@ public class ReprocessingMain {
     final Datastore mongoDestinationDatastore = createMongoDestinationDatastore(
         mongoDestinationMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
 
-    final ExecutorManager executorManager = new ExecutorManager(metisCoreDatastore, mongoCacheDatastore,
-        mongoSourceDatastore, mongoDestinationDatastore, propertiesHolder);
+    //Mongo Cache
+    // TODO: 15-5-19 Enable cache database connection when ready
+//    final MongoInitializer mongoCacheMongoInitializer = prepareMongoCacheConfiguration();
+//    final Datastore mongoCacheDatastore = createMongoCacheDatastore(
+//        mongoCacheMongoInitializer.getMongoClient(), propertiesHolder.cacheMongoDb);
+    final Datastore mongoCacheDatastore = null;
+
+    //S3
+    AmazonS3 amazonS3Client = new AmazonS3Client(new BasicAWSCredentials(
+        propertiesHolder.s3AccessKey,
+        propertiesHolder.s3SecretKey));
+    amazonS3Client.setEndpoint(propertiesHolder.s3Endpoint);
+
+    final ExecutorManager executorManager = new ExecutorManager(metisCoreDatastore,
+        mongoSourceDatastore, mongoDestinationDatastore, mongoCacheDatastore, amazonS3Client, propertiesHolder);
     executorManager.startReprocessing();
 
     executorManager.close();

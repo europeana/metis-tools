@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.execution;
 
+import com.amazonaws.services.s3.AmazonS3;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.utilities.MongoDao;
@@ -18,11 +19,16 @@ public class ReprocessForDataset implements Callable<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReprocessForDataset.class);
   private final String datasetId;
   private MongoDao mongoDao;
+  private final AmazonS3 amazonS3Client;
+  private final String s3Bucket;
 
-  public ReprocessForDataset(String datasetId, MongoDao mongoDao) {
+  public ReprocessForDataset(String datasetId, MongoDao mongoDao, AmazonS3 amazonS3Client,
+      String s3Bucket) {
     // TODO: 15-5-19 remember to correctly set datasetId
     this.datasetId = "2051942";
     this.mongoDao = mongoDao;
+    this.amazonS3Client = amazonS3Client;
+    this.s3Bucket = s3Bucket;
   }
 
   @Override
@@ -94,7 +100,7 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private void processRecord(FullBeanImpl fullBean) {
-    ProcessingUtilities.updateTechnicalMetadata(fullBean, mongoDao);
+    ProcessingUtilities.updateTechnicalMetadata(fullBean, mongoDao, amazonS3Client, s3Bucket);
     ProcessingUtilities.tierCalculation(fullBean);
   }
 

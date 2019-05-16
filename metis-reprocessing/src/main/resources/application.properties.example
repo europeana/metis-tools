@@ -35,3 +35,19 @@ zookeeper.destination.hosts=
 zookeeper.destination.port=
 zookeeper.destination.chroot=
 zookeeper.destination.defaultCollection=
+
+#EXTRA CONFIGURATION
+#Mongo Cache
+mongo.cache.hosts=
+mongo.cache.port=
+mongo.cache.authentication.db=
+mongo.cache.username=
+mongo.cache.password=
+mongo.cache.enableSSL=false
+mongo.cache.db=
+
+#S3
+s3.access.key=
+s3.secret.key=
+s3.endpoint=
+s3.bucket=
