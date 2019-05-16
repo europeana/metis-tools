@@ -5,7 +5,7 @@ import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTI
 import com.mongodb.MongoClient;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.List;
@@ -28,14 +28,14 @@ public class MetisCoreMongoDao {
   private static final String DATASET_ID = "datasetId";
   private final MongoInitializer metisCoreMongoInitializer;
   private Datastore metisCoreDatastore;
-  private PropertiesHolderExtension propertiesHolderExtension;
+  private PropertiesHolder propertiesHolder;
 
-  public MetisCoreMongoDao(PropertiesHolderExtension propertiesHolderExtension)
+  public MetisCoreMongoDao(PropertiesHolder propertiesHolder)
       throws TrustStoreConfigurationException {
-    this.propertiesHolderExtension = propertiesHolderExtension;
+    this.propertiesHolder = propertiesHolder;
     metisCoreMongoInitializer = prepareMetisCoreConfiguration();
     metisCoreDatastore = createMetisCoreDatastore(metisCoreMongoInitializer.getMongoClient(),
-        propertiesHolderExtension.metisCoreMongoDb);
+        propertiesHolder.metisCoreMongoDb);
   }
 
   public List<String> getAllDatasetIdsOrdered() {
@@ -49,22 +49,22 @@ public class MetisCoreMongoDao {
 
   private MongoInitializer prepareMetisCoreConfiguration()
       throws TrustStoreConfigurationException {
-    if (StringUtils.isNotEmpty(propertiesHolderExtension.truststorePath) && StringUtils
-        .isNotEmpty(propertiesHolderExtension.truststorePassword)) {
+    if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
+        .isNotEmpty(propertiesHolder.truststorePassword)) {
       LOGGER.info(EXECUTION_LOGS_MARKER,
           "Append default truststore with custom truststore");
       CustomTruststoreAppender
-          .appendCustomTrustoreToDefault(propertiesHolderExtension.truststorePath,
-              propertiesHolderExtension.truststorePassword);
+          .appendCustomTrustoreToDefault(propertiesHolder.truststorePath,
+              propertiesHolder.truststorePassword);
     }
     MongoInitializer mongoInitializer = new MongoInitializer(
-        propertiesHolderExtension.metisCoreMongoHosts,
-        propertiesHolderExtension.metisCoreMongoPorts,
-        propertiesHolderExtension.metisCoreMongoAuthenticationDb,
-        propertiesHolderExtension.metisCoreMongoUsername,
-        propertiesHolderExtension.metisCoreMongoPassword,
-        propertiesHolderExtension.metisCoreMongoEnablessl,
-        propertiesHolderExtension.metisCoreMongoDb);
+        propertiesHolder.metisCoreMongoHosts,
+        propertiesHolder.metisCoreMongoPorts,
+        propertiesHolder.metisCoreMongoAuthenticationDb,
+        propertiesHolder.metisCoreMongoUsername,
+        propertiesHolder.metisCoreMongoPassword,
+        propertiesHolder.metisCoreMongoEnablessl,
+        propertiesHolder.metisCoreMongoDb);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

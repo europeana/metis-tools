@@ -3,7 +3,7 @@ package eu.europeana.metis.reprocessing.model;
 import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 
 /**
@@ -17,11 +17,11 @@ public class BasicConfiguration {
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
   private ExtraConfiguration extraConfiguration;
 
-  public BasicConfiguration(PropertiesHolderExtension propertiesHolderExtension)
+  public BasicConfiguration(PropertiesHolder propertiesHolder)
       throws TrustStoreConfigurationException {
-    metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolderExtension);
-    mongoSourceMongoDao = new MongoSourceMongoDao(propertiesHolderExtension);
-    mongoDestinationMongoDao = new MongoDestinationMongoDao(propertiesHolderExtension);
+    metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
+    mongoSourceMongoDao = new MongoSourceMongoDao(propertiesHolder);
+    mongoDestinationMongoDao = new MongoDestinationMongoDao(propertiesHolder);
   }
 
   public MetisCoreMongoDao getMetisCoreMongoDao() {

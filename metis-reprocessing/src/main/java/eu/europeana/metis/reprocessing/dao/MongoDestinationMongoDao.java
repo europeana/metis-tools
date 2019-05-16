@@ -3,7 +3,7 @@ package eu.europeana.metis.reprocessing.dao;
 import com.mongodb.MongoClient;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
@@ -17,14 +17,14 @@ public class MongoDestinationMongoDao {
 
   private final MongoInitializer mongoDestinationMongoInitializer;
   private Datastore mongoDestinationDatastore;
-  private PropertiesHolderExtension propertiesHolderExtension;
+  private PropertiesHolder propertiesHolder;
 
-  public MongoDestinationMongoDao(PropertiesHolderExtension propertiesHolderExtension) {
-    this.propertiesHolderExtension = propertiesHolderExtension;
+  public MongoDestinationMongoDao(PropertiesHolder propertiesHolder) {
+    this.propertiesHolder = propertiesHolder;
     //Mongo Destination
     mongoDestinationMongoInitializer = prepareMongoDestinationConfiguration();
     mongoDestinationDatastore = createMongoDestinationDatastore(
-        mongoDestinationMongoInitializer.getMongoClient(), propertiesHolderExtension.sourceMongoDb);
+        mongoDestinationMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
   }
 
   public DatasetStatus getDatasetStatus(String datasetId) {
@@ -37,13 +37,13 @@ public class MongoDestinationMongoDao {
 
   private MongoInitializer prepareMongoDestinationConfiguration() {
     MongoInitializer mongoInitializer = new MongoInitializer(
-        propertiesHolderExtension.destinationMongoHosts,
-        propertiesHolderExtension.destinationMongoPorts,
-        propertiesHolderExtension.destinationMongoAuthenticationDb,
-        propertiesHolderExtension.destinationMongoUsername,
-        propertiesHolderExtension.destinationMongoPassword,
-        propertiesHolderExtension.destinationMongoEnablessl,
-        propertiesHolderExtension.destinationMongoDb);
+        propertiesHolder.destinationMongoHosts,
+        propertiesHolder.destinationMongoPorts,
+        propertiesHolder.destinationMongoAuthenticationDb,
+        propertiesHolder.destinationMongoUsername,
+        propertiesHolder.destinationMongoPassword,
+        propertiesHolder.destinationMongoEnablessl,
+        propertiesHolder.destinationMongoDb);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

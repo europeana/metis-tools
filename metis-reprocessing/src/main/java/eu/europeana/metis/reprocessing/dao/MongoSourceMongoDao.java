@@ -18,7 +18,7 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.core.workflow.OrderField;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.List;
 import org.mongodb.morphia.Datastore;
@@ -38,14 +38,14 @@ public class MongoSourceMongoDao {
 
   private final MongoInitializer mongoSourceMongoInitializer;
   private Datastore mongoSourceDatastore;
-  private PropertiesHolderExtension propertiesHolderExtension;
+  private PropertiesHolder propertiesHolder;
 
-  public MongoSourceMongoDao(PropertiesHolderExtension propertiesHolderExtension) {
-    this.propertiesHolderExtension = propertiesHolderExtension;
-    PAGE_SIZE = propertiesHolderExtension.sourceMongoPageSize;
+  public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
+    this.propertiesHolder = propertiesHolder;
+    PAGE_SIZE = propertiesHolder.sourceMongoPageSize;
     mongoSourceMongoInitializer = prepareMongoSourceConfiguration();
     mongoSourceDatastore = createMongoSourceDatastore(
-        mongoSourceMongoInitializer.getMongoClient(), propertiesHolderExtension.sourceMongoDb);
+        mongoSourceMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
   }
 
 
@@ -71,12 +71,12 @@ public class MongoSourceMongoDao {
 
   private MongoInitializer prepareMongoSourceConfiguration() {
     MongoInitializer mongoInitializer = new MongoInitializer(
-        propertiesHolderExtension.sourceMongoHosts,
-        propertiesHolderExtension.sourceMongoPorts,
-        propertiesHolderExtension.sourceMongoAuthenticationDb,
-        propertiesHolderExtension.sourceMongoUsername,
-        propertiesHolderExtension.sourceMongoPassword,
-        propertiesHolderExtension.sourceMongoEnablessl, propertiesHolderExtension.sourceMongoDb);
+        propertiesHolder.sourceMongoHosts,
+        propertiesHolder.sourceMongoPorts,
+        propertiesHolder.sourceMongoAuthenticationDb,
+        propertiesHolder.sourceMongoUsername,
+        propertiesHolder.sourceMongoPassword,
+        propertiesHolder.sourceMongoEnablessl, propertiesHolder.sourceMongoDb);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

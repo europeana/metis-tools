@@ -23,13 +23,14 @@ public class PropertiesHolder {
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesHolder.class);
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
-  private static Properties properties;
 
+  //General parameters
   public final int maxParallelThreads;
   public final int startFromDatasetIndex;
   public final int endAtDatasetIndex;
   public final int sourceMongoPageSize;
 
+  //Metis Core Mongo
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] metisCoreMongoHosts;
@@ -56,8 +57,10 @@ public class PropertiesHolder {
   public final boolean destinationMongoEnablessl;
   public final String destinationMongoDb;
 
+  private final PropertiesHolderExtension propertiesHolderExtension;
+
   public PropertiesHolder(String configurationFileName) {
-    properties = new Properties();
+    Properties properties = new Properties();
     final URL resource = getClass().getClassLoader().getResource(configurationFileName);
     final String filePathInResources = resource == null ? null : resource.getFile();
     String filePath;
@@ -77,11 +80,13 @@ public class PropertiesHolder {
       throw new ExceptionInInitializerError(e);
     }
 
+    //General parameters
     maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
     startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
     endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
 
+    //Metis Core Mongo
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     metisCoreMongoHosts = properties.getProperty("mongo.metis.core.hosts").split(",");
@@ -112,9 +117,11 @@ public class PropertiesHolder {
     destinationMongoPassword = properties.getProperty("mongo.destination.password");
     destinationMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
+
+    this.propertiesHolderExtension = new PropertiesHolderExtension(properties);
   }
 
-  public Properties getProperties() {
-    return properties;
+  public PropertiesHolderExtension getPropertiesHolderExtension() {
+    return propertiesHolderExtension;
   }
 }

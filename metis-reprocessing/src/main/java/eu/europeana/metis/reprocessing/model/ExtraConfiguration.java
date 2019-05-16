@@ -4,8 +4,9 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.metis.reprocessing.execution.ProcessingUtilities;
 import eu.europeana.metis.reprocessing.dao.CacheMongoDao;
+import eu.europeana.metis.reprocessing.execution.ProcessingUtilities;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import org.apache.logging.log4j.util.BiConsumer;
 
@@ -18,10 +19,12 @@ public class ExtraConfiguration {
   private final CacheMongoDao cacheMongoDao;
   private final AmazonS3 amazonS3Client;
   private final String s3Bucket;
-  final BiConsumer<FullBeanImpl, BasicConfiguration> fullBeanProcessor;
+  private final BiConsumer<FullBeanImpl, BasicConfiguration> fullBeanProcessor;
 
-  public ExtraConfiguration(PropertiesHolderExtension propertiesHolderExtension) {
-    this.cacheMongoDao = new CacheMongoDao(propertiesHolderExtension);
+  public ExtraConfiguration(PropertiesHolder propertiesHolder) {
+    final PropertiesHolderExtension propertiesHolderExtension = propertiesHolder
+        .getPropertiesHolderExtension();
+    this.cacheMongoDao = new CacheMongoDao(propertiesHolder);
 
     //S3
     this.amazonS3Client = new AmazonS3Client(new BasicAWSCredentials(

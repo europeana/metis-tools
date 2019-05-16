@@ -7,8 +7,8 @@ import java.util.Properties;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */
-public class PropertiesHolderExtension extends PropertiesHolder {
-  //EXTRA CONFIGURATION
+public class PropertiesHolderExtension {
+
   //Mongo Cache
   public final String[] cacheMongoHosts;
   public final int[] cacheMongoPorts;
@@ -24,11 +24,7 @@ public class PropertiesHolderExtension extends PropertiesHolder {
   public final String s3Endpoint;
   public final String s3Bucket;
 
-  public PropertiesHolderExtension(String configurationFileName) {
-    super(configurationFileName);
-    final Properties properties = getProperties();
-
-    //EXTRA CONFIGURATION
+  PropertiesHolderExtension(Properties properties) {
     //Mongo Cache
     cacheMongoHosts = properties.getProperty("mongo.cache.hosts").split(",");
     cacheMongoPorts = Arrays.stream(properties.getProperty("mongo.cache.port").split(","))

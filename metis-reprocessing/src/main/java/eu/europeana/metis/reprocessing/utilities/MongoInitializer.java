@@ -16,13 +16,13 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class MongoInitializer {
 
-  public final String[] mongoHosts;
-  public final int[] mongoPorts;
-  public final String mongoAuthenticationDb;
-  public final String mongoUsername;
-  public final String mongoPassword;
-  public final boolean mongoEnablessl;
-  public final String mongoDb;
+  private final String[] mongoHosts;
+  private final int[] mongoPorts;
+  private final String mongoAuthenticationDb;
+  private final String mongoUsername;
+  private final String mongoPassword;
+  private final boolean mongoEnablessl;
+  private final String mongoDb;
   private MongoClient mongoClient;
 
   public MongoInitializer(String[] mongoHosts, int[] mongoPorts, String mongoAuthenticationDb,

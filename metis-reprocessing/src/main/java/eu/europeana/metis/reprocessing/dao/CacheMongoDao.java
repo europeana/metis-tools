@@ -3,6 +3,7 @@ package eu.europeana.metis.reprocessing.dao;
 import com.mongodb.MongoClient;
 import eu.europeana.metis.reprocessing.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -18,8 +19,8 @@ public class CacheMongoDao {
   private PropertiesHolderExtension propertiesHolderExtension;
   private final MongoInitializer mongoCacheMongoInitializer;
 
-  public CacheMongoDao(PropertiesHolderExtension propertiesHolderExtension) {
-    this.propertiesHolderExtension = propertiesHolderExtension;
+  public CacheMongoDao(PropertiesHolder propertiesHolder) {
+    this.propertiesHolderExtension = propertiesHolder.getPropertiesHolderExtension();
     mongoCacheMongoInitializer = prepareMongoCacheConfiguration();
     mongoCacheDatastore = createMongoCacheDatastore(
         mongoCacheMongoInitializer.getMongoClient(), propertiesHolderExtension.cacheMongoDb);

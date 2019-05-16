@@ -1,7 +1,7 @@
 package eu.europeana.metis.reprocessing.execution;
 
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.util.List;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -28,10 +28,10 @@ public class ExecutorManager {
   private final ExecutorCompletionService<Void> completionService;
 
   public ExecutorManager(BasicConfiguration basicConfiguration,
-      PropertiesHolderExtension propertiesHolderExtension) {
-    this.maxParallelThreads = propertiesHolderExtension.maxParallelThreads;
-    this.startFromDatasetIndex = propertiesHolderExtension.startFromDatasetIndex;
-    this.endAtDataseteIndex = propertiesHolderExtension.endAtDatasetIndex;
+      PropertiesHolder propertiesHolder) {
+    this.maxParallelThreads = propertiesHolder.maxParallelThreads;
+    this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
+    this.endAtDataseteIndex = propertiesHolder.endAtDatasetIndex;
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
 
