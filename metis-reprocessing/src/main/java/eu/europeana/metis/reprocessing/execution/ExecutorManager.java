@@ -39,7 +39,8 @@ public class ExecutorManager {
   }
 
   public void startReprocessing() throws InterruptedException {
-    final List<String> allDatasetIds = basicConfiguration.getMongoDao().getAllDatasetIdsOrdered();
+    final List<String> allDatasetIds = basicConfiguration.getMetisCoreMongoDao()
+        .getAllDatasetIdsOrdered();
     int threadCounter = 0;
     int processedDatasets = 0;
     int datasetIndex = 0;

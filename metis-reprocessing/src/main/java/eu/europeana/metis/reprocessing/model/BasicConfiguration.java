@@ -1,6 +1,8 @@
 package eu.europeana.metis.reprocessing.model;
 
-import eu.europeana.metis.reprocessing.utilities.MongoDao;
+import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
+import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
+import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 
@@ -10,16 +12,28 @@ import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
  */
 public class BasicConfiguration {
 
-  private final MongoDao mongoDao;
+  private final MetisCoreMongoDao metisCoreMongoDao;
+  private final MongoSourceMongoDao mongoSourceMongoDao;
+  private final MongoDestinationMongoDao mongoDestinationMongoDao;
   private ExtraConfiguration extraConfiguration;
 
   public BasicConfiguration(PropertiesHolderExtension propertiesHolderExtension)
       throws TrustStoreConfigurationException {
-    this.mongoDao = new MongoDao(propertiesHolderExtension);
+    metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolderExtension);
+    mongoSourceMongoDao = new MongoSourceMongoDao(propertiesHolderExtension);
+    mongoDestinationMongoDao = new MongoDestinationMongoDao(propertiesHolderExtension);
   }
 
-  public MongoDao getMongoDao() {
-    return mongoDao;
+  public MetisCoreMongoDao getMetisCoreMongoDao() {
+    return metisCoreMongoDao;
+  }
+
+  public MongoSourceMongoDao getMongoSourceMongoDao() {
+    return mongoSourceMongoDao;
+  }
+
+  public MongoDestinationMongoDao getMongoDestinationMongoDao() {
+    return mongoDestinationMongoDao;
   }
 
   public ExtraConfiguration getExtraConfiguration() {
@@ -32,8 +46,11 @@ public class BasicConfiguration {
   }
 
   void close() {
-    mongoDao.close();
-    if (extraConfiguration != null)
+    metisCoreMongoDao.close();
+    mongoSourceMongoDao.close();
+    mongoDestinationMongoDao.close();
+    if (extraConfiguration != null) {
       extraConfiguration.close();
+    }
   }
 }

@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.reprocessing.execution.ProcessingUtilities;
-import eu.europeana.metis.reprocessing.utilities.CacheMongoDao;
+import eu.europeana.metis.reprocessing.dao.CacheMongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import org.apache.logging.log4j.util.BiConsumer;
 

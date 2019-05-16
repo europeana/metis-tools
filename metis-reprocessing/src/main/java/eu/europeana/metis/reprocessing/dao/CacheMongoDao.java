@@ -1,7 +1,9 @@
-package eu.europeana.metis.reprocessing.utilities;
+package eu.europeana.metis.reprocessing.dao;
 
 import com.mongodb.MongoClient;
 import eu.europeana.metis.reprocessing.model.TechnicalMetadataWrapper;
+import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 

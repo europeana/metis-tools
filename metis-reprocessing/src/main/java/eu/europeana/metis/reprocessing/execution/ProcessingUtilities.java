@@ -20,12 +20,12 @@ import eu.europeana.metis.mediaprocessing.model.TextResourceMetadata;
 import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.mediaprocessing.model.ThumbnailImpl;
 import eu.europeana.metis.mediaprocessing.model.VideoResourceMetadata;
+import eu.europeana.metis.reprocessing.dao.CacheMongoDao;
+import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
 import eu.europeana.metis.reprocessing.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.reprocessing.model.ThumbnailWrapper;
-import eu.europeana.metis.reprocessing.utilities.CacheMongoDao;
-import eu.europeana.metis.reprocessing.utilities.MongoDao;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,8 +53,9 @@ public class ProcessingUtilities {
   private ProcessingUtilities() {
   }
 
-  public static RDF updateTechnicalMetadata(final FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {
-    final MongoDao mongoDao = basicConfiguration.getMongoDao();
+  public static RDF updateTechnicalMetadata(final FullBeanImpl fullBean,
+      BasicConfiguration basicConfiguration) {
+    final MongoSourceMongoDao mongoSourceMongoDao = basicConfiguration.getMongoSourceMongoDao();
     final ExtraConfiguration extraConfiguration = basicConfiguration.getExtraConfiguration();
     final RDF rdf = EdmUtils.toRDF(fullBean);
     final EnrichedRdfImpl enrichedRdf = new EnrichedRdfImpl(rdf);
@@ -65,7 +66,7 @@ public class ProcessingUtilities {
           .of(aggregation.getEdmObject(), aggregation.getEdmIsShownAt(),
               aggregation.getEdmIsShownBy()).collect(Collectors.toList());
       for (String resourceUrl : urlsForWebResources) {
-        technicalMetadataForResource(mongoDao, enrichedRdf, resourceUrl,
+        technicalMetadataForResource(mongoSourceMongoDao, enrichedRdf, resourceUrl,
             extraConfiguration.getCacheMongoDao(), extraConfiguration.getAmazonS3Client(),
             extraConfiguration.getS3Bucket());
       }
@@ -73,13 +74,13 @@ public class ProcessingUtilities {
     return enrichedRdf.finalizeRdf();
   }
 
-  private static void technicalMetadataForResource(final MongoDao mongoDao,
+  private static void technicalMetadataForResource(final MongoSourceMongoDao mongoSourceMongoDao,
       final EnrichedRdfImpl enrichedRdf, final String resourceUrl,
       final CacheMongoDao cacheMongoDao, final AmazonS3 amazonS3Client,
       final String s3Bucket) {
     try {
       final String md5Hex = ProcessingUtilities.md5Hex(resourceUrl);
-      final WebResourceMetaInfoImpl webResourceMetaInfoImplFromSource = mongoDao
+      final WebResourceMetaInfoImpl webResourceMetaInfoImplFromSource = mongoSourceMongoDao
           .getTechnicalMetadataFromSource(md5Hex);
       if (webResourceMetaInfoImplFromSource == null) {
         //If it does not exist already check cache

@@ -1,9 +1,9 @@
 package eu.europeana.metis.reprocessing.execution;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
-import eu.europeana.metis.reprocessing.utilities.MongoDao;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.apache.commons.collections.CollectionUtils;
@@ -62,26 +62,27 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private DatasetStatus retrieveOrInitializeDatasetStatus() {
-    DatasetStatus datasetStatus = basicConfiguration.getMongoDao().getDatasetStatus(datasetId);
+    DatasetStatus datasetStatus = basicConfiguration.getMongoDestinationMongoDao()
+        .getDatasetStatus(datasetId);
     if (datasetStatus == null) {
       datasetStatus = new DatasetStatus();
-      final long totalRecordsForDataset = basicConfiguration.getMongoDao()
+      final long totalRecordsForDataset = basicConfiguration.getMongoSourceMongoDao()
           .getTotalRecordsForDataset(datasetId);
       datasetStatus.setDatasetId(datasetId);
       datasetStatus.setTotalRecords(totalRecordsForDataset);
-      basicConfiguration.getMongoDao().storeDatasetStatusToDb(datasetStatus);
+      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     }
     return datasetStatus;
   }
 
   private int getNextPage(DatasetStatus datasetStatus) {
     final long totalProcessed = datasetStatus.getTotalProcessed();
-    return (int) (totalProcessed / MongoDao.PAGE_SIZE);
+    return (int) (totalProcessed / MongoSourceMongoDao.PAGE_SIZE);
   }
 
   private void loopOverAllRecordsAndProcess(final DatasetStatus datasetStatus) {
     int nextPage = getNextPage(datasetStatus);
-    List<FullBeanImpl> nextPageOfRecords = basicConfiguration.getMongoDao()
+    List<FullBeanImpl> nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
         .getNextPageOfRecords(datasetId, nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("Processing number of records: {}", nextPageOfRecords.size());
@@ -90,9 +91,9 @@ public class ReprocessForDataset implements Callable<Void> {
 //        indexRecord(fullBean);
       }
       datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + nextPageOfRecords.size());
-      basicConfiguration.getMongoDao().storeDatasetStatusToDb(datasetStatus);
+      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
       nextPage++;
-      nextPageOfRecords = basicConfiguration.getMongoDao()
+      nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
           .getNextPageOfRecords(datasetId, nextPage);
     }
     // TODO: 16-5-19 Create all relative information about the reindexing workflow in metis-core
