@@ -23,6 +23,7 @@ public class PropertiesHolder {
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesHolder.class);
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
+  private Properties properties = new Properties();
 
   public final int maxParallelThreads;
   public final int startFromDatasetIndex;
@@ -53,22 +54,6 @@ public class PropertiesHolder {
   public final String destinationMongoPassword;
   public final boolean destinationMongoEnablessl;
   public final String destinationMongoDb;
-
-  //EXTRA CONFIGURATION
-  //Mongo Cache
-  public final String[] cacheMongoHosts;
-  public final int[] cacheMongoPorts;
-  public final String cacheMongoAuthenticationDb;
-  public final String cacheMongoUsername;
-  public final String cacheMongoPassword;
-  public final boolean cacheMongoEnablessl;
-  public final String cacheMongoDb;
-
-  //S3
-  public final String s3AccessKey;
-  public final String s3SecretKey;
-  public final String s3Endpoint;
-  public final String s3Bucket;
 
   public PropertiesHolder(String configurationFileName) {
     Properties properties = new Properties();
@@ -125,22 +110,9 @@ public class PropertiesHolder {
     destinationMongoPassword = properties.getProperty("mongo.destination.password");
     destinationMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
+  }
 
-    //EXTRA CONFIGURATION
-    //Mongo Cache
-    cacheMongoHosts = properties.getProperty("mongo.cache.hosts").split(",");
-    cacheMongoPorts = Arrays.stream(properties.getProperty("mongo.cache.port").split(","))
-        .mapToInt(Integer::parseInt).toArray();
-    cacheMongoAuthenticationDb = properties.getProperty("mongo.cache.authentication.db");
-    cacheMongoUsername = properties.getProperty("mongo.cache.username");
-    cacheMongoPassword = properties.getProperty("mongo.cache.password");
-    cacheMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.cache.enableSSL"));
-    cacheMongoDb = properties.getProperty("mongo.cache.db");
-
-    //S3
-    s3AccessKey = properties.getProperty("s3.access.key");
-    s3SecretKey = properties.getProperty("s3.secret.key");
-    s3Endpoint = properties.getProperty("s3.endpoint");
-    s3Bucket = properties.getProperty("s3.bucket");
+  public Properties getProperties() {
+    return properties;
   }
 }

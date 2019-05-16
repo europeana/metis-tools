@@ -1,7 +1,7 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import com.amazonaws.services.s3.AmazonS3;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.utilities.MongoDao;
 import java.util.List;
@@ -18,17 +18,12 @@ public class ReprocessForDataset implements Callable<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReprocessForDataset.class);
   private final String datasetId;
-  private MongoDao mongoDao;
-  private final AmazonS3 amazonS3Client;
-  private final String s3Bucket;
+  private final BasicConfiguration basicConfiguration;
 
-  public ReprocessForDataset(String datasetId, MongoDao mongoDao, AmazonS3 amazonS3Client,
-      String s3Bucket) {
+  public ReprocessForDataset(String datasetId, BasicConfiguration basicConfiguration) {
     // TODO: 15-5-19 remember to correctly set datasetId
     this.datasetId = "2051942";
-    this.mongoDao = mongoDao;
-    this.amazonS3Client = amazonS3Client;
-    this.s3Bucket = s3Bucket;
+    this.basicConfiguration = basicConfiguration;
   }
 
   @Override
@@ -67,13 +62,14 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private DatasetStatus retrieveOrInitializeDatasetStatus() {
-    DatasetStatus datasetStatus = mongoDao.getDatasetStatus(datasetId);
+    DatasetStatus datasetStatus = basicConfiguration.getMongoDao().getDatasetStatus(datasetId);
     if (datasetStatus == null) {
       datasetStatus = new DatasetStatus();
-      final long totalRecordsForDataset = mongoDao.getTotalRecordsForDataset(datasetId);
+      final long totalRecordsForDataset = basicConfiguration.getMongoDao()
+          .getTotalRecordsForDataset(datasetId);
       datasetStatus.setDatasetId(datasetId);
       datasetStatus.setTotalRecords(totalRecordsForDataset);
-      mongoDao.storeDatasetStatusToDb(datasetStatus);
+      basicConfiguration.getMongoDao().storeDatasetStatusToDb(datasetStatus);
     }
     return datasetStatus;
   }
@@ -85,7 +81,8 @@ public class ReprocessForDataset implements Callable<Void> {
 
   private void loopOverAllRecordsAndProcess(final DatasetStatus datasetStatus) {
     int nextPage = getNextPage(datasetStatus);
-    List<FullBeanImpl> nextPageOfRecords = mongoDao.getNextPageOfRecords(datasetId, nextPage);
+    List<FullBeanImpl> nextPageOfRecords = basicConfiguration.getMongoDao()
+        .getNextPageOfRecords(datasetId, nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("Processing number of records: {}", nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
@@ -93,15 +90,19 @@ public class ReprocessForDataset implements Callable<Void> {
 //        indexRecord(fullBean);
       }
       datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + nextPageOfRecords.size());
-      mongoDao.storeDatasetStatusToDb(datasetStatus);
+      basicConfiguration.getMongoDao().storeDatasetStatusToDb(datasetStatus);
       nextPage++;
-      nextPageOfRecords = mongoDao.getNextPageOfRecords(datasetId, nextPage);
+      nextPageOfRecords = basicConfiguration.getMongoDao()
+          .getNextPageOfRecords(datasetId, nextPage);
     }
+    // TODO: 16-5-19 Create all relative information about the reindexing workflow in metis-core
   }
 
   private void processRecord(FullBeanImpl fullBean) {
-    ProcessingUtilities.updateTechnicalMetadata(fullBean, mongoDao, amazonS3Client, s3Bucket);
-    ProcessingUtilities.tierCalculation(fullBean);
+    basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
+        .accept(fullBean, basicConfiguration);
+//    ProcessingUtilities.updateTechnicalMetadata(fullBean, mongoDao, amazonS3Client, s3Bucket);
+//    ProcessingUtilities.tierCalculation(fullBean);
   }
 
   private void indexRecord(FullBeanImpl fullBean) {

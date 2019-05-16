@@ -1,13 +1,11 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import com.amazonaws.services.s3.AmazonS3;
-import eu.europeana.metis.reprocessing.utilities.MongoDao;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.reprocessing.model.BasicConfiguration;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import java.util.List;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.mongodb.morphia.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +19,7 @@ public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
   private static final String PROCESSED_FILES_STR = "Processed datasets: {}";
-  private final MongoDao mongoDao;
-  private final AmazonS3 amazonS3Client;
-  private final String s3Bucket;
+  private final BasicConfiguration basicConfiguration;
   private final int maxParallelThreads;
   private final int startFromDatasetIndex;
   private final int endAtDataseteIndex;
@@ -31,23 +27,19 @@ public class ExecutorManager {
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Void> completionService;
 
-  public ExecutorManager(Datastore metisCoreDatastore, Datastore mongoSourceDatastore,
-      Datastore mongoDestinationDatastore, Datastore mongoCacheDatastore,
-      AmazonS3 amazonS3Client, PropertiesHolder propertiesHolder) {
-    this.maxParallelThreads = propertiesHolder.maxParallelThreads;
-    this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
-    this.endAtDataseteIndex = propertiesHolder.endAtDatasetIndex;
-    this.mongoDao = new MongoDao(metisCoreDatastore, mongoCacheDatastore, mongoSourceDatastore,
-        mongoDestinationDatastore);
-    this.amazonS3Client = amazonS3Client;
-    s3Bucket = propertiesHolder.s3Bucket;
-
+  public ExecutorManager(BasicConfiguration basicConfiguration,
+      PropertiesHolderExtension propertiesHolderExtension) {
+    this.maxParallelThreads = propertiesHolderExtension.maxParallelThreads;
+    this.startFromDatasetIndex = propertiesHolderExtension.startFromDatasetIndex;
+    this.endAtDataseteIndex = propertiesHolderExtension.endAtDatasetIndex;
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
+
+    this.basicConfiguration = basicConfiguration;
   }
 
   public void startReprocessing() throws InterruptedException {
-    final List<String> allDatasetIds = mongoDao.getAllDatasetIdsOrdered();
+    final List<String> allDatasetIds = basicConfiguration.getMongoDao().getAllDatasetIdsOrdered();
     int threadCounter = 0;
     int processedDatasets = 0;
     int datasetIndex = 0;
@@ -59,8 +51,8 @@ public class ExecutorManager {
       if (datasetIndex > endAtDataseteIndex) {
         break;
       }
-      final ReprocessForDataset reprocessForDataset = new ReprocessForDataset(datasetId, mongoDao,
-          amazonS3Client, s3Bucket);
+      final ReprocessForDataset reprocessForDataset = new ReprocessForDataset(datasetId,
+          basicConfiguration);
       if (threadCounter >= maxParallelThreads) {
         completionService.take();
         threadCounter--;
