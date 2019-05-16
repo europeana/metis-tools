@@ -1,3 +1,8 @@
+max.parallel.threads=
+start.from.dataset.index=
+end.at.dataset.index=
+source.mongo.page.size=
+
 #Truststore
 truststore.path=
 truststore.password=

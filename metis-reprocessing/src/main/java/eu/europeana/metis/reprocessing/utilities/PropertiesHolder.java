@@ -23,11 +23,12 @@ public class PropertiesHolder {
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesHolder.class);
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
-  private Properties properties = new Properties();
+  private static Properties properties;
 
   public final int maxParallelThreads;
   public final int startFromDatasetIndex;
   public final int endAtDatasetIndex;
+  public final int sourceMongoPageSize;
 
   public final String truststorePath;
   public final String truststorePassword;
@@ -56,7 +57,7 @@ public class PropertiesHolder {
   public final String destinationMongoDb;
 
   public PropertiesHolder(String configurationFileName) {
-    Properties properties = new Properties();
+    properties = new Properties();
     final URL resource = getClass().getClassLoader().getResource(configurationFileName);
     final String filePathInResources = resource == null ? null : resource.getFile();
     String filePath;
@@ -79,6 +80,7 @@ public class PropertiesHolder {
     maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
     startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
     endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
+    sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
 
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");

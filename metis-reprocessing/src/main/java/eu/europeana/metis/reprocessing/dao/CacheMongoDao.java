@@ -45,7 +45,9 @@ public class CacheMongoDao {
       String databaseName) {
     Morphia morphia = new Morphia();
     morphia.map(TechnicalMetadataWrapper.class);
-    return morphia.createDatastore(mongoClient, databaseName);
+    final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
+    datastore.ensureIndexes();
+    return datastore;
   }
 
   public void close() {

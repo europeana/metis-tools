@@ -33,8 +33,8 @@ public class ReprocessingMain {
     final ExecutorManager executorManager = new ExecutorManager(basicConfiguration,
         propertiesHolderExtension);
     executorManager.startReprocessing();
-
     executorManager.close();
+    LOGGER.info(EXECUTION_LOGS_MARKER, "End script");
   }
 
 }

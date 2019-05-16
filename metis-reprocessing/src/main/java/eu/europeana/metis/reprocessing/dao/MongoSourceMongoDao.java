@@ -33,7 +33,8 @@ import org.mongodb.morphia.query.Query;
 public class MongoSourceMongoDao {
 
   private static final String ID = "_id";
-  public static final int PAGE_SIZE = 200;
+  private static final int DEFAULT_PAGE_SIZE = 200;
+  public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   private final MongoInitializer mongoSourceMongoInitializer;
   private Datastore mongoSourceDatastore;
@@ -41,6 +42,7 @@ public class MongoSourceMongoDao {
 
   public MongoSourceMongoDao(PropertiesHolderExtension propertiesHolderExtension) {
     this.propertiesHolderExtension = propertiesHolderExtension;
+    PAGE_SIZE = propertiesHolderExtension.sourceMongoPageSize;
     mongoSourceMongoInitializer = prepareMongoSourceConfiguration();
     mongoSourceDatastore = createMongoSourceDatastore(
         mongoSourceMongoInitializer.getMongoClient(), propertiesHolderExtension.sourceMongoDb);
