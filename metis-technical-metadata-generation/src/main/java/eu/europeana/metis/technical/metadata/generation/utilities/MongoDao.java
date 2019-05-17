@@ -26,11 +26,11 @@ public class MongoDao {
 
   private Datastore datastore;
 
-  MongoDao(Datastore datastore) {
+  public MongoDao(Datastore datastore) {
     this.datastore = datastore;
   }
 
-  FileStatus getFileStatus(String fileName) {
+  public FileStatus getFileStatus(String fileName) {
     return datastore.find(FileStatus.class).filter(FILE_NAME, fileName).get();
   }
 

@@ -29,9 +29,8 @@ public class TechnicalMetadataGenerationMain {
   private static final String CONFIGURATION_FILE = "application.properties";
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
-  public static void main(String[] args)
-      throws Exception {
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script");
+  public static void main(String[] args) throws Exception {
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script for technical metadata generation.");
 
     final MongoInitializer mongoInitializer = prepareConfiguration();
     final Datastore datastore = createDatastore(mongoInitializer.getMongoClient(),
@@ -44,7 +43,7 @@ public class TechnicalMetadataGenerationMain {
 
   }
 
-  private static MongoInitializer prepareConfiguration() throws TrustStoreConfigurationException {
+  static MongoInitializer prepareConfiguration() throws TrustStoreConfigurationException {
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
         .isNotEmpty(propertiesHolder.truststorePassword)) {
       LOGGER.info(EXECUTION_LOGS_MARKER,
@@ -57,7 +56,7 @@ public class TechnicalMetadataGenerationMain {
     return mongoInitializer;
   }
 
-  private static Datastore createDatastore(MongoClient mongoClient, String databaseName) {
+  static Datastore createDatastore(MongoClient mongoClient, String databaseName) {
     Morphia morphia = new Morphia();
     morphia.map(TechnicalMetadataWrapper.class);
     morphia.map(FileStatus.class);

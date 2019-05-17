@@ -50,7 +50,7 @@ public class ExecutorManager {
     completionService = new ExecutorCompletionService<>(threadPool);
   }
 
-  public void startTechnicalMetadataGeneration() throws IOException, InterruptedException {
+  public static File[] getAllFiles(File directoryWithResourcesPerDataset) throws IOException {
     final File[] filesPerDataset = directoryWithResourcesPerDataset.listFiles();
     final boolean allFiles =
         filesPerDataset != null && Arrays.stream(filesPerDataset).allMatch(File::isFile);
@@ -61,6 +61,12 @@ public class ExecutorManager {
     }
     Arrays.sort(filesPerDataset, Comparator.comparing(File::getName));
     LOGGER.info(EXECUTION_LOGS_MARKER, "Total files to process: {}", filesPerDataset.length);
+    return filesPerDataset;
+  }
+
+  public void startTechnicalMetadataGeneration() throws IOException, InterruptedException {
+
+    final File[] filesPerDataset = getAllFiles(directoryWithResourcesPerDataset);
 
     int threadCounter = 0;
     int processedFiles = 0;

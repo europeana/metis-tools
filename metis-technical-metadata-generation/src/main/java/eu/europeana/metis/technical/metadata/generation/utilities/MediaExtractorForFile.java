@@ -118,7 +118,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return baos.toString();
   }
 
-  private InputStream getInputStreamForFilePath(File datasetFile) throws IOException {
+  public static InputStream getInputStreamForFilePath(File datasetFile) throws IOException {
     InputStream inputStream;
     if (isGZipped(datasetFile)) {
       inputStream = new GZIPInputStream(new FileInputStream(datasetFile));
@@ -188,13 +188,11 @@ public class MediaExtractorForFile implements Callable<Void> {
     return fileStatus;
   }
 
-  private boolean isGZipped(File file) {
+  private static boolean isGZipped(File file) {
     int magic = 0;
-    try {
-      RandomAccessFile raf = new RandomAccessFile(file, "r");
+    try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
       magic = raf.read() & 0xff | ((raf.read() << 8) & 0xff00);
-      raf.close();
-    } catch (Exception e) {
+    } catch (RuntimeException | IOException e) {
       LOGGER.error("Could not determine if file is gzip", e);
     }
     return magic == GZIPInputStream.GZIP_MAGIC;
