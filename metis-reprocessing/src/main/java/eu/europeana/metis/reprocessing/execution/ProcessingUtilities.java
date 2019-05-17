@@ -114,12 +114,15 @@ public class ProcessingUtilities {
   static void storeThumbnailsToS3(AmazonS3 amazonS3Client, String s3Bucket,
       List<ThumbnailWrapper> thumbnailWrappers) {
     for (ThumbnailWrapper thumbnailWrapper : thumbnailWrappers) {
-      try (InputStream stream = new ByteArrayInputStream(thumbnailWrapper.getThumbnailBytes())) {
-        amazonS3Client.putObject(s3Bucket, thumbnailWrapper.getTargetName(), stream, null);
-      } catch (Exception e) {
-        LOGGER.error(
-            "Error while uploading {} to S3 in Bluemix. The full error message is: {} because of: ",
-            thumbnailWrapper.getTargetName(), e);
+      //If the thumbnail already exists(e.g. from a previous execution of the script), avoid sending it again
+      if (!doesThumbnailExistInS3(amazonS3Client, s3Bucket, thumbnailWrapper.getTargetName())) {
+        try (InputStream stream = new ByteArrayInputStream(thumbnailWrapper.getThumbnailBytes())) {
+          amazonS3Client.putObject(s3Bucket, thumbnailWrapper.getTargetName(), stream, null);
+        } catch (Exception e) {
+          LOGGER.error(
+              "Error while uploading {} to S3 in Bluemix. The full error message is: {} because of: ",
+              thumbnailWrapper.getTargetName(), e);
+        }
       }
     }
   }
