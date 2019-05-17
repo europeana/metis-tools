@@ -22,14 +22,15 @@ public class DatasetStatus implements HasMongoObjectId {
 
   @Indexed(options = @IndexOptions(unique = true))
   private String datasetId;
-  private long totalProcessed;
   private long totalRecords;
+  private long totalProcessed;
   private long totalFailedRecords;
   private final Set<String> failedRecordsSet = new HashSet<>();
   private long averageTimeRecordProcessing;
   private long averageTimeRecordIndexing;
 
   public DatasetStatus() {
+    //Default constructor
   }
 
   @Override
@@ -50,20 +51,20 @@ public class DatasetStatus implements HasMongoObjectId {
     this.datasetId = datasetId;
   }
 
-  public long getTotalProcessed() {
-    return totalProcessed;
-  }
-
-  public void setTotalProcessed(long totalProcessed) {
-    this.totalProcessed = totalProcessed;
-  }
-
   public long getTotalRecords() {
     return totalRecords;
   }
 
   public void setTotalRecords(long totalRecords) {
     this.totalRecords = totalRecords;
+  }
+
+  public long getTotalProcessed() {
+    return totalProcessed;
+  }
+
+  public void setTotalProcessed(long totalProcessed) {
+    this.totalProcessed = totalProcessed;
   }
 
   public long getTotalFailedRecords() {
@@ -92,5 +93,14 @@ public class DatasetStatus implements HasMongoObjectId {
 
   public void setAverageTimeRecordIndexing(long averageTimeRecordIndexing) {
     this.averageTimeRecordIndexing = averageTimeRecordIndexing;
+  }
+
+  @Override
+  public String toString() {
+    return String.format(
+        "ObjectId: %s, datasetId: %s, totalRecords: %d, totalProcessed: %d, totalFailedRecords: %d, failedRecordsSetSize: %d, averageTimeRecordProcessing: %d, averageTimeRecordIndexing: %d",
+        id, datasetId, totalRecords, totalProcessed, totalFailedRecords, failedRecordsSet.size(),
+        averageTimeRecordProcessing, averageTimeRecordIndexing);
+
   }
 }

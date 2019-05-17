@@ -1,5 +1,7 @@
 package eu.europeana.metis.reprocessing.execution;
 
+import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.STATISTICS_LOGS_MARKER;
+
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
@@ -20,13 +22,14 @@ import org.slf4j.LoggerFactory;
 public class ReprocessForDataset implements Callable<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReprocessForDataset.class);
+  private final String prefixDatasetidLog;
   private final String datasetId;
   private final BasicConfiguration basicConfiguration;
 
   public ReprocessForDataset(String datasetId, BasicConfiguration basicConfiguration) {
-    // TODO: 15-5-19 remember to correctly set datasetId
-    this.datasetId = "2051942";
+    this.datasetId = datasetId;
     this.basicConfiguration = basicConfiguration;
+    this.prefixDatasetidLog = String.format("DatasetId: %s", this.datasetId);
   }
 
   @Override
@@ -39,28 +42,15 @@ public class ReprocessForDataset implements Callable<Void> {
     final DatasetStatus datasetStatus = retrieveOrInitializeDatasetStatus();
     if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
       LOGGER
-          .info("Processing DatasetId: {} not started because it was already completely processed",
-              datasetId);
+          .info("{} - Processing not started because it was already completely processed",
+              prefixDatasetidLog);
       return null;
     }
-    final long startTime = System.nanoTime();
     loopOverAllRecordsAndProcess(datasetStatus);
-
-    //Code here
-//    String dsId = "2051942";
-//    final long startTime = System.nanoTime();
-//    List<FullBeanImpl> nextPageOfRecords = mongoDao.getNextPageOfRecords(dsId, 0);
-//    List<FullBeanImpl> nextPageOfRecords = new ArrayList<>();
-//    for (int i = 0; i < 1000; i++) {
-//      nextPageOfRecords.add(mongoDao.getRecord(
-//          "/03915/public_mistral_memoire_fr_ACTION_CHERCHER_FIELD_1_REF_VALUE_1_AP70L00682F"));
-//    }
-    final long endTime = System.nanoTime();
-    System.out.println(String
-        .format("Total time: %s DatasetId: %s ", (double) (endTime - startTime) / 1_000_000_000.0,
-            datasetId));
-
-    LOGGER.info("Processing DatasetId: {} end", datasetId);
+    LOGGER.info("{} - Processing end", prefixDatasetidLog);
+    LOGGER.info("{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);
+    LOGGER.info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog,
+        datasetStatus);
     return null;
   }
 
@@ -88,7 +78,8 @@ public class ReprocessForDataset implements Callable<Void> {
     List<FullBeanImpl> nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
         .getNextPageOfRecords(datasetId, nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER.info("Processing number of records: {}", nextPageOfRecords.size());
+      LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
+          nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         processAndIndex(datasetStatus, fullBean);
       }
@@ -111,7 +102,8 @@ public class ReprocessForDataset implements Callable<Void> {
       } else {
         stepString = "index";
       }
-      LOGGER.error("Could not {} record: {}", stepString, fullBean.getAbout(), e);
+      LOGGER.error("{} - Could not {} record: {}", prefixDatasetidLog, stepString,
+          fullBean.getAbout(), e);
       if (fullBean.getAbout() != null) {
         datasetStatus.getFailedRecordsSet().add(fullBean.getAbout());
         datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);

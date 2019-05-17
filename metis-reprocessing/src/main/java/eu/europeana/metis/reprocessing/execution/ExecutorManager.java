@@ -1,5 +1,7 @@
 package eu.europeana.metis.reprocessing.execution;
 
+import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.util.List;
@@ -18,11 +20,11 @@ import org.slf4j.LoggerFactory;
 public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
-  private static final String PROCESSED_FILES_STR = "Processed datasets: {}";
+  private static final String PROCESSED_DATASETS_STR = "Processed datasets: {}";
   private final BasicConfiguration basicConfiguration;
   private final int maxParallelThreads;
   private final int startFromDatasetIndex;
-  private final int endAtDataseteIndex;
+  private final int endAtDatasetIndex;
 
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Void> completionService;
@@ -31,7 +33,7 @@ public class ExecutorManager {
       PropertiesHolder propertiesHolder) {
     this.maxParallelThreads = propertiesHolder.maxParallelThreads;
     this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
-    this.endAtDataseteIndex = propertiesHolder.endAtDatasetIndex;
+    this.endAtDatasetIndex = propertiesHolder.endAtDatasetIndex;
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
 
@@ -43,23 +45,19 @@ public class ExecutorManager {
         .getAllDatasetIdsOrdered();
     int threadCounter = 0;
     int processedDatasets = 0;
-    int datasetIndex = 0;
-    for (String datasetId : allDatasetIds) {
-      datasetIndex++;
-      if (datasetIndex < startFromDatasetIndex) {
-        continue;
-      }
-      if (datasetIndex > endAtDataseteIndex) {
-        break;
-      }
+
+    for (int i = startFromDatasetIndex; i <= endAtDatasetIndex; i++) {
+      String datasetId = allDatasetIds.get(i);
+      // TODO: 17-5-19 remove the below line
+      datasetId = "2051942";
       final ReprocessForDataset reprocessForDataset = new ReprocessForDataset(datasetId,
           basicConfiguration);
       if (threadCounter >= maxParallelThreads) {
         completionService.take();
         threadCounter--;
         processedDatasets++;
-        LOGGER.info(PROCESSED_FILES_STR, processedDatasets);
-//        LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
+        LOGGER.info(PROCESSED_DATASETS_STR, processedDatasets);
+        LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, processedDatasets);
       }
       completionService.submit(reprocessForDataset);
       threadCounter++;
@@ -69,25 +67,9 @@ public class ExecutorManager {
     for (int i = 0; i < threadCounter; i++) {
       completionService.take();
       processedDatasets++;
-      LOGGER.info(PROCESSED_FILES_STR, processedDatasets);
-//      LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
+      LOGGER.info(PROCESSED_DATASETS_STR, processedDatasets);
+      LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, processedDatasets);
     }
-
-//    String datasetId = "03915";
-//    final long startTime = System.nanoTime();
-//    List<FullBeanImpl> nextPageOfRecords = mongoDao.getNextPageOfRecords(datasetId, 0);
-//    List<FullBeanImpl> nextPageOfRecords = new ArrayList<>();
-//    for (int i = 0; i < 1000; i++) {
-//      nextPageOfRecords.add(mongoDao.getRecord(
-//          "/03915/public_mistral_memoire_fr_ACTION_CHERCHER_FIELD_1_REF_VALUE_1_AP70L00682F"));
-//    }
-//    System.out.println(nextPageOfRecords.size());
-//    final long endTime = System.nanoTime();
-//    System.out.println("Total time: " + (double) (endTime - startTime) / 1_000_000_000.0);
-//    final DatasetStatus datasetStatus = new DatasetStatus();
-//    datasetStatus.setDatasetId(datasetId);
-//    datasetStatus.setTotalProcessed(200);
-//    mongoDao.storeDatasetStatusToDb(datasetStatus);
   }
 
   public void close() {
