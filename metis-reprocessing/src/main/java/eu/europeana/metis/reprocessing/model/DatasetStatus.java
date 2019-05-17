@@ -25,7 +25,9 @@ public class DatasetStatus implements HasMongoObjectId {
   private long totalProcessed;
   private long totalRecords;
   private long totalFailedRecords;
-  private final Set<String> failedRecords = new HashSet<>();
+  private final Set<String> failedRecordsSet = new HashSet<>();
+  private long averageTimeRecordProcessing;
+  private long averageTimeRecordIndexing;
 
   public DatasetStatus() {
   }
@@ -72,7 +74,23 @@ public class DatasetStatus implements HasMongoObjectId {
     this.totalFailedRecords = totalFailedRecords;
   }
 
-  public Set<String> getFailedRecords() {
-    return failedRecords;
+  public Set<String> getFailedRecordsSet() {
+    return failedRecordsSet;
+  }
+
+  public long getAverageTimeRecordProcessing() {
+    return averageTimeRecordProcessing;
+  }
+
+  public void setAverageTimeRecordProcessing(long averageTimeRecordProcessing) {
+    this.averageTimeRecordProcessing = averageTimeRecordProcessing;
+  }
+
+  public long getAverageTimeRecordIndexing() {
+    return averageTimeRecordIndexing;
+  }
+
+  public void setAverageTimeRecordIndexing(long averageTimeRecordIndexing) {
+    this.averageTimeRecordIndexing = averageTimeRecordIndexing;
   }
 }
