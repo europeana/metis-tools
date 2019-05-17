@@ -3,6 +3,8 @@ package eu.europeana.metis.reprocessing.model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import eu.europeana.metis.core.workflow.HasMongoObjectId;
 import eu.europeana.metis.json.ObjectIdSerializer;
+import java.util.HashSet;
+import java.util.Set;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.IndexOptions;
@@ -22,6 +24,8 @@ public class DatasetStatus implements HasMongoObjectId {
   private String datasetId;
   private long totalProcessed;
   private long totalRecords;
+  private long totalFailedRecords;
+  private final Set<String> failedRecords = new HashSet<>();
 
   public DatasetStatus() {
   }
@@ -58,5 +62,17 @@ public class DatasetStatus implements HasMongoObjectId {
 
   public void setTotalRecords(long totalRecords) {
     this.totalRecords = totalRecords;
+  }
+
+  public long getTotalFailedRecords() {
+    return totalFailedRecords;
+  }
+
+  public void setTotalFailedRecords(long totalFailedRecords) {
+    this.totalFailedRecords = totalFailedRecords;
+  }
+
+  public Set<String> getFailedRecords() {
+    return failedRecords;
   }
 }

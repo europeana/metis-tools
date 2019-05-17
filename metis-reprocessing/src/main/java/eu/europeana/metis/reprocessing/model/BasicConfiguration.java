@@ -59,6 +59,10 @@ public class BasicConfiguration {
     return mongoDestinationMongoDao;
   }
 
+  public Indexer getIndexer() {
+    return indexer;
+  }
+
   public ExtraConfiguration getExtraConfiguration() {
     return extraConfiguration;
   }

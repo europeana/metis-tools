@@ -2,6 +2,7 @@ package eu.europeana.metis.reprocessing.execution;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
@@ -89,7 +90,6 @@ public class ReprocessForDataset implements Callable<Void> {
       LOGGER.info("Processing number of records: {}", nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
 //        processRecord(fullBean);
-//        indexRecord(fullBean);
       }
       datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + nextPageOfRecords.size());
       basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
@@ -100,11 +100,24 @@ public class ReprocessForDataset implements Callable<Void> {
     // TODO: 16-5-19 Create all relative information about the reindexing workflow in metis-core
   }
 
-  private void processRecord(FullBeanImpl fullBean) {
-    final RDF resultRDF = basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
-        .apply(fullBean, basicConfiguration);
-  }
-
-  private void indexRecord(RDF rdf) {
+  private void processRecord(FullBeanImpl fullBean, DatasetStatus datasetStatus) {
+    try {
+      RDF rdf = basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
+          .apply(fullBean, basicConfiguration);
+      basicConfiguration.getExtraConfiguration().getRdfIndexer()
+          .accept(rdf, true, basicConfiguration);
+    } catch (IndexingException e) {
+      LOGGER.error("Could not index record: {}", fullBean.getAbout(), e);
+      if (fullBean.getAbout() != null) {
+        datasetStatus.getFailedRecords().add(fullBean.getAbout());
+        datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
+      }
+    } catch (Exception e) {
+      LOGGER.error("Could not process record: {}", fullBean.getAbout(), e);
+      if (fullBean.getAbout() != null) {
+        datasetStatus.getFailedRecords().add(fullBean.getAbout());
+        datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
+      }
+    }
   }
 }
