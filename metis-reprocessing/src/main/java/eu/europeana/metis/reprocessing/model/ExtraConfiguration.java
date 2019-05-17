@@ -7,6 +7,7 @@ import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.CacheMongoDao;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.execution.IndexingUtilities;
 import eu.europeana.metis.reprocessing.execution.ProcessingUtilities;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
@@ -67,7 +68,7 @@ public class ExtraConfiguration {
   @FunctionalInterface
   public interface ThrowingBiFunction<T, U, R> {
 
-    R apply(T t, U u) throws Exception;
+    R apply(T t, U u) throws ProcessingException;
   }
 
   @FunctionalInterface

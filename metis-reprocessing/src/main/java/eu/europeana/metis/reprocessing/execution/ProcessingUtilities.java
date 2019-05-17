@@ -22,6 +22,7 @@ import eu.europeana.metis.mediaprocessing.model.ThumbnailImpl;
 import eu.europeana.metis.mediaprocessing.model.VideoResourceMetadata;
 import eu.europeana.metis.reprocessing.dao.CacheMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
 import eu.europeana.metis.reprocessing.model.TechnicalMetadataWrapper;
@@ -54,24 +55,28 @@ public class ProcessingUtilities {
   }
 
   public static RDF updateTechnicalMetadata(final FullBeanImpl fullBean,
-      BasicConfiguration basicConfiguration) {
-    final MongoSourceMongoDao mongoSourceMongoDao = basicConfiguration.getMongoSourceMongoDao();
-    final ExtraConfiguration extraConfiguration = basicConfiguration.getExtraConfiguration();
-    final RDF rdf = EdmUtils.toRDF(fullBean);
-    final EnrichedRdfImpl enrichedRdf = new EnrichedRdfImpl(rdf);
+      BasicConfiguration basicConfiguration) throws ProcessingException {
+    try {
+      final MongoSourceMongoDao mongoSourceMongoDao = basicConfiguration.getMongoSourceMongoDao();
+      final ExtraConfiguration extraConfiguration = basicConfiguration.getExtraConfiguration();
+      final RDF rdf = EdmUtils.toRDF(fullBean);
+      final EnrichedRdfImpl enrichedRdf = new EnrichedRdfImpl(rdf);
 
-    for (AggregationImpl aggregation : fullBean.getAggregations()) {
-      //Get all urls that should have webResources
-      List<String> urlsForWebResources = Stream
-          .of(aggregation.getEdmObject(), aggregation.getEdmIsShownAt(),
-              aggregation.getEdmIsShownBy()).collect(Collectors.toList());
-      for (String resourceUrl : urlsForWebResources) {
-        technicalMetadataForResource(mongoSourceMongoDao, enrichedRdf, resourceUrl,
-            extraConfiguration.getCacheMongoDao(), extraConfiguration.getAmazonS3Client(),
-            extraConfiguration.getS3Bucket());
+      for (AggregationImpl aggregation : fullBean.getAggregations()) {
+        //Get all urls that should have webResources
+        List<String> urlsForWebResources = Stream
+            .of(aggregation.getEdmObject(), aggregation.getEdmIsShownAt(),
+                aggregation.getEdmIsShownBy()).collect(Collectors.toList());
+        for (String resourceUrl : urlsForWebResources) {
+          technicalMetadataForResource(mongoSourceMongoDao, enrichedRdf, resourceUrl,
+              extraConfiguration.getCacheMongoDao(), extraConfiguration.getAmazonS3Client(),
+              extraConfiguration.getS3Bucket());
+        }
       }
+      return enrichedRdf.finalizeRdf();
+    } catch (RuntimeException e) {
+      throw new ProcessingException("A Runtime Exception occurred", e);
     }
-    return enrichedRdf.finalizeRdf();
   }
 
   private static void technicalMetadataForResource(final MongoSourceMongoDao mongoSourceMongoDao,
@@ -99,9 +104,6 @@ public class ProcessingUtilities {
     } catch (MediaExtractionException | IOException e) {
       LOGGER.warn("Could not enrich with technical metadata of resourceUrl: {}", resourceUrl, e);
     }
-  }
-
-  static void tierCalculation(FullBeanImpl fullBean) {
   }
 
   static boolean doesThumbnailExistInS3(AmazonS3 amazonS3Client, String s3Bucket,

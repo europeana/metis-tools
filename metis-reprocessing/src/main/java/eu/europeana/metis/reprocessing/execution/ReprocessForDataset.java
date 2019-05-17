@@ -6,9 +6,9 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,17 +89,9 @@ public class ReprocessForDataset implements Callable<Void> {
         .getNextPageOfRecords(datasetId, nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("Processing number of records: {}", nextPageOfRecords.size());
-      AtomicLong averageTimeRecordProcessing = new AtomicLong(
-          datasetStatus.getAverageTimeRecordProcessing());
-      AtomicLong averageTimeRecordIndexing = new AtomicLong(
-          datasetStatus.getAverageTimeRecordIndexing());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
-//        final RDF rdf = processRecord(fullBean, datasetStatus, averageTimeRecordProcessing);
-//        indexRecord(fullBean.getAbout(), rdf, datasetStatus, averageTimeRecordIndexing);
+        processAndIndex(datasetStatus, fullBean);
       }
-      datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + nextPageOfRecords.size());
-      datasetStatus.setAverageTimeRecordProcessing(averageTimeRecordProcessing.get());
-      datasetStatus.setAverageTimeRecordIndexing(averageTimeRecordIndexing.get());
       basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
       nextPage++;
       nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
@@ -108,46 +100,56 @@ public class ReprocessForDataset implements Callable<Void> {
     // TODO: 16-5-19 Create all relative information about the reindexing workflow in metis-core
   }
 
-  private RDF processRecord(FullBeanImpl fullBean, DatasetStatus datasetStatus,
-      AtomicLong averageTimeRecordProcessing) {
-    final long startTimeProcess = System.nanoTime();
+  private void processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean) {
     try {
-      return basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
-          .apply(fullBean, basicConfiguration);
-    } catch (Exception e) {
-      LOGGER.error("Could not process record: {}", fullBean.getAbout(), e);
+      final RDF rdf = processRecord(fullBean, datasetStatus);
+      indexRecord(rdf, datasetStatus);
+    } catch (ProcessingException | IndexingException e) {
+      String stepString;
+      if (e instanceof ProcessingException) {
+        stepString = "process";
+      } else {
+        stepString = "index";
+      }
+      LOGGER.error("Could not {} record: {}", stepString, fullBean.getAbout(), e);
       if (fullBean.getAbout() != null) {
         datasetStatus.getFailedRecordsSet().add(fullBean.getAbout());
         datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
       }
+    } finally {
+      datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
     }
-    final long endTimeProcess = System.nanoTime();
-    averageTimeRecordProcessing.set(addOneMoreValueToAverage(
-        datasetStatus.getTotalProcessed() + 1, averageTimeRecordProcessing.get(),
-        endTimeProcess - startTimeProcess));
-    return null;
   }
 
-  private void indexRecord(String recordId, RDF rdf, DatasetStatus datasetStatus,
-      AtomicLong averageTimeRecordIndexing) {
+  private RDF processRecord(FullBeanImpl fullBean, DatasetStatus datasetStatus)
+      throws ProcessingException {
+    final long startTimeProcess = System.nanoTime();
+    try {
+      return basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
+          .apply(fullBean, basicConfiguration);
+    } finally {
+      final long endTimeProcess = System.nanoTime();
+      final long newAverage = addValueToAverage(datasetStatus.getTotalProcessed() + 1,
+          datasetStatus.getAverageTimeRecordProcessing(), endTimeProcess - startTimeProcess);
+      datasetStatus.setAverageTimeRecordProcessing(newAverage);
+    }
+  }
+
+  private void indexRecord(RDF rdf, DatasetStatus datasetStatus)
+      throws IndexingException {
     final long startTimeIndex = System.nanoTime();
     try {
       basicConfiguration.getExtraConfiguration().getRdfIndexer()
           .accept(rdf, true, basicConfiguration);
-    } catch (IndexingException e) {
-      LOGGER.error("Could not index record: {}", recordId, e);
-      if (recordId != null) {
-        datasetStatus.getFailedRecordsSet().add(recordId);
-        datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
-      }
+    } finally {
+      final long endTimeIndex = System.nanoTime();
+      final long newAverage = addValueToAverage(datasetStatus.getTotalProcessed() + 1,
+          datasetStatus.getAverageTimeRecordIndexing(), endTimeIndex - startTimeIndex);
+      datasetStatus.setAverageTimeRecordIndexing(newAverage);
     }
-    final long endTimeIndex = System.nanoTime();
-    averageTimeRecordIndexing.set(addOneMoreValueToAverage(
-        datasetStatus.getTotalProcessed() + 1, averageTimeRecordIndexing.get(),
-        endTimeIndex - startTimeIndex));
   }
 
-  private long addOneMoreValueToAverage(long totalSamples, long oldAverage, long newValue) {
+  private long addValueToAverage(long totalSamples, long oldAverage, long newValue) {
     return oldAverage + ((newValue - oldAverage) / totalSamples);
   }
 }
