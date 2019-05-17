@@ -121,9 +121,11 @@ public class ReprocessForDataset implements Callable<Void> {
           .apply(fullBean, basicConfiguration);
     } finally {
       final long endTimeProcess = System.nanoTime();
+      final long elapsedTime = endTimeProcess - startTimeProcess;
       final long newAverage = addValueToAverage(datasetStatus.getTotalProcessed() + 1,
-          datasetStatus.getAverageTimeRecordProcessing(), endTimeProcess - startTimeProcess);
+          datasetStatus.getAverageTimeRecordProcessing(), elapsedTime);
       datasetStatus.setAverageTimeRecordProcessing(newAverage);
+      datasetStatus.setTotalTimeProcessing(datasetStatus.getTotalTimeProcessing() + elapsedTime);
     }
   }
 
@@ -135,9 +137,11 @@ public class ReprocessForDataset implements Callable<Void> {
           .accept(rdf, true, basicConfiguration);
     } finally {
       final long endTimeIndex = System.nanoTime();
+      final long elapsedTime = endTimeIndex - startTimeIndex;
       final long newAverage = addValueToAverage(datasetStatus.getTotalProcessed() + 1,
-          datasetStatus.getAverageTimeRecordIndexing(), endTimeIndex - startTimeIndex);
+          datasetStatus.getAverageTimeRecordIndexing(), elapsedTime);
       datasetStatus.setAverageTimeRecordIndexing(newAverage);
+      datasetStatus.setTotalTimeIndexing(datasetStatus.getTotalTimeIndexing() + elapsedTime);
     }
   }
 
