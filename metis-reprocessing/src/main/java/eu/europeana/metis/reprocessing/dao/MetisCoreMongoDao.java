@@ -3,7 +3,9 @@ package eu.europeana.metis.reprocessing.dao;
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 
 import com.mongodb.MongoClient;
+import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
@@ -28,6 +30,7 @@ public class MetisCoreMongoDao {
   private static final String DATASET_ID = "datasetId";
   private final MongoInitializer metisCoreMongoInitializer;
   private Datastore metisCoreDatastore;
+  private final WorkflowExecutionDao workflowExecutionDao;
   private PropertiesHolder propertiesHolder;
 
   public MetisCoreMongoDao(PropertiesHolder propertiesHolder)
@@ -36,6 +39,10 @@ public class MetisCoreMongoDao {
     metisCoreMongoInitializer = prepareMetisCoreConfiguration();
     metisCoreDatastore = createMetisCoreDatastore(metisCoreMongoInitializer.getMongoClient(),
         propertiesHolder.metisCoreMongoDb);
+
+    final MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProvider(
+        metisCoreMongoInitializer.getMongoClient(), propertiesHolder.metisCoreMongoDb);
+    workflowExecutionDao = new WorkflowExecutionDao(morphiaDatastoreProvider);
   }
 
   public List<String> getAllDatasetIdsOrdered() {
@@ -45,6 +52,12 @@ public class MetisCoreMongoDao {
     final List<Dataset> datasets = ExternalRequestUtil
         .retryableExternalRequestConnectionReset(query::asList);
     return datasets.stream().map(Dataset::getDatasetId).collect(Collectors.toList());
+  }
+
+  public Dataset getDataset(String datasetId) {
+    return ExternalRequestUtil
+        .retryableExternalRequestConnectionReset(
+            () -> metisCoreDatastore.find(Dataset.class).filter(DATASET_ID, datasetId).get());
   }
 
   private MongoInitializer prepareMetisCoreConfiguration()
@@ -73,6 +86,10 @@ public class MetisCoreMongoDao {
     Morphia morphia = new Morphia();
     morphia.map(Dataset.class);
     return morphia.createDatastore(mongoClient, databaseName);
+  }
+
+  public WorkflowExecutionDao getWorkflowExecutionDao() {
+    return workflowExecutionDao;
   }
 
   public void close() {

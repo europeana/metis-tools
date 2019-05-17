@@ -5,6 +5,7 @@ import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.SetupRelatedIndexingException;
+import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
@@ -12,6 +13,7 @@ import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ public class BasicConfiguration {
   private final MongoSourceMongoDao mongoSourceMongoDao;
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
   private final Indexer indexer;
+  private final List<ExecutablePluginType> invalidatePluginTypes;
   private ExtraConfiguration extraConfiguration;
 
   public BasicConfiguration(PropertiesHolder propertiesHolder)
@@ -45,6 +48,7 @@ public class BasicConfiguration {
     prepareZookeeperSettings(indexingSettings);
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
     indexer = indexerFactory.getIndexer();
+    invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
 
   public MetisCoreMongoDao getMetisCoreMongoDao() {
@@ -130,6 +134,10 @@ public class BasicConfiguration {
         .setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
     indexingSettings
         .setZookeeperDefaultCollection(propertiesHolder.destinationZookeeperDefaultCollection);
+  }
+
+  public List<ExecutablePluginType> getInvalidatePluginTypes() {
+    return invalidatePluginTypes;
   }
 
   void close() {

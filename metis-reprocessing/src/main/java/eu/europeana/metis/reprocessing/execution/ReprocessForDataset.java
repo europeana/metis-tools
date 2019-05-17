@@ -5,12 +5,29 @@ import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.STATIST
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.metis.core.dao.WorkflowExecutionDao;
+import eu.europeana.metis.core.dataset.Dataset;
+import eu.europeana.metis.core.workflow.WorkflowExecution;
+import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
+import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.DataStatus;
+import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
+import eu.europeana.metis.core.workflow.plugins.PluginStatus;
+import eu.europeana.metis.core.workflow.plugins.ReindexToPreviewPlugin;
+import eu.europeana.metis.core.workflow.plugins.ReindexToPreviewPluginMetadata;
+import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPlugin;
+import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPluginMetadata;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
-import eu.europeana.metis.reprocessing.exception.ProcessingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +91,7 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private void loopOverAllRecordsAndProcess(final DatasetStatus datasetStatus) {
+    Date startedDate = new Date();
     int nextPage = getNextPage(datasetStatus);
     List<FullBeanImpl> nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
         .getNextPageOfRecords(datasetId, nextPage);
@@ -88,7 +106,7 @@ public class ReprocessForDataset implements Callable<Void> {
       nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
           .getNextPageOfRecords(datasetId, nextPage);
     }
-    // TODO: 16-5-19 Create all relative information about the reindexing workflow in metis-core
+    updateMetisCoreWorkflowExecutions(startedDate);
   }
 
   private void processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean) {
@@ -147,5 +165,53 @@ public class ReprocessForDataset implements Callable<Void> {
 
   private long addValueToAverage(long totalSamples, long oldAverage, long newValue) {
     return oldAverage + ((newValue - oldAverage) / totalSamples);
+  }
+
+  private void updateMetisCoreWorkflowExecutions(Date startedDate) {
+    createReindexWorkflowExecutions(startedDate);
+    setInvalidFlagToPlugins();
+  }
+
+  private void setInvalidFlagToPlugins() {
+    final List<ExecutablePluginType> invalidatePluginTypes = basicConfiguration
+        .getInvalidatePluginTypes();
+    final WorkflowExecutionDao workflowExecutionDao = basicConfiguration.getMetisCoreMongoDao()
+        .getWorkflowExecutionDao();
+    final List<AbstractExecutablePlugin> deprecatedPlugins = invalidatePluginTypes.stream()
+        .map(executablePluginType -> workflowExecutionDao
+            .getLastFinishedWorkflowExecutionPluginByDatasetIdAndPluginType(datasetId,
+                Collections.singleton(executablePluginType), false)).collect(Collectors.toList());
+
+    deprecatedPlugins.stream().map(abstractExecutablePlugin -> {
+      final WorkflowExecution workflowExecution = workflowExecutionDao
+          .getByExternalTaskId(Long.parseLong(abstractExecutablePlugin.getExternalTaskId()));
+      final Optional<AbstractMetisPlugin> metisPluginWithType = workflowExecution
+          .getMetisPluginWithType(abstractExecutablePlugin.getPluginType());
+      metisPluginWithType.ifPresent(
+          abstractMetisPlugin -> ((AbstractExecutablePlugin) abstractMetisPlugin)
+              .setDataStatus(DataStatus.DEPRECATED));
+      return workflowExecution;
+    }).forEach(workflowExecutionDao::update);
+  }
+
+  private void createReindexWorkflowExecutions(Date startedDate) {
+    final Date finishedDate = new Date();
+    final ReindexToPreviewPlugin reindexToPreviewPlugin = new ReindexToPreviewPlugin(
+        new ReindexToPreviewPluginMetadata());
+    reindexToPreviewPlugin.setStartedDate(startedDate);
+    reindexToPreviewPlugin.setFinishedDate(finishedDate);
+    reindexToPreviewPlugin.setPluginStatus(PluginStatus.FINISHED);
+    final ReindexToPublishPlugin reindexToPublishPlugin = new ReindexToPublishPlugin(
+        new ReindexToPublishPluginMetadata());
+    reindexToPublishPlugin.setStartedDate(startedDate);
+    reindexToPublishPlugin.setFinishedDate(finishedDate);
+    reindexToPublishPlugin.setPluginStatus(PluginStatus.FINISHED);
+    final Dataset dataset = basicConfiguration.getMetisCoreMongoDao().getDataset(datasetId);
+    final ArrayList<AbstractMetisPlugin> abstractMetisPlugins = new ArrayList<>();
+    abstractMetisPlugins.add(reindexToPreviewPlugin);
+    abstractMetisPlugins.add(reindexToPublishPlugin);
+    final WorkflowExecution workflowExecution = new WorkflowExecution(dataset, abstractMetisPlugins,
+        0);
+    basicConfiguration.getMetisCoreMongoDao().getWorkflowExecutionDao().create(workflowExecution);
   }
 }

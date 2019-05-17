@@ -1,11 +1,14 @@
 package eu.europeana.metis.reprocessing.utilities;
 
+import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -29,6 +32,7 @@ public class PropertiesHolder {
   public final int startFromDatasetIndex;
   public final int endAtDatasetIndex;
   public final int sourceMongoPageSize;
+  public final List<ExecutablePluginType> invalidatePluginTypes;
 
   //Metis Core Mongo
   public final String truststorePath;
@@ -91,6 +95,10 @@ public class PropertiesHolder {
     startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
     endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
+    invalidatePluginTypes = Arrays
+        .stream(properties.getProperty("invalidate.plugin.types").split(","))
+        .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(
+            Collectors.toList());
 
     //Metis Core Mongo
     truststorePath = properties.getProperty("truststore.path");

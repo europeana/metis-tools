@@ -2,6 +2,7 @@ max.parallel.threads=
 start.from.dataset.index=
 end.at.dataset.index=
 source.mongo.page.size=
+invalidate.plugin.types=
 
 #Truststore
 truststore.path=
