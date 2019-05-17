@@ -76,6 +76,12 @@
     </dependency>
 
     <dependency>
+      <groupId>eu.europeana.metis</groupId>
+      <artifactId>metis-indexing</artifactId>
+      <version>${version.metis}</version>
+    </dependency>
+
+    <dependency>
       <groupId>eu.europeana.corelib</groupId>
       <artifactId>corelib-storage</artifactId>
       <version>${version.corelib}</version>

@@ -56,6 +56,12 @@ public class PropertiesHolder {
   public final String destinationMongoPassword;
   public final boolean destinationMongoEnablessl;
   public final String destinationMongoDb;
+  //Solr/Zookeeper Destination
+  public final String[] destinationSolrHosts;
+  public final String[] destinationZookeeperHosts;
+  public final int[] destinationZookeeperPorts;
+  public final String destinationZookeeperChroot;
+  public final String destinationZookeeperDefaultCollection;
 
   private final PropertiesHolderExtension propertiesHolderExtension;
 
@@ -117,6 +123,14 @@ public class PropertiesHolder {
     destinationMongoPassword = properties.getProperty("mongo.destination.password");
     destinationMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
+
+    //Solr/Zookeeper Destination
+    destinationSolrHosts = properties.getProperty("solr.destination.hosts").split(",");
+    destinationZookeeperHosts = properties.getProperty("zookeeper.destination.hosts").split(",");
+    destinationZookeeperPorts = Arrays.stream(properties.getProperty("zookeeper.destination.port").split(","))
+        .mapToInt(Integer::parseInt).toArray();
+    destinationZookeeperChroot = properties.getProperty("zookeeper.destination.chroot");
+    destinationZookeeperDefaultCollection = properties.getProperty("zookeeper.destination.defaultCollection");
 
     this.propertiesHolderExtension = new PropertiesHolderExtension(properties);
   }

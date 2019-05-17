@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.execution;
 
+import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
@@ -100,12 +101,10 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private void processRecord(FullBeanImpl fullBean) {
-    basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
-        .accept(fullBean, basicConfiguration);
-//    ProcessingUtilities.updateTechnicalMetadata(fullBean, mongoDao, amazonS3Client, s3Bucket);
-//    ProcessingUtilities.tierCalculation(fullBean);
+    final RDF resultRDF = basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
+        .apply(fullBean, basicConfiguration);
   }
 
-  private void indexRecord(FullBeanImpl fullBean) {
+  private void indexRecord(RDF rdf) {
   }
 }

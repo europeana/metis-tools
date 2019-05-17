@@ -3,12 +3,15 @@ package eu.europeana.metis.reprocessing.model;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.reprocessing.dao.CacheMongoDao;
 import eu.europeana.metis.reprocessing.execution.ProcessingUtilities;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
-import org.apache.logging.log4j.util.BiConsumer;
+import java.util.function.BiFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -16,10 +19,12 @@ import org.apache.logging.log4j.util.BiConsumer;
  */
 public class ExtraConfiguration {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ExtraConfiguration.class);
+
   private final CacheMongoDao cacheMongoDao;
   private final AmazonS3 amazonS3Client;
   private final String s3Bucket;
-  private final BiConsumer<FullBeanImpl, BasicConfiguration> fullBeanProcessor;
+  private final BiFunction<FullBeanImpl, BasicConfiguration, RDF> fullBeanProcessor;
 
   public ExtraConfiguration(PropertiesHolder propertiesHolder) {
     final PropertiesHolderExtension propertiesHolderExtension = propertiesHolder
@@ -48,7 +53,7 @@ public class ExtraConfiguration {
     return s3Bucket;
   }
 
-  public BiConsumer<FullBeanImpl, BasicConfiguration> getFullBeanProcessor() {
+  public BiFunction<FullBeanImpl, BasicConfiguration, RDF> getFullBeanProcessor() {
     return fullBeanProcessor;
   }
 

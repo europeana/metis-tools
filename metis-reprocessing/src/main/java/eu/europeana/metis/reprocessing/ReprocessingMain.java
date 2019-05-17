@@ -2,10 +2,12 @@ package eu.europeana.metis.reprocessing;
 
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 
+import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.execution.ExecutorManager;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import java.net.URISyntaxException;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,7 @@ public class ReprocessingMain {
       CONFIGURATION_FILE);
 
   public static void main(String[] args)
-      throws TrustStoreConfigurationException, InterruptedException {
+      throws TrustStoreConfigurationException, InterruptedException, IndexingException, URISyntaxException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script");
 
     final BasicConfiguration basicConfiguration = new BasicConfiguration(propertiesHolder);
