@@ -98,9 +98,23 @@ public class ReprocessForDataset implements Callable<Void> {
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
           nextPageOfRecords.size());
+      final long totalProcessedOld = datasetStatus.getTotalProcessed();
+      final long totalTimeProcessingBefore = datasetStatus.getTotalTimeProcessing();
+      final long totalTimeIndexingBefore = datasetStatus.getTotalTimeIndexing();
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         processAndIndex(datasetStatus, fullBean);
       }
+      final long totalProcessedNew = datasetStatus.getTotalProcessed();
+      final long totalTimeProcessingAfter = datasetStatus.getTotalTimeProcessing();
+      final long totalTimeIndexingAfter = datasetStatus.getTotalTimeIndexing();
+      final long newAverageProcessing = updateAverageWithNewValues(
+          datasetStatus.getAverageTimeRecordProcessing(), totalProcessedOld,
+          totalTimeProcessingAfter - totalTimeProcessingBefore, totalProcessedNew);
+      final long newAverageIndexing = updateAverageWithNewValues(
+          datasetStatus.getAverageTimeRecordIndexing(), totalProcessedOld,
+          totalTimeIndexingAfter - totalTimeIndexingBefore, totalProcessedNew);
+      datasetStatus.setAverageTimeRecordProcessing(newAverageProcessing);
+      datasetStatus.setAverageTimeRecordIndexing(newAverageIndexing);
       basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
       nextPage++;
       nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
@@ -140,9 +154,6 @@ public class ReprocessForDataset implements Callable<Void> {
     } finally {
       final long endTimeProcess = System.nanoTime();
       final long elapsedTime = endTimeProcess - startTimeProcess;
-      final long newAverage = addValueToAverage(datasetStatus.getTotalProcessed() + 1,
-          datasetStatus.getAverageTimeRecordProcessing(), elapsedTime);
-      datasetStatus.setAverageTimeRecordProcessing(newAverage);
       datasetStatus.setTotalTimeProcessing(datasetStatus.getTotalTimeProcessing() + elapsedTime);
     }
   }
@@ -156,15 +167,14 @@ public class ReprocessForDataset implements Callable<Void> {
     } finally {
       final long endTimeIndex = System.nanoTime();
       final long elapsedTime = endTimeIndex - startTimeIndex;
-      final long newAverage = addValueToAverage(datasetStatus.getTotalProcessed() + 1,
-          datasetStatus.getAverageTimeRecordIndexing(), elapsedTime);
-      datasetStatus.setAverageTimeRecordIndexing(newAverage);
       datasetStatus.setTotalTimeIndexing(datasetStatus.getTotalTimeIndexing() + elapsedTime);
     }
   }
 
-  private long addValueToAverage(long totalSamples, long oldAverage, long newValue) {
-    return oldAverage + ((newValue - oldAverage) / totalSamples);
+  private long updateAverageWithNewValues(long oldAverage, long oldTotalSamples,
+      long sumOfNewValues,
+      long newNumberOfSamples) {
+    return (oldAverage * oldTotalSamples + sumOfNewValues) / oldTotalSamples + newNumberOfSamples;
   }
 
   private void updateMetisCoreWorkflowExecutions(Date startedDate) {
