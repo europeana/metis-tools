@@ -38,6 +38,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -66,7 +67,8 @@ public class ProcessingUtilities {
         //Get all urls that should have webResources
         List<String> urlsForWebResources = Stream
             .of(aggregation.getEdmObject(), aggregation.getEdmIsShownAt(),
-                aggregation.getEdmIsShownBy()).collect(Collectors.toList());
+                aggregation.getEdmIsShownBy()).filter(Objects::nonNull)
+            .collect(Collectors.toList());
         for (String resourceUrl : urlsForWebResources) {
           technicalMetadataForResource(mongoSourceMongoDao, enrichedRdf, resourceUrl,
               extraConfiguration.getCacheMongoDao(), extraConfiguration.getAmazonS3Client(),

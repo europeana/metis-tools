@@ -3,6 +3,7 @@ package eu.europeana.metis.reprocessing.model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import eu.europeana.metis.core.workflow.HasMongoObjectId;
 import eu.europeana.metis.json.ObjectIdSerializer;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import org.bson.types.ObjectId;
@@ -22,6 +23,8 @@ public class DatasetStatus implements HasMongoObjectId {
 
   @Indexed(options = @IndexOptions(unique = true))
   private String datasetId;
+  private Date startDate;
+  private Date endDate;
   private long totalRecords;
   private long totalProcessed;
   private long totalFailedRecords;
@@ -51,6 +54,22 @@ public class DatasetStatus implements HasMongoObjectId {
 
   public void setDatasetId(String datasetId) {
     this.datasetId = datasetId;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
+
+  public Date getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(Date endDate) {
+    this.endDate = endDate;
   }
 
   public long getTotalRecords() {

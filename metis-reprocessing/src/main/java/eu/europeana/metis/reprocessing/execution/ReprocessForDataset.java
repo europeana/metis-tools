@@ -91,8 +91,8 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private void loopOverAllRecordsAndProcess(final DatasetStatus datasetStatus) {
-    Date startedDate = new Date();
     int nextPage = getNextPage(datasetStatus);
+    datasetStatus.setStartDate(new Date());
     List<FullBeanImpl> nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
         .getNextPageOfRecords(datasetId, nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
@@ -104,6 +104,8 @@ public class ReprocessForDataset implements Callable<Void> {
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         processAndIndex(datasetStatus, fullBean);
       }
+      LOGGER.info("{} - Processed number of records: {} out of total number of records: {}",
+          prefixDatasetidLog, datasetStatus.getTotalProcessed(), datasetStatus.getTotalRecords());
       final long totalProcessedNew = datasetStatus.getTotalProcessed();
       final long totalTimeProcessingAfter = datasetStatus.getTotalTimeProcessing();
       final long totalTimeIndexingAfter = datasetStatus.getTotalTimeIndexing();
@@ -120,7 +122,10 @@ public class ReprocessForDataset implements Callable<Void> {
       nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
           .getNextPageOfRecords(datasetId, nextPage);
     }
-    updateMetisCoreWorkflowExecutions(startedDate);
+    //Set End Date
+    datasetStatus.setEndDate(new Date());
+    basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+//    updateMetisCoreWorkflowExecutions(startedDate);
   }
 
   private void processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean) {
@@ -174,7 +179,7 @@ public class ReprocessForDataset implements Callable<Void> {
   private long updateAverageWithNewValues(long oldAverage, long oldTotalSamples,
       long sumOfNewValues,
       long newNumberOfSamples) {
-    return (oldAverage * oldTotalSamples + sumOfNewValues) / oldTotalSamples + newNumberOfSamples;
+    return (oldAverage * oldTotalSamples + sumOfNewValues) / (oldTotalSamples + newNumberOfSamples);
   }
 
   private void updateMetisCoreWorkflowExecutions(Date startedDate) {
