@@ -2,7 +2,9 @@ max.parallel.threads=
 start.from.dataset.index=
 end.at.dataset.index=
 source.mongo.page.size=
+mode=DEFAULT
 invalidate.plugin.types=
+reprocess.based.on.plugin.type=
 
 #Truststore
 truststore.path=
