@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import eu.europeana.metis.core.workflow.HasMongoObjectId;
 import eu.europeana.metis.json.ObjectIdSerializer;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.IndexOptions;
@@ -28,7 +26,6 @@ public class DatasetStatus implements HasMongoObjectId {
   private long totalRecords;
   private long totalProcessed;
   private long totalFailedRecords;
-  private final Set<String> failedRecordsSet = new HashSet<>();
   private long totalTimeProcessing;
   private long totalTimeIndexing;
   private long averageTimeRecordProcessing;
@@ -96,10 +93,6 @@ public class DatasetStatus implements HasMongoObjectId {
     this.totalFailedRecords = totalFailedRecords;
   }
 
-  public Set<String> getFailedRecordsSet() {
-    return failedRecordsSet;
-  }
-
   public long getAverageTimeRecordProcessing() {
     return averageTimeRecordProcessing;
   }
@@ -146,9 +139,9 @@ public class DatasetStatus implements HasMongoObjectId {
     final double totalTimeIndexingInSeconds = nanoTimeToSeconds(totalTimeIndexing);
     return String.format(
         "ObjectId: %s, datasetId: %s, totalRecords: %d, totalProcessed: %d, totalFailedRecords: %d, "
-            + "failedRecordsSetSize: %d, totalTimeProcessing: %fs = %fh, totalTimeIndexing: %fs = %fh, "
+            + "totalTimeProcessing: %fs = %fh, totalTimeIndexing: %fs = %fh, "
             + "averageTimeRecordProcessing: %fs, averageTimeRecordIndexing: %fs",
-        id, datasetId, totalRecords, totalProcessed, totalFailedRecords, failedRecordsSet.size(),
+        id, datasetId, totalRecords, totalProcessed, totalFailedRecords,
         totalTimeProcessingInSeconds, secondsTimeToHours(totalTimeProcessingInSeconds),
         totalTimeIndexingInSeconds, secondsTimeToHours(totalTimeIndexingInSeconds),
         nanoTimeToSeconds(averageTimeRecordProcessing),

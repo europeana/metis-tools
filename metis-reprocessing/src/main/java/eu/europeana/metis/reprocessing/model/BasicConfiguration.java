@@ -33,6 +33,7 @@ public class BasicConfiguration {
   private final MongoSourceMongoDao mongoSourceMongoDao;
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
   private final Indexer indexer;
+  private final Mode mode;
   private final List<ExecutablePluginType> invalidatePluginTypes;
   private ExtraConfiguration extraConfiguration;
 
@@ -49,6 +50,7 @@ public class BasicConfiguration {
     prepareZookeeperSettings(indexingSettings);
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
     indexer = indexerFactory.getIndexer();
+    mode = propertiesHolder.mode;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
 
@@ -135,6 +137,10 @@ public class BasicConfiguration {
         .setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
     indexingSettings
         .setZookeeperDefaultCollection(propertiesHolder.destinationZookeeperDefaultCollection);
+  }
+
+  public Mode getMode() {
+    return mode;
   }
 
   public List<ExecutablePluginType> getInvalidatePluginTypes() {

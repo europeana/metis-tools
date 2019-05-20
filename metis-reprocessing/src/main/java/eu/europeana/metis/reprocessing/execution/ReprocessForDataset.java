@@ -21,6 +21,8 @@ import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
+import eu.europeana.metis.reprocessing.model.FailedRecord;
+import eu.europeana.metis.reprocessing.model.Mode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -41,12 +43,14 @@ public class ReprocessForDataset implements Callable<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReprocessForDataset.class);
   private final String prefixDatasetidLog;
   private final String datasetId;
+  private final DatasetStatus datasetStatus;
   private final BasicConfiguration basicConfiguration;
 
   public ReprocessForDataset(String datasetId, BasicConfiguration basicConfiguration) {
     this.datasetId = datasetId;
     this.basicConfiguration = basicConfiguration;
     this.prefixDatasetidLog = String.format("DatasetId: %s", this.datasetId);
+    this.datasetStatus = retrieveOrInitializeDatasetStatus();
   }
 
   @Override
@@ -55,15 +59,19 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private Void reprocessDataset() {
-    LOGGER.info("Processing DatasetId: {} started", datasetId);
-    final DatasetStatus datasetStatus = retrieveOrInitializeDatasetStatus();
-    if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
-      LOGGER
-          .info("{} - Processing not started because it was already completely processed",
-              prefixDatasetidLog);
+    LOGGER.info("{}, Processing started", prefixDatasetidLog);
+    boolean processFailedOnly = datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()
+        && basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED;
+    if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()
+        && basicConfiguration.getMode() == Mode.DEFAULT) {
+      LOGGER.info("{} - Processing not started because it was already completely processed",
+          prefixDatasetidLog);
       return null;
+    } else if (processFailedOnly) {
+      LOGGER.info("{} - Processing will happen only on previously failed records",
+          prefixDatasetidLog);
     }
-    loopOverAllRecordsAndProcess(datasetStatus);
+    loopOverAllRecordsAndProcess(datasetStatus, processFailedOnly);
     LOGGER.info("{} - Processing end", prefixDatasetidLog);
     LOGGER.info("{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);
     LOGGER.info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog,
@@ -72,29 +80,60 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private DatasetStatus retrieveOrInitializeDatasetStatus() {
-    DatasetStatus datasetStatus = basicConfiguration.getMongoDestinationMongoDao()
+    DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
         .getDatasetStatus(datasetId);
-    if (datasetStatus == null) {
-      datasetStatus = new DatasetStatus();
+    if (retrievedDatasetStatus == null) {
+      retrievedDatasetStatus = new DatasetStatus();
       final long totalRecordsForDataset = basicConfiguration.getMongoSourceMongoDao()
           .getTotalRecordsForDataset(datasetId);
-      datasetStatus.setDatasetId(datasetId);
-      datasetStatus.setTotalRecords(totalRecordsForDataset);
-      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+      retrievedDatasetStatus.setDatasetId(datasetId);
+      retrievedDatasetStatus.setTotalRecords(totalRecordsForDataset);
+      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(retrievedDatasetStatus);
     }
-    return datasetStatus;
+    return retrievedDatasetStatus;
   }
 
-  private int getNextPage(DatasetStatus datasetStatus) {
-    final long totalProcessed = datasetStatus.getTotalProcessed();
-    return (int) (totalProcessed / MongoSourceMongoDao.PAGE_SIZE);
+  private int getStartingNextPage(DatasetStatus datasetStatus, boolean processFailedOnly) {
+    if (processFailedOnly) {
+      //Always start from the beginning
+      return 0;
+    } else {
+      final long totalProcessed = datasetStatus.getTotalProcessed();
+      return (int) (totalProcessed / MongoSourceMongoDao.PAGE_SIZE);
+    }
   }
 
-  private void loopOverAllRecordsAndProcess(final DatasetStatus datasetStatus) {
-    int nextPage = getNextPage(datasetStatus);
-    datasetStatus.setStartDate(new Date());
-    List<FullBeanImpl> nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
-        .getNextPageOfRecords(datasetId, nextPage);
+  private void loopOverAllRecordsAndProcess(final DatasetStatus datasetStatus,
+      boolean processFailedOnly) {
+    int nextPage = getStartingNextPage(datasetStatus, processFailedOnly);
+    if (!processFailedOnly) {
+      datasetStatus.setStartDate(new Date());
+    }
+    if (processFailedOnly) {
+      failedRecordsOperation(datasetStatus, nextPage);
+    } else {
+      defaultOperation(datasetStatus, nextPage);
+    }
+  }
+
+  private void failedRecordsOperation(DatasetStatus datasetStatus, int nextPage) {
+    final long totalFailedRecords = datasetStatus.getTotalFailedRecords();
+    List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage, true);
+    while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
+      LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
+          nextPageOfRecords.size());
+      for (FullBeanImpl fullBean : nextPageOfRecords) {
+        processAndIndex(datasetStatus, fullBean, true);
+      }
+      LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
+          prefixDatasetidLog, nextPageOfRecords.size(), totalFailedRecords);
+      nextPage++;
+      nextPageOfRecords = getFullBeans(nextPage, true);
+    }
+  }
+
+  private void defaultOperation(DatasetStatus datasetStatus, int nextPage) {
+    List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage, false);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
           nextPageOfRecords.size());
@@ -102,7 +141,7 @@ public class ReprocessForDataset implements Callable<Void> {
       final long totalTimeProcessingBefore = datasetStatus.getTotalTimeProcessing();
       final long totalTimeIndexingBefore = datasetStatus.getTotalTimeIndexing();
       for (FullBeanImpl fullBean : nextPageOfRecords) {
-        processAndIndex(datasetStatus, fullBean);
+        processAndIndex(datasetStatus, fullBean, false);
       }
       LOGGER.info("{} - Processed number of records: {} out of total number of records: {}",
           prefixDatasetidLog, datasetStatus.getTotalProcessed(), datasetStatus.getTotalRecords());
@@ -119,8 +158,7 @@ public class ReprocessForDataset implements Callable<Void> {
       datasetStatus.setAverageTimeRecordIndexing(newAverageIndexing);
       basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
       nextPage++;
-      nextPageOfRecords = basicConfiguration.getMongoSourceMongoDao()
-          .getNextPageOfRecords(datasetId, nextPage);
+      nextPageOfRecords = getFullBeans(nextPage, false);
     }
     //Set End Date
     datasetStatus.setEndDate(new Date());
@@ -128,10 +166,31 @@ public class ReprocessForDataset implements Callable<Void> {
 //    updateMetisCoreWorkflowExecutions(startedDate);
   }
 
-  private void processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean) {
+  private List<FullBeanImpl> getFullBeans(int nextPage, boolean processFailedOnly) {
+    if (processFailedOnly) {
+      final List<FailedRecord> nextPageOfFailedRecords = basicConfiguration
+          .getMongoDestinationMongoDao().getNextPageOfFailedRecords(datasetId, nextPage);
+      final List<String> failedRecordsUrls = nextPageOfFailedRecords.stream()
+          .map(FailedRecord::getFailedUrl)
+          .collect(Collectors.toList());
+      return basicConfiguration.getMongoSourceMongoDao().getRecordsFromList(failedRecordsUrls);
+    } else {
+      return basicConfiguration.getMongoSourceMongoDao()
+          .getNextPageOfRecords(datasetId, nextPage);
+    }
+  }
+
+  private void processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean,
+      boolean processFailedOnly) {
     try {
       final RDF rdf = processRecord(fullBean, datasetStatus);
       indexRecord(rdf, datasetStatus);
+      if (processFailedOnly && fullBean.getAbout() != null) {
+        basicConfiguration.getMongoDestinationMongoDao()
+            .deleteFailedRecord(new FailedRecord(fullBean.getAbout()));
+        datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() - 1);
+        basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+      }
     } catch (ProcessingException | IndexingException e) {
       String stepString;
       if (e instanceof ProcessingException) {
@@ -142,11 +201,16 @@ public class ReprocessForDataset implements Callable<Void> {
       LOGGER.error("{} - Could not {} record: {}", prefixDatasetidLog, stepString,
           fullBean.getAbout(), e);
       if (fullBean.getAbout() != null) {
-        datasetStatus.getFailedRecordsSet().add(fullBean.getAbout());
-        datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
+        basicConfiguration.getMongoDestinationMongoDao()
+            .storeFailedRecordToDb(new FailedRecord(fullBean.getAbout()));
+        if (!processFailedOnly) {
+          datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
+        }
       }
     } finally {
-      datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
+      if (!processFailedOnly) {
+        datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
+      }
     }
   }
 

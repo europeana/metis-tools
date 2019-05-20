@@ -1,6 +1,7 @@
 package eu.europeana.metis.reprocessing.utilities;
 
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
+import eu.europeana.metis.reprocessing.model.Mode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class PropertiesHolder {
   public final int startFromDatasetIndex;
   public final int endAtDatasetIndex;
   public final int sourceMongoPageSize;
+  public final Mode mode;
   public final List<ExecutablePluginType> invalidatePluginTypes;
 
   //Metis Core Mongo
@@ -95,6 +97,7 @@ public class PropertiesHolder {
     startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
     endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
+    mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
     invalidatePluginTypes = Arrays
         .stream(properties.getProperty("invalidate.plugin.types").split(","))
         .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(

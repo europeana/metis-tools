@@ -20,6 +20,7 @@ import eu.europeana.metis.core.workflow.OrderField;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.ExternalRequestUtil;
+import java.util.ArrayList;
 import java.util.List;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -55,6 +56,16 @@ public class MongoSourceMongoDao {
     query.order(OrderField.ID.getOrderFieldName());
     return ExternalRequestUtil.retryableExternalRequestConnectionReset(() -> query.asList(
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE)));
+  }
+
+  public List<FullBeanImpl> getRecordsFromList(List<String> recordIds) {
+    List<FullBeanImpl> fullBeans = new ArrayList<>();
+    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
+    recordIds.forEach(recordId -> {
+      query.field("about").equal(recordId);
+      fullBeans.add(ExternalRequestUtil.retryableExternalRequestConnectionReset(query::get));
+    });
+    return fullBeans;
   }
 
   public long getTotalRecordsForDataset(String datasetId) {
