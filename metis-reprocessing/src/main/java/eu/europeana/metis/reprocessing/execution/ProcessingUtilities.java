@@ -65,10 +65,14 @@ public class ProcessingUtilities {
 
       for (AggregationImpl aggregation : fullBean.getAggregations()) {
         //Get all urls that should have webResources
-        List<String> urlsForWebResources = Stream
+        final Stream<String> urlsStream = Stream
             .of(aggregation.getEdmObject(), aggregation.getEdmIsShownAt(),
-                aggregation.getEdmIsShownBy()).filter(Objects::nonNull)
-            .collect(Collectors.toList());
+                aggregation.getEdmIsShownBy());
+        final Stream<String> hasViewStream =
+            aggregation.getHasView() != null ? Arrays.stream(aggregation.getHasView())
+                : Stream.empty();
+        List<String> urlsForWebResources = Stream.concat(urlsStream, hasViewStream)
+            .filter(Objects::nonNull).collect(Collectors.toList());
         for (String resourceUrl : urlsForWebResources) {
           technicalMetadataForResource(mongoSourceMongoDao, enrichedRdf, resourceUrl,
               extraConfiguration.getCacheMongoDao(), extraConfiguration.getAmazonS3Client(),
