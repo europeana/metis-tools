@@ -46,11 +46,11 @@ public class ExecutorManager {
     int threadCounter = 0;
     int processedDatasets = 0;
 
-    for (int i = startFromDatasetIndex; i <= endAtDatasetIndex; i++) {
+    for (int i = startFromDatasetIndex; i < endAtDatasetIndex; i++) {
       String datasetId = allDatasetIds.get(i);
       // TODO: 17-5-19 remove the below line
       datasetId = "2048716";
-      final ReprocessForDataset reprocessForDataset = new ReprocessForDataset(datasetId,
+      final ReprocessForDataset reprocessForDataset = new ReprocessForDataset(datasetId, i,
           basicConfiguration);
       if (threadCounter >= maxParallelThreads) {
         completionService.take();

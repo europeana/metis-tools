@@ -21,6 +21,7 @@ public class DatasetStatus implements HasMongoObjectId {
 
   @Indexed(options = @IndexOptions(unique = true))
   private String datasetId;
+  private int indexInOrderedList;
   private Date startDate;
   private Date endDate;
   private long totalRecords;
@@ -51,6 +52,14 @@ public class DatasetStatus implements HasMongoObjectId {
 
   public void setDatasetId(String datasetId) {
     this.datasetId = datasetId;
+  }
+
+  public int getIndexInOrderedList() {
+    return indexInOrderedList;
+  }
+
+  public void setIndexInOrderedList(int indexInOrderedList) {
+    this.indexInOrderedList = indexInOrderedList;
   }
 
   public Date getStartDate() {

@@ -48,11 +48,12 @@ public class ReprocessForDataset implements Callable<Void> {
   private final DatasetStatus datasetStatus;
   private final BasicConfiguration basicConfiguration;
 
-  public ReprocessForDataset(String datasetId, BasicConfiguration basicConfiguration) {
+  public ReprocessForDataset(String datasetId, int indexInOrderedList,
+      BasicConfiguration basicConfiguration) {
     this.datasetId = datasetId;
     this.basicConfiguration = basicConfiguration;
     this.prefixDatasetidLog = String.format("DatasetId: %s", this.datasetId);
-    this.datasetStatus = retrieveOrInitializeDatasetStatus();
+    this.datasetStatus = retrieveOrInitializeDatasetStatus(indexInOrderedList);
   }
 
   @Override
@@ -81,7 +82,7 @@ public class ReprocessForDataset implements Callable<Void> {
     return null;
   }
 
-  private DatasetStatus retrieveOrInitializeDatasetStatus() {
+  private DatasetStatus retrieveOrInitializeDatasetStatus(int indexInOrderedList) {
     DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
         .getDatasetStatus(datasetId);
     if (retrievedDatasetStatus == null) {
@@ -89,6 +90,7 @@ public class ReprocessForDataset implements Callable<Void> {
       final long totalRecordsForDataset = basicConfiguration.getMongoSourceMongoDao()
           .getTotalRecordsForDataset(datasetId);
       retrievedDatasetStatus.setDatasetId(datasetId);
+      retrievedDatasetStatus.setIndexInOrderedList(indexInOrderedList);
       retrievedDatasetStatus.setTotalRecords(totalRecordsForDataset);
       basicConfiguration.getMongoDestinationMongoDao()
           .storeDatasetStatusToDb(retrievedDatasetStatus);
@@ -284,9 +286,12 @@ public class ReprocessForDataset implements Callable<Void> {
 
     //Preview Plugin
     final ReindexToPreviewPluginMetadata reindexToPreviewPluginMetadata = new ReindexToPreviewPluginMetadata();
-    reindexToPreviewPluginMetadata.setRevisionNamePreviousPlugin(lastExecutionToBeBasedOn.getPluginType().name());
-    reindexToPreviewPluginMetadata.setRevisionTimestampPreviousPlugin(lastExecutionToBeBasedOn.getStartedDate());
-    final ReindexToPreviewPlugin reindexToPreviewPlugin = new ReindexToPreviewPlugin(reindexToPreviewPluginMetadata);
+    reindexToPreviewPluginMetadata
+        .setRevisionNamePreviousPlugin(lastExecutionToBeBasedOn.getPluginType().name());
+    reindexToPreviewPluginMetadata
+        .setRevisionTimestampPreviousPlugin(lastExecutionToBeBasedOn.getStartedDate());
+    final ReindexToPreviewPlugin reindexToPreviewPlugin = new ReindexToPreviewPlugin(
+        reindexToPreviewPluginMetadata);
     reindexToPreviewPlugin
         .setId(new ObjectId().toString() + "-" + reindexToPreviewPlugin.getPluginType().name());
     reindexToPreviewPlugin.setStartedDate(startDate);
@@ -295,9 +300,12 @@ public class ReprocessForDataset implements Callable<Void> {
 
     //Publish Plugin
     final ReindexToPublishPluginMetadata reindexToPublishPluginMetadata = new ReindexToPublishPluginMetadata();
-    reindexToPublishPluginMetadata.setRevisionNamePreviousPlugin(reindexToPreviewPlugin.getPluginType().name());
-    reindexToPublishPluginMetadata.setRevisionTimestampPreviousPlugin(reindexToPreviewPlugin.getStartedDate());
-    final ReindexToPublishPlugin reindexToPublishPlugin = new ReindexToPublishPlugin(reindexToPublishPluginMetadata);
+    reindexToPublishPluginMetadata
+        .setRevisionNamePreviousPlugin(reindexToPreviewPlugin.getPluginType().name());
+    reindexToPublishPluginMetadata
+        .setRevisionTimestampPreviousPlugin(reindexToPreviewPlugin.getStartedDate());
+    final ReindexToPublishPlugin reindexToPublishPlugin = new ReindexToPublishPlugin(
+        reindexToPublishPluginMetadata);
     reindexToPublishPlugin
         .setId(new ObjectId().toString() + "-" + reindexToPublishPlugin.getPluginType().name());
     reindexToPublishPlugin.setStartedDate(startDate);
