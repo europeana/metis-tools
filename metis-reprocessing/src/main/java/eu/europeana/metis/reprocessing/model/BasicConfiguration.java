@@ -10,6 +10,7 @@ import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -140,12 +141,13 @@ public class BasicConfiguration {
     return invalidatePluginTypes;
   }
 
-  void close() {
+  public void close() throws IOException {
     metisCoreMongoDao.close();
     mongoSourceMongoDao.close();
     mongoDestinationMongoDao.close();
     if (extraConfiguration != null) {
       extraConfiguration.close();
     }
+    indexer.close();
   }
 }
