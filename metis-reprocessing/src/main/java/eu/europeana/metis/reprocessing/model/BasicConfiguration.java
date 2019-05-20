@@ -35,6 +35,7 @@ public class BasicConfiguration {
   private final Indexer indexer;
   private final Mode mode;
   private final List<ExecutablePluginType> invalidatePluginTypes;
+  public final ExecutablePluginType reprocessBasedOnPluginType;
   private ExtraConfiguration extraConfiguration;
 
   public BasicConfiguration(PropertiesHolder propertiesHolder)
@@ -52,6 +53,7 @@ public class BasicConfiguration {
     indexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
+    reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
   }
 
   public MetisCoreMongoDao getMetisCoreMongoDao() {
@@ -145,6 +147,10 @@ public class BasicConfiguration {
 
   public List<ExecutablePluginType> getInvalidatePluginTypes() {
     return invalidatePluginTypes;
+  }
+
+  public ExecutablePluginType getReprocessBasedOnPluginType() {
+    return reprocessBasedOnPluginType;
   }
 
   public void close() throws IOException {

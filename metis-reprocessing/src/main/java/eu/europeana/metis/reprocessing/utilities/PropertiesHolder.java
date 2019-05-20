@@ -35,6 +35,7 @@ public class PropertiesHolder {
   public final int sourceMongoPageSize;
   public final Mode mode;
   public final List<ExecutablePluginType> invalidatePluginTypes;
+  public final ExecutablePluginType reprocessBasedOnPluginType;
 
   //Metis Core Mongo
   public final String truststorePath;
@@ -102,6 +103,8 @@ public class PropertiesHolder {
         .stream(properties.getProperty("invalidate.plugin.types").split(","))
         .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(
             Collectors.toList());
+    reprocessBasedOnPluginType = ExecutablePluginType
+        .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
 
     //Metis Core Mongo
     truststorePath = properties.getProperty("truststore.path");
@@ -112,7 +115,8 @@ public class PropertiesHolder {
     metisCoreMongoAuthenticationDb = properties.getProperty("mongo.metis.core.authentication.db");
     metisCoreMongoUsername = properties.getProperty("mongo.metis.core.username");
     metisCoreMongoPassword = properties.getProperty("mongo.metis.core.password");
-    metisCoreMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
+    metisCoreMongoEnablessl = Boolean
+        .parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
     metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
 
     //Mongo Source
@@ -127,21 +131,26 @@ public class PropertiesHolder {
 
     //Mongo Destination
     destinationMongoHosts = properties.getProperty("mongo.destination.hosts").split(",");
-    destinationMongoPorts = Arrays.stream(properties.getProperty("mongo.destination.port").split(","))
+    destinationMongoPorts = Arrays
+        .stream(properties.getProperty("mongo.destination.port").split(","))
         .mapToInt(Integer::parseInt).toArray();
-    destinationMongoAuthenticationDb = properties.getProperty("mongo.destination.authentication.db");
+    destinationMongoAuthenticationDb = properties
+        .getProperty("mongo.destination.authentication.db");
     destinationMongoUsername = properties.getProperty("mongo.destination.username");
     destinationMongoPassword = properties.getProperty("mongo.destination.password");
-    destinationMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
+    destinationMongoEnablessl = Boolean
+        .parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
 
     //Solr/Zookeeper Destination
     destinationSolrHosts = properties.getProperty("solr.destination.hosts").split(",");
     destinationZookeeperHosts = properties.getProperty("zookeeper.destination.hosts").split(",");
-    destinationZookeeperPorts = Arrays.stream(properties.getProperty("zookeeper.destination.port").split(","))
+    destinationZookeeperPorts = Arrays
+        .stream(properties.getProperty("zookeeper.destination.port").split(","))
         .mapToInt(Integer::parseInt).toArray();
     destinationZookeeperChroot = properties.getProperty("zookeeper.destination.chroot");
-    destinationZookeeperDefaultCollection = properties.getProperty("zookeeper.destination.defaultCollection");
+    destinationZookeeperDefaultCollection = properties
+        .getProperty("zookeeper.destination.defaultCollection");
 
     this.propertiesHolderExtension = new PropertiesHolderExtension(properties);
   }
