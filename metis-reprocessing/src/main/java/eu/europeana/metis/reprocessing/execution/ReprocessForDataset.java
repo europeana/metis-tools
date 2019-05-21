@@ -107,23 +107,23 @@ public class ReprocessForDataset implements Callable<Void> {
 
   private void failedRecordsOperation(DatasetStatus datasetStatus, int nextPage) {
     final long totalFailedRecords = datasetStatus.getTotalFailedRecords();
-    List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage, true);
+    List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
           nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final boolean successfulProcess = processAndIndex(datasetStatus, fullBean);
-        updateProcessCounts(successfulProcess, true, fullBean.getAbout());
+        updateProcessFailedOnlyCounts(successfulProcess, fullBean.getAbout());
       }
       LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
           prefixDatasetidLog, nextPageOfRecords.size(), totalFailedRecords);
       nextPage++;
-      nextPageOfRecords = getFullBeans(nextPage, true);
+      nextPageOfRecords = getFailedFullBeans(nextPage);
     }
   }
 
   private void defaultOperation(DatasetStatus datasetStatus, int nextPage) {
-    List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage, false);
+    List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
           nextPageOfRecords.size());
@@ -132,7 +132,7 @@ public class ReprocessForDataset implements Callable<Void> {
       final long totalTimeIndexingBefore = datasetStatus.getTotalTimeIndexing();
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final boolean successfulProcess = processAndIndex(datasetStatus, fullBean);
-        updateProcessCounts(successfulProcess, false, fullBean.getAbout());
+        updateProcessCounts(successfulProcess, fullBean.getAbout());
       }
       LOGGER.info("{} - Processed number of records: {} out of total number of records: {}",
           prefixDatasetidLog, datasetStatus.getTotalProcessed(), datasetStatus.getTotalRecords());
@@ -149,7 +149,7 @@ public class ReprocessForDataset implements Callable<Void> {
       datasetStatus.setAverageTimeRecordIndexing(newAverageIndexing);
       basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
       nextPage++;
-      nextPageOfRecords = getFullBeans(nextPage, false);
+      nextPageOfRecords = getFullBeans(nextPage);
     }
     //Set End Date
     datasetStatus.setEndDate(new Date());
@@ -161,6 +161,14 @@ public class ReprocessForDataset implements Callable<Void> {
     } catch (ProcessingException e) {
       LOGGER.error("{} - After reprocessing operation failed!", prefixDatasetidLog, e);
     }
+  }
+
+  private List<FullBeanImpl> getFailedFullBeans(int nextPage) {
+    return getFullBeans(nextPage, true);
+  }
+
+  private List<FullBeanImpl> getFullBeans(int nextPage) {
+    return getFullBeans(nextPage, false);
   }
 
   private List<FullBeanImpl> getFullBeans(int nextPage, boolean processFailedOnly) {
@@ -193,6 +201,14 @@ public class ReprocessForDataset implements Callable<Void> {
       return false;
     }
     return true;
+  }
+
+  private void updateProcessFailedOnlyCounts(boolean successfulProcess, String resourceId) {
+    updateProcessCounts(successfulProcess, true, resourceId);
+  }
+
+  private void updateProcessCounts(boolean successfulProcess, String resourceId) {
+    updateProcessCounts(successfulProcess, false, resourceId);
   }
 
   private void updateProcessCounts(boolean successfulProcess, boolean processFailedOnly,
