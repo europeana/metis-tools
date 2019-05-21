@@ -28,7 +28,7 @@ public class CacheMongoDao {
 
   public TechnicalMetadataWrapper getTechnicalMetadataWrapper(String resourceUrl) {
     return mongoCacheDatastore.find(TechnicalMetadataWrapper.class)
-        .filter(RESOURCE_URL, resourceUrl).get();
+        .field(RESOURCE_URL).equal(resourceUrl).get();
   }
 
   private MongoInitializer prepareMongoCacheConfiguration() {

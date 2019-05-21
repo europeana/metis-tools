@@ -114,7 +114,7 @@ public class ProcessingUtilities {
         //If it does not exist already check cache
         final TechnicalMetadataWrapper technicalMetadataWrapper = cacheMongoDao
             .getTechnicalMetadataWrapper(resourceUrl);
-        if (technicalMetadataWrapper != null) {
+        if (technicalMetadataWrapper != null && technicalMetadataWrapper.isSuccessExtraction()) {
           enrichedRdf.enrichResource(technicalMetadataWrapper.getResourceMetadata());
           storeThumbnailsToS3(amazonS3Client, s3Bucket,
               technicalMetadataWrapper.getThumbnailWrappers());
