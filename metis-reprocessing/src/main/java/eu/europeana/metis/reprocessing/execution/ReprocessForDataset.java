@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +112,8 @@ public class ReprocessForDataset implements Callable<Void> {
       LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
           nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
-        processAndIndex(datasetStatus, fullBean, true);
+        final boolean successfulProcess = processAndIndex(datasetStatus, fullBean);
+        updateProcessCounts(successfulProcess, true, fullBean.getAbout());
       }
       LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
           prefixDatasetidLog, nextPageOfRecords.size(), totalFailedRecords);
@@ -129,7 +131,8 @@ public class ReprocessForDataset implements Callable<Void> {
       final long totalTimeProcessingBefore = datasetStatus.getTotalTimeProcessing();
       final long totalTimeIndexingBefore = datasetStatus.getTotalTimeIndexing();
       for (FullBeanImpl fullBean : nextPageOfRecords) {
-        processAndIndex(datasetStatus, fullBean, false);
+        final boolean successfulProcess = processAndIndex(datasetStatus, fullBean);
+        updateProcessCounts(successfulProcess, false, fullBean.getAbout());
       }
       LOGGER.info("{} - Processed number of records: {} out of total number of records: {}",
           prefixDatasetidLog, datasetStatus.getTotalProcessed(), datasetStatus.getTotalRecords());
@@ -174,17 +177,10 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
-  private void processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean,
-      boolean processFailedOnly) {
+  private boolean processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean) {
     try {
       final RDF rdf = processRecord(fullBean, datasetStatus);
       indexRecord(rdf, datasetStatus);
-      if (processFailedOnly && fullBean.getAbout() != null) {
-        basicConfiguration.getMongoDestinationMongoDao()
-            .deleteFailedRecord(new FailedRecord(fullBean.getAbout()));
-        datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() - 1);
-        basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
-      }
     } catch (ProcessingException | IndexingException e) {
       String stepString;
       if (e instanceof ProcessingException) {
@@ -194,16 +190,29 @@ public class ReprocessForDataset implements Callable<Void> {
       }
       LOGGER.error("{} - Could not {} record: {}", prefixDatasetidLog, stepString,
           fullBean.getAbout(), e);
-      if (fullBean.getAbout() != null) {
+      return false;
+    }
+    return true;
+  }
+
+  private void updateProcessCounts(boolean successfulProcess, boolean processFailedOnly,
+      String resourceId) {
+    if (StringUtils.isNotBlank(resourceId)) {
+      if (successfulProcess) {
+        if (processFailedOnly) {
+          basicConfiguration.getMongoDestinationMongoDao()
+              .deleteFailedRecord(new FailedRecord(resourceId));
+          datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() - 1);
+          basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+        } else {
+          datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
+        }
+      } else {
         basicConfiguration.getMongoDestinationMongoDao()
-            .storeFailedRecordToDb(new FailedRecord(fullBean.getAbout()));
+            .storeFailedRecordToDb(new FailedRecord(resourceId));
         if (!processFailedOnly) {
           datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
         }
-      }
-    } finally {
-      if (!processFailedOnly) {
-        datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
       }
     }
   }
@@ -237,6 +246,7 @@ public class ReprocessForDataset implements Callable<Void> {
   private long updateAverageWithNewValues(long oldAverage, long oldTotalSamples,
       long sumOfNewValues,
       long newNumberOfSamples) {
-    return (oldAverage * oldTotalSamples + sumOfNewValues) / (oldTotalSamples + newNumberOfSamples);
+    return (oldAverage * oldTotalSamples + sumOfNewValues) / (oldTotalSamples
+        + newNumberOfSamples);
   }
 }
