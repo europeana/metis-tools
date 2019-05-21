@@ -87,8 +87,12 @@ public class ReprocessForDataset implements Callable<Void> {
       //Always start from the beginning
       return 0;
     } else {
-      final long totalProcessed = datasetStatus.getTotalProcessed();
-      return (int) (totalProcessed / MongoSourceMongoDao.PAGE_SIZE);
+      final long remainder = datasetStatus.getTotalProcessed() % MongoSourceMongoDao.PAGE_SIZE;
+      //Restart the page if remainder not exact divisible with the page.
+      if (remainder != 0) {
+        datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() - remainder);
+      }
+      return (int) (datasetStatus.getTotalProcessed() / MongoSourceMongoDao.PAGE_SIZE);
     }
   }
 
