@@ -12,6 +12,7 @@ import eu.europeana.metis.reprocessing.execution.IndexingUtilities;
 import eu.europeana.metis.reprocessing.execution.ProcessingUtilities;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import java.util.Date;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -24,6 +25,7 @@ public class ExtraConfiguration {
   private final String s3Bucket;
   private final ThrowingBiFunction<FullBeanImpl, BasicConfiguration, RDF> fullBeanProcessor;
   private final ThrowingTriConsumer<RDF, Boolean, BasicConfiguration> rdfIndexer;
+  private final ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> afterReprocessProcessor;
 
   public ExtraConfiguration(PropertiesHolder propertiesHolder) {
     final PropertiesHolderExtension propertiesHolderExtension = propertiesHolder
@@ -39,6 +41,7 @@ public class ExtraConfiguration {
 
     this.fullBeanProcessor = ProcessingUtilities::updateTechnicalMetadata;
     this.rdfIndexer = IndexingUtilities::indexRdf;
+    this.afterReprocessProcessor = ProcessingUtilities::updateMetisCoreWorkflowExecutions;
   }
 
   public CacheMongoDao getCacheMongoDao() {
@@ -61,6 +64,10 @@ public class ExtraConfiguration {
     return rdfIndexer;
   }
 
+  public ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> getAfterReprocessProcessor() {
+    return afterReprocessProcessor;
+  }
+
   void close() {
     cacheMongoDao.close();
   }
@@ -75,5 +82,11 @@ public class ExtraConfiguration {
   public interface ThrowingTriConsumer<K, V, S> {
 
     void accept(K k, V v, S s) throws IndexingException;
+  }
+
+  @FunctionalInterface
+  public interface ThrowingQuadConsumer<K, V, S, T> {
+
+    void accept(K k, V v, S s, T t) throws ProcessingException;
   }
 }
