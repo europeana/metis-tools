@@ -38,8 +38,8 @@ import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
-import eu.europeana.metis.reprocessing.model.TechnicalMetadataWrapper;
-import eu.europeana.metis.reprocessing.model.ThumbnailWrapper;
+import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
+import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,7 +117,8 @@ public class ProcessingUtilities {
         if (technicalMetadataWrapper != null && technicalMetadataWrapper.isSuccessExtraction()) {
           enrichedRdf.enrichResource(technicalMetadataWrapper.getResourceMetadata());
           storeThumbnailsToS3(amazonS3Client, s3Bucket,
-              technicalMetadataWrapper.getThumbnailWrappers());
+              technicalMetadataWrapper.getThumbnailWrappers() == null ? Collections.emptyList()
+                  : technicalMetadataWrapper.getThumbnailWrappers());
         }
       } else {
         final ResourceMetadata resourceMetadata = convertWebResourceMetaInfoImpl(amazonS3Client,
@@ -213,13 +214,15 @@ public class ProcessingUtilities {
     return thumbnails;
   }
 
-  public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate, Date endDate, BasicConfiguration basicConfiguration) {
+  public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,
+      Date endDate, BasicConfiguration basicConfiguration) {
     // TODO: 21-5-19 Enable methods when ready
 //    createReindexWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
 //    setInvalidFlagToPlugins(datasetId, basicConfiguration);
   }
 
-  private static void createReindexWorkflowExecutions(String datasetId, Date startDate, Date endDate, BasicConfiguration basicConfiguration) {
+  private static void createReindexWorkflowExecutions(String datasetId, Date startDate,
+      Date endDate, BasicConfiguration basicConfiguration) {
     final AbstractExecutablePlugin lastExecutionToBeBasedOn = basicConfiguration
         .getMetisCoreMongoDao().getWorkflowExecutionDao()
         .getLastFinishedWorkflowExecutionPluginByDatasetIdAndPluginType(datasetId,
@@ -267,7 +270,8 @@ public class ProcessingUtilities {
     basicConfiguration.getMetisCoreMongoDao().getWorkflowExecutionDao().create(workflowExecution);
   }
 
-  private static void setInvalidFlagToPlugins(String datasetId, BasicConfiguration basicConfiguration) {
+  private static void setInvalidFlagToPlugins(String datasetId,
+      BasicConfiguration basicConfiguration) {
     final List<ExecutablePluginType> invalidatePluginTypes = basicConfiguration
         .getInvalidatePluginTypes();
     final WorkflowExecutionDao workflowExecutionDao = basicConfiguration.getMetisCoreMongoDao()

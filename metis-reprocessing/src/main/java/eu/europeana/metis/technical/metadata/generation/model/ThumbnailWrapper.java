@@ -1,4 +1,4 @@
-package eu.europeana.metis.reprocessing.model;
+package eu.europeana.metis.technical.metadata.generation.model;
 
 /**
  * Model class that contains the thumbnail bytes the target name of the thumbnail, that needs to
