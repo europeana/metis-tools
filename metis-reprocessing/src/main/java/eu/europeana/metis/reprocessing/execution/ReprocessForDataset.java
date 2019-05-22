@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.execution;
 
+import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.STATISTICS_LOGS_MARKER;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
@@ -54,21 +55,21 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private Void reprocessDataset() {
-    LOGGER.info("{} - Reprocessing started", prefixDatasetidLog);
+    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing starting", prefixDatasetidLog);
     boolean processFailedOnly = datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()
         && basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED;
     if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()
         && basicConfiguration.getMode() == Mode.DEFAULT) {
-      LOGGER.info("{} - Reprocessing not started because it was already completely processed",
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing not started because it was already completely processed",
           prefixDatasetidLog);
       return null;
     } else if (processFailedOnly) {
-      LOGGER.info("{} - Reprocessing will happen only on previously failed records",
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing will happen only on previously failed records",
           prefixDatasetidLog);
     }
     loopOverAllRecordsAndProcess(datasetStatus, processFailedOnly);
-    LOGGER.info("{} - Reprocessing end", prefixDatasetidLog);
-    LOGGER.info("{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);
+    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing end", prefixDatasetidLog);
+    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);
     LOGGER.info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog,
         datasetStatus);
     return null;
@@ -136,13 +137,13 @@ public class ReprocessForDataset implements Callable<Void> {
     final long totalFailedRecords = datasetStatus.getTotalFailedRecords();
     List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing number of records: {}", prefixDatasetidLog,
           nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final String exceptionStackTrace = processAndIndex(datasetStatus, fullBean);
         updateProcessFailedOnlyCounts(exceptionStackTrace, fullBean.getAbout());
       }
-      LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processed number of records: {} out of total number of failed records: {}",
           prefixDatasetidLog, nextPageOfRecords.size(), totalFailedRecords);
       nextPage++;
       nextPageOfRecords = getFailedFullBeans(nextPage);
@@ -165,7 +166,7 @@ public class ReprocessForDataset implements Callable<Void> {
   private void defaultOperation(DatasetStatus datasetStatus, int nextPage) {
     List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing number of records: {}", prefixDatasetidLog,
           nextPageOfRecords.size());
       final long totalProcessedOld = datasetStatus.getTotalProcessed();
       final long totalTimeProcessingBefore = datasetStatus.getTotalTimeProcessing();
@@ -174,7 +175,7 @@ public class ReprocessForDataset implements Callable<Void> {
         final String exceptionStackTrace = processAndIndex(datasetStatus, fullBean);
         updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
       }
-      LOGGER.info("{} - Processed number of records: {} out of total number of records: {}",
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processed number of records: {} out of total number of records: {}",
           prefixDatasetidLog, datasetStatus.getTotalProcessed(), datasetStatus.getTotalRecords());
       final long totalProcessedNew = datasetStatus.getTotalProcessed();
       final long totalTimeProcessingAfter = datasetStatus.getTotalTimeProcessing();
@@ -195,7 +196,7 @@ public class ReprocessForDataset implements Callable<Void> {
     datasetStatus.setEndDate(new Date());
     basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     afterReProcess(datasetStatus);
-    LOGGER.info("{} - Applied after reprocessing function", prefixDatasetidLog);
+    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Applied after reprocessing function", prefixDatasetidLog);
   }
 
   private List<FullBeanImpl> getFailedFullBeans(int nextPage) {
@@ -240,7 +241,7 @@ public class ReprocessForDataset implements Callable<Void> {
       } else {
         stepString = "index";
       }
-      LOGGER.error("{} - Could not {} record: {}", prefixDatasetidLog, stepString,
+      LOGGER.error(EXECUTION_LOGS_MARKER, "{} - Could not {} record: {}", prefixDatasetidLog, stepString,
           fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
     }
@@ -319,7 +320,7 @@ public class ReprocessForDataset implements Callable<Void> {
           .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),
               basicConfiguration);
     } catch (ProcessingException e) {
-      LOGGER.error("{} - After reprocessing operation failed!", prefixDatasetidLog, e);
+      LOGGER.error(EXECUTION_LOGS_MARKER, "{} - After reprocessing operation failed!", prefixDatasetidLog, e);
     }
   }
 

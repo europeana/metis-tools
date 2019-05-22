@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
-  private static final String PROCESSED_DATASETS_STR = "Processed datasets: {}";
+  private static final String REPROCESSED_DATASETS_STR = "Reprocessed datasets: {}";
   private final BasicConfiguration basicConfiguration;
   private final int maxParallelThreads;
   private final int startFromDatasetIndex;
@@ -46,7 +46,7 @@ public class ExecutorManager {
     final List<String> allDatasetIds = basicConfiguration.getMetisCoreMongoDao()
         .getAllDatasetIdsOrdered();
     int threadCounter = 0;
-    int processedDatasets = 0;
+    int reprocessedDatasets = 0;
 
     for (int i = startFromDatasetIndex; i < endAtDatasetIndex; i++) {
       String datasetId = allDatasetIds.get(i);
@@ -57,9 +57,9 @@ public class ExecutorManager {
       if (threadCounter >= maxParallelThreads) {
         completionService.take();
         threadCounter--;
-        processedDatasets++;
-        LOGGER.info(PROCESSED_DATASETS_STR, processedDatasets);
-        LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, processedDatasets);
+        reprocessedDatasets++;
+        LOGGER.info(REPROCESSED_DATASETS_STR, reprocessedDatasets);
+        LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
       }
       completionService.submit(reprocessForDataset);
       threadCounter++;
@@ -68,9 +68,8 @@ public class ExecutorManager {
     //Final cleanup of futures
     for (int i = 0; i < threadCounter; i++) {
       completionService.take();
-      processedDatasets++;
-      LOGGER.info(PROCESSED_DATASETS_STR, processedDatasets);
-      LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, processedDatasets);
+      reprocessedDatasets++;
+      LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
     }
   }
 
