@@ -10,6 +10,7 @@ public class FailedRecord {
 
   @Id
   private String failedUrl;
+  private String errorStackTrace;
 
   public FailedRecord() {
     //Default constructor
@@ -19,11 +20,16 @@ public class FailedRecord {
     this.failedUrl = failedUrl;
   }
 
+  public FailedRecord(String failedUrl, String errorStackTrace) {
+    this.failedUrl = failedUrl;
+    this.errorStackTrace = errorStackTrace;
+  }
+
   public String getFailedUrl() {
     return failedUrl;
   }
 
-  public void setFailedUrl(String failedUrl) {
-    this.failedUrl = failedUrl;
+  public String getErrorStackTrace() {
+    return errorStackTrace;
   }
 }

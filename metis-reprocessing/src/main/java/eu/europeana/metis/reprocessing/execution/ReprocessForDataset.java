@@ -11,6 +11,8 @@ import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.model.Mode;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -116,8 +118,8 @@ public class ReprocessForDataset implements Callable<Void> {
       LOGGER.info("{} - Processing number of records: {}", prefixDatasetidLog,
           nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
-        final boolean successfulProcess = processAndIndex(datasetStatus, fullBean);
-        updateProcessFailedOnlyCounts(successfulProcess, fullBean.getAbout());
+        final String exceptionStackTrace = processAndIndex(datasetStatus, fullBean);
+        updateProcessFailedOnlyCounts(exceptionStackTrace, fullBean.getAbout());
       }
       LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
           prefixDatasetidLog, nextPageOfRecords.size(), totalFailedRecords);
@@ -135,8 +137,8 @@ public class ReprocessForDataset implements Callable<Void> {
       final long totalTimeProcessingBefore = datasetStatus.getTotalTimeProcessing();
       final long totalTimeIndexingBefore = datasetStatus.getTotalTimeIndexing();
       for (FullBeanImpl fullBean : nextPageOfRecords) {
-        final boolean successfulProcess = processAndIndex(datasetStatus, fullBean);
-        updateProcessCounts(successfulProcess, fullBean.getAbout());
+        final String exceptionStackTrace = processAndIndex(datasetStatus, fullBean);
+        updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
       }
       LOGGER.info("{} - Processed number of records: {} out of total number of records: {}",
           prefixDatasetidLog, datasetStatus.getTotalProcessed(), datasetStatus.getTotalRecords());
@@ -189,7 +191,7 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
-  private boolean processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean) {
+  private String processAndIndex(DatasetStatus datasetStatus, FullBeanImpl fullBean) {
     try {
       final RDF rdf = processRecord(fullBean, datasetStatus);
       indexRecord(rdf, datasetStatus);
@@ -202,23 +204,23 @@ public class ReprocessForDataset implements Callable<Void> {
       }
       LOGGER.error("{} - Could not {} record: {}", prefixDatasetidLog, stepString,
           fullBean.getAbout(), e);
-      return false;
+      return exceptionStacktraceToString(e);
     }
-    return true;
+    return "";
   }
 
-  private void updateProcessFailedOnlyCounts(boolean successfulProcess, String resourceId) {
-    updateProcessCounts(successfulProcess, true, resourceId);
+  private void updateProcessFailedOnlyCounts(String exceptionStackTrace, String resourceId) {
+    updateProcessCounts(exceptionStackTrace, true, resourceId);
   }
 
-  private void updateProcessCounts(boolean successfulProcess, String resourceId) {
-    updateProcessCounts(successfulProcess, false, resourceId);
+  private void updateProcessCounts(String exceptionStackTrace, String resourceId) {
+    updateProcessCounts(exceptionStackTrace, false, resourceId);
   }
 
-  private void updateProcessCounts(boolean successfulProcess, boolean processFailedOnly,
+  private void updateProcessCounts(String exceptionStackTrace, boolean processFailedOnly,
       String resourceId) {
     if (StringUtils.isNotBlank(resourceId)) {
-      if (successfulProcess) {
+      if (StringUtils.isBlank(exceptionStackTrace)) {
         if (processFailedOnly) {
           basicConfiguration.getMongoDestinationMongoDao()
               .deleteFailedRecord(new FailedRecord(resourceId));
@@ -229,7 +231,7 @@ public class ReprocessForDataset implements Callable<Void> {
         }
       } else {
         basicConfiguration.getMongoDestinationMongoDao()
-            .storeFailedRecordToDb(new FailedRecord(resourceId));
+            .storeFailedRecordToDb(new FailedRecord(resourceId, exceptionStackTrace));
         if (!processFailedOnly) {
           datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
         }
@@ -268,5 +270,13 @@ public class ReprocessForDataset implements Callable<Void> {
       long newNumberOfSamples) {
     return (oldAverage * oldTotalSamples + sumOfNewValues) / (oldTotalSamples
         + newNumberOfSamples);
+  }
+
+  private static String exceptionStacktraceToString(Exception e) {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    PrintStream ps = new PrintStream(baos);
+    e.printStackTrace(ps);
+    ps.close();
+    return baos.toString();
   }
 }
