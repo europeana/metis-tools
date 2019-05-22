@@ -13,6 +13,11 @@ import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 
 /**
+ * Mongo Dao for destination mongo.
+ * <p>This is where the new records will reside as well as progress information of datasets and
+ * failed records, see
+ * {@link DatasetStatus} and {@link FailedRecord}</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */

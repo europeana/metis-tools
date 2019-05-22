@@ -28,6 +28,9 @@ import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 
 /**
+ * Mongo Dao for source records.
+ * <p>Contains functionality for reading the source records that are being reprocessed.</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */

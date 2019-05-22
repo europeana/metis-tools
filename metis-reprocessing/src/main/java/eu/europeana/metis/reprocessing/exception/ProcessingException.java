@@ -1,6 +1,8 @@
 package eu.europeana.metis.reprocessing.exception;
 
 /**
+ * Exception ocurred while processing a record.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-17
  */

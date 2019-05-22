@@ -3,6 +3,8 @@ package eu.europeana.metis.reprocessing.model;
 import org.mongodb.morphia.annotations.Id;
 
 /**
+ * Model class that contains failed record identifiers.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-20
  */

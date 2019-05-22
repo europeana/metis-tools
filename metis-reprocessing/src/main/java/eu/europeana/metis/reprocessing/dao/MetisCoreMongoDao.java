@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Mongo Dao for functionality related to metis-core, simplified.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */

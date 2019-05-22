@@ -1,6 +1,8 @@
 package eu.europeana.metis.reprocessing.model;
 
 /**
+ * Mode of execution of the script.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-19
  */

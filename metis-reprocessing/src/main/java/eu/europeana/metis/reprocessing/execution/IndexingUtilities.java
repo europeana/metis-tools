@@ -11,6 +11,10 @@ import java.util.Map;
 import org.apache.zookeeper.KeeperException.SessionExpiredException;
 
 /**
+ * Contains functionality for indexing.
+ * <p>Methods in this class will be provided as implementations of functional interfaces for
+ * performing the indexing of records</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-17
  */
@@ -22,6 +26,14 @@ public class IndexingUtilities {
   private IndexingUtilities() {
   }
 
+  /**
+   * Indexes a record using properties from a provided {@link BasicConfiguration}
+   *
+   * @param rdf the source rdf record
+   * @param preserveTimestamps should preserve timestamps from source
+   * @param basicConfiguration the configuration class that contains required properties
+   * @throws IndexingException if an exception occurred during indexing
+   */
   public static void indexRdf(RDF rdf, Boolean preserveTimestamps,
       BasicConfiguration basicConfiguration) throws IndexingException {
     try {

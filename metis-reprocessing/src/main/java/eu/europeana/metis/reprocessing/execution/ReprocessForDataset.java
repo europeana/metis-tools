@@ -23,6 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class is a {@link Callable} class that would be initialized with a {@link #datasetId}.
+ * <p>It is responsible of re-processing a dataset as a whole, by paging records from the
+ * database, while keeping track of it's dataset status. This class should not require modification
+ * and only provided functionality in the {@link BasicConfiguration#getExtraConfiguration()} should
+ * be modifiable.</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-14
  */
@@ -68,6 +74,12 @@ public class ReprocessForDataset implements Callable<Void> {
     return null;
   }
 
+  /**
+   * Either get a {@link DatasetStatus} that already exists or generate one.
+   *
+   * @param indexInOrderedList the index of the dataset in the original ordered list
+   * @return the dataset status
+   */
   private DatasetStatus retrieveOrInitializeDatasetStatus(int indexInOrderedList) {
     DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
         .getDatasetStatus(datasetId);
@@ -84,6 +96,15 @@ public class ReprocessForDataset implements Callable<Void> {
     return retrievedDatasetStatus;
   }
 
+  /**
+   * Retrieve the starting next page index based on a {@link DatasetStatus}.
+   * <p>For an execution of processing only previously failed records the starting page index is
+   * always 0(zero).</p>
+   *
+   * @param datasetStatus the provided dataset status
+   * @param processFailedOnly trigger for execution of processing only previously failed records
+   * @return the index of the next page
+   */
   private int getStartingNextPage(DatasetStatus datasetStatus, boolean processFailedOnly) {
     if (processFailedOnly) {
       //Always start from the beginning
@@ -128,6 +149,19 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
+  /**
+   * Default processing operation.
+   * <p>It calculates all sorts of statistics provided in the {@link DatasetStatus} in the
+   * datastore. The order of operation in this method is as follows:
+   * <ul>
+   * <li>{@link #processRecord(FullBeanImpl, DatasetStatus)}</li>
+   * <li>{@link #indexRecord(RDF, DatasetStatus)}</li>
+   * <li>{@link #afterReProcess(DatasetStatus)}</li>
+   * </ul></p>
+   *
+   * @param datasetStatus the provided dataset status
+   * @param nextPage the next page of records
+   */
   private void defaultOperation(DatasetStatus datasetStatus, int nextPage) {
     List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
@@ -160,13 +194,7 @@ public class ReprocessForDataset implements Callable<Void> {
     //Set End Date
     datasetStatus.setEndDate(new Date());
     basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
-    try {
-      basicConfiguration.getExtraConfiguration().getAfterReprocessProcessor()
-          .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),
-              basicConfiguration);
-    } catch (ProcessingException e) {
-      LOGGER.error("{} - After reprocessing operation failed!", prefixDatasetidLog, e);
-    }
+    afterReProcess(datasetStatus);
   }
 
   private List<FullBeanImpl> getFailedFullBeans(int nextPage) {
@@ -177,6 +205,15 @@ public class ReprocessForDataset implements Callable<Void> {
     return getFullBeans(nextPage, false);
   }
 
+  /**
+   * Retrieved the {@link FullBeanImpl}s.
+   * <p>For {@code processFailedOnly} true, the {@link FailedRecord}s datastore is checked instead
+   * of the source datastore.</p>
+   *
+   * @param nextPage the next page of records
+   * @param processFailedOnly trigger for execution of processing only previously failed records
+   * @return the list of records
+   */
   private List<FullBeanImpl> getFullBeans(int nextPage, boolean processFailedOnly) {
     if (processFailedOnly) {
       final List<FailedRecord> nextPageOfFailedRecords = basicConfiguration
@@ -217,6 +254,16 @@ public class ReprocessForDataset implements Callable<Void> {
     updateProcessCounts(exceptionStackTrace, false, resourceId);
   }
 
+  /**
+   * Update the record counts based on the execution.
+   * <p>For a failed record it will create a new {@link FailedRecord}.
+   * For a success record if the {@code processFailedOnly} is true then the {@link FailedRecord} is
+   * removed and the {@link DatasetStatus#getTotalFailedRecords()} is updated.</p>
+   *
+   * @param exceptionStackTrace the exception stack trace if any
+   * @param processFailedOnly trigger for execution of processing only previously failed records
+   * @param resourceId the processed record identifier
+   */
   private void updateProcessCounts(String exceptionStackTrace, boolean processFailedOnly,
       String resourceId) {
     if (StringUtils.isNotBlank(resourceId)) {
@@ -265,9 +312,29 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
+  private void afterReProcess(DatasetStatus datasetStatus) {
+    try {
+      basicConfiguration.getExtraConfiguration().getAfterReprocessProcessor()
+          .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),
+              basicConfiguration);
+    } catch (ProcessingException e) {
+      LOGGER.error("{} - After reprocessing operation failed!", prefixDatasetidLog, e);
+    }
+  }
+
+  /**
+   * Rolling average calculation.
+   * <p>Based on a previous average calculation it will generate the new average provided the new
+   * samples.</p>
+   *
+   * @param oldAverage the old average
+   * @param oldTotalSamples the old total samples
+   * @param sumOfNewValues the summary of all new values
+   * @param newNumberOfSamples the new total number of samples
+   * @return the new calculated average
+   */
   private long updateAverageWithNewValues(long oldAverage, long oldTotalSamples,
-      long sumOfNewValues,
-      long newNumberOfSamples) {
+      long sumOfNewValues, long newNumberOfSamples) {
     return (oldAverage * oldTotalSamples + sumOfNewValues) / (oldTotalSamples
         + newNumberOfSamples);
   }

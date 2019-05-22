@@ -9,6 +9,9 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 /**
+ * Mongo Dao for the technical metadata cache.
+ * <p>It contains generated technical metadata that should have been generated previously.</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */

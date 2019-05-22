@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Contains the {@link ExecutorService} class and handles the parallelization of the tasks.
+ * <p>Parallelization of tasks is performed per dataset. So each thread will be processing one
+ * dataset at a time.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-16

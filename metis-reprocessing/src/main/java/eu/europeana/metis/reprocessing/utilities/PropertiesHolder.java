@@ -17,7 +17,9 @@ import org.slf4j.MarkerFactory;
 
 /**
  * Contains all properties that are required for execution.
- * <p>During construction will read properties from the specified file from the classpath.</p>
+ * <p>During construction will read properties from the specified file from the classpath.
+ * Internally it holds {@link PropertiesHolder#propertiesHolderExtension} that should contain the
+ * extra required properties per re-process operation.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-16

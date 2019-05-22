@@ -62,6 +62,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Contains functionality for processing a record.
+ * <p>Methods in this class will be provided as implementations of functional interfaces for
+ * performing the processing of records</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-15
  */
@@ -72,6 +76,15 @@ public class ProcessingUtilities {
   private ProcessingUtilities() {
   }
 
+  /**
+   * Given a {@link FullBeanImpl} record it re-establishes the technical metadata in the {@link
+   * RDF}
+   *
+   * @param fullBean the source record
+   * @param basicConfiguration the configuration class that contains required properties
+   * @return the record containing the technical metadata
+   * @throws ProcessingException if an exception occurred while processing
+   */
   public static RDF updateTechnicalMetadata(final FullBeanImpl fullBean,
       BasicConfiguration basicConfiguration) throws ProcessingException {
     try {
@@ -102,6 +115,23 @@ public class ProcessingUtilities {
     }
   }
 
+  /**
+   * Given an {@link EnrichedRdfImpl} and the resource to be checked for technical metadata
+   * availability, it will check and {@link EnrichedRdfImpl#enrichResource(ResourceMetadata)} the
+   * rdf with the resource metadata.
+   * <p>Each original technical metadata has to be retrieved from the source mongo and re-combined
+   * in the {@link EnrichedRdfImpl}. If the original technical metadata is not present then the
+   * cache is checked and if there is technical metadata for that resource then that is inserted in
+   * the {@link EnrichedRdfImpl}. And if that technincal metadata has thumbnails they are uploaded
+   * to S3 if not already present.</p>
+   *
+   * @param mongoSourceMongoDao the source mongo dao where the original technical metadata reside
+   * @param enrichedRdf the provided rdf
+   * @param resourceUrl the resource url to check upon
+   * @param cacheMongoDao the cache mongo dao where the cached technical metadata reside
+   * @param amazonS3Client the S3 client for uploading thumbnails
+   * @param s3Bucket the S3 bucket
+   */
   private static void technicalMetadataForResource(final MongoSourceMongoDao mongoSourceMongoDao,
       final EnrichedRdfImpl enrichedRdf, final String resourceUrl,
       final CacheMongoDao cacheMongoDao, final AmazonS3 amazonS3Client,
@@ -151,6 +181,13 @@ public class ProcessingUtilities {
     }
   }
 
+  /**
+   * Converts a string to md5 hash.
+   *
+   * @param stringToMd5 the string to convert
+   * @return the md5 hash of the string
+   * @throws MediaExtractionException if the md5 could not be generated
+   */
   private static String md5Hex(final String stringToMd5) throws MediaExtractionException {
     try {
       byte[] bytes = stringToMd5.getBytes(StandardCharsets.UTF_8.name());
@@ -161,6 +198,21 @@ public class ProcessingUtilities {
     }
   }
 
+  /**
+   * Converted for {@link WebResourceMetaInfoImpl} to {@link ResourceMetadata} classes.
+   * <p>The conversion is based on records that already exist in the source data. So for each
+   * resource, there is a check performed, of it's md5 hash, in S3. That check is to generate the
+   * target names of the thumnails if they were previously present.</p>
+   *
+   * @param amazonS3Client the S3 client
+   * @param s3Bucket the S3 bucket
+   * @param webResourceMetaInfo the provided web resource metadata for conversion
+   * @param resourceUrl the resource url that the web resource metadata is based upon
+   * @param md5Hex the md5 hash of the resource url
+   * @return the converted class
+   * @throws MediaExtractionException if a conversion failed
+   * @throws IOException if the thumbnail target names generation fails
+   */
   static ResourceMetadata convertWebResourceMetaInfoImpl(AmazonS3 amazonS3Client, String s3Bucket,
       WebResourceMetaInfoImpl webResourceMetaInfo, String resourceUrl, String md5Hex)
       throws MediaExtractionException, IOException {
@@ -208,12 +260,22 @@ public class ProcessingUtilities {
     String targetNameLarge = md5Hex + "-LARGE";
     if (doesThumbnailExistInS3(amazonS3Client, s3Bucket, targetNameLarge)) {
       final ThumbnailImpl thumbnail = new ThumbnailImpl(resourceUrl, targetNameLarge);
+      //Close immediately, the contained files are not required.
       thumbnail.close();
       thumbnails.add(thumbnail);
     }
     return thumbnails;
   }
 
+  /**
+   * It writes all the required information to metis core of a dataset that has just been
+   * re-processed.
+   *
+   * @param datasetId the dataset id of the finished dataset re-processing
+   * @param startDate the start date of the re-processing
+   * @param endDate the end date of the re-processing
+   * @param basicConfiguration the configuration class that contains required properties
+   */
   public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,
       Date endDate, BasicConfiguration basicConfiguration) {
     // TODO: 21-5-19 Enable methods when ready

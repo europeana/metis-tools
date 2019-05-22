@@ -15,6 +15,11 @@ import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import java.util.Date;
 
 /**
+ * Extra configuration class that is part of {@link BasicConfiguration}.
+ * <p>This class is meant to be modifiable and different per re-processing operation.
+ * It contains 3 functional interfaces that should be initialized properly and they are triggered
+ * internally during the re-processing.</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */

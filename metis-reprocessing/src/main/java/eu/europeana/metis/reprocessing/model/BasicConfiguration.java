@@ -21,6 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Basic configuration of the re-processing operation.
+ * <p>Functionality here should be the same for each re-processing.
+ * Internally it holds {@link BasicConfiguration#extraConfiguration} that should contain the
+ * functionality per re-process operation.</p>
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */
