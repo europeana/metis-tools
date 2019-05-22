@@ -21,5 +21,6 @@
       <AppenderRef ref="ExecutionLogs"/>
       <AppenderRef ref="StatisticsLogs"/>
     </Root>
+    <Logger name="eu.europeana.indexing.IndexerImpl" level="ERROR"/>
   </Loggers>
 </Configuration>

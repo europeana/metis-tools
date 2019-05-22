@@ -8,6 +8,7 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.CacheMongoDao;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
+import eu.europeana.metis.reprocessing.execution.AfterReProcessingUtilities;
 import eu.europeana.metis.reprocessing.execution.IndexingUtilities;
 import eu.europeana.metis.reprocessing.execution.ProcessingUtilities;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
@@ -46,7 +47,7 @@ public class ExtraConfiguration {
 
     this.fullBeanProcessor = ProcessingUtilities::updateTechnicalMetadata;
     this.rdfIndexer = IndexingUtilities::indexRdf;
-    this.afterReprocessProcessor = ProcessingUtilities::updateMetisCoreWorkflowExecutions;
+    this.afterReprocessProcessor = AfterReProcessingUtilities::updateMetisCoreWorkflowExecutions;
   }
 
   public CacheMongoDao getCacheMongoDao() {

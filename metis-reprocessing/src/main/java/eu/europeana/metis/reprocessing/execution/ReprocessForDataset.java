@@ -54,20 +54,20 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private Void reprocessDataset() {
-    LOGGER.info("{}, Processing started", prefixDatasetidLog);
+    LOGGER.info("{} - Reprocessing started", prefixDatasetidLog);
     boolean processFailedOnly = datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()
         && basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED;
     if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()
         && basicConfiguration.getMode() == Mode.DEFAULT) {
-      LOGGER.info("{} - Processing not started because it was already completely processed",
+      LOGGER.info("{} - Reprocessing not started because it was already completely processed",
           prefixDatasetidLog);
       return null;
     } else if (processFailedOnly) {
-      LOGGER.info("{} - Processing will happen only on previously failed records",
+      LOGGER.info("{} - Reprocessing will happen only on previously failed records",
           prefixDatasetidLog);
     }
     loopOverAllRecordsAndProcess(datasetStatus, processFailedOnly);
-    LOGGER.info("{} - Processing end", prefixDatasetidLog);
+    LOGGER.info("{} - Reprocessing end", prefixDatasetidLog);
     LOGGER.info("{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);
     LOGGER.info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog,
         datasetStatus);
@@ -154,9 +154,9 @@ public class ReprocessForDataset implements Callable<Void> {
    * <p>It calculates all sorts of statistics provided in the {@link DatasetStatus} in the
    * datastore. The order of operation in this method is as follows:
    * <ul>
-   * <li>{@link #processRecord(FullBeanImpl, DatasetStatus)}</li>
-   * <li>{@link #indexRecord(RDF, DatasetStatus)}</li>
-   * <li>{@link #afterReProcess(DatasetStatus)}</li>
+   * <li>{@link #processRecord(FullBeanImpl, DatasetStatus)} per record</li>
+   * <li>{@link #indexRecord(RDF, DatasetStatus)} per record</li>
+   * <li>{@link #afterReProcess(DatasetStatus)} per dataset</li>
    * </ul></p>
    *
    * @param datasetStatus the provided dataset status
@@ -195,6 +195,7 @@ public class ReprocessForDataset implements Callable<Void> {
     datasetStatus.setEndDate(new Date());
     basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     afterReProcess(datasetStatus);
+    LOGGER.info("{} - Applied after reprocessing function", prefixDatasetidLog);
   }
 
   private List<FullBeanImpl> getFailedFullBeans(int nextPage) {

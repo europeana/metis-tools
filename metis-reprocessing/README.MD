@@ -33,7 +33,8 @@ The changes on the implementation, per reprocessing operation should be limited 
 - `ExtraConfiguration` For any extra fields that need to be initialized and the initialization of the required 
 functional interfaces
 - `ProcessingUtilities` That contains all functionality for processing records and datasets
-- `IndexingUtilities` That contains all functionality for indexing records  
+- `IndexingUtilities` That contains all functionality for indexing records
+- `AfterReProcessingUtilities` That contains all functionality for after reprocessing of all records, once per dataset  
 
 Depending on the operation classes can be created and removed when not required anymore.
 
