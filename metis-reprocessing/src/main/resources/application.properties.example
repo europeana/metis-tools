@@ -1,0 +1,61 @@
+max.parallel.threads=
+start.from.dataset.index=
+end.at.dataset.index=
+source.mongo.page.size=
+mode=DEFAULT
+invalidate.plugin.types=
+reprocess.based.on.plugin.type=
+
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo Metis Core
+mongo.metis.core.hosts=
+mongo.metis.core.port=
+mongo.metis.core.authentication.db=
+mongo.metis.core.username=
+mongo.metis.core.password=
+mongo.metis.core.enableSSL=false
+mongo.metis.core.db=
+
+#Mongo Source
+mongo.source.hosts=
+mongo.source.port=
+mongo.source.authentication.db=
+mongo.source.username=
+mongo.source.password=
+mongo.source.enableSSL=false
+mongo.source.db=
+
+#Mongo Destination
+mongo.destination.hosts=
+mongo.destination.port=
+mongo.destination.authentication.db=
+mongo.destination.username=
+mongo.destination.password=
+mongo.destination.enableSSL=false
+mongo.destination.db=
+
+#Solr/Zookeeper Destination
+solr.destination.hosts=
+zookeeper.destination.hosts=
+zookeeper.destination.port=
+zookeeper.destination.chroot=
+zookeeper.destination.defaultCollection=
+
+#EXTRA CONFIGURATION
+#Mongo Cache
+mongo.cache.hosts=
+mongo.cache.port=
+mongo.cache.authentication.db=
+mongo.cache.username=
+mongo.cache.password=
+mongo.cache.enableSSL=false
+mongo.cache.db=
+
+#S3
+s3.access.key=
+s3.secret.key=
+s3.endpoint=
+s3.bucket=
