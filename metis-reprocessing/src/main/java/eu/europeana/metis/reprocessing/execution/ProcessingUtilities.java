@@ -156,6 +156,7 @@ public class ProcessingUtilities {
       if (!doesThumbnailExistInS3(amazonS3Client, s3Bucket, thumbnailWrapper.getTargetName())) {
         try (InputStream stream = new ByteArrayInputStream(thumbnailWrapper.getThumbnailBytes())) {
           amazonS3Client.putObject(s3Bucket, thumbnailWrapper.getTargetName(), stream, null);
+          LOGGER.info("Sent item to S3 with name: {}", thumbnailWrapper.getTargetName());
         } catch (Exception e) {
           LOGGER.error(
               "Error while uploading {} to S3 in Bluemix. The full error message is: {} because of: ",

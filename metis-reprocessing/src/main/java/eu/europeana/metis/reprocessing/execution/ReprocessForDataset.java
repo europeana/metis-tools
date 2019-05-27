@@ -169,8 +169,9 @@ public class ReprocessForDataset implements Callable<Void> {
     List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER
-          .info(EXECUTION_LOGS_MARKER, "{} - Processing number of records: {}", prefixDatasetidLog,
-              nextPageOfRecords.size());
+          .info(EXECUTION_LOGS_MARKER,
+              "{} - Already processed: {}, Processing number of records: {}", prefixDatasetidLog,
+              datasetStatus.getTotalProcessed(), nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final String exceptionStackTrace = processAndIndex(fullBean);
         updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
