@@ -281,7 +281,7 @@ public class ReprocessForDataset implements Callable<Void> {
     } finally {
       final long endTimeProcess = System.nanoTime();
       final long elapsedTime = endTimeProcess - startTimeProcess;
-      datasetStatus.setTotalTimeProcessing(datasetStatus.getTotalTimeProcessing() + elapsedTime);
+      datasetStatus.setTotalTimeProcessingInSecs(datasetStatus.getTotalTimeProcessingInSecs() + nanoTimeToSeconds(elapsedTime));
     }
   }
 
@@ -294,7 +294,7 @@ public class ReprocessForDataset implements Callable<Void> {
     } finally {
       final long endTimeIndex = System.nanoTime();
       final long elapsedTime = endTimeIndex - startTimeIndex;
-      datasetStatus.setTotalTimeIndexing(datasetStatus.getTotalTimeIndexing() + elapsedTime);
+      datasetStatus.setTotalTimeIndexingInSecs(datasetStatus.getTotalTimeIndexingInSecs() + nanoTimeToSeconds(elapsedTime));
     }
   }
 
@@ -308,21 +308,8 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
-  /**
-   * Rolling average calculation.
-   * <p>Based on a previous average calculation it will generate the new average provided the new
-   * samples.</p>
-   *
-   * @param oldAverage the old average
-   * @param oldTotalSamples the old total samples
-   * @param sumOfNewValues the summary of all new values
-   * @param newNumberOfSamples the new total number of samples
-   * @return the new calculated average
-   */
-  private long updateAverageWithNewValues(long oldAverage, long oldTotalSamples,
-      long sumOfNewValues, long newNumberOfSamples) {
-    return (oldAverage * oldTotalSamples + sumOfNewValues) / (oldTotalSamples
-        + newNumberOfSamples);
+  private double nanoTimeToSeconds(long nanoTime) {
+    return nanoTime / 1_000_000_000.0;
   }
 
   private static String exceptionStacktraceToString(Exception e) {

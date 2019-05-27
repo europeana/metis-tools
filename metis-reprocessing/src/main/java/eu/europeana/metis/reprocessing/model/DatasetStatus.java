@@ -29,10 +29,10 @@ public class DatasetStatus implements HasMongoObjectId {
   private long totalRecords;
   private long totalProcessed;
   private long totalFailedRecords;
-  private long totalTimeProcessing;
-  private long totalTimeIndexing;
-  private long averageTimeRecordProcessing;
-  private long averageTimeRecordIndexing;
+  private double totalTimeProcessingInSecs;
+  private double totalTimeIndexingInSecs;
+  private double averageTimeRecordProcessingInSecs;
+  private double averageTimeRecordIndexingInSecs;
 
   public DatasetStatus() {
     //Default constructor
@@ -104,45 +104,41 @@ public class DatasetStatus implements HasMongoObjectId {
     this.totalFailedRecords = totalFailedRecords;
   }
 
-  public long getAverageTimeRecordProcessing() {
-    return averageTimeRecordProcessing;
+  public double getTotalTimeProcessingInSecs() {
+    return totalTimeProcessingInSecs;
   }
 
-  public void setAverageTimeRecordProcessing(long averageTimeRecordProcessing) {
-    this.averageTimeRecordProcessing = averageTimeRecordProcessing;
+  public void setTotalTimeProcessingInSecs(double totalTimeProcessingInSecs) {
+    this.totalTimeProcessingInSecs = totalTimeProcessingInSecs;
   }
 
-  public long getAverageTimeRecordIndexing() {
-    return averageTimeRecordIndexing;
+  public double getTotalTimeIndexingInSecs() {
+    return totalTimeIndexingInSecs;
   }
 
-  public void setAverageTimeRecordIndexing(long averageTimeRecordIndexing) {
-    this.averageTimeRecordIndexing = averageTimeRecordIndexing;
+  public void setTotalTimeIndexingInSecs(double totalTimeIndexingInSecs) {
+    this.totalTimeIndexingInSecs = totalTimeIndexingInSecs;
   }
 
-  public long getTotalTimeProcessing() {
-    return totalTimeProcessing;
+  public double getAverageTimeRecordProcessingInSecs() {
+    return averageTimeRecordProcessingInSecs;
   }
 
-  public void setTotalTimeProcessing(long totalTimeProcessing) {
-    this.totalTimeProcessing = totalTimeProcessing;
+  public void setAverageTimeRecordProcessingInSecs(double averageTimeRecordProcessingInSecs) {
+    this.averageTimeRecordProcessingInSecs = averageTimeRecordProcessingInSecs;
   }
 
-  public long getTotalTimeIndexing() {
-    return totalTimeIndexing;
+  public double getAverageTimeRecordIndexingInSecs() {
+    return averageTimeRecordIndexingInSecs;
   }
 
-  public void setTotalTimeIndexing(long totalTimeIndexing) {
-    this.totalTimeIndexing = totalTimeIndexing;
+  public void setAverageTimeRecordIndexingInSecs(double averageTimeRecordIndexingInSecs) {
+    this.averageTimeRecordIndexingInSecs = averageTimeRecordIndexingInSecs;
   }
 
   public void updateAverages() {
-    this.averageTimeRecordProcessing = this.totalTimeProcessing / this.totalProcessed;
-    this.averageTimeRecordIndexing = this.totalTimeIndexing / this.totalProcessed;
-  }
-
-  private double nanoTimeToSeconds(long nanoTime) {
-    return nanoTime / 1_000_000_000.0;
+    this.averageTimeRecordProcessingInSecs = this.totalTimeProcessingInSecs / this.totalProcessed;
+    this.averageTimeRecordIndexingInSecs = this.totalTimeIndexingInSecs / this.totalProcessed;
   }
 
   private double secondsTimeToHours(double secondTime) {
@@ -151,16 +147,13 @@ public class DatasetStatus implements HasMongoObjectId {
 
   @Override
   public String toString() {
-    final double totalTimeProcessingInSeconds = nanoTimeToSeconds(totalTimeProcessing);
-    final double totalTimeIndexingInSeconds = nanoTimeToSeconds(totalTimeIndexing);
     return String.format(
         "ObjectId: %s, datasetId: %s, totalRecords: %d, totalProcessed: %d, totalFailedRecords: %d, "
-            + "totalTimeProcessing: %fs = %fh, totalTimeIndexing: %fs = %fh, "
-            + "averageTimeRecordProcessing: %fs, averageTimeRecordIndexing: %fs",
+            + "totalTimeProcessingInSecs: %fs = %fh, totalTimeIndexingInSecs: %fs = %fh, "
+            + "averageTimeRecordProcessingInSecs: %fs, averageTimeRecordIndexingInSecs: %fs",
         id, datasetId, totalRecords, totalProcessed, totalFailedRecords,
-        totalTimeProcessingInSeconds, secondsTimeToHours(totalTimeProcessingInSeconds),
-        totalTimeIndexingInSeconds, secondsTimeToHours(totalTimeIndexingInSeconds),
-        nanoTimeToSeconds(averageTimeRecordProcessing),
-        nanoTimeToSeconds(averageTimeRecordIndexing));
+        totalTimeProcessingInSecs, secondsTimeToHours(totalTimeProcessingInSecs),
+        totalTimeIndexingInSecs, secondsTimeToHours(totalTimeIndexingInSecs),
+        averageTimeRecordProcessingInSecs, averageTimeRecordIndexingInSecs);
   }
 }
