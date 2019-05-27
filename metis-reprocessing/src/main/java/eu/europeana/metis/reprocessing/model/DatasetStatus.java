@@ -136,8 +136,13 @@ public class DatasetStatus implements HasMongoObjectId {
     this.totalTimeIndexing = totalTimeIndexing;
   }
 
+  public void updateAverages() {
+    this.averageTimeRecordProcessing = this.totalTimeProcessing / this.totalProcessed;
+    this.averageTimeRecordIndexing = this.totalTimeIndexing / this.totalProcessed;
+  }
+
   private double nanoTimeToSeconds(long nanoTime) {
-    return (double) nanoTime / 1_000_000_000.0;
+    return nanoTime / 1_000_000_000.0;
   }
 
   private double secondsTimeToHours(double secondTime) {

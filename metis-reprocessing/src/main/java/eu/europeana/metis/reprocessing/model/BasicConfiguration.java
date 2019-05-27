@@ -1,7 +1,7 @@
 package eu.europeana.metis.reprocessing.model;
 
-import eu.europeana.indexing.Indexer;
 import eu.europeana.indexing.IndexerFactory;
+import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.SetupRelatedIndexingException;
@@ -10,7 +10,6 @@ import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,7 +36,7 @@ public class BasicConfiguration {
   private final MetisCoreMongoDao metisCoreMongoDao;
   private final MongoSourceMongoDao mongoSourceMongoDao;
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
-  private final Indexer indexer;
+  private final IndexerPool indexerPool;
   private final Mode mode;
   private final List<ExecutablePluginType> invalidatePluginTypes;
   public final ExecutablePluginType reprocessBasedOnPluginType;
@@ -55,7 +54,7 @@ public class BasicConfiguration {
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
-    indexer = indexerFactory.getIndexer();
+    indexerPool = new IndexerPool(indexerFactory, 600, 60);
     mode = propertiesHolder.mode;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
@@ -73,8 +72,8 @@ public class BasicConfiguration {
     return mongoDestinationMongoDao;
   }
 
-  public Indexer getIndexer() {
-    return indexer;
+  public IndexerPool getIndexerPool() {
+    return indexerPool;
   }
 
   public ExtraConfiguration getExtraConfiguration() {
@@ -158,13 +157,13 @@ public class BasicConfiguration {
     return reprocessBasedOnPluginType;
   }
 
-  public void close() throws IOException {
+  public void close() {
     metisCoreMongoDao.close();
     mongoSourceMongoDao.close();
     mongoDestinationMongoDao.close();
     if (extraConfiguration != null) {
       extraConfiguration.close();
     }
-    indexer.close();
+    indexerPool.close();
   }
 }

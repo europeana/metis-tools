@@ -1,7 +1,7 @@
 package eu.europeana.metis.reprocessing.execution;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.indexing.Indexer;
+import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
@@ -37,9 +37,9 @@ public class IndexingUtilities {
   public static void indexRdf(RDF rdf, Boolean preserveTimestamps,
       BasicConfiguration basicConfiguration) throws IndexingException {
     try {
-      final Indexer indexer = basicConfiguration.getIndexer();
+      final IndexerPool indexerPool = basicConfiguration.getIndexerPool();
       ExternalRequestUtil.retryableExternalRequest(() -> {
-        indexer.indexRdf(rdf, preserveTimestamps);
+        indexerPool.indexRdf(rdf, preserveTimestamps);
         return null;
       }, exceptionMap);
     } catch (Exception e) {
