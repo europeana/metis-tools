@@ -1,6 +1,8 @@
 package eu.europeana.metis.reprocessing.dao;
 
 import com.mongodb.MongoClient;
+import eu.europeana.corelib.edm.exceptions.MongoDBException;
+import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
@@ -15,8 +17,7 @@ import org.mongodb.morphia.query.Query;
 /**
  * Mongo Dao for destination mongo.
  * <p>This is where the new records will reside as well as progress information of datasets and
- * failed records, see
- * {@link DatasetStatus} and {@link FailedRecord}</p>
+ * failed records, see {@link DatasetStatus} and {@link FailedRecord}</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
@@ -26,16 +27,18 @@ public class MongoDestinationMongoDao {
   private static final String DATASET_ID = "datasetId";
   private static final String FAILED_URL = "failedUrl";
 
-  private final MongoInitializer mongoDestinationMongoInitializer;
+  private final MongoInitializer destinationMongoInitializer;
   private Datastore mongoDestinationDatastore;
   private PropertiesHolder propertiesHolder;
 
   public MongoDestinationMongoDao(PropertiesHolder propertiesHolder) {
     this.propertiesHolder = propertiesHolder;
     //Mongo Destination
-    mongoDestinationMongoInitializer = prepareMongoDestinationConfiguration();
+    destinationMongoInitializer = prepareMongoDestinationConfiguration();
     mongoDestinationDatastore = createMongoDestinationDatastore(
-        mongoDestinationMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
+        destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoDb);
+    createIndexesForDestinationMongoRecords(destinationMongoInitializer.getMongoClient(),
+        propertiesHolder.destinationMongoDb);
   }
 
   public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
@@ -87,8 +90,18 @@ public class MongoDestinationMongoDao {
     return datastore;
   }
 
+  private static void createIndexesForDestinationMongoRecords(MongoClient mongoClient,
+      String databaseName) {
+    //Ignore object since we are using the IndexerImpl
+    try {
+      new EdmMongoServerImpl(mongoClient, databaseName, true);
+    } catch (MongoDBException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void close() {
-    mongoDestinationMongoInitializer.close();
+    destinationMongoInitializer.close();
   }
 
 }

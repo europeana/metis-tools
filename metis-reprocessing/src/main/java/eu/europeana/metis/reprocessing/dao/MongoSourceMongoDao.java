@@ -40,16 +40,16 @@ public class MongoSourceMongoDao {
   private static final int DEFAULT_PAGE_SIZE = 200;
   public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
-  private final MongoInitializer mongoSourceMongoInitializer;
+  private final MongoInitializer sourceMongoInitializer;
   private Datastore mongoSourceDatastore;
   private PropertiesHolder propertiesHolder;
 
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
     this.propertiesHolder = propertiesHolder;
     PAGE_SIZE = propertiesHolder.sourceMongoPageSize;
-    mongoSourceMongoInitializer = prepareMongoSourceConfiguration();
+    sourceMongoInitializer = prepareMongoSourceConfiguration();
     mongoSourceDatastore = createMongoSourceDatastore(
-        mongoSourceMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
+        sourceMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
   }
 
 
@@ -116,6 +116,6 @@ public class MongoSourceMongoDao {
   }
 
   public void close() {
-    mongoSourceMongoInitializer.close();
+    sourceMongoInitializer.close();
   }
 }

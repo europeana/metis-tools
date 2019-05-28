@@ -153,6 +153,7 @@ public class ProcessingUtilities {
       List<ThumbnailWrapper> thumbnailWrappers) {
     for (ThumbnailWrapper thumbnailWrapper : thumbnailWrappers) {
       //If the thumbnail already exists(e.g. from a previous execution of the script), avoid sending it again
+      LOGGER.info("Checking if thumbnail already exists in s3 with name: {}", thumbnailWrapper.getTargetName());
       if (!doesThumbnailExistInS3(amazonS3Client, s3Bucket, thumbnailWrapper.getTargetName())) {
         try (InputStream stream = new ByteArrayInputStream(thumbnailWrapper.getThumbnailBytes())) {
           amazonS3Client.putObject(s3Bucket, thumbnailWrapper.getTargetName(), stream, null);
