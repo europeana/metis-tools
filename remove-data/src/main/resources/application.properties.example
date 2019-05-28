@@ -1,11 +1,11 @@
-#Mongo
-mongo.hosts=
-mongo.port=
-mongo.authentication.db=
-mongo.username=
-mongo.password=
-mongo.enableSSL=
-mongo.db=
+#Mongo metis-core
+mongo.core.hosts=
+mongo.core.port=
+mongo.core.authentication.db=
+mongo.core.username=
+mongo.core.password=
+mongo.core.enableSSL=
+mongo.core.db=
 
 #eCloud
 ecloud.mcs.baseUrl=
@@ -16,3 +16,19 @@ ecloud.password=
 #Truststore
 truststore.path=
 truststore.password=
+
+#Mongo published records
+mongo.publish.hosts=
+mongo.publish.port=
+mongo.publish.authentication.db=
+mongo.publish.username=
+mongo.publish.password=
+mongo.publish.enableSSL=false
+mongo.publish.db=
+
+#Solr/Zookeeper published records
+solr.publish.hosts=
+zookeeper.publish.hosts=
+zookeeper.publish.port=
+zookeeper.publish.chroot=
+zookeeper.publish.defaultCollection=

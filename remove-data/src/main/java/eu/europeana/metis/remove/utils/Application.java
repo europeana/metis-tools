@@ -37,7 +37,7 @@ public final class Application implements Closeable {
     final MongoInitializer mongoInitializer = new MongoInitializer(properties);
     mongoInitializer.initializeMongoClient();
     final MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProvider(
-        mongoInitializer.getMongoClient(), properties.mongoDb);
+        mongoInitializer.getMongoClient(), properties.mongoCoreDb);
 
     return new Application(properties, mongoInitializer, morphiaDatastoreProvider);
   }

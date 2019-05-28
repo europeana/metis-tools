@@ -93,7 +93,7 @@ public class DatasetRemover {
     datasetXsltDao.deleteAllByDatasetId(metisDatasetId);
     datasetDao.delete(dataset);
 
-    // TODO JV: Delete all records from preview and publish Mongo and Solr
+    // TODO JV: Delete all records from preview and publish Mongo and Solr - call depublish script.
     LOGGER.error("TODO: Delete all records from preview and publish Mongo and Solr.");
   }
 

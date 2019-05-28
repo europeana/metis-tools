@@ -24,32 +24,32 @@ public class MongoInitializer {
   }
 
   public void initializeMongoClient() {
-    if (propertiesHolder.mongoHosts.length != propertiesHolder.mongoPorts.length
-        && propertiesHolder.mongoPorts.length != 1) {
+    if (propertiesHolder.mongoCoreHosts.length != propertiesHolder.mongoCorePorts.length
+        && propertiesHolder.mongoCorePorts.length != 1) {
       throw new IllegalArgumentException("Mongo hosts and ports are not properly configured.");
     }
 
     List<ServerAddress> serverAddresses = new ArrayList<>();
-    for (int i = 0; i < propertiesHolder.mongoHosts.length; i++) {
+    for (int i = 0; i < propertiesHolder.mongoCoreHosts.length; i++) {
       ServerAddress address;
-      if (propertiesHolder.mongoHosts.length == propertiesHolder.mongoPorts.length) {
-        address = new ServerAddress(propertiesHolder.mongoHosts[i], propertiesHolder.mongoPorts[i]);
+      if (propertiesHolder.mongoCoreHosts.length == propertiesHolder.mongoCorePorts.length) {
+        address = new ServerAddress(propertiesHolder.mongoCoreHosts[i], propertiesHolder.mongoCorePorts[i]);
       } else { // Same port for all
-        address = new ServerAddress(propertiesHolder.mongoHosts[i], propertiesHolder.mongoPorts[0]);
+        address = new ServerAddress(propertiesHolder.mongoCoreHosts[i], propertiesHolder.mongoCorePorts[0]);
       }
       serverAddresses.add(address);
     }
 
     Builder optionsBuilder = new Builder();
-    optionsBuilder.sslEnabled(propertiesHolder.mongoEnablessl);
-    if (StringUtils.isEmpty(propertiesHolder.mongoDb) || StringUtils
-        .isEmpty(propertiesHolder.mongoUsername) || StringUtils
-        .isEmpty(propertiesHolder.mongoPassword)) {
+    optionsBuilder.sslEnabled(propertiesHolder.mongoCoreEnablessl);
+    if (StringUtils.isEmpty(propertiesHolder.mongoCoreDb) || StringUtils
+        .isEmpty(propertiesHolder.mongoCoreUsername) || StringUtils
+        .isEmpty(propertiesHolder.mongoCorePassword)) {
       mongoClient = new MongoClient(serverAddresses, optionsBuilder.build());
     } else {
       MongoCredential mongoCredential = MongoCredential
-          .createCredential(propertiesHolder.mongoUsername, propertiesHolder.mongoAuthenticationDb,
-              propertiesHolder.mongoPassword.toCharArray());
+          .createCredential(propertiesHolder.mongoCoreUsername, propertiesHolder.mongoCoreAuthenticationDb,
+              propertiesHolder.mongoCorePassword.toCharArray());
       mongoClient = new MongoClient(serverAddresses, mongoCredential, optionsBuilder.build());
     }
   }
