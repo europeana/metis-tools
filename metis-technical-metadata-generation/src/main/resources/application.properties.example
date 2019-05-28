@@ -11,6 +11,10 @@ max.parallel.threads=
 start.from.file.index.in.directory=
 #The index of the file in the directory to end at. The file on that index is processed.
 end.at.file.index.in.directory=
+#The timeout, in milliseconds, of the connection to the resource.
+resource.connect.timeout=
+#The timeout, in milliseconds, of the socket after connecting to the resource.
+resource.socket.timeout=
 #Truststore
 truststore.path=
 truststore.password=
