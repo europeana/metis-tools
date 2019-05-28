@@ -1,27 +1,19 @@
 package eu.europeana.metis.technical.metadata.generation;
 
-import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
-
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManager;
-import eu.europeana.metis.technical.metadata.generation.utilities.MediaExtractorForFile;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoDao;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.mongodb.morphia.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProgressCheckerMain {
+public class ResetFileStatusMain {
+
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgressCheckerMain.class);
 
@@ -38,32 +30,16 @@ public class ProgressCheckerMain {
         .createDatastore(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
     // Check the progress.
-    checkProgress(datastore, 1, 131);
-    checkProgress(datastore, 397, 656);
-    checkProgress(datastore, 1089, 1921);
-
-    checkProgress(datastore, 132, 396);
-    checkProgress(datastore, 657, 1088);
-    checkProgress(datastore, 1922, 2200);
+    resetFiles(datastore, 1, 131);
+    resetFiles(datastore, 397, 656);
+    resetFiles(datastore, 1089, 1921);
 
     // Cleanup.
     LOGGER.info("Done.");
     mongoInitializer.close();
   }
 
-  private static int getLinkCount(File datasetFile) throws IOException {
-    try (InputStream inputStream = MediaExtractorForFile.getInputStreamForFilePath(datasetFile);
-        Reader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        BufferedReader reader = new BufferedReader(inputStreamReader)) {
-      int lines = 0;
-      while (reader.readLine() != null) {
-        lines++;
-      }
-      return lines;
-    }
-  }
-
-  private static void checkProgress(Datastore datastore, int from, int to) throws IOException {
+  private static void resetFiles(Datastore datastore, int from, int to) throws IOException {
     final MongoDao mongoDao = new MongoDao(datastore);
     final File[] filesPerDataset = ExecutorManager
         .getAllFiles(propertiesHolder.directoryWithResourcesPerDatasetPath);
@@ -78,22 +54,18 @@ public class ProgressCheckerMain {
 
         // Get the current status.
         final String fileName = datasetFile.getName();
-        final FileStatus fileStatus = Optional.ofNullable(mongoDao.getFileStatus(fileName))
-            .orElse(new FileStatus(fileName, 0));
-        final int linkCount = getLinkCount(datasetFile);
+        final FileStatus fileStatus = mongoDao.getFileStatus(fileName);
 
-        // maintain statistics
-        final boolean isFinished =
-            fileStatus.isEndOfFileReached() || fileStatus.getLineReached() >= linkCount;
-        totalLinkCount += linkCount;
-        processedLinkCount += (isFinished ? linkCount : fileStatus.getLineReached());
-
-        // Print
-        if (!isFinished) {
-          System.out.println(String
-              .format("File %s: %s, line %s of %s. %s lines left.", fileIndex, fileName,
-                  fileStatus.getLineReached(), linkCount, linkCount - fileStatus.getLineReached()));
+        // Reset
+        if (fileStatus != null) {
+          fileStatus.setEndOfFileReached(false);
+          fileStatus.setLineReached(0);
         }
+
+        // Re-store the status in db
+        mongoDao.storeFileStatusToDb(fileStatus);
+        System.out.println(String.format("Reset file %s: %s.", fileIndex, fileName));
+
       }
 
       // Next file.

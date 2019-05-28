@@ -34,7 +34,7 @@ public class MongoDao {
     return datastore.find(FileStatus.class).filter(FILE_NAME, fileName).get();
   }
 
-  void storeFileStatusToDb(FileStatus fileStatus) {
+  public void storeFileStatusToDb(FileStatus fileStatus) {
     datastore.save(fileStatus);
   }
 
@@ -64,7 +64,9 @@ public class MongoDao {
     technicalMetadataWrapper.setThumbnailWrappers(thumbnailWrappers);
     technicalMetadataWrapper.setSuccessExtraction(true);
 
-    datastore.save(technicalMetadataWrapper);
+    datastore.updateFirst(datastore.find(TechnicalMetadataWrapper.class)
+            .filter(RESOURCE_URL, technicalMetadataWrapper.getResourceUrl()), technicalMetadataWrapper,
+        true);
   }
 
   void storeFailedMediaInDb(String resourceUrl, String errorTrace) {
