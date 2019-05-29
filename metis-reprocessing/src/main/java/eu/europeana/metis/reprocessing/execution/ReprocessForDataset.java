@@ -56,20 +56,30 @@ public class ReprocessForDataset implements Callable<Void> {
 
   private Void reprocessDataset() {
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing starting", prefixDatasetidLog);
-    boolean processFailedOnly = datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()
-        && basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED;
-    if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()
-        && basicConfiguration.getMode() == Mode.DEFAULT) {
+
+    if (basicConfiguration.getMode() == Mode.DEFAULT) {
+      if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
+        LOGGER.info(EXECUTION_LOGS_MARKER,
+            "{} - Reprocessing not started because it was already completely processed with totalRecords: {} - totalProcessed: {}",
+            prefixDatasetidLog, datasetStatus.getTotalRecords(), datasetStatus.getTotalProcessed());
+        return null;
+      }
+      //Process normally if not completely processed
+      loopOverAllRecordsAndProcess(false);
+    } else if (basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED) {
+      if (datasetStatus.getTotalFailedRecords() <= 0) {
+        //Do not process dataset further cause we only process failed ones
+        LOGGER.info(EXECUTION_LOGS_MARKER,
+            "{} - Reprocessing not started because mode is: {} and there are no failed records",
+            prefixDatasetidLog, basicConfiguration.getMode().name());
+        return null;
+      }
       LOGGER.info(EXECUTION_LOGS_MARKER,
-          "{} - Reprocessing not started because it was already completely processed with totalRecords: {} - totalProcessed: {}",
-          prefixDatasetidLog, datasetStatus.getTotalRecords(), datasetStatus.getTotalProcessed());
-      return null;
-    } else if (processFailedOnly) {
-      LOGGER.info(EXECUTION_LOGS_MARKER,
-          "{} - Reprocessing will happen only on previously failed records",
-          prefixDatasetidLog);
+          "{} - Reprocessing will happen only on previously failed records, number of which is {}",
+          prefixDatasetidLog, datasetStatus.getTotalFailedRecords());
+      //Process only failed records no matter if the dataset has already been completed
+      loopOverAllRecordsAndProcess(true);
     }
-    loopOverAllRecordsAndProcess(processFailedOnly);
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing end", prefixDatasetidLog);
     LOGGER
         .info(EXECUTION_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);

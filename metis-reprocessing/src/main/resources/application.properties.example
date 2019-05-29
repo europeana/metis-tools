@@ -2,8 +2,8 @@ max.parallel.threads=
 start.from.dataset.index=
 end.at.dataset.index=
 source.mongo.page.size=
-#Possible values DEFAULT, REPROCESS_ALL_FAILED. The REPROCESS_ALL_FAILED will process failed records
-#for datasets that are already completely processed, the rest will continue processing as usual.
+#Possible values DEFAULT, REPROCESS_ALL_FAILED. The REPROCESS_ALL_FAILED will process only the
+#failed records for a dataset even if it's not previously completely processed.
 mode=DEFAULT
 invalidate.plugin.types=
 reprocess.based.on.plugin.type=
