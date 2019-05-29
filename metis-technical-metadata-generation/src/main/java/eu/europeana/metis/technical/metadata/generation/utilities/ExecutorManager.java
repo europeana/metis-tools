@@ -48,6 +48,9 @@ public class ExecutorManager {
 
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
+
+    processorFactory.setResourceConnectTimeout(propertiesHolder.resourceConnectTimeout);
+    processorFactory.setResourceSocketTimeout(propertiesHolder.resourceSocketTimeout);
   }
 
   public static File[] getAllFiles(File directoryWithResourcesPerDataset) throws IOException {

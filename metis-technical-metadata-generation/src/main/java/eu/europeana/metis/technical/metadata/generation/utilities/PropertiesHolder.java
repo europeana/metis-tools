@@ -30,6 +30,8 @@ public class PropertiesHolder {
   public final int maxParallelThreads;
   public final int startFromFileIndexInDirectory;
   public final int endAtFileIndexInDirectory;
+  public final int resourceConnectTimeout;
+  public final int resourceSocketTimeout;
 
   public final String truststorePath;
   public final String truststorePassword;
@@ -67,6 +69,8 @@ public class PropertiesHolder {
     maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
     startFromFileIndexInDirectory = Integer.parseInt(properties.getProperty("start.from.file.index.in.directory"));
     endAtFileIndexInDirectory = Integer.parseInt(properties.getProperty("end.at.file.index.in.directory"));
+    resourceConnectTimeout = Integer.parseInt(properties.getProperty("resource.connect.timeout"));
+    resourceSocketTimeout = Integer.parseInt(properties.getProperty("resource.socket.timeout"));
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");
