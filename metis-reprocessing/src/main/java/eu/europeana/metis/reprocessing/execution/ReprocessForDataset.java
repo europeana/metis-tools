@@ -147,22 +147,22 @@ public class ReprocessForDataset implements Callable<Void> {
   private void failedRecordsOperation(int nextPage) {
     final long totalFailedRecords = datasetStatus.getTotalFailedRecords();
     List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(nextPage);
-    long counterFaileRecordsProcessed = 0;
+    long counterFailedRecordsProcessed = 0;
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER
-          .info(EXECUTION_LOGS_MARKER, "{} - Processing number of records: {}", prefixDatasetidLog,
-              nextPageOfRecords.size());
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing number of records: {}",
+          prefixDatasetidLog, nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final String exceptionStackTrace = processAndIndex(fullBean);
         updateProcessFailedOnlyCounts(exceptionStackTrace, fullBean.getAbout());
       }
-      counterFaileRecordsProcessed += nextPageOfRecords.size();
+      counterFailedRecordsProcessed += nextPageOfRecords.size();
       LOGGER.info(EXECUTION_LOGS_MARKER,
           "{} - Processed number of records: {} out of total number of failed records: {}",
-          prefixDatasetidLog, counterFaileRecordsProcessed, totalFailedRecords);
+          prefixDatasetidLog, counterFailedRecordsProcessed, totalFailedRecords);
       nextPage++;
       nextPageOfRecords = getFailedFullBeans(nextPage);
     }
+    basicConfiguration.getMongoDestinationMongoDao().deleteAllSuccessfulReprocessedFailedRecords();
   }
 
   /**
@@ -277,8 +277,10 @@ public class ReprocessForDataset implements Callable<Void> {
     if (StringUtils.isNotBlank(resourceId)) {
       if (StringUtils.isBlank(exceptionStackTrace)) {
         if (processFailedOnly) {
-          basicConfiguration.getMongoDestinationMongoDao()
-              .deleteFailedRecord(new FailedRecord(resourceId));
+          //Replace the already existent failed record with indication that it was successfully reprocessed
+          final FailedRecord failedRecord = new FailedRecord(resourceId);
+          failedRecord.setSuccessfullyReprocessed(true);
+          basicConfiguration.getMongoDestinationMongoDao().storeFailedRecordToDb(failedRecord);
           datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() - 1);
           basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
         } else {

@@ -26,6 +26,7 @@ public class MongoDestinationMongoDao {
 
   private static final String DATASET_ID = "datasetId";
   private static final String FAILED_URL = "failedUrl";
+  private static final String SUCCESSFULLY_REPROCESSED = "successfullyReprocessed";
 
   private final MongoInitializer destinationMongoInitializer;
   private Datastore mongoDestinationDatastore;
@@ -43,7 +44,8 @@ public class MongoDestinationMongoDao {
 
   public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
     Query<FailedRecord> query = mongoDestinationDatastore.createQuery(FailedRecord.class);
-    query.field(FAILED_URL).startsWith("/" + datasetId + "/");
+    query.field(FAILED_URL).startsWith("/" + datasetId + "/").field(SUCCESSFULLY_REPROCESSED)
+        .equal(false);
     return ExternalRequestUtil.retryableExternalRequestConnectionReset(() -> query.asList(
         new FindOptions().skip(nextPage * MongoSourceMongoDao.PAGE_SIZE)
             .limit(MongoSourceMongoDao.PAGE_SIZE)));
@@ -62,8 +64,10 @@ public class MongoDestinationMongoDao {
     mongoDestinationDatastore.save(failedRecord);
   }
 
-  public void deleteFailedRecord(FailedRecord failedRecord) {
-    mongoDestinationDatastore.delete(failedRecord);
+  public void deleteAllSuccessfulReprocessedFailedRecords() {
+    Query<FailedRecord> query = mongoDestinationDatastore.createQuery(FailedRecord.class);
+    query.field(SUCCESSFULLY_REPROCESSED).equal(true);
+    mongoDestinationDatastore.delete(query);
   }
 
   private MongoInitializer prepareMongoDestinationConfiguration() {
