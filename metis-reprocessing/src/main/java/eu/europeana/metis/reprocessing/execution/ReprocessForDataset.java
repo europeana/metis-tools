@@ -137,6 +137,7 @@ public class ReprocessForDataset implements Callable<Void> {
   private void failedRecordsOperation(int nextPage) {
     final long totalFailedRecords = datasetStatus.getTotalFailedRecords();
     List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(nextPage);
+    long counterFaileRecordsProcessed = 0;
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER
           .info(EXECUTION_LOGS_MARKER, "{} - Processing number of records: {}", prefixDatasetidLog,
@@ -145,9 +146,10 @@ public class ReprocessForDataset implements Callable<Void> {
         final String exceptionStackTrace = processAndIndex(fullBean);
         updateProcessFailedOnlyCounts(exceptionStackTrace, fullBean.getAbout());
       }
+      counterFaileRecordsProcessed += nextPageOfRecords.size();
       LOGGER.info(EXECUTION_LOGS_MARKER,
           "{} - Processed number of records: {} out of total number of failed records: {}",
-          prefixDatasetidLog, nextPageOfRecords.size(), totalFailedRecords);
+          prefixDatasetidLog, counterFaileRecordsProcessed, totalFailedRecords);
       nextPage++;
       nextPageOfRecords = getFailedFullBeans(nextPage);
     }
