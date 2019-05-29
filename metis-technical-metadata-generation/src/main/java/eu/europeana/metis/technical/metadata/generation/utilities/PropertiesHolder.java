@@ -28,6 +28,7 @@ public class PropertiesHolder {
   public final File directoryWithResourcesPerDatasetPath;
   public final Mode mode;
   public final int maxParallelThreads;
+  public final int parallelThreadsPerFile;
   public final int startFromFileIndexInDirectory;
   public final int endAtFileIndexInDirectory;
   public final int resourceConnectTimeout;
@@ -67,6 +68,7 @@ public class PropertiesHolder {
     directoryWithResourcesPerDatasetPath = new File(properties.getProperty("directory.with.resources.per.dataset.path"));
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
     maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
+    parallelThreadsPerFile = Integer.parseInt(properties.getProperty("parallel.threads.per.file"));
     startFromFileIndexInDirectory = Integer.parseInt(properties.getProperty("start.from.file.index.in.directory"));
     endAtFileIndexInDirectory = Integer.parseInt(properties.getProperty("end.at.file.index.in.directory"));
     resourceConnectTimeout = Integer.parseInt(properties.getProperty("resource.connect.timeout"));

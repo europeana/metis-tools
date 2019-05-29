@@ -28,14 +28,9 @@ public class DepublishDatasetsMain {
   public static void main(String[] args)
       throws TrustStoreConfigurationException, IndexingException, URISyntaxException, IOException {
 
-    final List<String> datasetIds = Arrays
-        .asList("00501", "09330", "09411", "2020902", "2022069", "2022602", "2022607", "2026111",
-            "2026121", "2032008", "2048216", "2051916", "2055701", "2055702", "2055703", "2055704",
-            "2055705", "2055706", "2055707", "2055708", "2055709", "2055710", "2055711", "2055712",
-            "2055713", "2055714", "2055715", "2055716", "2055717", "2055718", "2055719", "2055720",
-            "2055721", "2055723", "2055724", "2055725", "2055726", "2055727", "2055728", "2055729",
-            "2055730", "2055731", "2055732", "2055733", "2055738", "2055739", "9200109", "9200132",
-            "9200175", "9200190", "9200203", "9200218", "9200226", "9200418", "9200419", "9200420");
+    final List<String> datasetIds = Arrays.asList(
+        // ADD DATASETS HERE.
+    );
     //    FileUtils.readLines(new File(DATASET_IDS_FILE), StandardCharsets.UTF_8).stream()
     //        .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
     try (final Application application = Application.initialize()) {

@@ -4,7 +4,6 @@ import static eu.europeana.metis.technical.metadata.generation.utilities.Propert
 import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.STATISTICS_LOGS_MARKER;
 
 import eu.europeana.metis.mediaprocessing.MediaProcessorFactory;
-import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.technical.metadata.generation.model.Mode;
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +31,7 @@ public class ExecutorManager {
   private final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
   private final Mode mode;
   private final int maxParallelThreads;
+  private final int parallelThreadsPerFile;
   private final int startFromFileIndexInDirectory;
   private final int endAtFileIndexInDirectory;
 
@@ -41,6 +41,7 @@ public class ExecutorManager {
   public ExecutorManager(Datastore datastore, PropertiesHolder propertiesHolder) {
     this.mongoDao = new MongoDao(datastore);
     this.maxParallelThreads = propertiesHolder.maxParallelThreads;
+    this.parallelThreadsPerFile = propertiesHolder.parallelThreadsPerFile;
     this.startFromFileIndexInDirectory = propertiesHolder.startFromFileIndexInDirectory;
     this.endAtFileIndexInDirectory = propertiesHolder.endAtFileIndexInDirectory;
     this.directoryWithResourcesPerDataset = propertiesHolder.directoryWithResourcesPerDatasetPath;
@@ -82,20 +83,16 @@ public class ExecutorManager {
       if (fileIndexInDirectory > endAtFileIndexInDirectory) {
         break;
       }
-      try {
-        final MediaExtractorForFile mediaExtractorForFile = new MediaExtractorForFile(datasetFile,
-            mongoDao, processorFactory, mode);
-        if (threadCounter >= maxParallelThreads) {
-          completionService.take();
-          threadCounter--;
-          processedFiles++;
-          LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
-        }
-        completionService.submit(mediaExtractorForFile);
-        threadCounter++;
-      } catch (MediaProcessorException e) {
-        LOGGER.warn("Could not create mediaExtractor during datasetFile {}", datasetFile, e);
+      final MediaExtractorForFile mediaExtractorForFile = new MediaExtractorForFile(datasetFile,
+          mongoDao, processorFactory, mode, parallelThreadsPerFile);
+      if (threadCounter >= maxParallelThreads) {
+        completionService.take();
+        threadCounter--;
+        processedFiles++;
+        LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_FILES_STR, processedFiles);
       }
+      completionService.submit(mediaExtractorForFile);
+      threadCounter++;
     }
 
     //Final cleanup of futures

@@ -30,7 +30,7 @@ public class ResetFileStatusMain {
         .createDatastore(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
     // Reset the file status.
-    resetFiles(propertiesHolder, datastore, 1, 1);
+    resetFiles(propertiesHolder, datastore, 875, 875);
  //   resetFiles(propertiesHolder, datastore, 397, 656);
  //   resetFiles(propertiesHolder, datastore, 1089, 1921);
 

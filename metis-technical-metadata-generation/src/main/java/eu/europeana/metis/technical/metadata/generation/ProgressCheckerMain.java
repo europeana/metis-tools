@@ -39,11 +39,12 @@ public class ProgressCheckerMain {
 
     // Check the progress.
     checkProgress(propertiesHolder, datastore, 1, 131);
-    checkProgress(propertiesHolder, datastore, 397, 656);
-    checkProgress(propertiesHolder, datastore, 1089, 1921);
+    checkProgress(propertiesHolder, datastore, 397, 882);
+    checkProgress(propertiesHolder, datastore, 1089, 1528);
+    checkProgress(propertiesHolder, datastore, 1529, 1921);
 
     checkProgress(propertiesHolder, datastore, 132, 396);
-    checkProgress(propertiesHolder, datastore, 657, 1088);
+    checkProgress(propertiesHolder, datastore, 883, 1088);
     checkProgress(propertiesHolder, datastore, 1922, 2200);
 
     // Cleanup.
