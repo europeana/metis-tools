@@ -18,35 +18,32 @@ public class ResetFileStatusMain {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgressCheckerMain.class);
 
   private static final String CONFIGURATION_FILE = "application.properties";
-  private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
 
     // Initialize.
     LOGGER.info("Starting script - initializing connections.");
+    final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
     final MongoInitializer mongoInitializer = TechnicalMetadataGenerationMain
-        .prepareConfiguration();
+        .prepareConfiguration(propertiesHolder);
     final Datastore datastore = TechnicalMetadataGenerationMain
         .createDatastore(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
-    // Check the progress.
-    resetFiles(datastore, 1, 131);
-    resetFiles(datastore, 397, 656);
-    resetFiles(datastore, 1089, 1921);
+    // Reset the file status.
+    resetFiles(propertiesHolder, datastore, 1, 1);
+ //   resetFiles(propertiesHolder, datastore, 397, 656);
+ //   resetFiles(propertiesHolder, datastore, 1089, 1921);
 
     // Cleanup.
     LOGGER.info("Done.");
     mongoInitializer.close();
   }
 
-  private static void resetFiles(Datastore datastore, int from, int to) throws IOException {
+  private static void resetFiles(PropertiesHolder propertiesHolder, Datastore datastore, int from,
+      int to) throws IOException {
     final MongoDao mongoDao = new MongoDao(datastore);
     final File[] filesPerDataset = ExecutorManager
         .getAllFiles(propertiesHolder.directoryWithResourcesPerDatasetPath);
-
-
-    long totalLinkCount = 0;
-    long processedLinkCount = 0;
     int fileIndex = 1; // one-based!
     for (File datasetFile : filesPerDataset) {
 
@@ -71,8 +68,5 @@ public class ResetFileStatusMain {
       // Next file.
       fileIndex++;
     }
-
-    LOGGER.info("{} files examined. Processed {} of {} links. {} links left.", fileIndex,
-        processedLinkCount, totalLinkCount, totalLinkCount - processedLinkCount);
   }
 }

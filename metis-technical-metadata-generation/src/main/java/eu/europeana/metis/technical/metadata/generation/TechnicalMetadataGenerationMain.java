@@ -27,12 +27,12 @@ public class TechnicalMetadataGenerationMain {
   private static final Logger LOGGER = LoggerFactory
       .getLogger(TechnicalMetadataGenerationMain.class);
   private static final String CONFIGURATION_FILE = "application.properties";
-  private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args) throws Exception {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script for technical metadata generation.");
 
-    final MongoInitializer mongoInitializer = prepareConfiguration();
+    final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
+    final MongoInitializer mongoInitializer = prepareConfiguration(propertiesHolder);
     final Datastore datastore = createDatastore(mongoInitializer.getMongoClient(),
         propertiesHolder.mongoDb);
 
@@ -43,7 +43,8 @@ public class TechnicalMetadataGenerationMain {
 
   }
 
-  static MongoInitializer prepareConfiguration() throws TrustStoreConfigurationException {
+  static MongoInitializer prepareConfiguration(PropertiesHolder propertiesHolder)
+      throws TrustStoreConfigurationException {
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
         .isNotEmpty(propertiesHolder.truststorePassword)) {
       LOGGER.info(EXECUTION_LOGS_MARKER,

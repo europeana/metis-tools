@@ -6,8 +6,7 @@ package eu.europeana.metis.technical.metadata.generation.model;
  */
 public enum Mode {
   DEFAULT,
-  START_FROM_BEGINNING_IGNORE_PROCESSED,
-  START_FROM_BEGINNING_RETRY_FAILED;
+  RETRY_FAILED;
 
   public static Mode getModeFromEnumName(String enumName) {
     for (Mode mode : Mode.values()) {
@@ -15,7 +14,7 @@ public enum Mode {
         return mode;
       }
     }
-    return DEFAULT;
+    throw new IllegalArgumentException();
   }
 
 }

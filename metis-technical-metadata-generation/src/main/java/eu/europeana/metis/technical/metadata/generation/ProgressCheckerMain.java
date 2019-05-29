@@ -26,25 +26,25 @@ public class ProgressCheckerMain {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgressCheckerMain.class);
 
   private static final String CONFIGURATION_FILE = "application.properties";
-  private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
 
     // Initialize.
     LOGGER.info("Starting script - initializing connections.");
+    final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
     final MongoInitializer mongoInitializer = TechnicalMetadataGenerationMain
-        .prepareConfiguration();
+        .prepareConfiguration(propertiesHolder);
     final Datastore datastore = TechnicalMetadataGenerationMain
         .createDatastore(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
     // Check the progress.
-    checkProgress(datastore, 1, 131);
-    checkProgress(datastore, 397, 656);
-    checkProgress(datastore, 1089, 1921);
+    checkProgress(propertiesHolder, datastore, 1, 131);
+    checkProgress(propertiesHolder, datastore, 397, 656);
+    checkProgress(propertiesHolder, datastore, 1089, 1921);
 
-    checkProgress(datastore, 132, 396);
-    checkProgress(datastore, 657, 1088);
-    checkProgress(datastore, 1922, 2200);
+    checkProgress(propertiesHolder, datastore, 132, 396);
+    checkProgress(propertiesHolder, datastore, 657, 1088);
+    checkProgress(propertiesHolder, datastore, 1922, 2200);
 
     // Cleanup.
     LOGGER.info("Done.");
@@ -63,7 +63,8 @@ public class ProgressCheckerMain {
     }
   }
 
-  private static void checkProgress(Datastore datastore, int from, int to) throws IOException {
+  private static void checkProgress(PropertiesHolder propertiesHolder, Datastore datastore,
+      int from, int to) throws IOException {
     final MongoDao mongoDao = new MongoDao(datastore);
     final File[] filesPerDataset = ExecutorManager
         .getAllFiles(propertiesHolder.directoryWithResourcesPerDatasetPath);

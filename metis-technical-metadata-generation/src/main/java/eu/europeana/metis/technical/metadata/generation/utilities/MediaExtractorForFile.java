@@ -143,7 +143,7 @@ public class MediaExtractorForFile implements Callable<Void> {
         .getTechnicalMetadataWrapper(resourceUrl);
     final boolean isMetadataNonNullAndRetryFailedResourcesTrue =
         technicalMetadataWrapper != null && !technicalMetadataWrapper.isSuccessExtraction()
-            && Mode.START_FROM_BEGINNING_RETRY_FAILED.equals(mode);
+            && Mode.RETRY_FAILED.equals(mode);
 
     return technicalMetadataWrapper == null || isMetadataNonNullAndRetryFailedResourcesTrue;
   }
@@ -176,15 +176,10 @@ public class MediaExtractorForFile implements Callable<Void> {
     //Or reset
     if (fileStatus == null) {
       fileStatus = new FileStatus(fileName, 0);
-    } else if (Mode.START_FROM_BEGINNING_IGNORE_PROCESSED.equals(mode)
-        || Mode.START_FROM_BEGINNING_RETRY_FAILED.equals(mode)) {
-      LOGGER.info(EXECUTION_LOGS_MARKER,
-          "Since startFromBeginningOfFiles or retryFailedResources is true, then we'll start from the beginning of the file");
-      fileStatus.setEndOfFileReached(false);
-      fileStatus.setLineReached(0);
+      mongoDao.storeFileStatusToDb(fileStatus);
     }
+
     //Re-store the status in db
-    mongoDao.storeFileStatusToDb(fileStatus);
     return fileStatus;
   }
 
