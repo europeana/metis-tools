@@ -5,6 +5,7 @@ import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTI
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,9 +52,20 @@ public class ExecutorManager {
     for (int i = startFromDatasetIndex; i < endAtDatasetIndex; i++) {
       String datasetId = allDatasetIds.get(i);
       // TODO: 17-5-19 remove the below line
-      datasetId = "2020103";
-      final ReprocessForDataset reprocessForDataset = new ReprocessForDataset(datasetId, i,
-          basicConfiguration);
+//      datasetId = "0940417";
+      Callable<Void> callable;
+      switch (basicConfiguration.getMode()) {
+        case CALCULATE_DATASET_STATISTICS:
+          callable = new StatisticsForDataset(datasetId, basicConfiguration, false);
+          break;
+        case CALCULATE_DATASET_STATISTICS_SAMPLE:
+          callable = new StatisticsForDataset(datasetId, basicConfiguration, true);
+          break;
+        case DEFAULT:
+        case REPROCESS_ALL_FAILED:
+        default:
+          callable = new ReprocessForDataset(datasetId, i, basicConfiguration);
+      }
       if (threadCounter >= maxParallelThreads) {
         completionService.take();
         threadCounter--;
@@ -61,7 +73,7 @@ public class ExecutorManager {
         LOGGER.info(REPROCESSED_DATASETS_STR, reprocessedDatasets);
         LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
       }
-      completionService.submit(reprocessForDataset);
+      completionService.submit(callable);
       threadCounter++;
     }
 

@@ -4,6 +4,7 @@ end.at.dataset.index=
 source.mongo.page.size=
 #Possible values DEFAULT, REPROCESS_ALL_FAILED. The REPROCESS_ALL_FAILED will process only the
 #failed records for a dataset even if it's not previously completely processed.
+#Extra modes to only generate some statistic logs. CALCULATE_DATASET_STATISTICS, CALCULATE_DATASET_STATISTICS_SAMPLE
 mode=DEFAULT
 invalidate.plugin.types=
 reprocess.based.on.plugin.type=
