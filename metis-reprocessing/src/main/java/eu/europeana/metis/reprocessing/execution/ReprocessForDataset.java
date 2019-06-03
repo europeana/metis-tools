@@ -290,6 +290,7 @@ public class ReprocessForDataset implements Callable<Void> {
         basicConfiguration.getMongoDestinationMongoDao()
             .storeFailedRecordToDb(new FailedRecord(resourceId, exceptionStackTrace));
         if (!processFailedOnly) {
+          datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
           datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
         }
       }

@@ -37,7 +37,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -130,9 +129,9 @@ public class ProcessingUtilities {
             .getTechnicalMetadataWrapper(resourceUrl);
         if (technicalMetadataWrapper != null && technicalMetadataWrapper.isSuccessExtraction()) {
           enrichedRdf.enrichResource(technicalMetadataWrapper.getResourceMetadata());
-          storeThumbnailsToS3(amazonS3Client, s3Bucket,
-              technicalMetadataWrapper.getThumbnailWrappers() == null ? Collections.emptyList()
-                  : technicalMetadataWrapper.getThumbnailWrappers());
+//          storeThumbnailsToS3(amazonS3Client, s3Bucket,
+//              technicalMetadataWrapper.getThumbnailWrappers() == null ? Collections.emptyList()
+//                  : technicalMetadataWrapper.getThumbnailWrappers());
         }
       } else {
         final ResourceMetadata resourceMetadata = convertWebResourceMetaInfoImpl(amazonS3Client,
@@ -153,7 +152,8 @@ public class ProcessingUtilities {
       List<ThumbnailWrapper> thumbnailWrappers) {
     for (ThumbnailWrapper thumbnailWrapper : thumbnailWrappers) {
       //If the thumbnail already exists(e.g. from a previous execution of the script), avoid sending it again
-      LOGGER.info("Checking if thumbnail already exists in s3 with name: {}", thumbnailWrapper.getTargetName());
+      LOGGER.info("Checking if thumbnail already exists in s3 with name: {}",
+          thumbnailWrapper.getTargetName());
       if (!doesThumbnailExistInS3(amazonS3Client, s3Bucket, thumbnailWrapper.getTargetName())) {
         try (InputStream stream = new ByteArrayInputStream(thumbnailWrapper.getThumbnailBytes())) {
           amazonS3Client.putObject(s3Bucket, thumbnailWrapper.getTargetName(), stream, null);
@@ -244,6 +244,7 @@ public class ProcessingUtilities {
       String s3Bucket, String resourceUrl, String md5Hex) throws IOException {
     ArrayList<Thumbnail> thumbnails = new ArrayList<>();
     String targetNameLarge = md5Hex + "-LARGE";
+    LOGGER.info("Get thumbnail target names existence from S3");
     if (doesThumbnailExistInS3(amazonS3Client, s3Bucket, targetNameLarge)) {
       final ThumbnailImpl thumbnail = new ThumbnailImpl(resourceUrl, targetNameLarge);
       //Close immediately, the contained files are not required.
