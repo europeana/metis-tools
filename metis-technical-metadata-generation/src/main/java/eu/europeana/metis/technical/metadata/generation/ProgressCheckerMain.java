@@ -1,7 +1,5 @@
 package eu.europeana.metis.technical.metadata.generation;
 
-import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
-
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManager;
 import eu.europeana.metis.technical.metadata.generation.utilities.MediaExtractorForFile;
@@ -38,14 +36,15 @@ public class ProgressCheckerMain {
         .createDatastore(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
     // Check the progress.
-    checkProgress(propertiesHolder, datastore, 1, 131);
-    checkProgress(propertiesHolder, datastore, 397, 882);
-    checkProgress(propertiesHolder, datastore, 1089, 1528);
-    checkProgress(propertiesHolder, datastore, 1529, 1921);
+    checkProgress(propertiesHolder, datastore, 1, 180);
+    checkProgress(propertiesHolder, datastore, 397, 1087);
+    checkProgress(propertiesHolder, datastore, 1089, 1979);
+    checkProgress(propertiesHolder, datastore, 2028, 2200);
 
-    checkProgress(propertiesHolder, datastore, 132, 396);
-    checkProgress(propertiesHolder, datastore, 883, 1088);
-    checkProgress(propertiesHolder, datastore, 1922, 2200);
+    checkProgress(propertiesHolder, datastore, 181, 183);
+    checkProgress(propertiesHolder, datastore, 184, 396);
+    checkProgress(propertiesHolder, datastore, 1088, 1088);
+    checkProgress(propertiesHolder, datastore, 1980, 2027);
 
     // Cleanup.
     LOGGER.info("Done.");

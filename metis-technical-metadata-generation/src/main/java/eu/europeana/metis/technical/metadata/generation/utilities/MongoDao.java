@@ -47,6 +47,10 @@ public class MongoDao {
   void storeMediaResultInDb(ResourceExtractionResult resourceExtractionResult)
       throws IOException {
 
+    if (resourceExtractionResult == null || resourceExtractionResult.getMetadata() == null) {
+      return;
+    }
+
     final TechnicalMetadataWrapper technicalMetadataWrapper = new TechnicalMetadataWrapper();
     technicalMetadataWrapper
         .setResourceUrl(resourceExtractionResult.getMetadata().getResourceUrl());
