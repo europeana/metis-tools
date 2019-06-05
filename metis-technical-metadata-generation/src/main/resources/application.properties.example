@@ -28,3 +28,9 @@ mongo.username=
 mongo.password=
 mongo.enableSSL=
 mongo.db=
+
+#S3
+s3.access.key=
+s3.secret.key=
+s3.endpoint=
+s3.bucket=

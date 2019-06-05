@@ -6,7 +6,8 @@ package eu.europeana.metis.technical.metadata.generation.model;
  */
 public enum Mode {
   DEFAULT,
-  RETRY_FAILED;
+  RETRY_FAILED,
+  UPLOAD_THUMBNAILS;
 
   public static Mode getModeFromEnumName(String enumName) {
     for (Mode mode : Mode.values()) {

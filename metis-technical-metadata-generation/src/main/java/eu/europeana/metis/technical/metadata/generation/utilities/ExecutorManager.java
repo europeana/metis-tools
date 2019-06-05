@@ -3,6 +3,9 @@ package eu.europeana.metis.technical.metadata.generation.utilities;
 import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.STATISTICS_LOGS_MARKER;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import eu.europeana.metis.mediaprocessing.MediaProcessorFactory;
 import eu.europeana.metis.technical.metadata.generation.model.Mode;
 import java.io.File;
@@ -12,6 +15,7 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,8 @@ public class ExecutorManager {
   private final MongoDao mongoDao;
   private final File directoryWithResourcesPerDataset;
   private final MediaProcessorFactory processorFactory = new MediaProcessorFactory();
+  private AmazonS3 amazonS3Client;
+  private String s3Bucket;
   private final Mode mode;
   private final int maxParallelThreads;
   private final int parallelThreadsPerFile;
@@ -46,6 +52,17 @@ public class ExecutorManager {
     this.endAtFileIndexInDirectory = propertiesHolder.endAtFileIndexInDirectory;
     this.directoryWithResourcesPerDataset = propertiesHolder.directoryWithResourcesPerDatasetPath;
     this.mode = propertiesHolder.mode;
+
+    //S3
+    if (StringUtils.isNotBlank(propertiesHolder.s3AccessKey) && StringUtils
+        .isNotBlank(propertiesHolder.s3SecretKey) && StringUtils
+        .isNotBlank(propertiesHolder.s3Bucket)) {
+      this.amazonS3Client = new AmazonS3Client(new BasicAWSCredentials(
+          propertiesHolder.s3AccessKey,
+          propertiesHolder.s3SecretKey));
+      amazonS3Client.setEndpoint(propertiesHolder.s3Endpoint);
+      this.s3Bucket = propertiesHolder.s3Bucket;
+    }
 
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
@@ -84,7 +101,7 @@ public class ExecutorManager {
         break;
       }
       final MediaExtractorForFile mediaExtractorForFile = new MediaExtractorForFile(datasetFile,
-          mongoDao, processorFactory, mode, parallelThreadsPerFile);
+          mongoDao, amazonS3Client, s3Bucket, processorFactory, mode, parallelThreadsPerFile);
       if (threadCounter >= maxParallelThreads) {
         completionService.take();
         threadCounter--;

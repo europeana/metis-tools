@@ -8,12 +8,10 @@ import org.mongodb.morphia.annotations.IndexOptions;
 import org.mongodb.morphia.annotations.Indexed;
 
 /**
- * Model class that contains the status of the process for a specific file.
- *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-04-17
+ * @since 2019-06-05
  */
-public class FileStatus implements PhysicalFileStatus {
+public class ThumbnailFileStatus implements PhysicalFileStatus {
 
   @Id
   @JsonSerialize(using = ObjectIdSerializer.class)
@@ -24,10 +22,10 @@ public class FileStatus implements PhysicalFileStatus {
   private int lineReached;
   private boolean endOfFileReached;
 
-  public FileStatus() {
+  public ThumbnailFileStatus() {
   }
 
-  public FileStatus(String fileName, int lineReached) {
+  public ThumbnailFileStatus(String fileName, int lineReached) {
     this.fileName = fileName;
     this.lineReached = lineReached;
   }

@@ -2,6 +2,7 @@ package eu.europeana.metis.technical.metadata.generation.utilities;
 
 import static eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 
+import com.amazonaws.services.s3.AmazonS3;
 import eu.europeana.metis.mediaprocessing.AbstractMediaProcessorPool.MediaExtractorPool;
 import eu.europeana.metis.mediaprocessing.MediaProcessorFactory;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
@@ -11,7 +12,11 @@ import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.Mode;
+import eu.europeana.metis.technical.metadata.generation.model.PhysicalFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
+import eu.europeana.metis.technical.metadata.generation.model.ThumbnailFileStatus;
+import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +26,7 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -30,6 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * {@link Callable} that will go through a initialized dataset file and parse each resource per
@@ -47,6 +54,8 @@ public class MediaExtractorForFile implements Callable<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(MediaExtractorForFile.class);
   private final File datasetFile;
   private final MongoDao mongoDao;
+  private final AmazonS3 amazonS3Client;
+  private final String s3Bucket;
   private final MediaExtractorPool mediaExtractorPool;
   private final Mode mode;
   private final int parallelThreadsPerFile;
@@ -54,10 +63,13 @@ public class MediaExtractorForFile implements Callable<Void> {
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Void> completionService;
 
-  MediaExtractorForFile(File datasetFile, MongoDao mongoDao,
-      MediaProcessorFactory mediaProcessorFactory, Mode mode, int parallelThreadsPerFile) {
+  MediaExtractorForFile(File datasetFile, MongoDao mongoDao, AmazonS3 amazonS3Client,
+      String s3Bucket, MediaProcessorFactory mediaProcessorFactory, Mode mode,
+      int parallelThreadsPerFile) {
     this.datasetFile = datasetFile;
     this.mongoDao = mongoDao;
+    this.amazonS3Client = amazonS3Client;
+    this.s3Bucket = s3Bucket;
     this.mediaExtractorPool = new MediaExtractorPool(mediaProcessorFactory);
     this.mode = mode;
     this.parallelThreadsPerFile = parallelThreadsPerFile;
@@ -78,15 +90,21 @@ public class MediaExtractorForFile implements Callable<Void> {
     try {
       inputStream = getInputStreamForFilePath(datasetFile);
     } catch (IOException e) {
-      LOGGER.warn(EXECUTION_LOGS_MARKER, "Something went wrong when reading file: {}", datasetFile, e);
+      LOGGER.warn(EXECUTION_LOGS_MARKER, "Something went wrong when reading file: {}", datasetFile,
+          e);
       return null;
     }
 
-    final FileStatus fileStatus = getFileStatus(datasetFile.getName());
-    int lineIndex = fileStatus.getLineReached();
+    final PhysicalFileStatus physicalFileStatus = retrieveCorrectPhysicalFileStatusModeBased(
+        datasetFile.getName());
+    //Exit if we cannot determine the file status
+    if (physicalFileStatus == null) {
+      return null;
+    }
+    int lineIndex = physicalFileStatus.getLineReached();
     try (Scanner scanner = new Scanner(inputStream, "UTF-8")) {
       //Bypass lines until the reached one, from a previous execution
-      if (moveScannerToLine(scanner, fileStatus)) {
+      if (moveScannerToLine(scanner, physicalFileStatus)) {
         final Set<Integer> nonRegisteredLines = new HashSet<>();
         int threadCounter = 0;
         while (scanner.hasNextLine()) {
@@ -99,7 +117,7 @@ public class MediaExtractorForFile implements Callable<Void> {
 
           // Submit task for this line.
           lineIndex++;
-          submitResource(fileStatus, nonRegisteredLines, lineIndex, scanner.nextLine());
+          submitResource(physicalFileStatus, nonRegisteredLines, lineIndex, scanner.nextLine());
           threadCounter++;
         }
 
@@ -109,8 +127,8 @@ public class MediaExtractorForFile implements Callable<Void> {
         }
 
         // Set file status for end of file.
-        fileStatus.setEndOfFileReached(true);
-        mongoDao.storeFileStatusToDb(fileStatus);
+        physicalFileStatus.setEndOfFileReached(true);
+        mongoDao.storeFileStatusToDb(physicalFileStatus);
       }
     }
     LOGGER.info(EXECUTION_LOGS_MARKER, "Finished: {}", datasetFile);
@@ -119,12 +137,33 @@ public class MediaExtractorForFile implements Callable<Void> {
     return null;
   }
 
-  private void submitResource(final FileStatus fileStatus, final Set<Integer> nonRegisteredLines,
+  private PhysicalFileStatus retrieveCorrectPhysicalFileStatusModeBased(String fileName) {
+    PhysicalFileStatus fileStatus = getFileStatus(fileName);
+    if (mode == Mode.UPLOAD_THUMBNAILS) {
+      //Check if the generation of technical metadata has actually finished
+      if (!fileStatus.isEndOfFileReached()) {
+        LOGGER.info(
+            "FileStatus {} that has not been fully processed will not be processed for thumbnail upload..",
+            fileStatus.getFileName());
+        return null;
+      }
+      //Otherwise replace file status with thumbnail file status
+      fileStatus = getThumbnailFileStatus(fileName);
+    }
+    return fileStatus;
+  }
+
+  private void submitResource(final PhysicalFileStatus fileStatus,
+      final Set<Integer> nonRegisteredLines,
       final int thisLineIndex, final String thisLine) {
     completionService.submit(() -> {
 
       // process resource
-      processResource(thisLine);
+      if (mode == Mode.UPLOAD_THUMBNAILS) {
+        thumbnailUpload(thisLine);
+      } else {
+        processResource(thisLine);
+      }
 
       // Set file status - synchronized to protect the set and the file status
       synchronized (this) {
@@ -153,6 +192,18 @@ public class MediaExtractorForFile implements Callable<Void> {
       // Done.
       return null;
     });
+  }
+
+  private void thumbnailUpload(String resourceUrl) {
+    final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
+        .getTechnicalMetadataWrapper(resourceUrl);
+    if (CollectionUtils.isEmpty(technicalMetadataWrapper.getThumbnailWrappers())) {
+      LOGGER.info("Resource does not have thumbnails: {}", resourceUrl);
+    } else {
+      storeThumbnailsToS3(amazonS3Client, s3Bucket,
+          technicalMetadataWrapper.getThumbnailWrappers());
+      mongoDao.removeThumbnailsFromTechnicalMetadataWrapper(technicalMetadataWrapper);
+    }
   }
 
   private void processResource(String resourceUrl) {
@@ -203,7 +254,7 @@ public class MediaExtractorForFile implements Callable<Void> {
 
   private boolean eligibleForProcessing(String resourceUrl) {
     final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
-        .getTechnicalMetadataWrapper(resourceUrl);
+        .getTechnicalMetadataWrapperFieldProjection(resourceUrl);
     final boolean isMetadataNonNullAndRetryFailedResourcesTrue =
         technicalMetadataWrapper != null && !technicalMetadataWrapper.isSuccessExtraction()
             && Mode.RETRY_FAILED.equals(mode);
@@ -211,7 +262,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return technicalMetadataWrapper == null || isMetadataNonNullAndRetryFailedResourcesTrue;
   }
 
-  private boolean moveScannerToLine(Scanner scanner, FileStatus fileStatus) {
+  private boolean moveScannerToLine(Scanner scanner, PhysicalFileStatus fileStatus) {
     if (fileStatus.isEndOfFileReached()) {
       LOGGER.warn(EXECUTION_LOGS_MARKER,
           "On a previous execution, we have already reached the end of file {}",
@@ -246,6 +297,20 @@ public class MediaExtractorForFile implements Callable<Void> {
     return fileStatus;
   }
 
+  private ThumbnailFileStatus getThumbnailFileStatus(String fileName) {
+    //From Mongo
+    ThumbnailFileStatus thumbnailFileStatus = mongoDao.getThumbnailFileStatus(fileName);
+
+    //Or reset
+    if (thumbnailFileStatus == null) {
+      thumbnailFileStatus = new ThumbnailFileStatus(fileName, 0);
+      mongoDao.storeFileStatusToDb(thumbnailFileStatus);
+    }
+
+    //Re-store the status in db
+    return thumbnailFileStatus;
+  }
+
   private static boolean isGZipped(File file) {
     int magic = 0;
     try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
@@ -254,6 +319,30 @@ public class MediaExtractorForFile implements Callable<Void> {
       LOGGER.error("Could not determine if file is gzip", e);
     }
     return magic == GZIPInputStream.GZIP_MAGIC;
+  }
+
+  static void storeThumbnailsToS3(AmazonS3 amazonS3Client, String s3Bucket,
+      List<ThumbnailWrapper> thumbnailWrappers) {
+    for (ThumbnailWrapper thumbnailWrapper : thumbnailWrappers) {
+      //If the thumbnail already exists(e.g. from a previous execution of the script), avoid sending it again
+      LOGGER.info("Checking if thumbnail already exists in s3 with name: {}",
+          thumbnailWrapper.getTargetName());
+      if (!doesThumbnailExistInS3(amazonS3Client, s3Bucket, thumbnailWrapper.getTargetName())) {
+        try (InputStream stream = new ByteArrayInputStream(thumbnailWrapper.getThumbnailBytes())) {
+          amazonS3Client.putObject(s3Bucket, thumbnailWrapper.getTargetName(), stream, null);
+          LOGGER.info("Sent item to S3 with name: {}", thumbnailWrapper.getTargetName());
+        } catch (Exception e) {
+          LOGGER.error(
+              "Error while uploading {} to S3 in Bluemix. The full error message is: {} because of: ",
+              thumbnailWrapper.getTargetName(), e);
+        }
+      }
+    }
+  }
+
+  static boolean doesThumbnailExistInS3(AmazonS3 amazonS3Client, String s3Bucket,
+      String targetNameLarge) {
+    return amazonS3Client.doesObjectExist(s3Bucket, targetNameLarge);
   }
 
 }
