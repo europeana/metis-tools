@@ -1,8 +1,9 @@
 #Directory that contains one file per dataset, and each file contains a resource url per line
 directory.with.resources.per.dataset.path=
-#Possible values DEFAULT, RETRY_FAILED.
+#Possible values DEFAULT, RETRY_FAILED, UPLOAD_THUMBNAILS.
 #The DEFAULT value will skip all lines that have already been processed.
 #The RETRY_FAILED value will attempt to redo all lines that have failed.
+#The UPLOAD_THUMBNAILS value will upload already generated thumbnails to S3 and remove them from the cache
 mode=DEFAULT
 #The number of parallel executions, each thread will take care of one dataset.
 max.parallel.threads=

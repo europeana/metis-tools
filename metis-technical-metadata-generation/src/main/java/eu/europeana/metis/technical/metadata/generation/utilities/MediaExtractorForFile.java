@@ -142,7 +142,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     if (mode == Mode.UPLOAD_THUMBNAILS) {
       //Check if the generation of technical metadata has actually finished
       if (!fileStatus.isEndOfFileReached()) {
-        LOGGER.info(
+        LOGGER.info(EXECUTION_LOGS_MARKER,
             "FileStatus {} that has not been fully processed will not be processed for thumbnail upload..",
             fileStatus.getFileName());
         return null;
@@ -325,14 +325,15 @@ public class MediaExtractorForFile implements Callable<Void> {
       List<ThumbnailWrapper> thumbnailWrappers) {
     for (ThumbnailWrapper thumbnailWrapper : thumbnailWrappers) {
       //If the thumbnail already exists(e.g. from a previous execution of the script), avoid sending it again
-      LOGGER.info("Checking if thumbnail already exists in s3 with name: {}",
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Checking if thumbnail already exists in s3 with name: {}",
           thumbnailWrapper.getTargetName());
       if (!doesThumbnailExistInS3(amazonS3Client, s3Bucket, thumbnailWrapper.getTargetName())) {
         try (InputStream stream = new ByteArrayInputStream(thumbnailWrapper.getThumbnailBytes())) {
           amazonS3Client.putObject(s3Bucket, thumbnailWrapper.getTargetName(), stream, null);
-          LOGGER.info("Sent item to S3 with name: {}", thumbnailWrapper.getTargetName());
+          LOGGER.info(EXECUTION_LOGS_MARKER, "Sent item to S3 with name: {}",
+              thumbnailWrapper.getTargetName());
         } catch (Exception e) {
-          LOGGER.error(
+          LOGGER.error(EXECUTION_LOGS_MARKER,
               "Error while uploading {} to S3 in Bluemix. The full error message is: {} because of: ",
               thumbnailWrapper.getTargetName(), e);
         }
