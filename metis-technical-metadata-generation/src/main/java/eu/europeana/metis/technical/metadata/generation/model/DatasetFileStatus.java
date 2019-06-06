@@ -6,7 +6,7 @@ import eu.europeana.metis.core.workflow.HasMongoObjectId;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-06-05
  */
-public interface PhysicalFileStatus extends HasMongoObjectId {
+public interface DatasetFileStatus extends HasMongoObjectId {
 
   String getFileName();
 

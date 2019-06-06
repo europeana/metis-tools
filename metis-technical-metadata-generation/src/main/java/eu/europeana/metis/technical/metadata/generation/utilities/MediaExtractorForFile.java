@@ -12,7 +12,7 @@ import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.Mode;
-import eu.europeana.metis.technical.metadata.generation.model.PhysicalFileStatus;
+import eu.europeana.metis.technical.metadata.generation.model.DatasetFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.technical.metadata.generation.model.ThumbnailFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
@@ -95,16 +95,16 @@ public class MediaExtractorForFile implements Callable<Void> {
       return null;
     }
 
-    final PhysicalFileStatus physicalFileStatus = retrieveCorrectPhysicalFileStatusModeBased(
+    final DatasetFileStatus datasetFileStatus = retrieveCorrectPhysicalFileStatusModeBased(
         datasetFile.getName());
     //Exit if we cannot determine the file status
-    if (physicalFileStatus == null) {
+    if (datasetFileStatus == null) {
       return null;
     }
-    int lineIndex = physicalFileStatus.getLineReached();
+    int lineIndex = datasetFileStatus.getLineReached();
     try (Scanner scanner = new Scanner(inputStream, "UTF-8")) {
       //Bypass lines until the reached one, from a previous execution
-      if (moveScannerToLine(scanner, physicalFileStatus)) {
+      if (moveScannerToLine(scanner, datasetFileStatus)) {
         final Set<Integer> nonRegisteredLines = new HashSet<>();
         int threadCounter = 0;
         while (scanner.hasNextLine()) {
@@ -117,7 +117,7 @@ public class MediaExtractorForFile implements Callable<Void> {
 
           // Submit task for this line.
           lineIndex++;
-          submitResource(physicalFileStatus, nonRegisteredLines, lineIndex, scanner.nextLine());
+          submitResource(datasetFileStatus, nonRegisteredLines, lineIndex, scanner.nextLine());
           threadCounter++;
         }
 
@@ -127,8 +127,8 @@ public class MediaExtractorForFile implements Callable<Void> {
         }
 
         // Set file status for end of file.
-        physicalFileStatus.setEndOfFileReached(true);
-        mongoDao.storeFileStatusToDb(physicalFileStatus);
+        datasetFileStatus.setEndOfFileReached(true);
+        mongoDao.storeFileStatusToDb(datasetFileStatus);
       }
     }
     LOGGER.info(EXECUTION_LOGS_MARKER, "Finished: {}", datasetFile);
@@ -137,8 +137,8 @@ public class MediaExtractorForFile implements Callable<Void> {
     return null;
   }
 
-  private PhysicalFileStatus retrieveCorrectPhysicalFileStatusModeBased(String fileName) {
-    PhysicalFileStatus fileStatus = getFileStatus(fileName);
+  private DatasetFileStatus retrieveCorrectPhysicalFileStatusModeBased(String fileName) {
+    DatasetFileStatus fileStatus = getFileStatus(fileName);
     if (mode == Mode.UPLOAD_THUMBNAILS) {
       //Check if the generation of technical metadata has actually finished
       if (!fileStatus.isEndOfFileReached()) {
@@ -153,7 +153,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return fileStatus;
   }
 
-  private void submitResource(final PhysicalFileStatus fileStatus,
+  private void submitResource(final DatasetFileStatus fileStatus,
       final Set<Integer> nonRegisteredLines,
       final int thisLineIndex, final String thisLine) {
     completionService.submit(() -> {
@@ -262,7 +262,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return technicalMetadataWrapper == null || isMetadataNonNullAndRetryFailedResourcesTrue;
   }
 
-  private boolean moveScannerToLine(Scanner scanner, PhysicalFileStatus fileStatus) {
+  private boolean moveScannerToLine(Scanner scanner, DatasetFileStatus fileStatus) {
     if (fileStatus.isEndOfFileReached()) {
       LOGGER.warn(EXECUTION_LOGS_MARKER,
           "On a previous execution, we have already reached the end of file {}",

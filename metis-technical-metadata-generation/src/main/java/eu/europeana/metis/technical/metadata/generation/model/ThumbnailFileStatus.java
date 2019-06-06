@@ -13,7 +13,7 @@ import org.mongodb.morphia.annotations.Indexed;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-06-05
  */
-public class ThumbnailFileStatus implements PhysicalFileStatus {
+public class ThumbnailFileStatus implements DatasetFileStatus {
 
   @Id
   @JsonSerialize(using = ObjectIdSerializer.class)

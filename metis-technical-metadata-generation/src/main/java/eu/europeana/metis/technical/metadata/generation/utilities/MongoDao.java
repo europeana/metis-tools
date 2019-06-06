@@ -3,7 +3,7 @@ package eu.europeana.metis.technical.metadata.generation.utilities;
 import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
-import eu.europeana.metis.technical.metadata.generation.model.PhysicalFileStatus;
+import eu.europeana.metis.technical.metadata.generation.model.DatasetFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.technical.metadata.generation.model.ThumbnailFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
@@ -48,7 +48,7 @@ public class MongoDao {
     return datastore.find(ThumbnailFileStatus.class).asList();
   }
 
-  public void storeFileStatusToDb(PhysicalFileStatus fileStatus) {
+  public void storeFileStatusToDb(DatasetFileStatus fileStatus) {
     datastore.save(fileStatus);
   }
 
