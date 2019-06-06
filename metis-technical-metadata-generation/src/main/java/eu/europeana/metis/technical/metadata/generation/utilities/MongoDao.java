@@ -36,8 +36,16 @@ public class MongoDao {
     return datastore.find(FileStatus.class).filter(FILE_NAME, fileName).get();
   }
 
+  public List<FileStatus> getAllFileStatus() {
+    return datastore.find(FileStatus.class).asList();
+  }
+
   public ThumbnailFileStatus getThumbnailFileStatus(String fileName) {
     return datastore.find(ThumbnailFileStatus.class).filter(FILE_NAME, fileName).get();
+  }
+
+  public List<ThumbnailFileStatus> getAllThumbnailFileStatus() {
+    return datastore.find(ThumbnailFileStatus.class).asList();
   }
 
   public void storeFileStatusToDb(PhysicalFileStatus fileStatus) {

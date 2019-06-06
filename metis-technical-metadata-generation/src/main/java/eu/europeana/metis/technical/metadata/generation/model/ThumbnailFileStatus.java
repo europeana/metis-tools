@@ -8,6 +8,8 @@ import org.mongodb.morphia.annotations.IndexOptions;
 import org.mongodb.morphia.annotations.Indexed;
 
 /**
+ * Model class that contains the status of the thumbnail upload process for a specific file.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-06-05
  */
@@ -68,5 +70,12 @@ public class ThumbnailFileStatus implements PhysicalFileStatus {
   @Override
   public void setEndOfFileReached(boolean endOfFileReached) {
     this.endOfFileReached = endOfFileReached;
+  }
+
+  @Override
+  public String toString() {
+    return String
+        .format("ObjectId: %s, fileName: %s, lineReached: %d, endOfFileReached: %b", id, fileName,
+            lineReached, endOfFileReached);
   }
 }

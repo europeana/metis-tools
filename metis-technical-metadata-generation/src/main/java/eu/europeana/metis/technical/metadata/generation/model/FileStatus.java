@@ -71,4 +71,11 @@ public class FileStatus implements PhysicalFileStatus {
   public void setEndOfFileReached(boolean endOfFileReached) {
     this.endOfFileReached = endOfFileReached;
   }
+
+  @Override
+  public String toString() {
+    return String
+        .format("ObjectId: %s, fileName: %s, lineReached: %d, endOfFileReached: %b", id, fileName,
+            lineReached, endOfFileReached);
+  }
 }

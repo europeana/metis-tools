@@ -1,6 +1,8 @@
 package eu.europeana.metis.technical.metadata.generation.model;
 
 /**
+ * Mode options.
+ *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-19
  */
