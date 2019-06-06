@@ -4,11 +4,13 @@ import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTI
 
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,13 +46,24 @@ public class ExecutorManager {
   }
 
   public void startReprocessing() throws InterruptedException {
+    LOGGER.info("Calculating order of datasets for processing..");
     final List<String> allDatasetIds = basicConfiguration.getMetisCoreMongoDao()
         .getAllDatasetIdsOrdered();
+    final List<Long> sizeOfAllDatasetIds = allDatasetIds.stream()
+        .map(datasetId -> basicConfiguration.getMongoSourceMongoDao()
+            .getTotalRecordsForDataset(datasetId)).collect(Collectors.toList());
+    final List<String> sortedAllDatasetIds = allDatasetIds.stream()
+        .sorted(Comparator.comparingLong(o -> sizeOfAllDatasetIds.get(allDatasetIds.indexOf(o)))
+            .reversed()).collect(Collectors.toList());
+    final List<String> nonZeroSortedAllDatasetIds = sortedAllDatasetIds.stream()
+        .filter(datasetId -> sizeOfAllDatasetIds.get(allDatasetIds.indexOf(datasetId)) != 0)
+        .collect(Collectors.toList());
+
     int threadCounter = 0;
     int reprocessedDatasets = 0;
 
     for (int i = startFromDatasetIndex; i < endAtDatasetIndex; i++) {
-      String datasetId = allDatasetIds.get(i);
+      String datasetId = nonZeroSortedAllDatasetIds.get(i);
       // TODO: 17-5-19 remove the below line
 //      datasetId = "0940417";
       Callable<Void> callable;
