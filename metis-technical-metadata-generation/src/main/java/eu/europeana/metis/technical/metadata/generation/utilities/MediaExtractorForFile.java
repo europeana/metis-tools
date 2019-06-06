@@ -34,7 +34,6 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,18 +194,16 @@ public class MediaExtractorForFile implements Callable<Void> {
   }
 
   private void thumbnailUpload(String resourceUrl) {
-    if (StringUtils.isNotBlank(resourceUrl)) {
-      final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
-          .getTechnicalMetadataWrapper(resourceUrl);
-      if (technicalMetadataWrapper.getThumbnailWrappers() == null || technicalMetadataWrapper
-          .getThumbnailWrappers().isEmpty()) {
-        LOGGER.info("Resource does not have thumbnails: {}", resourceUrl);
-      } else {
-        final boolean successfulOperation = storeThumbnailsToS3(amazonS3Client, s3Bucket,
-            technicalMetadataWrapper.getThumbnailWrappers());
-        if (successfulOperation) {
-          mongoDao.removeThumbnailsFromTechnicalMetadataWrapper(technicalMetadataWrapper);
-        }
+    final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
+        .getTechnicalMetadataWrapper(resourceUrl);
+    if (technicalMetadataWrapper == null || technicalMetadataWrapper.getThumbnailWrappers() == null
+        || technicalMetadataWrapper.getThumbnailWrappers().isEmpty()) {
+      LOGGER.info("Resource does not have thumbnails: {}", resourceUrl);
+    } else {
+      final boolean successfulOperation = storeThumbnailsToS3(amazonS3Client, s3Bucket,
+          technicalMetadataWrapper.getThumbnailWrappers());
+      if (successfulOperation) {
+        mongoDao.removeThumbnailsFromTechnicalMetadataWrapper(technicalMetadataWrapper);
       }
     }
   }
