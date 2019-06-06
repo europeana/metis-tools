@@ -46,7 +46,7 @@ public class ExecutorManager {
   }
 
   public void startReprocessing() throws InterruptedException {
-    LOGGER.info("Calculating order of datasets for processing..");
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
     final List<String> allDatasetIds = basicConfiguration.getMetisCoreMongoDao()
         .getAllDatasetIdsOrdered();
     final List<Long> sizeOfAllDatasetIds = allDatasetIds.stream()
@@ -62,7 +62,8 @@ public class ExecutorManager {
     int threadCounter = 0;
     int reprocessedDatasets = 0;
 
-    for (int i = startFromDatasetIndex; i < endAtDatasetIndex; i++) {
+    for (int i = startFromDatasetIndex;
+        i < endAtDatasetIndex && i < nonZeroSortedAllDatasetIds.size(); i++) {
       String datasetId = nonZeroSortedAllDatasetIds.get(i);
       // TODO: 17-5-19 remove the below line
 //      datasetId = "0940417";
