@@ -5,6 +5,7 @@ import static eu.europeana.metis.technical.metadata.generation.utilities.Propert
 import com.mongodb.MongoClient;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
+import eu.europeana.metis.technical.metadata.generation.model.ThumbnailFileStatus;
 import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManager;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
@@ -61,6 +62,7 @@ public class TechnicalMetadataGenerationMain {
     Morphia morphia = new Morphia();
     morphia.map(TechnicalMetadataWrapper.class);
     morphia.map(FileStatus.class);
+    morphia.map(ThumbnailFileStatus.class);
     final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
     datastore.ensureIndexes();
     return datastore;

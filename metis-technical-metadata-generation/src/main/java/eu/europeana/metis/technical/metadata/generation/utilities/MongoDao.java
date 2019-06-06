@@ -3,7 +3,9 @@ package eu.europeana.metis.technical.metadata.generation.utilities;
 import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
+import eu.europeana.metis.technical.metadata.generation.model.DatasetFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
+import eu.europeana.metis.technical.metadata.generation.model.ThumbnailFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,14 +36,37 @@ public class MongoDao {
     return datastore.find(FileStatus.class).filter(FILE_NAME, fileName).get();
   }
 
-  public void storeFileStatusToDb(FileStatus fileStatus) {
+  public List<FileStatus> getAllFileStatus() {
+    return datastore.find(FileStatus.class).asList();
+  }
+
+  public ThumbnailFileStatus getThumbnailFileStatus(String fileName) {
+    return datastore.find(ThumbnailFileStatus.class).filter(FILE_NAME, fileName).get();
+  }
+
+  public List<ThumbnailFileStatus> getAllThumbnailFileStatus() {
+    return datastore.find(ThumbnailFileStatus.class).asList();
+  }
+
+  public void storeFileStatusToDb(DatasetFileStatus fileStatus) {
     datastore.save(fileStatus);
+  }
+
+  TechnicalMetadataWrapper getTechnicalMetadataWrapperFieldProjection(String resourceUrl) {
+    return datastore.find(TechnicalMetadataWrapper.class)
+        .filter(RESOURCE_URL, resourceUrl).project(ID, true).project(SUCCESS_EXTRACTION, true)
+        .get();
   }
 
   TechnicalMetadataWrapper getTechnicalMetadataWrapper(String resourceUrl) {
     return datastore.find(TechnicalMetadataWrapper.class)
-        .filter(RESOURCE_URL, resourceUrl).project(ID, true).project(SUCCESS_EXTRACTION, true)
-        .get();
+        .field(RESOURCE_URL).equal(resourceUrl).get();
+  }
+
+  void removeThumbnailsFromTechnicalMetadataWrapper(
+      TechnicalMetadataWrapper technicalMetadataWrapper) {
+    technicalMetadataWrapper.setThumbnailWrappers(null);
+    datastore.save(technicalMetadataWrapper);
   }
 
   void storeMediaResultInDb(ResourceExtractionResult resourceExtractionResult)
@@ -57,7 +82,7 @@ public class MongoDao {
     technicalMetadataWrapper.setResourceMetadata(resourceExtractionResult.getMetadata());
 
     List<ThumbnailWrapper> thumbnailWrappers = new ArrayList<>(2);
-    if(resourceExtractionResult.getThumbnails() != null) {
+    if (resourceExtractionResult.getThumbnails() != null) {
       for (Thumbnail thumbnail : resourceExtractionResult.getThumbnails()) {
         final ThumbnailWrapper thumbnailWrapper = new ThumbnailWrapper();
         thumbnailWrapper.setTargetName(thumbnail.getTargetName());
@@ -75,7 +100,7 @@ public class MongoDao {
 
   void storeFailedMediaInDb(String resourceUrl, String errorTrace) {
     //Keep track of the failed ones to bypass them on a second execution if needed
-    TechnicalMetadataWrapper technicalMetadataWrapper = getTechnicalMetadataWrapper(
+    TechnicalMetadataWrapper technicalMetadataWrapper = getTechnicalMetadataWrapperFieldProjection(
         resourceUrl);
     if (technicalMetadataWrapper == null) {
       technicalMetadataWrapper = new TechnicalMetadataWrapper();

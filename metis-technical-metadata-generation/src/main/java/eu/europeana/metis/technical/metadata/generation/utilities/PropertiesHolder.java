@@ -44,6 +44,12 @@ public class PropertiesHolder {
   public final boolean mongoEnablessl;
   public final String mongoDb;
 
+  //S3
+  public final String s3AccessKey;
+  public final String s3SecretKey;
+  public final String s3Endpoint;
+  public final String s3Bucket;
+
   public PropertiesHolder(String configurationFileName) {
     Properties properties = new Properties();
     final URL resource = getClass().getClassLoader().getResource(configurationFileName);
@@ -83,5 +89,11 @@ public class PropertiesHolder {
     mongoPassword = properties.getProperty("mongo.password");
     mongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.enableSSL"));
     mongoDb = properties.getProperty("mongo.db");
+
+    //S3
+    s3AccessKey = properties.getProperty("s3.access.key");
+    s3SecretKey = properties.getProperty("s3.secret.key");
+    s3Endpoint = properties.getProperty("s3.endpoint");
+    s3Bucket = properties.getProperty("s3.bucket");
   }
 }

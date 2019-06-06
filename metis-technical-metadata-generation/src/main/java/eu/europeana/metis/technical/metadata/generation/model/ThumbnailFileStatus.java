@@ -8,12 +8,12 @@ import org.mongodb.morphia.annotations.IndexOptions;
 import org.mongodb.morphia.annotations.Indexed;
 
 /**
- * Model class that contains the status of the process for a specific file.
+ * Model class that contains the status of the thumbnail upload process for a specific file.
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-04-17
+ * @since 2019-06-05
  */
-public class FileStatus implements DatasetFileStatus {
+public class ThumbnailFileStatus implements DatasetFileStatus {
 
   @Id
   @JsonSerialize(using = ObjectIdSerializer.class)
@@ -24,10 +24,10 @@ public class FileStatus implements DatasetFileStatus {
   private int lineReached;
   private boolean endOfFileReached;
 
-  public FileStatus() {
+  public ThumbnailFileStatus() {
   }
 
-  public FileStatus(String fileName, int lineReached) {
+  public ThumbnailFileStatus(String fileName, int lineReached) {
     this.fileName = fileName;
     this.lineReached = lineReached;
   }
