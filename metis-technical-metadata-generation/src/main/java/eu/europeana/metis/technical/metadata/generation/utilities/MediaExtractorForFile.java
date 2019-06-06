@@ -10,9 +10,9 @@ import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.mediaprocessing.model.RdfResourceEntry;
 import eu.europeana.metis.mediaprocessing.model.ResourceExtractionResult;
 import eu.europeana.metis.mediaprocessing.model.UrlType;
+import eu.europeana.metis.technical.metadata.generation.model.DatasetFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.FileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.Mode;
-import eu.europeana.metis.technical.metadata.generation.model.DatasetFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
 import eu.europeana.metis.technical.metadata.generation.model.ThumbnailFileStatus;
 import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
@@ -34,9 +34,9 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 /**
  * {@link Callable} that will go through a initialized dataset file and parse each resource per
@@ -95,7 +95,7 @@ public class MediaExtractorForFile implements Callable<Void> {
       return null;
     }
 
-    final DatasetFileStatus datasetFileStatus = retrieveCorrectPhysicalFileStatusModeBased(
+    final DatasetFileStatus datasetFileStatus = retrieveCorrectDatasetFileStatusModeBased(
         datasetFile.getName());
     //Exit if we cannot determine the file status
     if (datasetFileStatus == null) {
@@ -137,7 +137,7 @@ public class MediaExtractorForFile implements Callable<Void> {
     return null;
   }
 
-  private DatasetFileStatus retrieveCorrectPhysicalFileStatusModeBased(String fileName) {
+  private DatasetFileStatus retrieveCorrectDatasetFileStatusModeBased(String fileName) {
     DatasetFileStatus fileStatus = getFileStatus(fileName);
     if (mode == Mode.UPLOAD_THUMBNAILS) {
       //Check if the generation of technical metadata has actually finished
@@ -195,14 +195,19 @@ public class MediaExtractorForFile implements Callable<Void> {
   }
 
   private void thumbnailUpload(String resourceUrl) {
-    final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
-        .getTechnicalMetadataWrapper(resourceUrl);
-    if (CollectionUtils.isEmpty(technicalMetadataWrapper.getThumbnailWrappers())) {
-      LOGGER.info("Resource does not have thumbnails: {}", resourceUrl);
-    } else {
-      storeThumbnailsToS3(amazonS3Client, s3Bucket,
-          technicalMetadataWrapper.getThumbnailWrappers());
-      mongoDao.removeThumbnailsFromTechnicalMetadataWrapper(technicalMetadataWrapper);
+    if (StringUtils.isNotBlank(resourceUrl)) {
+      final TechnicalMetadataWrapper technicalMetadataWrapper = mongoDao
+          .getTechnicalMetadataWrapper(resourceUrl);
+      if (technicalMetadataWrapper.getThumbnailWrappers() == null || technicalMetadataWrapper
+          .getThumbnailWrappers().isEmpty()) {
+        LOGGER.info("Resource does not have thumbnails: {}", resourceUrl);
+      } else {
+        final boolean successfulOperation = storeThumbnailsToS3(amazonS3Client, s3Bucket,
+            technicalMetadataWrapper.getThumbnailWrappers());
+        if (successfulOperation) {
+          mongoDao.removeThumbnailsFromTechnicalMetadataWrapper(technicalMetadataWrapper);
+        }
+      }
     }
   }
 
@@ -307,7 +312,6 @@ public class MediaExtractorForFile implements Callable<Void> {
       mongoDao.storeFileStatusToDb(thumbnailFileStatus);
     }
 
-    //Re-store the status in db
     return thumbnailFileStatus;
   }
 
@@ -321,8 +325,9 @@ public class MediaExtractorForFile implements Callable<Void> {
     return magic == GZIPInputStream.GZIP_MAGIC;
   }
 
-  static void storeThumbnailsToS3(AmazonS3 amazonS3Client, String s3Bucket,
+  static boolean storeThumbnailsToS3(AmazonS3 amazonS3Client, String s3Bucket,
       List<ThumbnailWrapper> thumbnailWrappers) {
+    boolean successfulOperation = true;
     for (ThumbnailWrapper thumbnailWrapper : thumbnailWrappers) {
       //If the thumbnail already exists(e.g. from a previous execution of the script), avoid sending it again
       LOGGER.info(EXECUTION_LOGS_MARKER, "Checking if thumbnail already exists in s3 with name: {}",
@@ -336,9 +341,11 @@ public class MediaExtractorForFile implements Callable<Void> {
           LOGGER.error(EXECUTION_LOGS_MARKER,
               "Error while uploading {} to S3 in Bluemix. The full error message is: {} because of: ",
               thumbnailWrapper.getTargetName(), e);
+          successfulOperation = false;
         }
       }
     }
+    return successfulOperation;
   }
 
   static boolean doesThumbnailExistInS3(AmazonS3 amazonS3Client, String s3Bucket,
