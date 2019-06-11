@@ -14,10 +14,18 @@ import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.model.Mode;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -40,21 +48,30 @@ public class ReprocessForDataset implements Callable<Void> {
   private final String datasetId;
   private final DatasetStatus datasetStatus;
   private final BasicConfiguration basicConfiguration;
+  private final int maxParallelPageThreads;
+  private int nextPage;
+
+  private final ExecutorService threadPool;
+  private final ExecutorCompletionService<Integer> completionService;
 
   public ReprocessForDataset(String datasetId, int indexInOrderedList,
-      BasicConfiguration basicConfiguration) {
+      BasicConfiguration basicConfiguration, int maxParallelPageThreads) {
     this.datasetId = datasetId;
     this.basicConfiguration = basicConfiguration;
     this.prefixDatasetidLog = String.format("DatasetId: %s", this.datasetId);
     this.datasetStatus = retrieveOrInitializeDatasetStatus(indexInOrderedList);
+
+    this.maxParallelPageThreads = maxParallelPageThreads;
+    threadPool = Executors.newFixedThreadPool(maxParallelPageThreads);
+    completionService = new ExecutorCompletionService<>(threadPool);
   }
 
   @Override
-  public Void call() {
+  public Void call() throws ExecutionException, InterruptedException {
     return reprocessDataset();
   }
 
-  private Void reprocessDataset() {
+  private Void reprocessDataset() throws ExecutionException, InterruptedException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing starting", prefixDatasetidLog);
 
     if (basicConfiguration.getMode() == Mode.DEFAULT) {
@@ -123,24 +140,40 @@ public class ReprocessForDataset implements Callable<Void> {
       //Always start from the beginning
       return 0;
     } else {
-      final long remainder = datasetStatus.getTotalProcessed() % MongoSourceMongoDao.PAGE_SIZE;
-      //Restart the page if remainder not exact divisible with the page.
-      if (remainder != 0) {
-        datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() - remainder);
+      final Set<Integer> pagesProcessed = datasetStatus.getPagesProcessed();
+      int startingPage;
+      if (pagesProcessed.isEmpty()) {
+        startingPage = 0;
+      } else {
+        final Integer lastProcessedPage = Collections.max(pagesProcessed);
+        //This can possibly happen if the PAGE_SIZE is changed on a subsequent execution
+        final boolean isLastPageValid =
+            MongoSourceMongoDao.PAGE_SIZE * lastProcessedPage <= datasetStatus.getTotalProcessed();
+
+        if (isLastPageValid) {
+          startingPage = lastProcessedPage + 1;
+        } else {
+          startingPage = (int) (datasetStatus.getTotalProcessed() / MongoSourceMongoDao.PAGE_SIZE);
+          //Fix processed pages.
+          pagesProcessed.clear();
+          IntStream.range(0, startingPage).forEach(pagesProcessed::add);
+          basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+        }
       }
-      return (int) (datasetStatus.getTotalProcessed() / MongoSourceMongoDao.PAGE_SIZE);
+      return startingPage;
     }
   }
 
-  private void loopOverAllRecordsAndProcess(boolean processFailedOnly) {
-    int nextPage = getStartingNextPage(processFailedOnly);
+  private void loopOverAllRecordsAndProcess(boolean processFailedOnly)
+      throws ExecutionException, InterruptedException {
+    nextPage = getStartingNextPage(processFailedOnly);
     if (!processFailedOnly) {
       datasetStatus.setStartDate(new Date());
     }
     if (processFailedOnly) {
       failedRecordsOperation(nextPage);
     } else {
-      defaultOperation(nextPage);
+      defaultOperation();
     }
   }
 
@@ -174,28 +207,31 @@ public class ReprocessForDataset implements Callable<Void> {
    * <li>{@link #indexRecord(RDF)} per record</li>
    * <li>{@link #afterReProcess()} per dataset</li>
    * </ul></p>
-   *
-   * @param nextPage the next page of records
    */
-  private void defaultOperation(int nextPage) {
-    List<FullBeanImpl> nextPageOfRecords = getFullBeans(nextPage);
-    while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER
-          .info(EXECUTION_LOGS_MARKER,
-              "{} - Already processed: {}, Processing number of records: {}", prefixDatasetidLog,
-              datasetStatus.getTotalProcessed(), nextPageOfRecords.size());
-      for (FullBeanImpl fullBean : nextPageOfRecords) {
-        final String exceptionStackTrace = processAndIndex(fullBean);
-        updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
+  private void defaultOperation() throws InterruptedException, ExecutionException {
+    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Already processed: {}", prefixDatasetidLog,
+        datasetStatus.getTotalProcessed());
+    int threadCounter = 0;
+    while (true) {
+      Callable<Integer> callable = new PageProcess(this, datasetId);
+      //Create callable that returns the number of records processed from the page
+      if (threadCounter >= maxParallelPageThreads) {
+        final Future<Integer> recordsInPageProcessed = completionService.take();
+        threadCounter--;
+        //If page here was less than the page size, then exit while
+        if (recordsInPageProcessed.get() < MongoSourceMongoDao.PAGE_SIZE) {
+          break;
+        }
       }
-      LOGGER.info(EXECUTION_LOGS_MARKER,
-          "{} - Processed number of records: {} out of total number of records: {}",
-          prefixDatasetidLog, datasetStatus.getTotalProcessed(), datasetStatus.getTotalRecords());
-      datasetStatus.updateAverages();
-      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
-      nextPage++;
-      nextPageOfRecords = getFullBeans(nextPage);
+      completionService.submit(callable);
+      threadCounter++;
     }
+
+    //Final cleanup of futures
+    for (int i = 0; i < threadCounter; i++) {
+      completionService.take();
+    }
+
     //Set End Date
     datasetStatus.setEndDate(new Date());
     basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
@@ -204,11 +240,35 @@ public class ReprocessForDataset implements Callable<Void> {
         prefixDatasetidLog);
   }
 
+  void processRecords(List<FullBeanImpl> nextPageOfRecords) {
+    for (FullBeanImpl fullBean : nextPageOfRecords) {
+      final String exceptionStackTrace = processAndIndex(fullBean);
+      updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
+    }
+  }
+
+  void updateDatasetStatus(int pageProcessed) {
+    synchronized (this) {
+      final Set<Integer> pagesProcessed = datasetStatus.getPagesProcessed();
+      pagesProcessed.add(pageProcessed);
+      datasetStatus.updateAverages();
+      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+    }
+  }
+
+  int getNextPageAndIncrement() {
+    synchronized (this) {
+      int nextPageToReturn = nextPage;
+      nextPage++;
+      return nextPageToReturn;
+    }
+  }
+
   private List<FullBeanImpl> getFailedFullBeans(int nextPage) {
     return getFullBeans(nextPage, true);
   }
 
-  private List<FullBeanImpl> getFullBeans(int nextPage) {
+  List<FullBeanImpl> getFullBeans(int nextPage) {
     return getFullBeans(nextPage, false);
   }
 
@@ -274,24 +334,26 @@ public class ReprocessForDataset implements Callable<Void> {
    */
   private void updateProcessCounts(String exceptionStackTrace, boolean processFailedOnly,
       String resourceId) {
-    if (StringUtils.isNotBlank(resourceId)) {
-      if (StringUtils.isBlank(exceptionStackTrace)) {
-        if (processFailedOnly) {
-          //Replace the already existent failed record with indication that it was successfully reprocessed
-          final FailedRecord failedRecord = new FailedRecord(resourceId);
-          failedRecord.setSuccessfullyReprocessed(true);
-          basicConfiguration.getMongoDestinationMongoDao().storeFailedRecordToDb(failedRecord);
-          datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() - 1);
-          basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+    synchronized (this) {
+      if (StringUtils.isNotBlank(resourceId)) {
+        if (StringUtils.isBlank(exceptionStackTrace)) {
+          if (processFailedOnly) {
+            //Replace the already existent failed record with indication that it was successfully reprocessed
+            final FailedRecord failedRecord = new FailedRecord(resourceId);
+            failedRecord.setSuccessfullyReprocessed(true);
+            basicConfiguration.getMongoDestinationMongoDao().storeFailedRecordToDb(failedRecord);
+            datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() - 1);
+            basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+          } else {
+            datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
+          }
         } else {
-          datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
-        }
-      } else {
-        basicConfiguration.getMongoDestinationMongoDao()
-            .storeFailedRecordToDb(new FailedRecord(resourceId, exceptionStackTrace));
-        if (!processFailedOnly) {
-          datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
-          datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
+          basicConfiguration.getMongoDestinationMongoDao()
+              .storeFailedRecordToDb(new FailedRecord(resourceId, exceptionStackTrace));
+          if (!processFailedOnly) {
+            datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
+            datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
+          }
         }
       }
     }

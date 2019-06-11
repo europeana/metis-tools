@@ -32,6 +32,7 @@ public class PropertiesHolder {
 
   //General parameters
   public final int maxParallelThreads;
+  public final int maxParallelThreadsPerDataset;
   public final int startFromDatasetIndex;
   public final int endAtDatasetIndex;
   public final int sourceMongoPageSize;
@@ -97,6 +98,7 @@ public class PropertiesHolder {
 
     //General parameters
     maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
+    maxParallelThreadsPerDataset = Integer.parseInt(properties.getProperty("max.parallel.threads.per.dataset"));
     startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
     endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));

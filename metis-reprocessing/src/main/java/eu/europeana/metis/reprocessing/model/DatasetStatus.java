@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import eu.europeana.metis.core.workflow.HasMongoObjectId;
 import eu.europeana.metis.json.ObjectIdSerializer;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.IndexOptions;
@@ -29,6 +31,7 @@ public class DatasetStatus implements HasMongoObjectId {
   private long totalRecords;
   private long totalProcessed;
   private long totalFailedRecords;
+  private Set<Integer> pagesProcessed = new HashSet<>();
   private double totalTimeProcessingInSecs;
   private double totalTimeIndexingInSecs;
   private double averageTimeRecordProcessingInSecs;
@@ -102,6 +105,10 @@ public class DatasetStatus implements HasMongoObjectId {
 
   public void setTotalFailedRecords(long totalFailedRecords) {
     this.totalFailedRecords = totalFailedRecords;
+  }
+
+  public Set<Integer> getPagesProcessed() {
+    return pagesProcessed;
   }
 
   public double getTotalTimeProcessingInSecs() {

@@ -28,6 +28,7 @@ public class ExecutorManager {
   private static final String REPROCESSED_DATASETS_STR = "Reprocessed datasets: {}";
   private final BasicConfiguration basicConfiguration;
   private final int maxParallelThreads;
+  private final int maxParallelThreadsPerDataset;
   private final int startFromDatasetIndex;
   private final int endAtDatasetIndex;
 
@@ -37,6 +38,7 @@ public class ExecutorManager {
   public ExecutorManager(BasicConfiguration basicConfiguration,
       PropertiesHolder propertiesHolder) {
     this.maxParallelThreads = propertiesHolder.maxParallelThreads;
+    this.maxParallelThreadsPerDataset = propertiesHolder.maxParallelThreadsPerDataset;
     this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
     this.endAtDatasetIndex = propertiesHolder.endAtDatasetIndex;
     threadPool = Executors.newFixedThreadPool(maxParallelThreads);
@@ -67,6 +69,13 @@ public class ExecutorManager {
       String datasetId = nonZeroSortedAllDatasetIds.get(i);
       // TODO: 17-5-19 remove the below line
 //      datasetId = "0940417";
+      if (threadCounter >= maxParallelThreads) {
+        completionService.take();
+        threadCounter--;
+        reprocessedDatasets++;
+        LOGGER.info(REPROCESSED_DATASETS_STR, reprocessedDatasets);
+        LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
+      }
       Callable<Void> callable;
       switch (basicConfiguration.getMode()) {
         case CALCULATE_DATASET_STATISTICS:
@@ -78,14 +87,8 @@ public class ExecutorManager {
         case DEFAULT:
         case REPROCESS_ALL_FAILED:
         default:
-          callable = new ReprocessForDataset(datasetId, i, basicConfiguration);
-      }
-      if (threadCounter >= maxParallelThreads) {
-        completionService.take();
-        threadCounter--;
-        reprocessedDatasets++;
-        LOGGER.info(REPROCESSED_DATASETS_STR, reprocessedDatasets);
-        LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
+          callable = new ReprocessForDataset(datasetId, i, basicConfiguration,
+              maxParallelThreadsPerDataset);
       }
       completionService.submit(callable);
       threadCounter++;
