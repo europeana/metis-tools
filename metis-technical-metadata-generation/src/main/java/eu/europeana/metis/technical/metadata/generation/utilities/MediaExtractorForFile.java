@@ -144,9 +144,10 @@ public class MediaExtractorForFile implements Callable<Void> {
         LOGGER.info(EXECUTION_LOGS_MARKER,
             "FileStatus {} that has not been fully processed will not be processed for thumbnail upload..",
             fileStatus.getFileName());
+        getThumbnailFileStatus(fileName); //Generate the thumbnail file status with zero processed if it doesn't exist
         return null;
       }
-      //Otherwise replace file status with thumbnail file status
+      //Replace file status with thumbnail file status
       fileStatus = getThumbnailFileStatus(fileName);
     }
     return fileStatus;
