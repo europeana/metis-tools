@@ -16,7 +16,6 @@ import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-import eu.europeana.metis.core.workflow.OrderField;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.ExternalRequestUtil;
@@ -45,6 +44,7 @@ public class MongoSourceMongoDao {
   private PropertiesHolder propertiesHolder;
 
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
+    // TODO: 8-6-19 Create a pool of connections, to speed up the read/write on db?
     this.propertiesHolder = propertiesHolder;
     PAGE_SIZE = propertiesHolder.sourceMongoPageSize;
     sourceMongoInitializer = prepareMongoSourceConfiguration();
@@ -56,7 +56,6 @@ public class MongoSourceMongoDao {
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
     Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
     query.field("about").startsWith("/" + datasetId + "/");
-    query.order(OrderField.ID.getOrderFieldName());
     return ExternalRequestUtil.retryableExternalRequestConnectionReset(() -> query.asList(
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE)));
   }
