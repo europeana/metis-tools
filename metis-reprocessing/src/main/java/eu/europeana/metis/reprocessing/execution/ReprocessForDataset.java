@@ -14,7 +14,6 @@ import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.model.Mode;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -102,6 +101,7 @@ public class ReprocessForDataset implements Callable<Void> {
         .info(EXECUTION_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);
     LOGGER.info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog,
         datasetStatus);
+    close();
     return null;
   }
 
@@ -145,20 +145,27 @@ public class ReprocessForDataset implements Callable<Void> {
       if (pagesProcessed.isEmpty()) {
         startingPage = 0;
       } else {
-        final Integer lastProcessedPage = Collections.max(pagesProcessed);
-        //This can possibly happen if the PAGE_SIZE is changed on a subsequent execution
-        final boolean isLastPageValid =
-            MongoSourceMongoDao.PAGE_SIZE * lastProcessedPage <= datasetStatus.getTotalProcessed();
+        startingPage = IntStream.range(0, pagesProcessed.size())
+            .filter(idx -> !pagesProcessed.contains(idx)).findFirst().orElse(pagesProcessed.size());
 
-        if (isLastPageValid) {
-          startingPage = lastProcessedPage + 1;
-        } else {
+        //This can possibly happen if the PAGE_SIZE is changed on a subsequent execution
+        //It should be valid even if there are missing pages if the page size is the same
+        final boolean isPagingValid =
+            MongoSourceMongoDao.PAGE_SIZE * pagesProcessed.size() <= datasetStatus
+                .getTotalProcessed() && datasetStatus.getTotalProcessed() / pagesProcessed.size()
+                <= (MongoSourceMongoDao.PAGE_SIZE * 2) - 1;
+
+        if (!isPagingValid) {
           startingPage = (int) (datasetStatus.getTotalProcessed() / MongoSourceMongoDao.PAGE_SIZE);
           //Fix processed pages.
           pagesProcessed.clear();
-          IntStream.range(0, startingPage).forEach(pagesProcessed::add);
-          basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+          if (startingPage != 0) {
+            IntStream.range(0, startingPage).forEach(pagesProcessed::add);
+          }
         }
+        //Fix totalProcessed
+        datasetStatus.setTotalProcessed(MongoSourceMongoDao.PAGE_SIZE * pagesProcessed.size());
+        basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
       }
       return startingPage;
     }
@@ -258,8 +265,16 @@ public class ReprocessForDataset implements Callable<Void> {
 
   int getNextPageAndIncrement() {
     synchronized (this) {
-      int nextPageToReturn = nextPage;
-      nextPage++;
+      final Set<Integer> pagesProcessed = datasetStatus.getPagesProcessed();
+      int nextPageToReturn;
+      if (pagesProcessed.size() <= nextPage) {
+        nextPageToReturn = nextPage;
+        nextPage++;
+      } else {
+        nextPageToReturn = IntStream.range(nextPage, pagesProcessed.size())
+            .filter(idx -> !pagesProcessed.contains(idx)).findFirst().orElse(pagesProcessed.size());
+        nextPage = nextPageToReturn + 1;
+      }
       return nextPageToReturn;
     }
   }
@@ -408,5 +423,9 @@ public class ReprocessForDataset implements Callable<Void> {
     e.printStackTrace(ps);
     ps.close();
     return baos.toString();
+  }
+
+  public void close() {
+    threadPool.shutdown();
   }
 }
