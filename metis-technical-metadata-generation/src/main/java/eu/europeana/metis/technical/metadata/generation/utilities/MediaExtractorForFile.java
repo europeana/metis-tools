@@ -85,50 +85,47 @@ public class MediaExtractorForFile implements Callable<Void> {
   private Void parseMediaForFile(File datasetFile) throws InterruptedException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Parsing: {}", datasetFile);
 
-    InputStream inputStream;
-    try {
-      inputStream = getInputStreamForFilePath(datasetFile);
+    try (InputStream inputStream = MediaExtractorForFile.getInputStreamForFilePath(datasetFile)) {
+      final DatasetFileStatus datasetFileStatus = retrieveCorrectDatasetFileStatusModeBased(
+          datasetFile.getName());
+      //Exit if we cannot determine the file status
+      if (datasetFileStatus == null) {
+        return null;
+      }
+      int lineIndex = datasetFileStatus.getLineReached();
+      try (Scanner scanner = new Scanner(inputStream, "UTF-8")) {
+        //Bypass lines until the reached one, from a previous execution
+        if (moveScannerToLine(scanner, datasetFileStatus)) {
+          final Set<Integer> nonRegisteredLines = new HashSet<>();
+          int threadCounter = 0;
+          while (scanner.hasNextLine()) {
+
+            // If all threads are busy, wait for the first one to become available.
+            if (threadCounter >= parallelThreadsPerFile) {
+              completionService.take();
+              threadCounter--;
+            }
+
+            // Submit task for this line.
+            lineIndex++;
+            submitResource(datasetFileStatus, nonRegisteredLines, lineIndex, scanner.nextLine());
+            threadCounter++;
+          }
+
+          // Wait for remaining threads to finish.
+          for (int i = 0; i < threadCounter; i++) {
+            completionService.take();
+          }
+
+          // Set file status for end of file.
+          datasetFileStatus.setEndOfFileReached(true);
+          mongoDao.storeFileStatusToDb(datasetFileStatus);
+        }
+      }
     } catch (IOException e) {
       LOGGER.warn(EXECUTION_LOGS_MARKER, "Something went wrong when reading file: {}", datasetFile,
           e);
       return null;
-    }
-
-    final DatasetFileStatus datasetFileStatus = retrieveCorrectDatasetFileStatusModeBased(
-        datasetFile.getName());
-    //Exit if we cannot determine the file status
-    if (datasetFileStatus == null) {
-      return null;
-    }
-    int lineIndex = datasetFileStatus.getLineReached();
-    try (Scanner scanner = new Scanner(inputStream, "UTF-8")) {
-      //Bypass lines until the reached one, from a previous execution
-      if (moveScannerToLine(scanner, datasetFileStatus)) {
-        final Set<Integer> nonRegisteredLines = new HashSet<>();
-        int threadCounter = 0;
-        while (scanner.hasNextLine()) {
-
-          // If all threads are busy, wait for the first one to become available.
-          if (threadCounter >= parallelThreadsPerFile) {
-            completionService.take();
-            threadCounter--;
-          }
-
-          // Submit task for this line.
-          lineIndex++;
-          submitResource(datasetFileStatus, nonRegisteredLines, lineIndex, scanner.nextLine());
-          threadCounter++;
-        }
-
-        // Wait for remaining threads to finish.
-        for (int i = 0; i < threadCounter; i++) {
-          completionService.take();
-        }
-
-        // Set file status for end of file.
-        datasetFileStatus.setEndOfFileReached(true);
-        mongoDao.storeFileStatusToDb(datasetFileStatus);
-      }
     }
     LOGGER.info(EXECUTION_LOGS_MARKER, "Finished: {}", datasetFile);
     mediaExtractorPool.close();
@@ -144,7 +141,8 @@ public class MediaExtractorForFile implements Callable<Void> {
         LOGGER.info(EXECUTION_LOGS_MARKER,
             "FileStatus {} that has not been fully processed will not be processed for thumbnail upload..",
             fileStatus.getFileName());
-        getThumbnailFileStatus(fileName); //Generate the thumbnail file status with zero processed if it doesn't exist
+        getThumbnailFileStatus(
+            fileName); //Generate the thumbnail file status with zero processed if it doesn't exist
         return null;
       }
       //Replace file status with thumbnail file status
