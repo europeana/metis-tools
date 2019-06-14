@@ -2,6 +2,7 @@ package eu.europeana.metis.execution.utilities;
 
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
+import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
@@ -10,8 +11,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TimeZone;
 import org.mongodb.morphia.aggregation.AggregationPipeline;
 import org.mongodb.morphia.query.Criteria;
@@ -36,6 +40,7 @@ public class ExecutorManager {
 
   private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
   private static final DateFormat dateFormat;
+  private static List<PluginType> pluginTypes = null;
 
   static {
     dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -44,6 +49,9 @@ public class ExecutorManager {
 
   public ExecutorManager(MorphiaDatastoreProvider morphiaDatastoreProvider) {
     this.morphiaDatastoreProvider = morphiaDatastoreProvider;
+    pluginTypes = new ArrayList<>(Arrays.asList(PluginType.values()));
+    pluginTypes.remove(PluginType.REINDEX_TO_PREVIEW);
+    pluginTypes.remove(PluginType.REINDEX_TO_PUBLISH);
   }
 
   public void startCalculationForAllPluginTypes(int startNumberOfDaysAgo, int endNumberOfDaysAgo) {
@@ -81,10 +89,10 @@ public class ExecutorManager {
 
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "All {} pluginTypes and all pluginStatuses together - {}",
-        PluginType.values().length, allPluginsStatusesAverageMaintainer);
+        pluginTypes.size(), allPluginsStatusesAverageMaintainer);
     LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER,
         "\nAll {} pluginTypes and all pluginStatuses together - {}",
-        PluginType.values().length, allPluginsStatusesAverageMaintainer);
+        pluginTypes.size(), allPluginsStatusesAverageMaintainer);
   }
 
   /**
@@ -101,7 +109,7 @@ public class ExecutorManager {
     LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER, "\n{} EXECUTIONS", pluginStatus);
 
     final AverageMaintainer allPluginsAverageMaintainer = new AverageMaintainer();
-    for (PluginType pluginType : PluginType.values()) {
+    for (PluginType pluginType : pluginTypes) {
       final AverageMaintainer averageMaintainer = calculationForPluginTypeAndFinalStatus(pluginType,
           pluginStatus, fromDate, toDate);
       LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
@@ -114,10 +122,10 @@ public class ExecutorManager {
 
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "All {} pluginTypes and pluginStatus {} together - {}",
-        PluginType.values().length, pluginStatus, allPluginsAverageMaintainer);
-    LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER, "All {} pluginTypes together - {}",
-        pluginStatus,
-        allPluginsAverageMaintainer);
+        pluginTypes.size(), pluginStatus, allPluginsAverageMaintainer);
+    LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER,
+        "All {} pluginTypes and pluginStatus {} together - {}",
+        pluginTypes.size(), pluginStatus, allPluginsAverageMaintainer);
     return allPluginsAverageMaintainer;
   }
 
@@ -134,6 +142,7 @@ public class ExecutorManager {
       PluginStatus pluginStatus, Date fromDate, Date toDate) {
     Query<WorkflowExecution> query = morphiaDatastoreProvider.getDatastore()
         .createQuery(WorkflowExecution.class);
+    query.disableValidation();
 
     AggregationPipeline aggregation = morphiaDatastoreProvider.getDatastore()
         .createAggregation(WorkflowExecution.class);
@@ -161,7 +170,7 @@ public class ExecutorManager {
    * AbstractMetisPlugin}, get all statistics from all items and calculate the average speed. During
    * the calculation of {@link PluginStatus#FINISHED} the {@link AbstractMetisPlugin#getFinishedDate()}
    * is used but during the calculation of {@link PluginStatus#CANCELLED} or {@link
-   * PluginStatus#FAILED} the {@link AbstractMetisPlugin#getUpdatedDate()} is used instead.
+   * PluginStatus#FAILED} the {@link AbstractExecutablePlugin#getUpdatedDate()} is used instead.
    *
    * @param iteratorPastSuccessfulPlugins iterator of workflow executions with single plugin
    * @param pluginStatus the final status of the plugins provided
@@ -174,19 +183,22 @@ public class ExecutorManager {
       while (iteratorPastSuccessfulPlugins.hasNext()) {
         final WorkflowExecution workflowExecution = iteratorPastSuccessfulPlugins.next();
         final AbstractMetisPlugin abstractMetisPlugin = workflowExecution.getMetisPlugins().get(0);
-        final float sampleAverageInSecs = addSampleToCalculation(averageMaintainer,
-            abstractMetisPlugin, pluginStatus);
-        if (LOGGER.isDebugEnabled()) {
-          Date endDate = abstractMetisPlugin.getFinishedDate();
-          if (pluginStatus == PluginStatus.FAILED || pluginStatus == PluginStatus.CANCELLED) {
-            endDate = abstractMetisPlugin.getUpdatedDate();
+        if (abstractMetisPlugin instanceof AbstractExecutablePlugin) {
+          final float sampleAverageInSecs = addSampleToCalculation(averageMaintainer,
+              (AbstractExecutablePlugin) abstractMetisPlugin, pluginStatus);
+          if (LOGGER.isDebugEnabled()) {
+            Date endDate = abstractMetisPlugin.getFinishedDate();
+            if (pluginStatus == PluginStatus.FAILED || pluginStatus == PluginStatus.CANCELLED) {
+              endDate = ((AbstractExecutablePlugin) abstractMetisPlugin).getUpdatedDate();
+            }
+            LOGGER.debug(PropertiesHolder.EXECUTION_LOGS_MARKER,
+                "Started Date: {}, Finished Date: {}, totalRecords: {}, with average speed {} r/s",
+                dateFormat.format(abstractMetisPlugin.getStartedDate()),
+                dateFormat.format(endDate),
+                ((AbstractExecutablePlugin) abstractMetisPlugin).getExecutionProgress()
+                    .getProcessedRecords(),
+                sampleAverageInSecs);
           }
-          LOGGER.debug(PropertiesHolder.EXECUTION_LOGS_MARKER,
-              "Started Date: {}, Finished Date: {}, totalRecords: {}, with average speed {} r/s",
-              dateFormat.format(abstractMetisPlugin.getStartedDate()),
-              dateFormat.format(endDate),
-              abstractMetisPlugin.getExecutionProgress().getProcessedRecords(),
-              sampleAverageInSecs);
         }
       }
     }
@@ -194,17 +206,20 @@ public class ExecutorManager {
   }
 
   private float addSampleToCalculation(AverageMaintainer averageMaintainer,
-      AbstractMetisPlugin abstractMetisPlugin, PluginStatus pluginStatus) {
-    final Date startedDate = abstractMetisPlugin.getStartedDate();
+      AbstractExecutablePlugin abstractExecutablePlugin, PluginStatus pluginStatus) {
+    final Date startedDate = abstractExecutablePlugin.getStartedDate();
 
-    Date endDate = abstractMetisPlugin.getFinishedDate();
+    Date endDate = abstractExecutablePlugin.getFinishedDate();
     if (pluginStatus == PluginStatus.FAILED || pluginStatus == PluginStatus.CANCELLED) {
-      endDate = abstractMetisPlugin.getUpdatedDate();
+      endDate = abstractExecutablePlugin.getUpdatedDate();
     }
     if (startedDate != null && endDate != null) {
       float executionDurationInSecs = (endDate.getTime() - startedDate.getTime()) / 1000f;
-      final int processedRecords = abstractMetisPlugin.getExecutionProgress().getProcessedRecords();
-      averageMaintainer.addSample(processedRecords, executionDurationInSecs);
+      final int processedRecords = abstractExecutablePlugin.getExecutionProgress()
+          .getProcessedRecords();
+      if (executionDurationInSecs > 0 && processedRecords > 0) {
+        averageMaintainer.addSample(processedRecords, executionDurationInSecs);
+      }
       return processedRecords / executionDurationInSecs;
     }
     return 0.0f;
