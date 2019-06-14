@@ -26,10 +26,7 @@ import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
-import eu.europeana.metis.technical.metadata.generation.model.ThumbnailWrapper;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -129,9 +126,6 @@ public class ProcessingUtilities {
             .getTechnicalMetadataWrapper(resourceUrl);
         if (technicalMetadataWrapper != null && technicalMetadataWrapper.isSuccessExtraction()) {
           enrichedRdf.enrichResource(technicalMetadataWrapper.getResourceMetadata());
-//          storeThumbnailsToS3(amazonS3Client, s3Bucket,
-//              technicalMetadataWrapper.getThumbnailWrappers() == null ? Collections.emptyList()
-//                  : technicalMetadataWrapper.getThumbnailWrappers());
         }
       } else {
         final ResourceMetadata resourceMetadata = convertWebResourceMetaInfoImpl(amazonS3Client,
@@ -146,25 +140,6 @@ public class ProcessingUtilities {
   static boolean doesThumbnailExistInS3(AmazonS3 amazonS3Client, String s3Bucket,
       String targetNameLarge) {
     return amazonS3Client.doesObjectExist(s3Bucket, targetNameLarge);
-  }
-
-  static void storeThumbnailsToS3(AmazonS3 amazonS3Client, String s3Bucket,
-      List<ThumbnailWrapper> thumbnailWrappers) {
-    for (ThumbnailWrapper thumbnailWrapper : thumbnailWrappers) {
-      //If the thumbnail already exists(e.g. from a previous execution of the script), avoid sending it again
-      LOGGER.info("Checking if thumbnail already exists in s3 with name: {}",
-          thumbnailWrapper.getTargetName());
-      if (!doesThumbnailExistInS3(amazonS3Client, s3Bucket, thumbnailWrapper.getTargetName())) {
-        try (InputStream stream = new ByteArrayInputStream(thumbnailWrapper.getThumbnailBytes())) {
-          amazonS3Client.putObject(s3Bucket, thumbnailWrapper.getTargetName(), stream, null);
-          LOGGER.info("Sent item to S3 with name: {}", thumbnailWrapper.getTargetName());
-        } catch (Exception e) {
-          LOGGER.error(
-              "Error while uploading {} to S3 in Bluemix. The full error message is: {} because of: ",
-              thumbnailWrapper.getTargetName(), e);
-        }
-      }
-    }
   }
 
   /**
@@ -241,7 +216,7 @@ public class ProcessingUtilities {
   }
 
   private static ArrayList<Thumbnail> getThumbnailTargetNames(AmazonS3 amazonS3Client,
-      String s3Bucket, String resourceUrl, String md5Hex) throws IOException {
+      String s3Bucket, String resourceUrl, String md5Hex) {
     ArrayList<Thumbnail> thumbnails = new ArrayList<>();
     String targetNameLarge = md5Hex + "-LARGE";
     LOGGER.info("Get thumbnail target names existence from S3");
