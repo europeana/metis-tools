@@ -31,7 +31,7 @@ public class PropertiesHolder {
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
   //General parameters
-  public final int maxParallelThreads;
+  public final int minParallelDatasets;
   public final int maxParallelThreadsPerDataset;
   public final int startFromDatasetIndex;
   public final int endAtDatasetIndex;
@@ -97,7 +97,7 @@ public class PropertiesHolder {
     }
 
     //General parameters
-    maxParallelThreads = Integer.parseInt(properties.getProperty("max.parallel.threads"));
+    minParallelDatasets = Integer.parseInt(properties.getProperty("min.parallel.datasets"));
     maxParallelThreadsPerDataset = Integer.parseInt(properties.getProperty("max.parallel.threads.per.dataset"));
     startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
     endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));

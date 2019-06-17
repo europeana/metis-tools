@@ -26,7 +26,6 @@ import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
 import eu.europeana.metis.technical.metadata.generation.model.TechnicalMetadataWrapper;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -132,7 +131,7 @@ public class ProcessingUtilities {
             s3Bucket, webResourceMetaInfoImplFromSource, resourceUrl, md5Hex);
         enrichedRdf.enrichResource(resourceMetadata);
       }
-    } catch (MediaExtractionException | IOException e) {
+    } catch (MediaExtractionException e) {
       LOGGER.warn("Could not enrich with technical metadata of resourceUrl: {}", resourceUrl, e);
     }
   }
@@ -172,11 +171,10 @@ public class ProcessingUtilities {
    * @param md5Hex the md5 hash of the resource url
    * @return the converted class
    * @throws MediaExtractionException if a conversion failed
-   * @throws IOException if the thumbnail target names generation fails
    */
   static ResourceMetadata convertWebResourceMetaInfoImpl(AmazonS3 amazonS3Client, String s3Bucket,
       WebResourceMetaInfoImpl webResourceMetaInfo, String resourceUrl, String md5Hex)
-      throws MediaExtractionException, IOException {
+      throws MediaExtractionException {
     final AudioMetaInfoImpl audioMetaInfo = webResourceMetaInfo.getAudioMetaInfo();
     final ImageMetaInfoImpl imageMetaInfo = webResourceMetaInfo.getImageMetaInfo();
     final TextMetaInfoImpl textMetaInfo = webResourceMetaInfo.getTextMetaInfo();

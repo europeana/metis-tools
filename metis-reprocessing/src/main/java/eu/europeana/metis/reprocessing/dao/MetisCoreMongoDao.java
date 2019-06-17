@@ -47,10 +47,8 @@ public class MetisCoreMongoDao {
     workflowExecutionDao = new WorkflowExecutionDao(morphiaDatastoreProvider);
   }
 
-  public List<String> getAllDatasetIdsOrdered() {
+  public List<String> getAllDatasetIds() {
     Query<Dataset> query = metisCoreDatastore.createQuery(Dataset.class);
-    //Order by dataset id which is a String order not a number order.
-    query.order(DATASET_ID);
     final List<Dataset> datasets = ExternalRequestUtil
         .retryableExternalRequestConnectionReset(query::asList);
     return datasets.stream().map(Dataset::getDatasetId).collect(Collectors.toList());

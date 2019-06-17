@@ -2,14 +2,17 @@ package eu.europeana.metis.reprocessing.execution;
 
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 
+import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +30,8 @@ public class ExecutorManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
   private static final String REPROCESSED_DATASETS_STR = "Reprocessed datasets: {}";
   private final BasicConfiguration basicConfiguration;
-  private final int maxParallelThreads;
   private final int maxParallelThreadsPerDataset;
+  private final int totalAllowedThreads;
   private final int startFromDatasetIndex;
   private final int endAtDatasetIndex;
 
@@ -37,11 +40,12 @@ public class ExecutorManager {
 
   public ExecutorManager(BasicConfiguration basicConfiguration,
       PropertiesHolder propertiesHolder) {
-    this.maxParallelThreads = propertiesHolder.maxParallelThreads;
+    int maxParallelThreads = propertiesHolder.minParallelDatasets;
     this.maxParallelThreadsPerDataset = propertiesHolder.maxParallelThreadsPerDataset;
     this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
     this.endAtDatasetIndex = propertiesHolder.endAtDatasetIndex;
-    threadPool = Executors.newFixedThreadPool(maxParallelThreads);
+    totalAllowedThreads = maxParallelThreads * maxParallelThreadsPerDataset;
+    threadPool = Executors.newFixedThreadPool(totalAllowedThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
 
     this.basicConfiguration = basicConfiguration;
@@ -50,7 +54,7 @@ public class ExecutorManager {
   public void startReprocessing() throws InterruptedException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
     final List<String> allDatasetIds = basicConfiguration.getMetisCoreMongoDao()
-        .getAllDatasetIdsOrdered();
+        .getAllDatasetIds();
     final List<Long> sizeOfAllDatasetIds = allDatasetIds.stream()
         .map(datasetId -> basicConfiguration.getMongoSourceMongoDao()
             .getTotalRecordsForDataset(datasetId)).collect(Collectors.toList());
@@ -58,49 +62,77 @@ public class ExecutorManager {
         .sorted(Comparator.comparingLong(o -> sizeOfAllDatasetIds.get(allDatasetIds.indexOf(o)))
             .reversed()).collect(Collectors.toList());
     final List<String> nonZeroSortedAllDatasetIds = sortedAllDatasetIds.stream()
-        .filter(datasetId -> sizeOfAllDatasetIds.get(allDatasetIds.indexOf(datasetId)) != 0)
+        .filter(datasetId -> sizeOfAllDatasetIds.get(allDatasetIds.indexOf(datasetId)) > 0)
         .collect(Collectors.toList());
+//    IntStream.range(0, nonZeroSortedAllDatasetIds.size())
+//        .forEach(i -> retrieveOrInitializeDatasetStatus(nonZeroSortedAllDatasetIds.get(i), i));
 
-    int threadCounter = 0;
+    int parallelDatasets = 0;
     int reprocessedDatasets = 0;
+
+    int countOfTotalCurrentThreads = 0;
+    final HashMap<Future, Integer> futureConsumedThreadsHashMap = new HashMap<>();
 
     for (int i = startFromDatasetIndex;
         i < endAtDatasetIndex && i < nonZeroSortedAllDatasetIds.size(); i++) {
       String datasetId = nonZeroSortedAllDatasetIds.get(i);
+      final Long sizeOfDatasetId = sizeOfAllDatasetIds.get(allDatasetIds.indexOf(datasetId));
+      final int numberOfPages = (int) Math
+          .ceil((double) sizeOfDatasetId / MongoSourceMongoDao.PAGE_SIZE);
+      final int maxThreadsConsumedByDataset =
+          numberOfPages >= maxParallelThreadsPerDataset ? maxParallelThreadsPerDataset
+              : numberOfPages;
+
       // TODO: 17-5-19 remove the below line
 //      datasetId = "9200515";
-      if (threadCounter >= maxParallelThreads) {
-        completionService.take();
-        threadCounter--;
+      while (countOfTotalCurrentThreads >= totalAllowedThreads || maxThreadsConsumedByDataset > (
+          totalAllowedThreads - countOfTotalCurrentThreads)) {
+        final Future<Void> completedFuture = completionService.take();
+        final Integer futureConsumedThreads = futureConsumedThreadsHashMap.get(completedFuture);
+        futureConsumedThreadsHashMap.remove(completedFuture);
+        parallelDatasets--;
+        countOfTotalCurrentThreads -= futureConsumedThreads;
         reprocessedDatasets++;
         LOGGER.info(REPROCESSED_DATASETS_STR, reprocessedDatasets);
         LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
       }
       Callable<Void> callable;
       switch (basicConfiguration.getMode()) {
-        case CALCULATE_DATASET_STATISTICS:
-          callable = new StatisticsForDataset(datasetId, basicConfiguration, false);
-          break;
-        case CALCULATE_DATASET_STATISTICS_SAMPLE:
-          callable = new StatisticsForDataset(datasetId, basicConfiguration, true);
-          break;
         case DEFAULT:
         case REPROCESS_ALL_FAILED:
         default:
           callable = new ReprocessForDataset(datasetId, i, basicConfiguration,
               maxParallelThreadsPerDataset);
       }
-      completionService.submit(callable);
-      threadCounter++;
+      final Future<Void> submit = completionService.submit(callable);
+      futureConsumedThreadsHashMap.put(submit, maxThreadsConsumedByDataset);
+      parallelDatasets++;
+      countOfTotalCurrentThreads += maxThreadsConsumedByDataset;
     }
 
-    //Final cleanup of futures
-    for (int i = 0; i < threadCounter; i++) {
+    for (int i = 0; i < parallelDatasets; i++) {
       completionService.take();
       reprocessedDatasets++;
       LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
     }
   }
+
+//  private DatasetStatus retrieveOrInitializeDatasetStatus(String datasetId,
+//      int indexInOrderedList) {
+//    DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
+//        .getDatasetStatus(datasetId);
+//    if (retrievedDatasetStatus == null) {
+//      retrievedDatasetStatus = new DatasetStatus();
+//      final long totalRecordsForDataset = basicConfiguration.getMongoSourceMongoDao()
+//          .getTotalRecordsForDataset(datasetId);
+//      retrievedDatasetStatus.setDatasetId(datasetId);
+//      retrievedDatasetStatus.setIndexInOrderedList(indexInOrderedList);
+//      retrievedDatasetStatus.setTotalRecords(totalRecordsForDataset);
+//      basicConfiguration.getMongoDestinationMongoDao()
+//          .storeDatasetStatusToDb(retrievedDatasetStatus);
+//    }
+//    return retrievedDatasetStatus;
+//  }
 
   public void close() {
     threadPool.shutdown();
