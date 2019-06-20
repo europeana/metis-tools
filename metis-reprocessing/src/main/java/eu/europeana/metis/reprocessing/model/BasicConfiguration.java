@@ -39,7 +39,7 @@ public class BasicConfiguration {
   private final IndexerPool indexerPool;
   private final Mode mode;
   private final List<ExecutablePluginType> invalidatePluginTypes;
-  public final ExecutablePluginType reprocessBasedOnPluginType;
+  private final ExecutablePluginType reprocessBasedOnPluginType;
   private ExtraConfiguration extraConfiguration;
 
   public BasicConfiguration(PropertiesHolder propertiesHolder)

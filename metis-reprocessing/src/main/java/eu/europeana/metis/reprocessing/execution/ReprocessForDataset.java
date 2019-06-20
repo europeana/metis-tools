@@ -53,7 +53,7 @@ public class ReprocessForDataset implements Callable<Void> {
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Integer> completionService;
 
-  public ReprocessForDataset(String datasetId, int indexInOrderedList,
+  ReprocessForDataset(String datasetId, int indexInOrderedList,
       BasicConfiguration basicConfiguration, int maxParallelPageThreads) {
     this.datasetId = datasetId;
     this.basicConfiguration = basicConfiguration;
@@ -85,9 +85,11 @@ public class ReprocessForDataset implements Callable<Void> {
     } else if (basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED) {
       if (datasetStatus.getTotalFailedRecords() <= 0) {
         //Do not process dataset further cause we only process failed ones
-        LOGGER.info(EXECUTION_LOGS_MARKER,
-            "{} - Reprocessing not started because mode is: {} and there are no failed records",
-            prefixDatasetidLog, basicConfiguration.getMode().name());
+        if (LOGGER.isInfoEnabled()) {
+          LOGGER.info(EXECUTION_LOGS_MARKER,
+              "{} - Reprocessing not started because mode is: {} and there are no failed records",
+              prefixDatasetidLog, basicConfiguration.getMode().name());
+        }
         return null;
       }
       LOGGER.info(EXECUTION_LOGS_MARKER,
@@ -164,7 +166,8 @@ public class ReprocessForDataset implements Callable<Void> {
           }
         }
         //Fix totalProcessed
-        datasetStatus.setTotalProcessed(MongoSourceMongoDao.PAGE_SIZE * pagesProcessed.size());
+        datasetStatus
+            .setTotalProcessed((long) MongoSourceMongoDao.PAGE_SIZE * pagesProcessed.size());
         basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
       }
       return startingPage;
@@ -208,12 +211,9 @@ public class ReprocessForDataset implements Callable<Void> {
   /**
    * Default processing operation.
    * <p>It calculates all sorts of statistics provided in the {@link DatasetStatus} in the
-   * datastore. The order of operation in this method is as follows:
-   * <ul>
-   * <li>{@link #processRecord(FullBeanImpl)} per record</li>
-   * <li>{@link #indexRecord(RDF)} per record</li>
-   * <li>{@link #afterReProcess()} per dataset</li>
-   * </ul></p>
+   * datastore. Creates new {@link PageProcess} classes and starts them under the thread pool, while
+   * finalizing the operation by running {@link #afterReProcess()} when all records have been
+   * processed.
    */
   private void defaultOperation() throws InterruptedException, ExecutionException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Already processed: {}", prefixDatasetidLog,
@@ -314,15 +314,12 @@ public class ReprocessForDataset implements Callable<Void> {
     try {
       final RDF rdf = processRecord(fullBean);
       indexRecord(rdf);
-    } catch (ProcessingException | IndexingException e) {
-      String stepString;
-      if (e instanceof ProcessingException) {
-        stepString = "process";
-      } else {
-        stepString = "index";
-      }
-      LOGGER.error(EXECUTION_LOGS_MARKER, "{} - Could not {} record: {}", prefixDatasetidLog,
-          stepString,
+    } catch (ProcessingException e) {
+      LOGGER.error(EXECUTION_LOGS_MARKER, "{} - Could not process record: {}", prefixDatasetidLog,
+          fullBean.getAbout(), e);
+      return exceptionStacktraceToString(e);
+    } catch (IndexingException e) {
+      LOGGER.error(EXECUTION_LOGS_MARKER, "{} - Could not index record: {}", prefixDatasetidLog,
           fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
     }

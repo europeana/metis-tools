@@ -8,9 +8,7 @@ package eu.europeana.metis.reprocessing.model;
  */
 public enum Mode {
   DEFAULT,
-  REPROCESS_ALL_FAILED,
-  CALCULATE_DATASET_STATISTICS,
-  CALCULATE_DATASET_STATISTICS_SAMPLE;
+  REPROCESS_ALL_FAILED;
 
   public static Mode getModeFromEnumName(String enumName) {
     for (Mode mode : Mode.values()) {
