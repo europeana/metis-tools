@@ -36,15 +36,18 @@ public class ProgressCheckerMain {
         .createDatastore(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
     // Check the progress.
-    checkProgress(propertiesHolder, datastore, 1, 180);
-    checkProgress(propertiesHolder, datastore, 397, 1087);
-    checkProgress(propertiesHolder, datastore, 1089, 1979);
-    checkProgress(propertiesHolder, datastore, 2028, 2200);
+    System.out.println("FIRST PASS");
 
-    checkProgress(propertiesHolder, datastore, 181, 183);
-    checkProgress(propertiesHolder, datastore, 184, 396);
+    System.out.println("RECHECK");
+    checkProgress(propertiesHolder, datastore, 181, 181);
+    checkProgress(propertiesHolder, datastore, 182, 185);
     checkProgress(propertiesHolder, datastore, 1088, 1088);
-    checkProgress(propertiesHolder, datastore, 1980, 2027);
+    checkProgress(propertiesHolder, datastore, 1981, 2200);
+
+    System.out.println("COMPLETED");
+    checkProgress(propertiesHolder, datastore, 1, 180);
+    checkProgress(propertiesHolder, datastore, 186, 1087);
+    checkProgress(propertiesHolder, datastore, 1089, 1980);
 
     // Cleanup.
     LOGGER.info("Done.");
