@@ -56,12 +56,14 @@ public class MongoDestinationMongoDao {
   }
 
   public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
-    mongoDestinationDatastore.save(datasetStatus);
+    ExternalRequestUtil.retryableExternalRequestConnectionReset(
+        () -> mongoDestinationDatastore.save(datasetStatus));
   }
 
   public void storeFailedRecordToDb(FailedRecord failedRecord) {
     //Will replace it if already existent
-    mongoDestinationDatastore.save(failedRecord);
+    ExternalRequestUtil.retryableExternalRequestConnectionReset(
+        () -> mongoDestinationDatastore.save(failedRecord));
   }
 
   public void deleteAllSuccessfulReprocessedFailedRecords() {

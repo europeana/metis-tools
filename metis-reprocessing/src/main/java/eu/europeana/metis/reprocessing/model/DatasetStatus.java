@@ -29,13 +29,13 @@ public class DatasetStatus implements HasMongoObjectId {
   private Date startDate;
   private Date endDate;
   private long totalRecords;
-  private long totalProcessed;
-  private long totalFailedRecords;
-  private Set<Integer> pagesProcessed = new HashSet<>();
-  private double totalTimeProcessingInSecs;
-  private double totalTimeIndexingInSecs;
-  private double averageTimeRecordProcessingInSecs;
-  private double averageTimeRecordIndexingInSecs;
+  private volatile long totalProcessed;
+  private volatile long totalFailedRecords;
+  private volatile Set<Integer> pagesProcessed = new HashSet<>();
+  private volatile double totalTimeProcessingInSecs;
+  private volatile double totalTimeIndexingInSecs;
+  private volatile double averageTimeRecordProcessingInSecs;
+  private volatile double averageTimeRecordIndexingInSecs;
 
   public DatasetStatus() {
     //Default constructor

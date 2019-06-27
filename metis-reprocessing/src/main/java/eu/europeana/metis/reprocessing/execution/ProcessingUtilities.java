@@ -69,7 +69,7 @@ public class ProcessingUtilities {
     try {
       final MongoSourceMongoDao mongoSourceMongoDao = basicConfiguration.getMongoSourceMongoDao();
       final ExtraConfiguration extraConfiguration = basicConfiguration.getExtraConfiguration();
-      final RDF rdf = EdmUtils.toRDF(fullBean);
+      final RDF rdf = EdmUtils.toRDF(fullBean, true);
       final EnrichedRdfImpl enrichedRdf = new EnrichedRdfImpl(rdf);
 
       for (AggregationImpl aggregation : fullBean.getAggregations()) {
@@ -89,7 +89,7 @@ public class ProcessingUtilities {
         }
       }
       return enrichedRdf.finalizeRdf();
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
       throw new ProcessingException("A Runtime Exception occurred", e);
     }
   }

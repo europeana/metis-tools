@@ -1,24 +1,30 @@
 package eu.europeana.metis.reprocessing.execution;
 
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+import static java.util.Map.Entry.*;
+import static java.util.stream.Collectors.*;
 
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.time.Duration;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,24 +67,22 @@ public class ExecutorManager {
 
   public void startReprocessing() throws InterruptedException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
-    final List<String> allDatasetIds = basicConfiguration.getMetisCoreMongoDao()
-        .getAllDatasetIds();
-    final List<Long> sizeOfAllDatasetIds = allDatasetIds.stream()
-        .map(datasetId -> basicConfiguration.getMongoSourceMongoDao()
-            .getTotalRecordsForDataset(datasetId)).collect(Collectors.toList());
-    final List<String> sortedAllDatasetIds = allDatasetIds.stream()
-        .sorted(Comparator.comparingLong(o -> sizeOfAllDatasetIds.get(allDatasetIds.indexOf(o)))
-            .reversed()).collect(Collectors.toList());
-    final List<String> nonZeroSortedAllDatasetIds = sortedAllDatasetIds.stream()
-        .filter(datasetId -> sizeOfAllDatasetIds.get(allDatasetIds.indexOf(datasetId)) > 0)
-        .collect(Collectors.toList());
-//    IntStream.range(0, nonZeroSortedAllDatasetIds.size())
-//        .forEach(i -> retrieveOrInitializeDatasetStatus(nonZeroSortedAllDatasetIds.get(i), i));
+    final Map<String, Long> datasetsWithSize = basicConfiguration.getMetisCoreMongoDao()
+        .getAllDatasetIds().parallelStream().collect(toMap(Function.identity(),
+            datasetId -> basicConfiguration.getMongoSourceMongoDao()
+                .getTotalRecordsForDataset(datasetId)));
+    AtomicInteger atomicIndex = new AtomicInteger(0);
+    final List<DatasetStatus> datasetStatuses = datasetsWithSize.entrySet().stream()
+        .filter(entry -> entry.getValue() > 0)
+        .sorted(Collections.reverseOrder(comparingByValue()))
+        .map(entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
+            atomicIndex.getAndIncrement(),
+            entry.getValue())).collect(Collectors.toList());
 
     Date startDate = new Date();
     Timer timer = new Timer();
     ScheduledThreadForSpeedProjection st = new ScheduledThreadForSpeedProjection(startDate,
-        nonZeroSortedAllDatasetIds, sizeOfAllDatasetIds);
+        datasetStatuses);
     timer.scheduleAtFixedRate(st, Duration.ofMinutes(10).toMillis(),
         Duration.ofMinutes(10).toMillis());
 
@@ -88,12 +92,10 @@ public class ExecutorManager {
     int countOfTotalCurrentThreads = 0;
     final HashMap<Future, Integer> futureConsumedThreadsHashMap = new HashMap<>();
 
-    for (int i = startFromDatasetIndex;
-        i < endAtDatasetIndex && i < nonZeroSortedAllDatasetIds.size(); i++) {
-      String datasetId = nonZeroSortedAllDatasetIds.get(i);
-      final Long sizeOfDatasetId = sizeOfAllDatasetIds.get(allDatasetIds.indexOf(datasetId));
+    for (int i = startFromDatasetIndex; i < endAtDatasetIndex && i < datasetStatuses.size(); i++) {
+      final DatasetStatus datasetStatus = datasetStatuses.get(i);
       final int numberOfPages = (int) Math
-          .ceil((double) sizeOfDatasetId / MongoSourceMongoDao.PAGE_SIZE);
+          .ceil((double) datasetStatus.getTotalRecords() / MongoSourceMongoDao.PAGE_SIZE);
       int maxThreadsConsumedByDataset =
           numberOfPages >= maxParallelThreadsPerDataset ? maxParallelThreadsPerDataset
               : numberOfPages;
@@ -101,6 +103,12 @@ public class ExecutorManager {
       while (countOfTotalCurrentThreads >= totalAllowedThreads || maxThreadsConsumedByDataset > (
           totalAllowedThreads - countOfTotalCurrentThreads)) {
         final Future<Void> completedFuture = completionService.take();
+        try {
+          //Check and log for exceptions
+          completedFuture.get();
+        } catch (ExecutionException e) {
+          LOGGER.error(EXECUTION_LOGS_MARKER, "An exception occurred in a callable.", e);
+        }
         final Integer futureConsumedThreads = futureConsumedThreadsHashMap.get(completedFuture);
         futureConsumedThreadsHashMap.remove(completedFuture);
         parallelDatasets--;
@@ -114,7 +122,7 @@ public class ExecutorManager {
         case DEFAULT:
         case REPROCESS_ALL_FAILED:
         default:
-          callable = new ReprocessForDataset(datasetId, i, basicConfiguration,
+          callable = new ReprocessForDataset(datasetStatus, basicConfiguration,
               maxParallelThreadsPerDataset);
       }
       final Future<Void> submit = completionService.submit(callable);
@@ -124,29 +132,39 @@ public class ExecutorManager {
     }
 
     for (int i = 0; i < parallelDatasets; i++) {
-      completionService.take();
+      final Future<Void> completedFuture = completionService.take();
+      try {
+        //Check and log for exceptions
+        completedFuture.get();
+      } catch (ExecutionException e) {
+        LOGGER.error(EXECUTION_LOGS_MARKER, "An exception occurred in a callable.", e);
+      }
       reprocessedDatasets++;
       LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
     }
     timer.cancel();
   }
 
-//  private DatasetStatus retrieveOrInitializeDatasetStatus(String datasetId,
-//      int indexInOrderedList) {
-//    DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
-//        .getDatasetStatus(datasetId);
-//    if (retrievedDatasetStatus == null) {
-//      retrievedDatasetStatus = new DatasetStatus();
-//      final long totalRecordsForDataset = basicConfiguration.getMongoSourceMongoDao()
-//          .getTotalRecordsForDataset(datasetId);
-//      retrievedDatasetStatus.setDatasetId(datasetId);
-//      retrievedDatasetStatus.setIndexInOrderedList(indexInOrderedList);
-//      retrievedDatasetStatus.setTotalRecords(totalRecordsForDataset);
-//      basicConfiguration.getMongoDestinationMongoDao()
-//          .storeDatasetStatusToDb(retrievedDatasetStatus);
-//    }
-//    return retrievedDatasetStatus;
-//  }
+  /**
+   * Either get a {@link DatasetStatus} that already exists or generate one.
+   *
+   * @param indexInOrderedList the index of the dataset in the original ordered list
+   * @return the dataset status
+   */
+  private DatasetStatus retrieveOrInitializeDatasetStatus(String datasetId,
+      int indexInOrderedList, long totalRecordsForDataset) {
+    DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
+        .getDatasetStatus(datasetId);
+    if (retrievedDatasetStatus == null) {
+      retrievedDatasetStatus = new DatasetStatus();
+      retrievedDatasetStatus.setDatasetId(datasetId);
+      retrievedDatasetStatus.setIndexInOrderedList(indexInOrderedList);
+      retrievedDatasetStatus.setTotalRecords(totalRecordsForDataset);
+      basicConfiguration.getMongoDestinationMongoDao()
+          .storeDatasetStatusToDb(retrievedDatasetStatus);
+    }
+    return retrievedDatasetStatus;
+  }
 
   public void close() {
     threadPool.shutdown();
@@ -159,18 +177,19 @@ public class ExecutorManager {
   private class ScheduledThreadForSpeedProjection extends TimerTask {
 
     private final Date startDate;
-    private final List<String> datasetIds;
-    private final List<Long> sizeOfAllDatasetIds;
     private final long totalPreviouslyProcessed;
+    private final List<DatasetStatus> datasetStatuses;
+    private final long totalRecords;
 
-    ScheduledThreadForSpeedProjection(Date startDate, List<String> datasetIds,
-        List<Long> sizeOfAllDatasetIds) {
+    ScheduledThreadForSpeedProjection(Date startDate, List<DatasetStatus> datasetStatuses) {
       this.startDate = startDate;
-      this.datasetIds = datasetIds;
-      this.sizeOfAllDatasetIds = sizeOfAllDatasetIds;
-      this.totalPreviouslyProcessed = datasetIds.stream()
-          .map(id -> basicConfiguration.getMongoDestinationMongoDao().getDatasetStatus(id))
-          .filter(Objects::nonNull).mapToLong(DatasetStatus::getTotalProcessed).sum();
+      this.datasetStatuses = datasetStatuses;
+      this.totalPreviouslyProcessed = datasetStatuses.stream()
+          .map(datasetStatus -> basicConfiguration.getMongoDestinationMongoDao()
+              .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
+          .mapToLong(DatasetStatus::getTotalProcessed).sum();
+      this.totalRecords = datasetStatuses.stream().map(DatasetStatus::getTotalRecords)
+          .reduce(0L, Long::sum);
     }
 
     public void run() {
@@ -178,10 +197,10 @@ public class ExecutorManager {
       Date nowDate = new Date();
       long secondsInBetween = (nowDate.getTime() - startDate.getTime()) / 1000;
       //Only calculate projected date if a defined time threshold has passed
-      final long totalRecords = sizeOfAllDatasetIds.stream().reduce(0L, Long::sum);
-      final List<DatasetStatus> datasetStatusesSnapshot = datasetIds.stream()
-          .map(id -> basicConfiguration.getMongoDestinationMongoDao().getDatasetStatus(id))
-          .filter(Objects::nonNull).collect(Collectors.toList());
+      final List<DatasetStatus> datasetStatusesSnapshot = datasetStatuses.stream()
+          .map(datasetStatus -> basicConfiguration.getMongoDestinationMongoDao()
+              .getDatasetStatus(datasetStatus.getDatasetId()))
+          .filter(Objects::nonNull).collect(toList());
       final long totalProcessedFromStartDate = datasetStatusesSnapshot.stream()
           .filter(ds -> ds.getStartDate() != null)
           .filter(ds -> ds.getStartDate().compareTo(startDate) >= 0)
@@ -198,9 +217,9 @@ public class ExecutorManager {
           .from(startDate.toInstant().plus(
               Duration.ofMinutes((long) (totalHoursRequiredWithoutPreviouslyProcessed * 60))));
 
-      LOGGER.info(EXECUTION_LOGS_MARKER,
-          "Average time required, with current speed, for a full reprocess: {} Hours, projected end date: {}",
-          totalHoursRequired, projectedEndDate);
+      LOGGER.info(EXECUTION_LOGS_MARKER,String.format(
+          "Average time required, with current speed, for a full reprocess: %.2f Hours, projected end date: %s",
+          totalHoursRequired, projectedEndDate));
     }
   }
 }

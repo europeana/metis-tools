@@ -53,12 +53,12 @@ public class ReprocessForDataset implements Callable<Void> {
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Integer> completionService;
 
-  ReprocessForDataset(String datasetId, int indexInOrderedList,
+  ReprocessForDataset(DatasetStatus datasetStatus,
       BasicConfiguration basicConfiguration, int maxParallelPageThreads) {
-    this.datasetId = datasetId;
+    this.datasetId = datasetStatus.getDatasetId();
     this.basicConfiguration = basicConfiguration;
     this.prefixDatasetidLog = String.format("DatasetId: %s", this.datasetId);
-    this.datasetStatus = retrieveOrInitializeDatasetStatus(indexInOrderedList);
+    this.datasetStatus = datasetStatus;
 
     this.maxParallelPageThreads = maxParallelPageThreads;
     threadPool = Executors.newFixedThreadPool(maxParallelPageThreads);
@@ -105,28 +105,6 @@ public class ReprocessForDataset implements Callable<Void> {
         datasetStatus);
     close();
     return null;
-  }
-
-  /**
-   * Either get a {@link DatasetStatus} that already exists or generate one.
-   *
-   * @param indexInOrderedList the index of the dataset in the original ordered list
-   * @return the dataset status
-   */
-  private DatasetStatus retrieveOrInitializeDatasetStatus(int indexInOrderedList) {
-    DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
-        .getDatasetStatus(datasetId);
-    if (retrievedDatasetStatus == null) {
-      retrievedDatasetStatus = new DatasetStatus();
-      final long totalRecordsForDataset = basicConfiguration.getMongoSourceMongoDao()
-          .getTotalRecordsForDataset(datasetId);
-      retrievedDatasetStatus.setDatasetId(datasetId);
-      retrievedDatasetStatus.setIndexInOrderedList(indexInOrderedList);
-      retrievedDatasetStatus.setTotalRecords(totalRecordsForDataset);
-      basicConfiguration.getMongoDestinationMongoDao()
-          .storeDatasetStatusToDb(retrievedDatasetStatus);
-    }
-    return retrievedDatasetStatus;
   }
 
   /**
@@ -179,6 +157,7 @@ public class ReprocessForDataset implements Callable<Void> {
     nextPage = getStartingNextPage(processFailedOnly);
     if (!processFailedOnly) {
       datasetStatus.setStartDate(new Date());
+      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     }
     if (processFailedOnly) {
       failedRecordsOperation(nextPage);
@@ -380,8 +359,10 @@ public class ReprocessForDataset implements Callable<Void> {
     } finally {
       final long endTimeProcess = System.nanoTime();
       final long elapsedTime = endTimeProcess - startTimeProcess;
-      datasetStatus.setTotalTimeProcessingInSecs(
-          datasetStatus.getTotalTimeProcessingInSecs() + nanoTimeToSeconds(elapsedTime));
+      synchronized (this) {
+        datasetStatus.setTotalTimeProcessingInSecs(
+            datasetStatus.getTotalTimeProcessingInSecs() + nanoTimeToSeconds(elapsedTime));
+      }
     }
   }
 
@@ -394,8 +375,10 @@ public class ReprocessForDataset implements Callable<Void> {
     } finally {
       final long endTimeIndex = System.nanoTime();
       final long elapsedTime = endTimeIndex - startTimeIndex;
-      datasetStatus.setTotalTimeIndexingInSecs(
-          datasetStatus.getTotalTimeIndexingInSecs() + nanoTimeToSeconds(elapsedTime));
+      synchronized (this) {
+        datasetStatus.setTotalTimeIndexingInSecs(
+            datasetStatus.getTotalTimeIndexingInSecs() + nanoTimeToSeconds(elapsedTime));
+      }
     }
   }
 

@@ -56,8 +56,8 @@ public class MongoInitializer {
 
     Builder optionsBuilder = new Builder();
     optionsBuilder.sslEnabled(mongoEnablessl);
-    if (StringUtils.isEmpty(mongoDb) || StringUtils
-        .isEmpty(mongoUsername) || StringUtils
+    optionsBuilder.connectionsPerHost(2000);
+    if (StringUtils.isEmpty(mongoDb) || StringUtils.isEmpty(mongoUsername) || StringUtils
         .isEmpty(mongoPassword)) {
       mongoClient = new MongoClient(serverAddresses, optionsBuilder.build());
     } else {
