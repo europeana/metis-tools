@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -85,7 +86,7 @@ public class ProcessingUtilities {
         for (String resourceUrl : urlsForWebResources) {
           technicalMetadataForResource(mongoSourceMongoDao, enrichedRdf, resourceUrl,
               extraConfiguration.getCacheMongoDao(), extraConfiguration.getAmazonS3Client(),
-              extraConfiguration.getS3Bucket());
+              extraConfiguration.getS3Bucket(), rdf.getProvidedCHOList().get(0).getAbout());
         }
       }
       return enrichedRdf.finalizeRdf();
@@ -114,11 +115,12 @@ public class ProcessingUtilities {
   private static void technicalMetadataForResource(final MongoSourceMongoDao mongoSourceMongoDao,
       final EnrichedRdfImpl enrichedRdf, final String resourceUrl,
       final CacheMongoDao cacheMongoDao, final AmazonS3 amazonS3Client,
-      final String s3Bucket) {
+      final String s3Bucket, final String recordId) {
     try {
-      final String md5Hex = ProcessingUtilities.md5Hex(resourceUrl);
+      final String md5HexTechnicalMetadata = md5Hex(resourceUrl + "-" + recordId);
+      final String md5HexThumb = md5Hex(resourceUrl);
       final WebResourceMetaInfoImpl webResourceMetaInfoImplFromSource = mongoSourceMongoDao
-          .getTechnicalMetadataFromSource(md5Hex);
+          .getTechnicalMetadataFromSource(md5HexTechnicalMetadata);
       if (webResourceMetaInfoImplFromSource == null) {
         //If it does not exist already check cache
         final TechnicalMetadataWrapper technicalMetadataWrapper = cacheMongoDao
@@ -128,7 +130,7 @@ public class ProcessingUtilities {
         }
       } else {
         final ResourceMetadata resourceMetadata = convertWebResourceMetaInfoImpl(amazonS3Client,
-            s3Bucket, webResourceMetaInfoImplFromSource, resourceUrl, md5Hex);
+            s3Bucket, webResourceMetaInfoImplFromSource, resourceUrl, md5HexThumb);
         enrichedRdf.enrichResource(resourceMetadata);
       }
     } catch (MediaExtractionException e) {
@@ -190,18 +192,23 @@ public class ProcessingUtilities {
     } else if (imageMetaInfo != null) {
       ArrayList<Thumbnail> thumbnails = getThumbnailTargetNames(amazonS3Client, s3Bucket,
           resourceUrl, md5Hex);
+      final List<String> colorPaletteWithoutStartingHash = Optional
+          .ofNullable(imageMetaInfo.getColorPalette()).map(Arrays::stream).orElseGet(Stream::empty)
+          .map(color -> color.startsWith("#") ? color.substring(1) : color)
+          .collect(Collectors.toList());
       final ImageResourceMetadata imageResourceMetadata = new ImageResourceMetadata(
           imageMetaInfo.getMimeType(), resourceUrl, imageMetaInfo.getFileSize(),
           imageMetaInfo.getWidth(), imageMetaInfo.getHeight(),
           ColorSpaceType.convert(imageMetaInfo.getColorSpace()),
-          Arrays.asList(imageMetaInfo.getColorPalette()), thumbnails);
+          colorPaletteWithoutStartingHash, thumbnails);
       resourceMetadata = new ResourceMetadata(imageResourceMetadata);
     } else if (textMetaInfo != null) {
       ArrayList<Thumbnail> thumbnails = getThumbnailTargetNames(amazonS3Client, s3Bucket,
           resourceUrl, md5Hex);
       final TextResourceMetadata textResourceMetadata = new TextResourceMetadata(
           textMetaInfo.getMimeType(), resourceUrl, textMetaInfo.getFileSize(),
-          textMetaInfo.getIsSearchable(), textMetaInfo.getResolution(), thumbnails);
+          Optional.ofNullable(textMetaInfo.getIsSearchable()).orElse(false),
+          textMetaInfo.getResolution(), thumbnails);
       resourceMetadata = new ResourceMetadata(textResourceMetadata);
     } else if (videoMetaInfo != null) {
       final VideoResourceMetadata videoResourceMetadata = new VideoResourceMetadata(
