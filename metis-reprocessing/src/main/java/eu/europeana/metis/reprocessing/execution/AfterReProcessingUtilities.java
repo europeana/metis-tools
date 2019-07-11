@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
@@ -48,8 +49,8 @@ public class AfterReProcessingUtilities {
   public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,
       Date endDate, BasicConfiguration basicConfiguration) {
     // TODO: 21-5-19 Enable methods when ready
-//    createReindexWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
-//    setInvalidFlagToPlugins(datasetId, basicConfiguration);
+    createReindexWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
+    setInvalidFlagToPlugins(datasetId, basicConfiguration);
   }
 
   private static void createReindexWorkflowExecutions(String datasetId, Date startDate,
@@ -62,9 +63,11 @@ public class AfterReProcessingUtilities {
     //Preview Plugin
     final ReindexToPreviewPluginMetadata reindexToPreviewPluginMetadata = new ReindexToPreviewPluginMetadata();
     reindexToPreviewPluginMetadata
-        .setRevisionNamePreviousPlugin(lastExecutionToBeBasedOn.getPluginType().name());
+        .setRevisionNamePreviousPlugin(lastExecutionToBeBasedOn == null ? null
+            : lastExecutionToBeBasedOn.getPluginType().name());
     reindexToPreviewPluginMetadata
-        .setRevisionTimestampPreviousPlugin(lastExecutionToBeBasedOn.getStartedDate());
+        .setRevisionTimestampPreviousPlugin(
+            lastExecutionToBeBasedOn == null ? null : lastExecutionToBeBasedOn.getStartedDate());
     final ReindexToPreviewPlugin reindexToPreviewPlugin = new ReindexToPreviewPlugin(
         reindexToPreviewPluginMetadata);
     reindexToPreviewPlugin
@@ -110,7 +113,8 @@ public class AfterReProcessingUtilities {
     final List<AbstractExecutablePlugin> deprecatedPlugins = invalidatePluginTypes.stream()
         .map(executablePluginType -> workflowExecutionDao
             .getLastFinishedWorkflowExecutionPluginByDatasetIdAndPluginType(datasetId,
-                Collections.singleton(executablePluginType), false)).collect(Collectors.toList());
+                Collections.singleton(executablePluginType), false)).filter(Objects::nonNull)
+        .collect(Collectors.toList());
 
     deprecatedPlugins.stream().map(abstractExecutablePlugin -> {
       final WorkflowExecution workflowExecution = workflowExecutionDao

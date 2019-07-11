@@ -222,6 +222,7 @@ public class ProcessingUtilities {
 
   private static ArrayList<Thumbnail> getThumbnailTargetNames(AmazonS3 amazonS3Client,
       String s3Bucket, String resourceUrl, String md5Hex) {
+    // TODO: 11-7-19 Better way to do this? To avoid checking S3..
     ArrayList<Thumbnail> thumbnails = new ArrayList<>();
     String targetNameLarge = md5Hex + "-LARGE";
     LOGGER.info("Get thumbnail target names existence from S3");
