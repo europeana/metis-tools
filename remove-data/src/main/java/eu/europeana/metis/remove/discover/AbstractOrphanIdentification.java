@@ -1,7 +1,7 @@
 package eu.europeana.metis.remove.discover;
 
 import com.mongodb.DBCollection;
-import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.ExecutionProgress;
@@ -29,7 +29,7 @@ abstract class AbstractOrphanIdentification {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOrphanIdentification.class);
 
-  private final MorphiaDatastoreProvider morphiaDatastoreProvider;
+  private final MorphiaDatastoreProviderImpl morphiaDatastoreProvider;
 
   private final DiscoveryMode discoveryMode;
 
@@ -58,7 +58,7 @@ abstract class AbstractOrphanIdentification {
    * @param morphiaDatastoreProvider Access to the database.
    * @param discoveryMode The discoveryMode in which to operate.
    */
-  AbstractOrphanIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider, DiscoveryMode discoveryMode) {
+  AbstractOrphanIdentification(MorphiaDatastoreProviderImpl morphiaDatastoreProvider, DiscoveryMode discoveryMode) {
     this.morphiaDatastoreProvider = morphiaDatastoreProvider;
     this.discoveryMode = discoveryMode;
   }

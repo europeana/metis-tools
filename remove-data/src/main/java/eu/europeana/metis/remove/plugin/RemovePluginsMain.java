@@ -2,7 +2,7 @@ package eu.europeana.metis.remove.plugin;
 
 import com.opencsv.CSVReader;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
-import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.WorkflowStatus;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
@@ -141,7 +141,7 @@ public class RemovePluginsMain {
 
   private static boolean canDeletePlugin(
       Pair<WorkflowExecution, AbstractMetisPlugin> executionAndPlugin,
-      MorphiaDatastoreProvider datastoreProvider) {
+      MorphiaDatastoreProviderImpl datastoreProvider) {
     final WorkflowExecution execution = executionAndPlugin.getLeft();
     final AbstractMetisPlugin plugin = executionAndPlugin.getRight();
 
@@ -194,7 +194,7 @@ public class RemovePluginsMain {
   }
 
   private static void deletePlugin(Pair<WorkflowExecution, AbstractMetisPlugin> executionAndPlugin,
-      MorphiaDatastoreProvider datastoreProvider) {
+      MorphiaDatastoreProviderImpl datastoreProvider) {
 
     // If the mode calls for marking as deleted, we do this and are done.
     if (MODE == Mode.MARK_AS_DELETED) {

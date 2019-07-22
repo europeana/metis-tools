@@ -10,7 +10,7 @@ import eu.europeana.metis.core.dao.ScheduledWorkflowDao;
 import eu.europeana.metis.core.dao.WorkflowDao;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
-import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class DatasetRemover {
   private final ScheduledWorkflowDao scheduledWorkflowDao;
   private final DatasetXsltDao datasetXsltDao;
 
-  public DatasetRemover(MorphiaDatastoreProvider morphiaDatastoreProvider,
+  public DatasetRemover(MorphiaDatastoreProviderImpl morphiaDatastoreProvider,
       DataSetServiceClient datasetServiceClient, RecordServiceClient recordServiceClient,
       String providerId) {
 

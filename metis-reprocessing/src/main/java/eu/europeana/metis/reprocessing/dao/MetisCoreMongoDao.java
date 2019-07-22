@@ -5,7 +5,7 @@ import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTI
 import com.mongodb.MongoClient;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
-import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
@@ -42,7 +42,7 @@ public class MetisCoreMongoDao {
     metisCoreDatastore = createMetisCoreDatastore(metisCoreMongoInitializer.getMongoClient(),
         propertiesHolder.metisCoreMongoDb);
 
-    final MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProvider(
+    final MorphiaDatastoreProviderImpl morphiaDatastoreProvider = new MorphiaDatastoreProviderImpl(
         metisCoreMongoInitializer.getMongoClient(), propertiesHolder.metisCoreMongoDb);
     workflowExecutionDao = new WorkflowExecutionDao(morphiaDatastoreProvider);
   }

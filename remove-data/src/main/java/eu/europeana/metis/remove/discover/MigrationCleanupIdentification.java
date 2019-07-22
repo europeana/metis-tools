@@ -1,6 +1,6 @@
 package eu.europeana.metis.remove.discover;
 
-import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import java.time.Instant;
@@ -58,7 +58,7 @@ class MigrationCleanupIdentification extends AbstractOrphanIdentification {
    * @param morphiaDatastoreProvider Access to the database.
    * @param discoveryMode The discoveryMode in which to operate.
    */
-  MigrationCleanupIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider, DiscoveryMode discoveryMode) {
+  MigrationCleanupIdentification(MorphiaDatastoreProviderImpl morphiaDatastoreProvider, DiscoveryMode discoveryMode) {
     super(morphiaDatastoreProvider, discoveryMode);
   }
 
