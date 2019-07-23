@@ -5,15 +5,15 @@ import eu.europeana.metis.remove.utils.Application;
 import java.io.IOException;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 
-public class CanceledOrFailedIdentificationMain extends AbstractOrphanIdentificationEngine {
+public class DatasetSpecificIdentificationMain extends AbstractOrphanIdentificationEngine {
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
-    new CanceledOrFailedIdentificationMain().discoverOrphans();
+    new DatasetSpecificIdentificationMain().discoverOrphans();
   }
 
   @Override
   AbstractOrphanIdentification createOrphansDiscoverer(Application application) {
-    return new CanceledOrFailedIdentification(
-        application.getDatastoreProvider(), DiscoveryMode.DISCOVER_ONLY_CHILDLESS_ORPHANS);
+    return new DatasetSpecificIdentification(application.getDatastoreProvider(),
+        DiscoveryMode.DISCOVER_ONLY_CHILDLESS_ORPHANS);
   }
 }
