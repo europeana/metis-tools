@@ -5,7 +5,9 @@ import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.WorkflowStatus;
+import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.DataStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.remove.utils.Application;
@@ -34,7 +36,13 @@ public class RemovePluginsMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RemovePluginsMain.class);
 
+  private enum Mode {
+    REMOVE_FROM_DB, MARK_AS_DELETED
+  }
+
   private static final String FILE_FOR_PLUGIN_REMOVAL = "/home/jochen/Desktop/plugins_to_remove.csv";
+
+  private static final Mode MODE = Mode.REMOVE_FROM_DB;
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
     try (final Application application = Application.initialize()) {
@@ -139,7 +147,7 @@ public class RemovePluginsMain {
     // Test that there is no other plugin depending on this one. NOTE: disabling validation on one
     // of the queries to suppress warnings from Morphia.
     final Query<AbstractMetisPlugin> pluginQuery = datastoreProvider.getDatastore()
-        .createQuery(AbstractMetisPlugin.class);
+        .createQuery(AbstractMetisPlugin.class).disableValidation();
     pluginQuery.field("pluginMetadata.revisionNamePreviousPlugin")
         .equal(plugin.getPluginType().name());
     pluginQuery.field("pluginMetadata.revisionTimestampPreviousPlugin")
@@ -186,6 +194,16 @@ public class RemovePluginsMain {
 
   private static void deletePlugin(Pair<WorkflowExecution, AbstractMetisPlugin> executionAndPlugin,
       MorphiaDatastoreProvider datastoreProvider) {
+
+    // If the mode calls for marking as deleted, we do this and are done.
+    if (MODE == Mode.MARK_AS_DELETED) {
+      if (executionAndPlugin.getRight() instanceof AbstractExecutablePlugin) {
+        ((AbstractExecutablePlugin) executionAndPlugin.getRight()).setDataStatus(DataStatus.DELETED);
+        ExternalRequestUtil.retryableExternalRequestConnectionReset(
+            () -> datastoreProvider.getDatastore().save(executionAndPlugin.getLeft()));
+      }
+      return;
+    }
 
     // If there is only one plugin, we remove the execution and we are done.
     final WorkflowExecution execution = executionAndPlugin.getLeft();
