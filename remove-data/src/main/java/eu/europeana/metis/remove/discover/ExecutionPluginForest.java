@@ -174,7 +174,8 @@ class ExecutionPluginForest {
 
   /**
    * This method returns all non-overlapping subtrees of leafs (identified by top node and
-   * potentially including leafs themselves) that satisfy the given test.
+   * potentially including leafs themselves) that satisfy the given test. So this method will only
+   * look at nodes that are leafs or descendants of leafs.
    *
    * @param subtreeTest The test that the subtrees of the leaf (including the leaf itself) need to
    * satisfy (see {@link ExecutionPluginNode#findSubtrees(Predicate, Consumer)}).
@@ -186,7 +187,8 @@ class ExecutionPluginForest {
 
   /**
    * This method returns all non-overlapping subtrees of leafs (identified by top node and
-   * potentially including leafs themselves) that satisfy the given tests.
+   * potentially including leafs themselves) that satisfy the given tests. So this method will only
+   * * look at nodes that are leafs or descendants of leafs.
    *
    * @param leafTest The test that the leaf itself needs to satisfy.
    * @param subtreeTest The test that the subtrees of the leaf (including the leaf itself) need to

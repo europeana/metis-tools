@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 
-public abstract class AbstractOrphanIdentificationMain {
+public abstract class AbstractOrphanIdentificationEngine {
 
   private static final String FILE_FOR_PLUGIN_REMOVAL = "/home/jochen/Desktop/plugins_to_remove.csv";
   private static final String FILE_FOR_REVISION_REMOVAL = "/home/jochen/Desktop/revisions_to_remove.csv";

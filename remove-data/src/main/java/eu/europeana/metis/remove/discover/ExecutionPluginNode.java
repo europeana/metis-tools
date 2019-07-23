@@ -2,6 +2,7 @@ package eu.europeana.metis.remove.discover;
 
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import java.time.Instant;
 import java.util.ArrayDeque;
@@ -142,7 +143,49 @@ class ExecutionPluginNode {
     return new ArrayList<>(result);
   }
 
+  /**
+   * Checks whether the plugin was started before the given date. If the plugin was not started at
+   * all, this method answers negatively.
+   *
+   * @param date The cut-off date.
+   * @return Whether the plugin was started before the given date.
+   */
   boolean wasStartedBefore(Instant date) {
     return plugin.getStartedDate() != null && date.isAfter(plugin.getStartedDate().toInstant());
+  }
+
+  /**
+   * Checks whether the plugin was started or canceled before the given date. If the plugin was not
+   * started at all, but cancelled preemptively because one of the predecessors failed (before the
+   * given date) this method also answers positively.
+   *
+   * @param date The cut-off date.
+   * @return Whether the plugin was started or canceled before the given date.
+   */
+  boolean wasStartedOrCancelledBefore(Instant date) {
+
+    // Loop back through history.
+    ExecutionPluginNode current = this;
+    while (current != null) {
+
+      // If we have a started date, we can answer immediately, also for any cancelled successors.
+      if (current.getPlugin().getStartedDate() != null) {
+        return date.isAfter(current.getPlugin().getStartedDate().toInstant());
+      }
+
+      // So there is no started date. If it was cancelled preemptively, check predecessors.
+      if (current.getPlugin().getPluginStatus() == PluginStatus.CANCELLED) {
+        current = current.getParent();
+        continue;
+      }
+
+      // So if it is not started and not cancelled, something strange must be going on.
+      return false;
+    }
+
+    // If we are here, we know that the whole execution was cancelled. We look
+    // at the creation date of the execution (which should always be available).
+    return execution.getCreatedDate() != null && date
+        .isAfter(execution.getCreatedDate().toInstant());
   }
 }

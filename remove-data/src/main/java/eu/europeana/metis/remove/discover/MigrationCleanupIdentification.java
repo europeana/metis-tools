@@ -78,13 +78,13 @@ class MigrationCleanupIdentification extends AbstractOrphanIdentification {
     final Predicate<ExecutionPluginNode> failedOrCancelledCheck = node ->
         node.getPlugin().getPluginStatus() == PluginStatus.FAILED
             || node.getPlugin().getPluginStatus() == PluginStatus.CANCELLED;
-    final Predicate<ExecutionPluginNode> startedBeforeCheck = node -> node
-        .wasStartedBefore(END_OF_MIGRATION);
+    final Predicate<ExecutionPluginNode> startedOrCancelledBeforeCheck = node -> node
+        .wasStartedOrCancelledBefore(END_OF_MIGRATION);
 
     // Collect all leafs or descendants of leafs that satisfy the criteria. Optimize by checking the
     // time before even considering the leaf node: all descendants must have started later.
-    return forest.getOrphanLeafSubtrees(startedBeforeCheck,
-        failedOrCancelledCheck.and(startedBeforeCheck));
+    return forest.getOrphanLeafSubtrees(startedOrCancelledBeforeCheck,
+        failedOrCancelledCheck.and(startedOrCancelledBeforeCheck));
   }
 
   private static List<ExecutionPluginNode> getFinishedSupersededLeafs(
