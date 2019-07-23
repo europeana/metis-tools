@@ -4,6 +4,7 @@ import com.opencsv.CSVWriter;
 import eu.europeana.metis.CommonStringValues;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.DataStatus;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -65,6 +66,7 @@ final class OutputUtils {
       final DateFormat dateFormat = new SimpleDateFormat(CommonStringValues.DATE_FORMAT, Locale.US);
       nodesToRemove.stream().filter(node -> node.getPlugin() instanceof AbstractExecutablePlugin)
           .filter(node -> node.getPlugin().getStartedDate() != null)
+          .filter(node -> ((AbstractExecutablePlugin) node.getPlugin()).getDataStatus() != DataStatus.DELETED)
           .forEach(node ->
               writer.writeNext(new String[]{
                   node.getExecution().getEcloudDatasetId(),
@@ -93,6 +95,7 @@ final class OutputUtils {
       nodesToRemove.stream().map(ExecutionPluginNode::getPlugin)
           .filter(plugin -> plugin instanceof AbstractExecutablePlugin)
           .map(plugin -> (AbstractExecutablePlugin) plugin)
+          .filter(plugin -> plugin.getDataStatus() != DataStatus.DELETED)
           .map(AbstractExecutablePlugin::getExternalTaskId).filter(StringUtils::isNotBlank)
           .forEach(taskId -> writer.writeNext(new String[]{taskId}, false));
     }
