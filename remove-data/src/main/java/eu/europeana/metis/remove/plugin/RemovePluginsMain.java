@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -172,14 +173,14 @@ public class RemovePluginsMain {
         .findFirst().orElseThrow(IllegalStateException::new);
     if (pluginIndex != execution.getMetisPlugins().size() - 1) {
       final AbstractMetisPlugin nextPlugin = execution.getMetisPlugins().get(pluginIndex + 1);
-      final boolean previousTimestampIsSetAndDifferent =
-          nextPlugin.getPluginMetadata().getRevisionTimestampPreviousPlugin() != null && !nextPlugin
-              .getPluginMetadata().getRevisionTimestampPreviousPlugin()
-              .equals(plugin.getStartedDate());
-      final boolean previousNameIsSetAndDifferent =
-          nextPlugin.getPluginMetadata().getRevisionNamePreviousPlugin() != null && !nextPlugin
-              .getPluginMetadata().getRevisionNamePreviousPlugin()
-              .equals(plugin.getPluginType().name());
+      final boolean previousTimestampIsSetAndDifferent = nextPlugin.getPluginMetadata() != null
+          && nextPlugin.getPluginMetadata().getRevisionTimestampPreviousPlugin() != null
+          && !nextPlugin.getPluginMetadata().getRevisionTimestampPreviousPlugin()
+          .equals(plugin.getStartedDate());
+      final boolean previousNameIsSetAndDifferent = nextPlugin.getPluginMetadata() != null
+          && nextPlugin.getPluginMetadata().getRevisionNamePreviousPlugin() != null && !nextPlugin
+          .getPluginMetadata().getRevisionNamePreviousPlugin()
+          .equals(plugin.getPluginType().name());
       if (!previousTimestampIsSetAndDifferent && !previousNameIsSetAndDifferent) {
         LOGGER.error("Could not remove plugin execution with ID {} and type {} in workflow with ID "
                 + "{}: the next plugin in the workflow seems to be the successor of this plugin.",

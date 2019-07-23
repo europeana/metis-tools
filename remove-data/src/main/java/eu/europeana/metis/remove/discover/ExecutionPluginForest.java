@@ -2,6 +2,7 @@ package eu.europeana.metis.remove.discover;
 
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.AbstractMetisPluginMetadata;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -113,11 +115,12 @@ class ExecutionPluginForest {
 
   private ExecutionPluginNode findPredecessor(ExecutionPluginNode node) {
 
-    // Analize the previous plugin information given in the plugin metadata.
-    final Date previousPluginDate = node.getPlugin().getPluginMetadata()
-        .getRevisionTimestampPreviousPlugin();
-    final PluginType previousPluginType = PluginType.getPluginTypeFromEnumName(
-        node.getPlugin().getPluginMetadata().getRevisionNamePreviousPlugin());
+    // Analyze the previous plugin information given in the plugin metadata.
+    final Date previousPluginDate = Optional.ofNullable(node.getPlugin().getPluginMetadata())
+        .map(AbstractMetisPluginMetadata::getRevisionTimestampPreviousPlugin).orElse(null);
+    final PluginType previousPluginType = Optional.ofNullable(node.getPlugin().getPluginMetadata())
+        .map(AbstractMetisPluginMetadata::getRevisionNamePreviousPlugin)
+        .map(PluginType::getPluginTypeFromEnumName).orElse(null);
     final ExecutionPluginNode previous;
     if (previousPluginDate != null && previousPluginType != null) {
 
@@ -151,12 +154,18 @@ class ExecutionPluginForest {
       }
     }
 
-    // Check: we only expect harvesting plugins to have no ancestor.
+    // Check: we only expect harvesting and reindexing plugins to have no ancestor.
     final boolean isHarvesting =
         node.getType() == PluginType.OAIPMH_HARVEST || node.getType() == PluginType.HTTP_HARVEST;
-    if (isHarvesting != (previous == null)) {
+    final boolean isReindexing = node.getType() == PluginType.REINDEX_TO_PREVIEW
+        || node.getType() == PluginType.REINDEX_TO_PUBLISH;
+    if (isHarvesting && previous != null) {
       throw new IllegalStateException("Problem with plugin " + node.getId()
           + ": this is a harvesting plugin with a predecessor.");
+    }
+    if (!isHarvesting && !isReindexing && previous == null) {
+      throw new IllegalStateException("Problem with plugin " + node.getId()
+          + ": this plugin requires a predecessor but none was found.");
     }
 
     // Done
