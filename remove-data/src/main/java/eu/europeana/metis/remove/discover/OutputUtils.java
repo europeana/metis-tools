@@ -3,7 +3,7 @@ package eu.europeana.metis.remove.discover;
 import com.opencsv.CSVWriter;
 import eu.europeana.metis.CommonStringValues;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
-import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.MetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.DataStatus;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -71,7 +71,7 @@ final class OutputUtils {
               writer.writeNext(new String[]{
                   node.getExecution().getEcloudDatasetId(),
                   providerId,
-                  AbstractMetisPlugin.getRepresentationName(),
+                  MetisPlugin.getRepresentationName(),
                   node.getPlugin().getPluginType().name(),
                   providerId,
                   dateFormat.format(node.getPlugin().getStartedDate().getTime())

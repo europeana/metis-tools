@@ -58,7 +58,8 @@ abstract class AbstractOrphanIdentification {
    * @param morphiaDatastoreProvider Access to the database.
    * @param discoveryMode The discoveryMode in which to operate.
    */
-  AbstractOrphanIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider, DiscoveryMode discoveryMode) {
+  AbstractOrphanIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider,
+      DiscoveryMode discoveryMode) {
     this.morphiaDatastoreProvider = morphiaDatastoreProvider;
     this.discoveryMode = discoveryMode;
   }

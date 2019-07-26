@@ -1,6 +1,7 @@
 package eu.europeana.metis.remove.utils;
 
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import java.io.Closeable;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +37,7 @@ public final class Application implements Closeable {
 
     final MongoInitializer mongoInitializer = new MongoInitializer(properties);
     mongoInitializer.initializeMongoClient();
-    final MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProvider(
+    final MorphiaDatastoreProviderImpl morphiaDatastoreProvider = new MorphiaDatastoreProviderImpl(
         mongoInitializer.getMongoClient(), properties.mongoCoreDb);
 
     return new Application(properties, mongoInitializer, morphiaDatastoreProvider);
