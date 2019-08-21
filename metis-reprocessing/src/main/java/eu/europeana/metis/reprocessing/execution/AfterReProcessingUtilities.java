@@ -56,8 +56,7 @@ public class AfterReProcessingUtilities {
   private static void createReindexWorkflowExecutions(String datasetId, Date startDate,
       Date endDate, BasicConfiguration basicConfiguration) {
     final AbstractExecutablePlugin lastExecutionToBeBasedOn = basicConfiguration
-        .getMetisCoreMongoDao().getWorkflowExecutionDao()
-        .getLastFinishedWorkflowExecutionPluginByDatasetIdAndPluginType(datasetId,
+        .getMetisCoreMongoDao().getWorkflowExecutionDao().getLatestSuccessfulPlugin(datasetId,
             Collections.singleton(basicConfiguration.getReprocessBasedOnPluginType()), false);
 
     //Preview Plugin
@@ -110,11 +109,10 @@ public class AfterReProcessingUtilities {
         .getInvalidatePluginTypes();
     final WorkflowExecutionDao workflowExecutionDao = basicConfiguration.getMetisCoreMongoDao()
         .getWorkflowExecutionDao();
-    final List<AbstractExecutablePlugin> deprecatedPlugins = invalidatePluginTypes.stream()
-        .map(executablePluginType -> workflowExecutionDao
-            .getLastFinishedWorkflowExecutionPluginByDatasetIdAndPluginType(datasetId,
-                Collections.singleton(executablePluginType), false)).filter(Objects::nonNull)
-        .collect(Collectors.toList());
+    final List<AbstractExecutablePlugin> deprecatedPlugins = invalidatePluginTypes.stream().map(
+        executablePluginType -> workflowExecutionDao
+            .getLatestSuccessfulPlugin(datasetId, Collections.singleton(executablePluginType),
+                false)).filter(Objects::nonNull).collect(Collectors.toList());
 
     deprecatedPlugins.stream().map(abstractExecutablePlugin -> {
       final WorkflowExecution workflowExecution = workflowExecutionDao

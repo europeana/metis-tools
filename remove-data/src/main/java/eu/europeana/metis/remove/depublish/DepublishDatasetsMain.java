@@ -56,8 +56,7 @@ public class DepublishDatasetsMain {
     final WorkflowExecutionDao workflowExecutionDao = new WorkflowExecutionDao(
         application.getDatastoreProvider());
     final AbstractExecutablePlugin targetPlugin = workflowExecutionDao
-        .getLastFinishedWorkflowExecutionPluginByDatasetIdAndPluginType(datasetId,
-            EnumSet.of(ExecutablePluginType.PUBLISH), true);
+        .getLatestSuccessfulPlugin(datasetId, EnumSet.of(ExecutablePluginType.PUBLISH), true);
     if (targetPlugin != null) {
       final WorkflowExecution execution = workflowExecutionDao
           .getByExternalTaskId(Long.parseLong(targetPlugin.getExternalTaskId()));
