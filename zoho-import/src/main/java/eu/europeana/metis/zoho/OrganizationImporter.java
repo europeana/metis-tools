@@ -117,8 +117,18 @@ public class OrganizationImporter extends BaseOrganizationImporter {
   }
   
   public void run(Date lastRun) throws ZohoAccessException, OrganizationImportException {
-    if (incrementalImport || individualImport)
+    
+    Date modifiedSince = lastRun;
+    if (incrementalImport || individualImport) {
       lastRun = entityService.getLastOrganizationImportDate();
+      //EA-1466 lastModified is inclusive, add one second to avoid re-import of last modified entity
+      long lastRunTimestamp = 0;
+      if(lastRun != null) {             
+          lastRunTimestamp = lastRun.getTime();
+      }
+      int one_second = 1000;          
+      modifiedSince = new Date(lastRunTimestamp + one_second);
+    }
 
     List<ZohoOrganization> orgList;
     SortedSet<Operation> operations;
@@ -133,8 +143,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
         orgList = getOneOrganizationAsList(individualEntityId);
         hasNext = false;
       } else {
-        orgList = zohoAccessService.getOrganizations(start, rows, lastRun, searchCriteria);
-        LOGGER.debug("Processing organizations set: {}", ""+start+"-"+(start+rows));
+        orgList = zohoAccessService.getOrganizations(start, rows, modifiedSince, searchCriteria);
+        LOGGER.debug("Processing organizations set: {}", ""+start+"-"+(start+orgList.size()));
       }
       // collect operations to be run on Metis and Entity API
       operations = fillOperationsSet(orgList);
