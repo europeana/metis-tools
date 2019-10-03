@@ -56,7 +56,7 @@ public class DepublishDatasetsMain {
     final WorkflowExecutionDao workflowExecutionDao = new WorkflowExecutionDao(
         application.getDatastoreProvider());
     final AbstractExecutablePlugin targetPlugin = workflowExecutionDao
-        .getLatestSuccessfulPlugin(datasetId, EnumSet.of(ExecutablePluginType.PUBLISH), true);
+        .getLatestSuccessfulExecutablePlugin(datasetId, EnumSet.of(ExecutablePluginType.PUBLISH), true);
     if (targetPlugin != null) {
       final WorkflowExecution execution = workflowExecutionDao
           .getByExternalTaskId(Long.parseLong(targetPlugin.getExternalTaskId()));
@@ -68,7 +68,7 @@ public class DepublishDatasetsMain {
     }
 
     // Remove from mongo and solr.
-    final int removed = indexer.removeAll(datasetId);
+    final int removed = indexer.removeAll(datasetId, null);
     LOGGER.info("{} records in dataset {} are successfully removed.", removed, datasetId);
   }
 }
