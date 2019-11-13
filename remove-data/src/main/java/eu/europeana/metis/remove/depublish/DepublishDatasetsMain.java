@@ -9,7 +9,9 @@ import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.DataStatus;
-import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
+import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
+import eu.europeana.metis.core.workflow.plugins.MetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.remove.utils.Application;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -52,23 +54,26 @@ public class DepublishDatasetsMain {
   private static void depublish(String datasetId, Application application, Indexer indexer)
       throws IndexingException {
 
+    // Remove from mongo and solr.
+    final int removed = indexer.removeAll(datasetId, null);
+    LOGGER.info(" -> {} records in dataset {} are successfully removed.", removed, datasetId);
+
     // Mark as deprecated
     final WorkflowExecutionDao workflowExecutionDao = new WorkflowExecutionDao(
         application.getDatastoreProvider());
-    final AbstractExecutablePlugin targetPlugin = workflowExecutionDao
-        .getLatestSuccessfulExecutablePlugin(datasetId, EnumSet.of(ExecutablePluginType.PUBLISH), true);
-    if (targetPlugin != null) {
-      final WorkflowExecution execution = workflowExecutionDao
-          .getByExternalTaskId(Long.parseLong(targetPlugin.getExternalTaskId()));
-      final Optional<AbstractMetisPlugin> metisPluginWithType = execution
-          .getMetisPluginWithType(targetPlugin.getPluginType());
-      metisPluginWithType.ifPresent(
-          plugin -> ((AbstractExecutablePlugin) plugin).setDataStatus(DataStatus.DEPRECATED));
-      workflowExecutionDao.update(execution);
+    final MetisPlugin targetPlugin = workflowExecutionDao.getLatestSuccessfulPlugin(datasetId,
+        EnumSet.of(PluginType.PUBLISH, PluginType.REINDEX_TO_PUBLISH));
+    if (targetPlugin instanceof ExecutablePlugin) {
+      final ExecutablePlugin castPlugin = (ExecutablePlugin) targetPlugin;
+      if (ExecutablePlugin.getDataStatus(castPlugin) == DataStatus.VALID) {
+        final WorkflowExecution execution = workflowExecutionDao
+            .getByExternalTaskId(Long.parseLong(castPlugin.getExternalTaskId()));
+        final Optional<AbstractMetisPlugin> metisPluginWithType = execution
+            .getMetisPluginWithType(castPlugin.getPluginType());
+        metisPluginWithType.ifPresent(
+            plugin -> ((AbstractExecutablePlugin) plugin).setDataStatus(DataStatus.DEPRECATED));
+        workflowExecutionDao.update(execution);
+      }
     }
-
-    // Remove from mongo and solr.
-    final int removed = indexer.removeAll(datasetId, null);
-    LOGGER.info("{} records in dataset {} are successfully removed.", removed, datasetId);
   }
 }
