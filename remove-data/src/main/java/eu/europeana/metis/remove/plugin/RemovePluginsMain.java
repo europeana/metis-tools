@@ -1,6 +1,8 @@
 package eu.europeana.metis.remove.plugin;
 
 import com.opencsv.CSVReader;
+import dev.morphia.query.FindOptions;
+import dev.morphia.query.Query;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
@@ -27,8 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
-import org.mongodb.morphia.query.FindOptions;
-import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
