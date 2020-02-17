@@ -13,6 +13,7 @@ import eu.europeana.metis.core.workflow.plugins.DataStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.remove.utils.Application;
+import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +29,6 @@ import java.util.stream.IntStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,13 +155,12 @@ public class RemovePluginsMain {
     final Query<WorkflowExecution> query =
         datastoreProvider.getDatastore().createQuery(WorkflowExecution.class).disableValidation();
     query.field("metisPlugins").elemMatch(pluginQuery);
-    final List<WorkflowExecution> resultList = ExternalRequestUtil
-        .retryableExternalRequestConnectionReset(() -> query.asList(new FindOptions().limit(1)));
-    if (!resultList.isEmpty()) {
+    final WorkflowExecution result = ExternalRequestUtil
+            .retryableExternalRequestConnectionReset(() -> query.first(new FindOptions()));
+    if (result != null) {
       LOGGER.error("Could not remove plugin execution with ID {} and type {} in workflow with ID "
-              + "{}: there seems to be a successor of this plugin in workflow with ID {}.",
-          plugin.getId(), plugin.getPluginType(), execution.getId(),
-          resultList.get(0).getId().toString());
+                      + "{}: there seems to be a successor of this plugin in workflow with ID {}.",
+              plugin.getId(), plugin.getPluginType(), execution.getId(), result.getId().toString());
       return false;
     }
 

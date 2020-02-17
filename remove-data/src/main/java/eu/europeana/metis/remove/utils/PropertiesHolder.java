@@ -3,14 +3,16 @@ package eu.europeana.metis.remove.utils;
 import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.SetupRelatedIndexingException;
+import eu.europeana.metis.mongo.MongoProperties;
+import eu.europeana.metis.utils.InetAddressUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Contains all properties that are required for execution.
@@ -24,12 +26,12 @@ public class PropertiesHolder {
   private static final String CONFIGURATION_FILE = "application.properties";
 
   // Mongo metis-core
-  final String[] mongoCoreHosts;
-  final int[] mongoCorePorts;
-  final String mongoCoreAuthenticationDb;
-  final String mongoCoreUsername;
-  final String mongoCorePassword;
-  final boolean mongoCoreEnablessl;
+  private final String[] mongoCoreHosts;
+  private final int[] mongoCorePorts;
+  private final String mongoCoreAuthenticationDb;
+  private final String mongoCoreUsername;
+  private final String mongoCorePassword;
+  private final boolean mongoCoreEnablessl;
   final String mongoCoreDb;
 
   // eCloud
@@ -113,35 +115,29 @@ public class PropertiesHolder {
         .getProperty("zookeeper.publish.defaultCollection");
   }
 
+  public MongoProperties<IllegalArgumentException> getMongoCoreProperties() {
+    final MongoProperties<IllegalArgumentException> properties = new MongoProperties<>(
+            IllegalArgumentException::new);
+    properties.setAllProperties(mongoCoreHosts, mongoCorePorts, mongoCoreAuthenticationDb,
+            mongoCoreUsername, mongoCorePassword, mongoCoreEnablessl);
+    return properties;
+  }
+
   public IndexingSettings getPublishIndexingSettings()
       throws IndexingException, URISyntaxException {
     final IndexingSettings indexingSettings = new IndexingSettings();
     prepareMongoSettings(indexingSettings);
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
+    indexingSettings.setRecordRedirectDatabaseName("This value is assumed to not be needed.");
     return indexingSettings;
   }
 
   private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
-    for (int i = 0; i < publishMongoHosts.length; i++) {
-      if (publishMongoHosts.length == publishMongoPorts.length) {
-        indexingSettings
-            .addMongoHost(new InetSocketAddress(publishMongoHosts[i], publishMongoPorts[i]));
-      } else { // Same port for all
-        indexingSettings
-            .addMongoHost(new InetSocketAddress(publishMongoHosts[i], publishMongoPorts[0]));
-      }
-    }
+    indexingSettings.getMongoProperties().setAllProperties(publishMongoHosts,
+            publishMongoPorts, publishMongoAuthenticationDb, publishMongoUsername,
+            publishMongoPassword, publishMongoEnablessl);
     indexingSettings.setMongoDatabaseName(publishMongoDb);
-    if (!StringUtils.isEmpty(publishMongoAuthenticationDb) && !StringUtils
-        .isEmpty(publishMongoUsername) && !StringUtils.isEmpty(publishMongoPassword)) {
-      indexingSettings.setMongoCredentials(publishMongoUsername, publishMongoPassword,
-          publishMongoAuthenticationDb);
-    }
-
-    if (publishMongoEnablessl) {
-      indexingSettings.setMongoEnableSsl();
-    }
   }
 
   private void prepareSolrSettings(IndexingSettings indexingSettings)
@@ -153,14 +149,11 @@ public class PropertiesHolder {
 
   private void prepareZookeeperSettings(IndexingSettings indexingSettings)
       throws SetupRelatedIndexingException {
-    for (int i = 0; i < publishZookeeperHosts.length; i++) {
-      if (publishZookeeperHosts.length == publishZookeeperPorts.length) {
-        indexingSettings.addZookeeperHost(
-            new InetSocketAddress(publishZookeeperHosts[i], publishZookeeperPorts[i]));
-      } else { // Same port for all
-        indexingSettings.addZookeeperHost(
-            new InetSocketAddress(publishZookeeperHosts[i], publishZookeeperPorts[0]));
-      }
+    final List<InetSocketAddress> addresses = new InetAddressUtil<>(
+            SetupRelatedIndexingException::new)
+            .getAddressesFromHostsAndPorts(publishZookeeperHosts, publishZookeeperPorts);
+    for (InetSocketAddress address : addresses) {
+      indexingSettings.addZookeeperHost(address);
     }
     indexingSettings.setZookeeperChroot(publishZookeeperChroot);
     indexingSettings.setZookeeperDefaultCollection(publishZookeeperDefaultCollection);
