@@ -129,7 +129,7 @@ public class PropertiesHolder {
     prepareMongoSettings(indexingSettings);
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
-    indexingSettings.setRecordRedirectDatabaseName("This value is assumed to not be needed.");
+    indexingSettings.setRecordRedirectDatabaseName("assumed_to_not_be_needed");
     return indexingSettings;
   }
 
