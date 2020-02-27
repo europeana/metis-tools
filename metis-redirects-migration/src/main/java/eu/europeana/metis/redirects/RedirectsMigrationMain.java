@@ -1,6 +1,7 @@
 package eu.europeana.metis.redirects;
 
 import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
+import eu.europeana.metis.mongo.RecordRedirectDao;
 import eu.europeana.metis.redirects.utilities.ExecutorManager;
 import eu.europeana.metis.redirects.utilities.MongoInitializer;
 import eu.europeana.metis.redirects.utilities.PropertiesHolder;
@@ -26,12 +27,15 @@ public class RedirectsMigrationMain {
     final MongoInitializer mongoInitializer = prepareConfiguration();
     final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(mongoInitializer.getMongoClient(),
         propertiesHolder.mongoDb, false);
+    final RecordRedirectDao recordRedirectDao = new RecordRedirectDao(
+        mongoInitializer.getMongoClient(), propertiesHolder.mongoDbRedirects, true);
 
-    final ExecutorManager executorManager = new ExecutorManager(edmMongoServer);
+    final ExecutorManager executorManager = new ExecutorManager(edmMongoServer, recordRedirectDao);
     executorManager.analyzeOldDatabaseRedirects();
+    executorManager.displayCollectedResults();
+//    executorManager.populateNewDatabase();
 
     mongoInitializer.close();
-
   }
 
   private static MongoInitializer prepareConfiguration()

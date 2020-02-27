@@ -32,6 +32,7 @@ public class PropertiesHolder {
   public final String mongoPassword;
   public final boolean mongoEnablessl;
   public final String mongoDb;
+  public final String mongoDbRedirects;
 
   public PropertiesHolder(String configurationFileName) {
     Properties properties = new Properties();
@@ -64,5 +65,6 @@ public class PropertiesHolder {
     mongoPassword = properties.getProperty("mongo.password");
     mongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.enableSSL"));
     mongoDb = properties.getProperty("mongo.db");
+    mongoDbRedirects = properties.getProperty("mongo.db.redirects");
   }
 }
