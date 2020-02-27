@@ -1,13 +1,11 @@
 package eu.europeana.metis.redirects;
 
 import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
-import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
+import eu.europeana.metis.redirects.utilities.ExecutorManager;
 import eu.europeana.metis.redirects.utilities.MongoInitializer;
 import eu.europeana.metis.redirects.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,15 +24,11 @@ public class RedirectsMigrationMain {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting redirects migration");
 
     final MongoInitializer mongoInitializer = prepareConfiguration();
-//    final MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProviderImpl(
-//        mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
-    final EdmMongoServerImpl europeanaId = new EdmMongoServerImpl(mongoInitializer.getMongoClient(),
+    final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(mongoInitializer.getMongoClient(),
         propertiesHolder.mongoDb, false);
-    final Query<EuropeanaId> query = europeanaId.getDatastore().createQuery(EuropeanaId.class);
-    final List<EuropeanaId> europeanaIds = query.asList();
 
-
-//    final ExecutorManager executorManager = new ExecutorManager(morphiaDatastoreProvider);
+    final ExecutorManager executorManager = new ExecutorManager(edmMongoServer);
+    executorManager.analyzeOldDatabaseRedirects();
 
     mongoInitializer.close();
 
