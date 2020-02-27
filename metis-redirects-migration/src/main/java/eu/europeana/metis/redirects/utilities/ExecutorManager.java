@@ -2,13 +2,17 @@ package eu.europeana.metis.redirects.utilities;
 
 import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
+import eu.europeana.metis.mongo.RecordRedirect;
+import eu.europeana.metis.mongo.RecordRedirectDao;
 import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -25,15 +29,17 @@ import org.springframework.util.CollectionUtils;
 public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
-  private static final int ROWS_PER_REQUEST = 1000;
+  private static final int ROWS_PER_REQUEST = 10;
   private final EdmMongoServerImpl edmMongoServer;
+  private final RecordRedirectDao recordRedirectDao;
   private final Map<String, EuropeanaId> encounteredRows = new HashMap<>();
   private final List<LinkedList<String>> listOfChains = new ArrayList<>();
   private final List<EuropeanaId> selfRedirects = new ArrayList<>();
   private final List<LinkedList<String>> circularRedirectChains = new ArrayList<>();
 
-  public ExecutorManager(EdmMongoServerImpl edmMongoServer) {
+  public ExecutorManager(EdmMongoServerImpl edmMongoServer, RecordRedirectDao recordRedirectDao) {
     this.edmMongoServer = edmMongoServer;
+    this.recordRedirectDao = recordRedirectDao;
   }
 
   public void analyzeOldDatabaseRedirects() {
@@ -52,6 +58,7 @@ public class ExecutorManager {
       analyzeRows(nextPageResults);
       if (nextPage % 10 == 0) {
         displayCollectedResults();
+//        populateNewDatabase();
       }
       nextPage++;
     } while (!CollectionUtils.isEmpty(nextPageResults));
@@ -158,7 +165,7 @@ public class ExecutorManager {
     } while (!CollectionUtils.isEmpty(europeanaIds));
   }
 
-  private void displayCollectedResults() {
+  public void displayCollectedResults() {
     final Map<Integer, List<LinkedList<String>>> chainSizeBasedMapOrdered = listOfChains.stream()
         .collect(Collectors.groupingBy(LinkedList::size)).entrySet().stream()
         .sorted(Entry.comparingByKey())
@@ -171,6 +178,31 @@ public class ExecutorManager {
         .info("Total chains of {} redirects per chain are: {}", key - 1, value.size()));
     LOGGER.info("Total collected self redirects: {}", selfRedirects);
     LOGGER.info("Total collected circular redirect chains: {}", circularRedirectChains);
+  }
+
+  public void populateNewDatabase() {
+    final ListIterator<LinkedList<String>> listIterator = listOfChains.listIterator();
+    while(listIterator.hasNext()){
+      LinkedList<String> chain = listIterator.next();
+      final String lastRedirect = chain.getLast();
+      String oldId = chain.pollFirst();
+      String newId;
+      do {
+        newId = chain.pollFirst();
+        if (newId != null) {
+          String sanitizedOldId = oldId;
+          if (oldId.contains("http://www.europeana.eu/resolve/record")) {
+            //Cleanup of old prefix url
+            sanitizedOldId = oldId.substring("http://www.europeana.eu/resolve/record".length());
+          }
+          final RecordRedirect recordRedirect = new RecordRedirect(lastRedirect, sanitizedOldId,
+              new Date(encounteredRows.get(oldId).getTimestamp()));
+          recordRedirectDao.createUpdate(recordRedirect);
+        }
+        oldId = newId;
+      } while (newId != null);
+      listIterator.remove();
+    }
   }
 
 }
