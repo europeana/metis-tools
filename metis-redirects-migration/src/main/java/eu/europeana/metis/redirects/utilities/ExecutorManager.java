@@ -51,12 +51,14 @@ public class ExecutorManager {
     Query<EuropeanaId> europeanaIdQuery = edmMongoServer.getDatastore()
         .createQuery(EuropeanaId.class);
     final long count = europeanaIdQuery.count();
-    LOGGER.info("Total rows of redirects in the database: {}", count);
+    LOGGER
+        .info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total rows of redirects in the database: {}",
+            count);
 
     int nextPage = 0;
     List<EuropeanaId> nextPageResults;
     do {
-      LOGGER.info("Parsing page {}", nextPage);
+      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Parsing page {}", nextPage);
       europeanaIdQuery = edmMongoServer.getDatastore().createQuery(EuropeanaId.class);
       nextPageResults = getNextPageResults(europeanaIdQuery, nextPage);
       analyzeRows(nextPageResults);
@@ -80,7 +82,8 @@ public class ExecutorManager {
       boolean europeanaIdAcceptable = true;
       if (europeanaId.getOldId().equals(europeanaId.getNewId())) {
         //Ignore the self references
-        LOGGER.info("Self reference detected with oldId {} and newId {}", europeanaId.getOldId(),
+        LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
+            "Self reference detected with oldId {} and newId {}", europeanaId.getOldId(),
             europeanaId.getNewId());
         selfRedirects.add(europeanaId);
         europeanaIdAcceptable = false;
@@ -90,9 +93,9 @@ public class ExecutorManager {
       if (isRedirectAlreadyMigrated(europeanaId.getOldId()) || oldIdsDateMap
           .containsKey(europeanaId.getOldId())) {
         //If already encountered, no need to further do anything
-        LOGGER
-            .warn("Already encountered oldId, bypassing oldId {}, newId {}", europeanaId.getOldId(),
-                europeanaId.getNewId());
+        LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER,
+            "Already encountered oldId, bypassing oldId {}, newId {}", europeanaId.getOldId(),
+            europeanaId.getNewId());
         europeanaIdAcceptable = false;
       }
 
@@ -126,7 +129,8 @@ public class ExecutorManager {
         final EuropeanaId latestEuropeanaId = sortedEuropeanaIds.get(sortedEuropeanaIds.size() - 1);
         if (chain.contains(latestEuropeanaId.getOldId())) {
           //We have encountered a loop.
-          LOGGER.warn("Circular chain detected with oldId: {}", latestEuropeanaId.getOldId());
+          LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER,
+              "Circular chain detected with oldId: {}", latestEuropeanaId.getOldId());
           oldIdsDateMap
               .put(latestEuropeanaId.getOldId(), new Date(latestEuropeanaId.getTimestamp()));
           circularRedirectChains.add(chain);
@@ -139,13 +143,15 @@ public class ExecutorManager {
 
         //Retrieve older redirections and add them to encounters
         if (sortedEuropeanaIds.size() - 1 > 0) {
-          LOGGER.warn(
+          LOGGER.warn(PropertiesHolder.EXECUTION_LOGS_MARKER,
               "Results more that one for newId: {}, parsing older chain and adding them to encounters",
               latestEuropeanaId.getNewId());
           for (int i = 0; i < sortedEuropeanaIds.size() - 1; i++) {
             parseChainTillBeginning(europeanaIds.get(i));
           }
-          LOGGER.warn("Finished parsing chain for newId: {}", latestEuropeanaId.getNewId());
+          LOGGER
+              .warn(PropertiesHolder.EXECUTION_LOGS_MARKER, "Finished parsing chain for newId: {}",
+                  latestEuropeanaId.getNewId());
         }
       }
     } while (!CollectionUtils.isEmpty(europeanaIds));
@@ -196,12 +202,12 @@ public class ExecutorManager {
       totalChainSizeBasedMapOrdered.put(key, totalChainsOfKeyLength);
     });
 
-    LOGGER.info("Display information of collected results");
-    LOGGER.info("Total collected chains: {}", totalListOfChains);
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Display information of collected results");
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total collected chains: {}", totalListOfChains);
     totalChainSizeBasedMapOrdered.forEach((key, value) -> LOGGER
-        .info("Total chains of {} redirects per chain are: {}", key - 1, value));
-    LOGGER.info("Total collected self redirects: {}", selfRedirects.size());
-    LOGGER.info("Total collected circular redirect chains: {}", circularRedirectChains.size());
+        .info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total chains of {} redirects per chain are: {}", key - 1, value));
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total collected self redirects: {}", selfRedirects.size());
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total collected circular redirect chains: {}", circularRedirectChains.size());
   }
 
   public void tranferMemoryResultsIntoNewDb() {

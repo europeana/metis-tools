@@ -61,11 +61,23 @@
       <artifactId>metis-core-common</artifactId>
       <groupId>eu.europeana.metis</groupId>
       <version>${version.metis}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.zoho.crm</groupId>
+          <artifactId>java-sdk</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <artifactId>metis-core-service</artifactId>
       <groupId>eu.europeana.metis</groupId>
       <version>${version.metis}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.zoho.crm</groupId>
+          <artifactId>java-sdk</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>eu.europeana.corelib</groupId>
