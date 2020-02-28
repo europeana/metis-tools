@@ -29,15 +29,20 @@ import org.springframework.util.CollectionUtils;
 public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
-  private static final int ROWS_PER_REQUEST = 10;
+  private final int rowsPerRequest;
   private final EdmMongoServerImpl edmMongoServer;
   private final RecordRedirectDao recordRedirectDao;
-  private final Map<String, EuropeanaId> encounteredRows = new HashMap<>();
+  private final Map<String, Date> oldIdsDateMap = new HashMap<>();
   private final List<LinkedList<String>> listOfChains = new ArrayList<>();
   private final List<EuropeanaId> selfRedirects = new ArrayList<>();
   private final List<LinkedList<String>> circularRedirectChains = new ArrayList<>();
 
-  public ExecutorManager(EdmMongoServerImpl edmMongoServer, RecordRedirectDao recordRedirectDao) {
+  private int totalListOfChains = 0;
+  private Map<Integer, Integer> totalChainSizeBasedMapOrdered = new LinkedHashMap<>();
+
+  public ExecutorManager(EdmMongoServerImpl edmMongoServer, RecordRedirectDao recordRedirectDao,
+      int rowsPerRequest) {
+    this.rowsPerRequest = rowsPerRequest <= 0 ? 100 : rowsPerRequest;
     this.edmMongoServer = edmMongoServer;
     this.recordRedirectDao = recordRedirectDao;
   }
@@ -52,51 +57,56 @@ public class ExecutorManager {
     List<EuropeanaId> nextPageResults;
     do {
       LOGGER.info("Parsing page {}", nextPage);
-      europeanaIdQuery = edmMongoServer.getDatastore()
-          .createQuery(EuropeanaId.class);
+      europeanaIdQuery = edmMongoServer.getDatastore().createQuery(EuropeanaId.class);
       nextPageResults = getNextPageResults(europeanaIdQuery, nextPage);
       analyzeRows(nextPageResults);
       if (nextPage % 10 == 0) {
         displayCollectedResults();
-//        populateNewDatabase();
+        tranferMemoryResultsIntoNewDb();
       }
       nextPage++;
     } while (!CollectionUtils.isEmpty(nextPageResults));
   }
 
   private <T> List<T> getNextPageResults(Query<T> query, int nextPage) {
-    final FindOptions findOptions = new FindOptions().skip(nextPage * ROWS_PER_REQUEST)
-        .limit(ROWS_PER_REQUEST);
+    final FindOptions findOptions = new FindOptions().skip(nextPage * rowsPerRequest)
+        .limit(rowsPerRequest);
     return ExternalRequestUtil
         .retryableExternalRequestConnectionReset(() -> query.asList(findOptions));
   }
 
   private void analyzeRows(List<EuropeanaId> nextPageResults) {
     for (EuropeanaId europeanaId : nextPageResults) {
+      boolean europeanaIdAcceptable = true;
       if (europeanaId.getOldId().equals(europeanaId.getNewId())) {
         //Ignore the self references
-        LOGGER.warn("Self reference detected with oldId {} and newId {}", europeanaId.getOldId(),
+        LOGGER.info("Self reference detected with oldId {} and newId {}", europeanaId.getOldId(),
             europeanaId.getNewId());
         selfRedirects.add(europeanaId);
-        continue;
+        europeanaIdAcceptable = false;
       }
-      if (encounteredRows.containsKey(europeanaId.getOldId())) {
+      //The oldIds map may contain items that are must not have been stored in the new database
+      //because they should be invalid, therefore we still want to bypass them
+      if (isRedirectAlreadyMigrated(europeanaId.getOldId()) || oldIdsDateMap
+          .containsKey(europeanaId.getOldId())) {
         //If already encountered, no need to further do anything
         LOGGER
             .warn("Already encountered oldId, bypassing oldId {}, newId {}", europeanaId.getOldId(),
                 europeanaId.getNewId());
-        continue;
+        europeanaIdAcceptable = false;
       }
 
-      final LinkedList<String> chain = new LinkedList<>();
-      chain.addFirst(europeanaId.getOldId());
-      chain.addLast(europeanaId.getNewId());
-      //Add to encounters for faster reach on subsequent page results
-      encounteredRows.put(europeanaId.getOldId(), europeanaId);
+      if (europeanaIdAcceptable) {
+        final LinkedList<String> chain = new LinkedList<>();
+        chain.addFirst(europeanaId.getOldId());
+        chain.addLast(europeanaId.getNewId());
+        //Add to encounters for faster reach on subsequent page results
+        oldIdsDateMap.put(europeanaId.getOldId(), new Date(europeanaId.getTimestamp()));
 
-      if (populateChainBackwards(chain)) {
-        populateChainForwards(chain);
-        listOfChains.add(chain);
+        if (populateChainBackwards(chain)) {
+          populateChainForwards(chain);
+          listOfChains.add(chain);
+        }
       }
     }
   }
@@ -117,19 +127,24 @@ public class ExecutorManager {
         if (chain.contains(latestEuropeanaId.getOldId())) {
           //We have encountered a loop.
           LOGGER.warn("Circular chain detected with oldId: {}", latestEuropeanaId.getOldId());
+          oldIdsDateMap
+              .put(latestEuropeanaId.getOldId(), new Date(latestEuropeanaId.getTimestamp()));
           circularRedirectChains.add(chain);
           return false;
         }
         chain.addFirst(latestEuropeanaId.getOldId());
         identifier = latestEuropeanaId.getOldId();
-        encounteredRows.put(latestEuropeanaId.getOldId(), latestEuropeanaId);
+        oldIdsDateMap
+            .put(latestEuropeanaId.getOldId(), new Date(latestEuropeanaId.getTimestamp()));
 
         //Retrieve older redirections and add them to encounters
-        for (int i = 0; i < sortedEuropeanaIds.size() - 1; i++) {
+        if (sortedEuropeanaIds.size() - 1 > 0) {
           LOGGER.warn(
               "Results more that one for newId: {}, parsing older chain and adding them to encounters",
               latestEuropeanaId.getNewId());
-          parseChainTillBeginning(europeanaIds.get(i));
+          for (int i = 0; i < sortedEuropeanaIds.size() - 1; i++) {
+            parseChainTillBeginning(europeanaIds.get(i));
+          }
           LOGGER.warn("Finished parsing chain for newId: {}", latestEuropeanaId.getNewId());
         }
       }
@@ -139,7 +154,7 @@ public class ExecutorManager {
 
   private void parseChainTillBeginning(EuropeanaId europeanaId) {
     List<EuropeanaId> europeanaIds;
-    encounteredRows.put(europeanaId.getOldId(), europeanaId);
+    oldIdsDateMap.put(europeanaId.getOldId(), new Date(europeanaId.getTimestamp()));
     do {
       Query<EuropeanaId> europeanaIdQuery = edmMongoServer.getDatastore()
           .createQuery(EuropeanaId.class);
@@ -160,29 +175,38 @@ public class ExecutorManager {
       if (!CollectionUtils.isEmpty(europeanaIds)) {
         chain.addLast(europeanaIds.get(0).getNewId());
         identifier = europeanaIds.get(0).getNewId();
-        encounteredRows.put(europeanaIds.get(0).getOldId(), europeanaIds.get(0));
+        oldIdsDateMap
+            .put(europeanaIds.get(0).getOldId(), new Date(europeanaIds.get(0).getTimestamp()));
       }
     } while (!CollectionUtils.isEmpty(europeanaIds));
   }
 
   public void displayCollectedResults() {
+    //Calculates and adds up the statistics to the totals
     final Map<Integer, List<LinkedList<String>>> chainSizeBasedMapOrdered = listOfChains.stream()
         .collect(Collectors.groupingBy(LinkedList::size)).entrySet().stream()
         .sorted(Entry.comparingByKey())
         .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (v1, v2) -> v1,
             LinkedHashMap::new));
 
+    totalListOfChains += listOfChains.size();
+    chainSizeBasedMapOrdered.forEach((key, value) -> {
+      Integer totalChainsOfKeyLength = totalChainSizeBasedMapOrdered.getOrDefault(key, 0);
+      totalChainsOfKeyLength += value.size();
+      totalChainSizeBasedMapOrdered.put(key, totalChainsOfKeyLength);
+    });
+
     LOGGER.info("Display information of collected results");
-    LOGGER.info("Total collected chains: {}", listOfChains.size());
-    chainSizeBasedMapOrdered.forEach((key, value) -> LOGGER
-        .info("Total chains of {} redirects per chain are: {}", key - 1, value.size()));
-    LOGGER.info("Total collected self redirects: {}", selfRedirects);
-    LOGGER.info("Total collected circular redirect chains: {}", circularRedirectChains);
+    LOGGER.info("Total collected chains: {}", totalListOfChains);
+    totalChainSizeBasedMapOrdered.forEach((key, value) -> LOGGER
+        .info("Total chains of {} redirects per chain are: {}", key - 1, value));
+    LOGGER.info("Total collected self redirects: {}", selfRedirects.size());
+    LOGGER.info("Total collected circular redirect chains: {}", circularRedirectChains.size());
   }
 
-  public void populateNewDatabase() {
+  public void tranferMemoryResultsIntoNewDb() {
     final ListIterator<LinkedList<String>> listIterator = listOfChains.listIterator();
-    while(listIterator.hasNext()){
+    while (listIterator.hasNext()) {
       LinkedList<String> chain = listIterator.next();
       final String lastRedirect = chain.getLast();
       String oldId = chain.pollFirst();
@@ -191,18 +215,23 @@ public class ExecutorManager {
         newId = chain.pollFirst();
         if (newId != null) {
           String sanitizedOldId = oldId;
-          if (oldId.contains("http://www.europeana.eu/resolve/record")) {
+          if (oldId.startsWith("http://www.europeana.eu/resolve/record")) {
             //Cleanup of old prefix url
             sanitizedOldId = oldId.substring("http://www.europeana.eu/resolve/record".length());
           }
           final RecordRedirect recordRedirect = new RecordRedirect(lastRedirect, sanitizedOldId,
-              new Date(encounteredRows.get(oldId).getTimestamp()));
+              oldIdsDateMap.get(oldId));
+          oldIdsDateMap.remove(oldId);
           recordRedirectDao.createUpdate(recordRedirect);
         }
         oldId = newId;
       } while (newId != null);
       listIterator.remove();
     }
+  }
+
+  private boolean isRedirectAlreadyMigrated(String oldId) {
+    return !CollectionUtils.isEmpty(recordRedirectDao.getRecordRedirectsByOldId(oldId));
   }
 
 }

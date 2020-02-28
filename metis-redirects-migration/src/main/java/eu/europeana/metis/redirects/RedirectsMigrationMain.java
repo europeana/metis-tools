@@ -25,15 +25,17 @@ public class RedirectsMigrationMain {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting redirects migration");
 
     final MongoInitializer mongoInitializer = prepareConfiguration();
-    final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(mongoInitializer.getMongoClient(),
+    final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(
+        mongoInitializer.getMongoClient(),
         propertiesHolder.mongoDb, false);
     final RecordRedirectDao recordRedirectDao = new RecordRedirectDao(
         mongoInitializer.getMongoClient(), propertiesHolder.mongoDbRedirects, true);
 
-    final ExecutorManager executorManager = new ExecutorManager(edmMongoServer, recordRedirectDao);
+    final ExecutorManager executorManager = new ExecutorManager(edmMongoServer, recordRedirectDao,
+        propertiesHolder.rowsPerRequest);
     executorManager.analyzeOldDatabaseRedirects();
     executorManager.displayCollectedResults();
-//    executorManager.populateNewDatabase();
+    executorManager.tranferMemoryResultsIntoNewDb();
 
     mongoInitializer.close();
   }
