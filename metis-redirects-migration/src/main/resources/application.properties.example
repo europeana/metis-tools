@@ -1,3 +1,4 @@
+rows.per.request=
 #Truststore
 truststore.path=
 truststore.password=
@@ -10,3 +11,4 @@ mongo.username=
 mongo.password=
 mongo.enableSSL=
 mongo.db=
+mongo.db.redirects=
