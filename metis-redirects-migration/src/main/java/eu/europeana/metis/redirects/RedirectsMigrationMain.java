@@ -38,6 +38,8 @@ public class RedirectsMigrationMain {
     executorManager.tranferMemoryResultsIntoNewDb();
 
     mongoInitializer.close();
+
+    LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Finished redirects migration");
   }
 
   private static MongoInitializer prepareConfiguration()

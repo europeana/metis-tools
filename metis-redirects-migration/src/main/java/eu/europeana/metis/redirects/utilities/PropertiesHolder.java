@@ -41,10 +41,10 @@ public class PropertiesHolder {
     final String filePathInResources = resource == null ? null : resource.getFile();
     String filePath;
     if (filePathInResources != null && new File(filePathInResources).exists()) {
-      LOGGER.info("Will try to load {} properties file", filePathInResources);
+      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Will try to load {} properties file", filePathInResources);
       filePath = filePathInResources;
     } else {
-      LOGGER.info(
+      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
           "{} properties file does NOT exist, probably running in standalone .jar mode where the properties file should be on the same directory "
               + "as the .jar file is. Will try to load {} properties file",
           filePathInResources, configurationFileName);
