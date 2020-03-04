@@ -26,10 +26,10 @@ public class RedirectsMigrationMain {
 
     final MongoInitializer mongoInitializer = prepareConfiguration();
     final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(
-        mongoInitializer.getMongoClient(),
+        mongoInitializer.getRedirectsMongoClient(),
         propertiesHolder.mongoDb, false);
     final RecordRedirectDao recordRedirectDao = new RecordRedirectDao(
-        mongoInitializer.getMongoClient(), propertiesHolder.mongoDbRedirects, true);
+        mongoInitializer.getRedirectsMongoClient(), propertiesHolder.mongoDbRedirects, true);
 
     final ExecutorManager executorManager = new ExecutorManager(edmMongoServer, recordRedirectDao,
         propertiesHolder.rowsPerRequest);
@@ -52,7 +52,7 @@ public class RedirectsMigrationMain {
           propertiesHolder.truststorePassword);
     }
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder);
-    mongoInitializer.initializeMongoClient();
+    mongoInitializer.initializeRedirectsMongoClient();
     return mongoInitializer;
   }
 

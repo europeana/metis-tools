@@ -26,7 +26,8 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>eu.europeana.metis.redirects.RedirectsMigrationMain</mainClass>
+              <!--Change this value based on what has to the default on the autonomous script-->
+              <mainClass>eu.europeana.metis.redirects.RedirectsCleanupMain</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

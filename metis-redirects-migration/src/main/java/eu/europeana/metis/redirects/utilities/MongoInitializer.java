@@ -17,48 +17,72 @@ import org.apache.commons.lang3.StringUtils;
 public class MongoInitializer {
 
   private final PropertiesHolder propertiesHolder;
-  private MongoClient mongoClient;
+  private MongoClient redirectsMongoClient;
+  private MongoClient recordsMongoClient;
 
   public MongoInitializer(PropertiesHolder propertiesHolder) {
     this.propertiesHolder = propertiesHolder;
   }
 
-  public void initializeMongoClient() {
-    if (propertiesHolder.mongoHosts.length != propertiesHolder.mongoPorts.length
-        && propertiesHolder.mongoPorts.length != 1) {
+  public void initializeRedirectsMongoClient() {
+    redirectsMongoClient = initializeMongoClient(propertiesHolder.mongoHosts,
+        propertiesHolder.mongoPorts,
+        propertiesHolder.mongoEnablessl, propertiesHolder.mongoDb, propertiesHolder.mongoUsername,
+        propertiesHolder.mongoPassword, propertiesHolder.mongoAuthenticationDb);
+  }
+
+  public void initializeRecordsMongoClient() {
+    recordsMongoClient = initializeMongoClient(propertiesHolder.recordsMongoHosts,
+        propertiesHolder.recordsMongoPorts, propertiesHolder.recordsMongoEnablessl,
+        propertiesHolder.recordsMongoDb, propertiesHolder.recordsMongoUsername,
+        propertiesHolder.recordsMongoPassword, propertiesHolder.recordsMongoAuthenticationDb);
+  }
+
+  private MongoClient initializeMongoClient(String[] mongoHosts, int[] mongoPorts,
+      boolean mongoEnablessl, String mongoDb, String mongoUsername, String mongoPassword,
+      String mongoAuthenticationDb) {
+    if (mongoHosts.length != mongoPorts.length
+        && mongoPorts.length != 1) {
       throw new IllegalArgumentException("Mongo hosts and ports are not properly configured.");
     }
 
     List<ServerAddress> serverAddresses = new ArrayList<>();
-    for (int i = 0; i < propertiesHolder.mongoHosts.length; i++) {
+    for (int i = 0; i < mongoHosts.length; i++) {
       ServerAddress address;
-      if (propertiesHolder.mongoHosts.length == propertiesHolder.mongoPorts.length) {
-        address = new ServerAddress(propertiesHolder.mongoHosts[i], propertiesHolder.mongoPorts[i]);
+      if (mongoHosts.length == mongoPorts.length) {
+        address = new ServerAddress(mongoHosts[i], mongoPorts[i]);
       } else { // Same port for all
-        address = new ServerAddress(propertiesHolder.mongoHosts[i], propertiesHolder.mongoPorts[0]);
+        address = new ServerAddress(mongoHosts[i], mongoPorts[0]);
       }
       serverAddresses.add(address);
     }
 
     Builder optionsBuilder = new Builder();
-    optionsBuilder.sslEnabled(propertiesHolder.mongoEnablessl);
-    if (StringUtils.isEmpty(propertiesHolder.mongoDb) || StringUtils
-        .isEmpty(propertiesHolder.mongoUsername) || StringUtils
-        .isEmpty(propertiesHolder.mongoPassword)) {
-      mongoClient = new MongoClient(serverAddresses, optionsBuilder.build());
+    optionsBuilder.sslEnabled(mongoEnablessl);
+    if (StringUtils.isEmpty(mongoDb) || StringUtils.isEmpty(mongoUsername) || StringUtils
+        .isEmpty(mongoPassword)) {
+      return new MongoClient(serverAddresses, optionsBuilder.build());
     } else {
       MongoCredential mongoCredential = MongoCredential
-          .createCredential(propertiesHolder.mongoUsername, propertiesHolder.mongoAuthenticationDb,
-              propertiesHolder.mongoPassword.toCharArray());
-      mongoClient = new MongoClient(serverAddresses, mongoCredential, optionsBuilder.build());
+          .createCredential(mongoUsername, mongoAuthenticationDb, mongoPassword.toCharArray());
+      return new MongoClient(serverAddresses, mongoCredential, optionsBuilder.build());
     }
   }
 
   public void close() {
-    mongoClient.close();
+    if (recordsMongoClient != null) {
+      redirectsMongoClient.close();
+    }
+    if (recordsMongoClient != null) {
+      recordsMongoClient.close();
+    }
   }
 
-  public MongoClient getMongoClient() {
-    return mongoClient;
+  public MongoClient getRedirectsMongoClient() {
+    return redirectsMongoClient;
+  }
+
+  public MongoClient getRecordsMongoClient() {
+    return recordsMongoClient;
   }
 }
