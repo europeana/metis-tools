@@ -84,8 +84,11 @@ public class ExecutorManagerRecordsCleanup {
     for (RecordRedirect recordRedirect : nextPageResults) {
       final Query<FullBeanImpl> recordsQuery = edmMongoServer.getDatastore()
           .createQuery(FullBeanImpl.class);
-      final String datasetId = recordRedirect.getNewId()
+      final String datasetId;
+
+      datasetId = "".equals(recordRedirect.getNewId()) ? "" : recordRedirect.getNewId()
           .substring(1, recordRedirect.getNewId().lastIndexOf('/'));
+
       //Skip records that are part of the datasetIds that we want to keep in the redirects
       //Also skip records that are already marked as dead
       if (datasetIdsToKeep.contains(datasetId) || deadRedirectsPerDatasetId
@@ -114,7 +117,8 @@ public class ExecutorManagerRecordsCleanup {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total dead datasetId redirect maps: {}",
         deadRedirectsPerDatasetId.size());
     deadRedirectsPerDatasetId.forEach((key, value) -> LOGGER
-        .info("Total dead redirects for datasetId {}: {}", key, value.size()));
+        .info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Total dead redirects for datasetId {}: {}",
+            key, value.size()));
   }
 
 }
