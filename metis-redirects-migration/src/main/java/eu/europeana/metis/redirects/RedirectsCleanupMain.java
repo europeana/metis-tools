@@ -24,7 +24,7 @@ public class RedirectsCleanupMain {
    *
    */
   public static void main(String[] args)
-      throws CustomTruststoreAppender.TrustStoreConfigurationException {
+      throws CustomTruststoreAppender.TrustStoreConfigurationException, InterruptedException {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting redirects cleanup");
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "Append default truststore with custom truststore");

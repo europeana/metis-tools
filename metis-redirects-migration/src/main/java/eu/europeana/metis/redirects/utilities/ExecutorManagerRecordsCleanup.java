@@ -6,6 +6,7 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.mongo.RecordRedirect;
 import eu.europeana.metis.mongo.RecordRedirectDao;
 import eu.europeana.metis.utils.ExternalRequestUtil;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 public class ExecutorManagerRecordsCleanup {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManagerRecordsCleanup.class);
+  public static final int SLEEP_SECONDS = 60;
   private final int rowsPerRequest;
   private final List<String> datasetIdsToKeep;
   private final EdmMongoServerImpl edmMongoServer;
@@ -39,7 +41,7 @@ public class ExecutorManagerRecordsCleanup {
     this.datasetIdsToKeep = datasetIdsToKeep;
   }
 
-  public void cleanupDatabaseRedirects() {
+  public void cleanupDatabaseRedirects() throws InterruptedException {
     final dev.morphia.query.Query<RecordRedirect> recordRedirectsQuery = recordRedirectDao
         .getDatastore().createQuery(RecordRedirect.class);
 
@@ -50,8 +52,11 @@ public class ExecutorManagerRecordsCleanup {
           "Parsing page {} - redirect cases till now {}", nextPage, nextPage * rowsPerRequest);
       nextPageResults = getNextPageResults(recordRedirectsQuery, nextPage);
       checkRedirectsHealth(nextPageResults);
-      if (nextPage % 10 == 0) {
+      if (nextPage != 0 && nextPage % 1000 == 0) {
         displayCollectedResults();
+        LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
+            "Starting sleep to give gc time for {} seconds", SLEEP_SECONDS);
+        Thread.sleep(Duration.ofSeconds(SLEEP_SECONDS).toMillis());
       }
       nextPage++;
     } while (CollectionUtils.isNotEmpty(nextPageResults));
@@ -91,8 +96,9 @@ public class ExecutorManagerRecordsCleanup {
 
       //Skip records that are part of the datasetIds that we want to keep in the redirects
       //Also skip records that are already marked as dead
-      if (datasetIdsToKeep.contains(datasetId) || deadRedirectsPerDatasetId
-          .getOrDefault(datasetId, new HashSet<>()).contains(recordRedirect.getNewId())) {
+      final Set<String> datasetIdRedirects = deadRedirectsPerDatasetId.get(datasetId);
+      if (datasetIdsToKeep.contains(datasetId) || (datasetIdRedirects != null
+          && datasetIdRedirects.contains(recordRedirect.getNewId()))) {
         continue;
       }
 
