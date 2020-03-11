@@ -28,7 +28,7 @@ public class DepublishDatasetsMain {
   private static final Logger LOGGER = LoggerFactory.getLogger(DepublishDatasetsMain.class);
 
   public static void main(String[] args)
-      throws TrustStoreConfigurationException, IndexingException, URISyntaxException, IOException {
+      throws IndexingException, URISyntaxException, IOException, TrustStoreConfigurationException {
 
     final List<String> datasetIds = Arrays.asList(
         // ADD DATASETS HERE.
