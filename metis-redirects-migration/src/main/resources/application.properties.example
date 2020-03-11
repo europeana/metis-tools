@@ -1,4 +1,5 @@
 rows.per.request=
+dataset.ids.to.keep=
 #Truststore
 truststore.path=
 truststore.password=
@@ -12,3 +13,12 @@ mongo.password=
 mongo.enableSSL=
 mongo.db=
 mongo.db.redirects=
+
+#Mongo records
+records.mongo.hosts=
+records.mongo.port=
+records.mongo.authentication.db=
+records.mongo.username=
+records.mongo.password=
+records.mongo.enableSSL=
+records.mongo.db=

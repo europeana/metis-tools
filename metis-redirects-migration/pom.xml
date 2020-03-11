@@ -26,7 +26,8 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>eu.europeana.metis.redirects.RedirectsMigrationMain</mainClass>
+              <!--Change this value based on what has to the default on the autonomous script-->
+              <mainClass>eu.europeana.metis.redirects.RedirectsCleanupMain</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -61,23 +62,11 @@
       <artifactId>metis-core-common</artifactId>
       <groupId>eu.europeana.metis</groupId>
       <version>${version.metis}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.zoho.crm</groupId>
-          <artifactId>java-sdk</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <artifactId>metis-core-service</artifactId>
       <groupId>eu.europeana.metis</groupId>
       <version>${version.metis}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.zoho.crm</groupId>
-          <artifactId>java-sdk</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>eu.europeana.corelib</groupId>
