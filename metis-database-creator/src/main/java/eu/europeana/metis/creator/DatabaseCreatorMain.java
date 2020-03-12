@@ -57,22 +57,14 @@ public class DatabaseCreatorMain {
 
   private static void initializeRecordRedirectDatabase(MongoClient mongoClient,
       String databaseName) {
-    final RecordRedirectDao recordRedirectDao = new RecordRedirectDao(mongoClient, databaseName,
-        true);
-    recordRedirectDao.close();
+    new RecordRedirectDao(mongoClient, databaseName, true);
   }
 
   public static void initializeMetisCoreDatabase(MongoClient mongoClient, String databaseName) {
-    final MorphiaDatastoreProviderImpl morphiaDatastoreProvider = new MorphiaDatastoreProviderImpl(
-        mongoClient, databaseName);
-    morphiaDatastoreProvider.getDatastore().ensureIndexes();
-    LOGGER.info("Record database is created");
+    new MorphiaDatastoreProviderImpl(mongoClient, databaseName, true);
   }
 
   public static void initializeRecordDatabase(MongoClient mongoClient, String databaseName) {
-    final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(mongoClient, databaseName,
-        true);
-    edmMongoServer.close();
+    new EdmMongoServerImpl(mongoClient, databaseName, true);
   }
-
 }

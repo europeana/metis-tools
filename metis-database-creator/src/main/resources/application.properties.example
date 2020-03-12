@@ -1,3 +1,5 @@
+#Specify the type of the database to be created RECORD_REDIRECT, RECORD, METIS_CORE
+creation.database.type=
 #Truststore
 truststore.path=
 truststore.password=
@@ -10,4 +12,3 @@ mongo.username=
 mongo.password=
 mongo.enableSSL=
 mongo.db=
-mongo.db.redirects=
