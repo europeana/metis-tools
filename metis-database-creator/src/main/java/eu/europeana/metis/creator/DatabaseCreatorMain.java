@@ -60,11 +60,11 @@ public class DatabaseCreatorMain {
     new RecordRedirectDao(mongoClient, databaseName, true);
   }
 
-  public static void initializeMetisCoreDatabase(MongoClient mongoClient, String databaseName) {
+  private static void initializeMetisCoreDatabase(MongoClient mongoClient, String databaseName) {
     new MorphiaDatastoreProviderImpl(mongoClient, databaseName, true);
   }
 
-  public static void initializeRecordDatabase(MongoClient mongoClient, String databaseName) {
+  private static void initializeRecordDatabase(MongoClient mongoClient, String databaseName) {
     new EdmMongoServerImpl(mongoClient, databaseName, true);
   }
 }
