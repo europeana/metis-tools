@@ -28,8 +28,7 @@ public class RedirectsMigrationMain {
     final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(
         mongoInitializer.getRedirectsMongoClient(),
         propertiesHolder.mongoDb, false);
-    final RecordRedirectDao recordRedirectDao = new RecordRedirectDao(
-        mongoInitializer.getRedirectsMongoClient(), propertiesHolder.mongoDbRedirects, true);
+    final RecordRedirectDao recordRedirectDao = new RecordRedirectDao(mongoInitializer.getRedirectsMongoClient(), propertiesHolder.mongoDbRedirects);
 
     final ExecutorManager executorManager = new ExecutorManager(edmMongoServer, recordRedirectDao,
         propertiesHolder.rowsPerRequest);

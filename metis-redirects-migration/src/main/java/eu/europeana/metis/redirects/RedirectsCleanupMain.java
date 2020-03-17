@@ -38,7 +38,7 @@ public class RedirectsCleanupMain {
     final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(
         mongoInitializer.getRecordsMongoClient(), propertiesHolder.recordsMongoDb, false);
     final RecordRedirectDao recordRedirectDao = new RecordRedirectDao(
-        mongoInitializer.getRedirectsMongoClient(), propertiesHolder.mongoDbRedirects, true);
+        mongoInitializer.getRedirectsMongoClient(), propertiesHolder.mongoDbRedirects);
 
     final ExecutorManagerRecordsCleanup executorManagerRecordsCleanup = new ExecutorManagerRecordsCleanup(
         edmMongoServer, recordRedirectDao, propertiesHolder.rowsPerRequest, propertiesHolder.datasetIdsToKeep);
