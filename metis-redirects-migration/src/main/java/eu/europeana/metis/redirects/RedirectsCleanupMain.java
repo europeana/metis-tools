@@ -41,8 +41,13 @@ public class RedirectsCleanupMain {
         mongoInitializer.getRedirectsMongoClient(), propertiesHolder.mongoDbRedirects, true);
 
     final ExecutorManagerRecordsCleanup executorManagerRecordsCleanup = new ExecutorManagerRecordsCleanup(
-        edmMongoServer, recordRedirectDao, propertiesHolder.rowsPerRequest, propertiesHolder.datasetIdsToKeep);
+        edmMongoServer, recordRedirectDao, propertiesHolder.rowsPerRequest,
+        propertiesHolder.datasetIdsToCheck);
     executorManagerRecordsCleanup.cleanupDatabaseRedirects();
+    executorManagerRecordsCleanup.displayCollectedResults();
+    if (!propertiesHolder.dryRun) {
+      executorManagerRecordsCleanup.deleteCollectedDeadRedirects();
+    }
     executorManagerRecordsCleanup.displayCollectedResults();
 
     mongoInitializer.close();

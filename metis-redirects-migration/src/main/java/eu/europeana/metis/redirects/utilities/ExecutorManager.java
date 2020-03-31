@@ -225,7 +225,7 @@ public class ExecutorManager {
             //Cleanup of old prefix url
             sanitizedOldId = oldId.substring("http://www.europeana.eu/resolve/record".length());
           }
-          final RecordRedirect recordRedirect = new RecordRedirect(lastRedirect, sanitizedOldId,
+          final RecordRedirect recordRedirect = new RecordRedirect(lastRersdirect, sanitizedOldId,
               oldIdsDateMap.get(oldId));
           oldIdsDateMap.remove(oldId);
           recordRedirectDao.createUpdate(recordRedirect);
