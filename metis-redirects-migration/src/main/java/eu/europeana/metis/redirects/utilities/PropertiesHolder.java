@@ -27,7 +27,8 @@ public class PropertiesHolder {
   public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
 
   public final int rowsPerRequest;
-  public final List<String> datasetIdsToKeep;
+  public final List<String> datasetIdsToCheck;
+  public final boolean dryRun;
   public final String truststorePath;
   public final String truststorePassword;
   public final String[] mongoHosts;
@@ -70,8 +71,11 @@ public class PropertiesHolder {
     }
 
     rowsPerRequest = Integer.parseInt(properties.getProperty("rows.per.request"));
-    datasetIdsToKeep = Arrays.stream(properties.getProperty("dataset.ids.to.keep").split(","))
+    datasetIdsToCheck = Arrays.stream(properties.getProperty("dataset.ids.to.check").split(","))
         .filter(StringUtils::isNotBlank).collect(Collectors.toList());
+    dryRun = Boolean.parseBoolean(
+        "".equals(properties.getProperty("dry.run")) ? "true" : properties.getProperty("dry.run"));
+
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     mongoHosts = properties.getProperty("mongo.hosts").split(",");

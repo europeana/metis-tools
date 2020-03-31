@@ -1,5 +1,9 @@
 rows.per.request=
-dataset.ids.to.keep=
+#Those datasets will only be checked for dead redirects
+dataset.ids.to.check=
+#This value is true if we don't won't the actual removal of redirect to happen and only require the stats
+#Default true
+dry.run=
 #Truststore
 truststore.path=
 truststore.password=
