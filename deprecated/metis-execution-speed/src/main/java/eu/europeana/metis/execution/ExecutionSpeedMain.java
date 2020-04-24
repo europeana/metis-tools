@@ -1,13 +1,13 @@
 package eu.europeana.metis.execution;
 
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
+import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.exception.BadContentException;
 import eu.europeana.metis.execution.utilities.ExecutorManager;
 import eu.europeana.metis.execution.utilities.MongoInitializer;
 import eu.europeana.metis.execution.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ public class ExecutionSpeedMain {
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args)
-      throws TrustStoreConfigurationException, BadContentException {
+      throws BadContentException, CustomTruststoreAppender.TrustStoreConfigurationException {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "Starting execution speed script");
     if (propertiesHolder.endNumberOfDaysAgo < 0
         || propertiesHolder.startNumberOfDaysAgo < propertiesHolder.endNumberOfDaysAgo) {
@@ -31,7 +31,7 @@ public class ExecutionSpeedMain {
     }
 
     final MongoInitializer mongoInitializer = prepareConfiguration();
-    final MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProvider(
+    final MorphiaDatastoreProvider morphiaDatastoreProvider = new MorphiaDatastoreProviderImpl(
         mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
 
     final ExecutorManager executorManager = new ExecutorManager(morphiaDatastoreProvider);
@@ -42,7 +42,8 @@ public class ExecutionSpeedMain {
 
   }
 
-  private static MongoInitializer prepareConfiguration() throws TrustStoreConfigurationException {
+  private static MongoInitializer prepareConfiguration()
+      throws CustomTruststoreAppender.TrustStoreConfigurationException {
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
         "Append default truststore with custom truststore");
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
