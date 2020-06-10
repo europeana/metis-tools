@@ -4,6 +4,7 @@ import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.SetupRelatedIndexingException;
 import eu.europeana.metis.mongo.MongoProperties;
+import eu.europeana.metis.mongo.MongoProperties.ReadPreferenceValue;
 import eu.europeana.metis.utils.InetAddressUtil;
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,7 +120,7 @@ public class PropertiesHolder {
     final MongoProperties<IllegalArgumentException> properties = new MongoProperties<>(
             IllegalArgumentException::new);
     properties.setAllProperties(mongoCoreHosts, mongoCorePorts, mongoCoreAuthenticationDb,
-            mongoCoreUsername, mongoCorePassword, mongoCoreEnablessl);
+            mongoCoreUsername, mongoCorePassword, mongoCoreEnablessl, ReadPreferenceValue.PRIMARY);
     return properties;
   }
 
@@ -136,7 +137,7 @@ public class PropertiesHolder {
   private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
     indexingSettings.getMongoProperties().setAllProperties(publishMongoHosts,
             publishMongoPorts, publishMongoAuthenticationDb, publishMongoUsername,
-            publishMongoPassword, publishMongoEnablessl);
+            publishMongoPassword, publishMongoEnablessl, ReadPreferenceValue.PRIMARY);
     indexingSettings.setMongoDatabaseName(publishMongoDb);
   }
 
