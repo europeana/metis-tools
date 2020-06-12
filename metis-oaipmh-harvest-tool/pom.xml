@@ -5,35 +5,20 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>eu.europeana.metis</groupId>
-  <artifactId>remove-data</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <artifactId>metis-oaipmh-harvest-tool</artifactId>
+  <version>1.10.0-SNAPSHOT</version>
 
-  <name>remove-data</name>
+  <name>metis-oaipmh-harvest-tool</name>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.1</version>
+        <version>3.8.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <testSource>1.8</testSource>
-          <testTarget>1.8</testTarget>
-        </configuration>
-      </plugin>
-      <plugin>
-        <!--> Run with: mvn clean compile assembly:single <-->
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>eu.europeana.metis.remove.dataset.CountRecordsMain</mainClass>
-            </manifest>
-          </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
+          <release>11</release>
+          <source>11</source>
+          <target>11</target>
         </configuration>
       </plugin>
     </plugins>
@@ -41,7 +26,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.metis>1.9.0-SNAPSHOT</version.metis>
+    <version.metis>1.10.0-SNAPSHOT</version.metis>
+    <version.javax.xml.bind>2.3.1</version.javax.xml.bind>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.25</version.slf4j>
     <version.log4j>2.9.1</version.log4j>
@@ -49,49 +35,14 @@
 
   <dependencies>
     <dependency>
-      <artifactId>metis-common</artifactId>
-      <groupId>eu.europeana.metis</groupId>
-      <version>${version.metis}</version>
-    </dependency>
-    <dependency>
-      <artifactId>metis-core-common</artifactId>
-      <groupId>eu.europeana.metis</groupId>
-      <version>${version.metis}</version>
-    </dependency>
-    <dependency>
-      <artifactId>metis-core-service</artifactId>
-      <groupId>eu.europeana.metis</groupId>
-      <version>${version.metis}</version>
-    </dependency>
-    <dependency>
-      <artifactId>metis-indexing</artifactId>
-      <groupId>eu.europeana.metis</groupId>
-      <version>${version.metis}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>4.5</version>
-    </dependency>
-    <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
-      <version>2.2.11</version>
+      <version>${version.javax.xml.bind}</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-core</artifactId>
-      <version>2.2.11</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>2.2.11</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>activation</artifactId>
-      <version>1.1.1</version>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>${version.javax.xml.bind}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
