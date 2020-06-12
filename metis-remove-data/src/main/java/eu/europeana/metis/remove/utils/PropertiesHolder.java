@@ -120,7 +120,7 @@ public class PropertiesHolder {
     final MongoProperties<IllegalArgumentException> properties = new MongoProperties<>(
             IllegalArgumentException::new);
     properties.setAllProperties(mongoCoreHosts, mongoCorePorts, mongoCoreAuthenticationDb,
-            mongoCoreUsername, mongoCorePassword, mongoCoreEnablessl, ReadPreferenceValue.getDefault());
+            mongoCoreUsername, mongoCorePassword, mongoCoreEnablessl, ReadPreferenceValue.PRIMARY);
     return properties;
   }
 
@@ -137,7 +137,7 @@ public class PropertiesHolder {
   private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
     indexingSettings.getMongoProperties().setAllProperties(publishMongoHosts,
             publishMongoPorts, publishMongoAuthenticationDb, publishMongoUsername,
-            publishMongoPassword, publishMongoEnablessl, ReadPreferenceValue.getDefault());
+            publishMongoPassword, publishMongoEnablessl, ReadPreferenceValue.PRIMARY);
     indexingSettings.setMongoDatabaseName(publishMongoDb);
   }
 
