@@ -62,10 +62,11 @@ public class DepublishDatasetsMain {
     final WorkflowExecutionDao workflowExecutionDao = new WorkflowExecutionDao(
         application.getDatastoreProvider());
     final MetisPlugin targetPlugin = workflowExecutionDao.getLatestSuccessfulPlugin(datasetId,
-        EnumSet.of(PluginType.PUBLISH, PluginType.REINDEX_TO_PUBLISH));
+        EnumSet.of(PluginType.PUBLISH, PluginType.REINDEX_TO_PUBLISH)).getPlugin();
     if (targetPlugin instanceof ExecutablePlugin) {
       final ExecutablePlugin castPlugin = (ExecutablePlugin) targetPlugin;
-      if (ExecutablePlugin.getDataStatus(castPlugin) == DataStatus.VALID) {
+      final DataStatus dataStatus = castPlugin.getDataStatus();
+      if (dataStatus == null || dataStatus == DataStatus.VALID) {
         final WorkflowExecution execution = workflowExecutionDao
             .getByExternalTaskId(Long.parseLong(castPlugin.getExternalTaskId()));
         final Optional<AbstractMetisPlugin> metisPluginWithType = execution
