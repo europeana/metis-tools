@@ -3,6 +3,7 @@ package eu.europeana.metis.creator;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import dev.morphia.annotations.Id;
 import eu.europeana.enrichment.api.external.ObjectIdSerializer;
+import java.util.List;
 import org.bson.types.ObjectId;
 
 /**
@@ -15,13 +16,13 @@ public class LabelInfo {
   @JsonSerialize(using = ObjectIdSerializer.class)
   private ObjectId id;
   private String lang;
-  private String originalLabel;
-  private String lowerCaseLabel;
+  private List<String> originalLabel;
+  private List<String> lowerCaseLabel;
 
   public LabelInfo() {
   }
 
-  public LabelInfo(String originalLabel, String lowerCaseLabel, String lang) {
+  public LabelInfo(List<String> originalLabel, List<String> lowerCaseLabel, String lang) {
     this.originalLabel = originalLabel;
     this.lowerCaseLabel = lowerCaseLabel;
     this.lang = lang;
@@ -43,19 +44,19 @@ public class LabelInfo {
     this.lang = lang;
   }
 
-  public String getOriginalLabel() {
+  public List<String> getOriginalLabel() {
     return originalLabel;
   }
 
-  public void setOriginalLabel(String originalLabel) {
+  public void setOriginalLabel(List<String> originalLabel) {
     this.originalLabel = originalLabel;
   }
 
-  public String getLowerCaseLabel() {
+  public List<String> getLowerCaseLabel() {
     return lowerCaseLabel;
   }
 
-  public void setLowerCaseLabel(String lowerCaseLabel) {
+  public void setLowerCaseLabel(List<String> lowerCaseLabel) {
     this.lowerCaseLabel = lowerCaseLabel;
   }
 }
