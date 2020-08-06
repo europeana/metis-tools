@@ -1,9 +1,7 @@
 package eu.europeana.metis.creator.utilities;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 import org.slf4j.Logger;
@@ -37,23 +35,11 @@ public class PropertiesHolder {
   public final String destinationMongoDb;
 
   public PropertiesHolder(String configurationFileName) {
-    Properties properties = new Properties();
-    final URL resource = getClass().getClassLoader().getResource(configurationFileName);
-    final String filePathInResources = resource == null ? null : resource.getFile();
-    String filePath;
-    if (filePathInResources != null && new File(filePathInResources).exists()) {
-      LOGGER.info("Will try to load {} properties file",
-          filePathInResources);
-      filePath = filePathInResources;
-    } else {
-      LOGGER.info(
-          "{} properties file does NOT exist, probably running in standalone .jar mode where the properties file should be on the same directory "
-              + "as the .jar file is. Will try to load {} properties file",
-          filePathInResources, configurationFileName);
-      filePath = configurationFileName;
-    }
-    try {
-      properties.load(new FileInputStream(filePath));
+    // Load properties file.
+    final Properties properties = new Properties();
+    try (final InputStream stream = PropertiesHolder.class.getClassLoader()
+        .getResourceAsStream(configurationFileName)) {
+      properties.load(stream);
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }

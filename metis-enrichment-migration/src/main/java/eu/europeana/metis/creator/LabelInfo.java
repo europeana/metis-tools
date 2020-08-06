@@ -1,10 +1,6 @@
 package eu.europeana.metis.creator;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import dev.morphia.annotations.Id;
-import eu.europeana.enrichment.api.external.ObjectIdSerializer;
 import java.util.List;
-import org.bson.types.ObjectId;
 
 /**
  * @author Simon Tzanakis
@@ -12,9 +8,6 @@ import org.bson.types.ObjectId;
  */
 public class LabelInfo {
 
-  @Id
-  @JsonSerialize(using = ObjectIdSerializer.class)
-  private ObjectId id;
   private String lang;
   private List<String> originalLabel;
   private List<String> lowerCaseLabel;
@@ -26,14 +19,6 @@ public class LabelInfo {
     this.originalLabel = originalLabel;
     this.lowerCaseLabel = lowerCaseLabel;
     this.lang = lang;
-  }
-
-  public ObjectId getId() {
-    return id;
-  }
-
-  public void setId(ObjectId id) {
-    this.id = id;
   }
 
   public String getLang() {

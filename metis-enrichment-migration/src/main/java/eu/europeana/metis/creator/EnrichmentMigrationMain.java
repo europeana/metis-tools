@@ -3,6 +3,7 @@ package eu.europeana.metis.creator;
 import static eu.europeana.metis.utils.SonarqubeNullcheckAvoidanceUtils.performFunction;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
 import dev.morphia.query.FindOptions;
@@ -10,6 +11,7 @@ import dev.morphia.query.Query;
 import dev.morphia.query.internal.MorphiaCursor;
 import eu.europeana.corelib.solr.entity.AbstractEdmEntityImpl;
 import eu.europeana.corelib.solr.entity.ContextualClassImpl;
+import eu.europeana.corelib.solr.entity.OrganizationImpl;
 import eu.europeana.enrichment.api.internal.AgentTermList;
 import eu.europeana.enrichment.api.internal.ConceptTermList;
 import eu.europeana.enrichment.api.internal.MongoTermList;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +43,13 @@ public class EnrichmentMigrationMain {
   private static final String CONFIGURATION_FILE = "application.properties";
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
   private static final String ENTITY_TYPE = "entityType";
-  private static final int TOTAL_ITEMS_PER_PAGE = 5;
+  private static final int TOTAL_ITEMS_PER_PAGE = 100;
+  private static boolean exitPromptly = false;
   public static final String CONCEPT_IMPL = "ConceptImpl";
   public static final String AGENT_IMPL = "AgentImpl";
   public static final String TIMESPAN_IMPL = "TimespanImpl";
   public static final String PLACE_IMPL = "PlaceImpl";
   public static final String ORGANIZATION_IMPL = "OrganizationImpl";
-  private static boolean existPromptly = true;
 
   private static Datastore sourceDatastore;
   private static Datastore destinationDatastore;
@@ -73,9 +76,28 @@ public class EnrichmentMigrationMain {
     LOGGER.info("--Processing Organizations--");
     migrateOrganizations();
 
+//    final MongoDatabase destinationDatabase = destinationMongoClient
+//        .getDatabase(propertiesHolder.destinationMongoDb);
+//    executeCommandForRenamingAddress(destinationDatabase);
+
     mongoInitializer.close();
 
     LOGGER.info("Finished database migration script");
+  }
+
+  public static void executeCommandForRenamingAddress(MongoDatabase destinationDatabase) {
+    String json = "   {\n"
+        + "      update: 'EnrichmentTerm',\n"
+        + "      updates: [\n"
+        + "         {\n"
+        + "           q: {},\n"
+        + "           u: {$rename:{'contextualEntity.addressInt':'contextualEntity.address'}},\n"
+        + "           upsert: false,\n"
+        + "           multi: true,\n"
+        + "         },\n"
+        + "      ],\n"
+        + "   }";
+    destinationDatabase.runCommand(Document.parse(json));
   }
 
   private static <T extends MongoTermList<S>, S extends ContextualClassImpl> EnrichmentTerm convertToNewClass(
@@ -86,6 +108,7 @@ public class EnrichmentMigrationMain {
     enrichmentTerm.setParent(termList.getParent());
     enrichmentTerm.setEntityType(getEntityType(termList.getEntityType()));
     final ContextualClassImpl contextualClass = termList.getRepresentation();
+    fixOrganizationImplAddress(contextualClass); //Fix internal structure of address
     enrichmentTerm.setContextualEntity(contextualClass);
     enrichmentTerm.setLabelInfos(createLabelInfoList(contextualClass));
     enrichmentTerm.setOwlSameAs(
@@ -101,6 +124,14 @@ public class EnrichmentMigrationMain {
         entry -> new LabelInfo(entry.getValue(),
             entry.getValue().stream().map(String::toLowerCase).collect(
                 Collectors.toList()), entry.getKey())).collect(Collectors.toList());
+  }
+
+  private static void fixOrganizationImplAddress(ContextualClassImpl contextualClass) {
+    if (contextualClass instanceof OrganizationImpl) {
+      ((OrganizationImpl) contextualClass)
+          .setAddressInt(((OrganizationImpl) contextualClass).getAddress().getAddressImpl());
+      ((OrganizationImpl) contextualClass).setAddress(null);
+    }
   }
 
   private static EntityType getEntityType(String entityTypeClassName) {
@@ -144,7 +175,7 @@ public class EnrichmentMigrationMain {
       itemsCount += allMongoTermListsByFields.size();
       LOGGER.info("Total items processed until now: {}/{}", itemsCount, totalItems);
       page++;
-    } while (!existPromptly && !allMongoTermListsByFields.isEmpty());
+    } while (!exitPromptly && !allMongoTermListsByFields.isEmpty());
   }
 
   private static void migrateAgents() {
@@ -164,7 +195,7 @@ public class EnrichmentMigrationMain {
       itemsCount += allMongoTermListsByFields.size();
       LOGGER.info("Total items processed until now: {}/{}", itemsCount, totalItems);
       page++;
-    } while (!existPromptly && !allMongoTermListsByFields.isEmpty());
+    } while (!exitPromptly && !allMongoTermListsByFields.isEmpty());
   }
 
   private static void migrateTimespans() {
@@ -184,7 +215,7 @@ public class EnrichmentMigrationMain {
       itemsCount += allMongoTermListsByFields.size();
       LOGGER.info("Total items processed until now: {}/{}", itemsCount, totalItems);
       page++;
-    } while (!existPromptly && !allMongoTermListsByFields.isEmpty());
+    } while (!exitPromptly && !allMongoTermListsByFields.isEmpty());
   }
 
   private static void migratePlaces() {
@@ -204,7 +235,7 @@ public class EnrichmentMigrationMain {
       itemsCount += allMongoTermListsByFields.size();
       LOGGER.info("Total items processed until now: {}/{}", itemsCount, totalItems);
       page++;
-    } while (!existPromptly && !allMongoTermListsByFields.isEmpty());
+    } while (!exitPromptly && !allMongoTermListsByFields.isEmpty());
   }
 
   private static void migrateOrganizations() {
@@ -224,7 +255,7 @@ public class EnrichmentMigrationMain {
       itemsCount += allMongoTermListsByFields.size();
       LOGGER.info("Total items processed until now: {}/{}", itemsCount, totalItems);
       page++;
-    } while (!existPromptly && !allMongoTermListsByFields.isEmpty());
+    } while (!exitPromptly && !allMongoTermListsByFields.isEmpty());
   }
 
   private static <T extends MongoTermList<S>, S extends AbstractEdmEntityImpl> List<T> getAllMongoTermListsByFields(
