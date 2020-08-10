@@ -1,7 +1,7 @@
 package eu.europeana.metis.zoho.model;
 
 import java.util.Date;
-import eu.europeana.corelib.definitions.edm.entity.Organization;
+import eu.europeana.corelib.solr.entity.Organization;
 import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
 
 public class UpdateOperation extends BaseOperation implements  Operation {
