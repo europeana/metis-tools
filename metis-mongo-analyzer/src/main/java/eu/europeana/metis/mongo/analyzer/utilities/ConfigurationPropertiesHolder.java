@@ -2,8 +2,8 @@ package eu.europeana.metis.mongo.analyzer.utilities;
 
 import eu.europeana.metis.mongo.MongoProperties;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 
 /**
  * Contains all properties that are required for execution.
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2020-10-01
  */
-@Component
+@Configuration
 @PropertySource({"classpath:application.properties"})
 public class ConfigurationPropertiesHolder {
 

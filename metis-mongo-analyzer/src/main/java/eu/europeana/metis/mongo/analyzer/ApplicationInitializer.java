@@ -21,10 +21,12 @@ public class ApplicationInitializer implements AutoCloseable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
   private final MongoClient mongoClient;
+  private final String mongoDatabase;
 
   public ApplicationInitializer(ConfigurationPropertiesHolder configurationPropertiesHolder)
       throws TrustStoreConfigurationException {
     mongoClient = initializeApplication(configurationPropertiesHolder);
+    mongoDatabase = configurationPropertiesHolder.getMongoDb();
   }
 
   private MongoClient initializeApplication(ConfigurationPropertiesHolder propertiesHolder)
@@ -59,8 +61,12 @@ public class ApplicationInitializer implements AutoCloseable {
     return mongoClient;
   }
 
+  public String getMongoDatabase() {
+    return mongoDatabase;
+  }
+
   @Override
-  public void close() throws Exception {
+  public void close() {
     if (mongoClient != null) {
       mongoClient.close();
     }
