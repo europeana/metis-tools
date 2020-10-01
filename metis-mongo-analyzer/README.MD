@@ -1,0 +1,1 @@
+**Tool to analyze mongo database structure**  
