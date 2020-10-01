@@ -1,15 +1,15 @@
 package eu.europeana.metis.creator;
 
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
-import eu.europeana.metis.creator.utilities.MongoInitializer;
-import eu.europeana.metis.creator.utilities.PropertiesHolder;
+import eu.europeana.metis.creator.utilities.ConfigurationPropertiesHolder;
 import eu.europeana.metis.mongo.RecordRedirectDao;
-import eu.europeana.metis.utils.CustomTruststoreAppender;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * This class is used to create databases based on configuration or initialize the creation of
@@ -18,40 +18,38 @@ import org.slf4j.LoggerFactory;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2020-03-11
  */
+@Configuration
+@ComponentScan
 public class DatabaseCreatorMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseCreatorMain.class);
-  private static final String CONFIGURATION_FILE = "application.properties";
-  private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
+  private static ConfigurationPropertiesHolder configurationPropertiesHolder;
 
-  public static void main(String[] args)
-      throws CustomTruststoreAppender.TrustStoreConfigurationException {
+  @Autowired
+  public DatabaseCreatorMain(ConfigurationPropertiesHolder configurationPropertiesHolder) {
+    DatabaseCreatorMain.configurationPropertiesHolder = configurationPropertiesHolder;
+  }
+
+  public static void main(String[] args) throws Exception {
     LOGGER.info("Starting creation database script");
-    LOGGER.info("Append default truststore with custom truststore");
-    if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
-        .isNotEmpty(propertiesHolder.truststorePassword)) {
-      CustomTruststoreAppender.appendCustomTrustoreToDefault(propertiesHolder.truststorePath,
-          propertiesHolder.truststorePassword);
-    }
 
-    final MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder);
-    mongoInitializer.initializeMongoClient();
-    switch (propertiesHolder.creationDatabaseType) {
-      case RECORD_REDIRECT:
-        initializeRecordRedirectDatabase(mongoInitializer.getMongoClient(),
-            propertiesHolder.mongoDb);
-        break;
-      case METIS_CORE:
-        initializeMetisCoreDatabase(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
-        break;
-      case RECORD:
-        initializeRecordDatabase(mongoInitializer.getMongoClient(), propertiesHolder.mongoDb);
-        break;
-      default:
-        LOGGER.info("No creation database type supplied.");
+    try (ApplicationInitializer applicationInitializer = new ApplicationInitializer(
+        configurationPropertiesHolder)) {
+      final MongoClient mongoClient = applicationInitializer.getMongoClient();
+      switch (configurationPropertiesHolder.creationDatabaseType) {
+        case RECORD_REDIRECT:
+          initializeRecordRedirectDatabase(mongoClient, configurationPropertiesHolder.mongoDb);
+          break;
+        case METIS_CORE:
+          initializeMetisCoreDatabase(mongoClient, configurationPropertiesHolder.mongoDb);
+          break;
+        case RECORD:
+          initializeRecordDatabase(mongoClient, configurationPropertiesHolder.mongoDb);
+          break;
+        default:
+          LOGGER.info("No creation database type supplied.");
+      }
     }
-    mongoInitializer.close();
-
     LOGGER.info("Finished creation database script");
   }
 
