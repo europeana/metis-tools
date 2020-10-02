@@ -1,6 +1,7 @@
 package eu.europeana.metis.mongo.analyzer;
 
 import static eu.europeana.metis.mongo.analyzer.utilities.ConfigurationPropertiesHolder.ERROR_LOGS_MARKER;
+import static eu.europeana.metis.mongo.analyzer.utilities.ReportGenerator.createAnalysisReportLog;
 
 import com.mongodb.DBRef;
 import com.mongodb.client.FindIterable;
@@ -9,16 +10,8 @@ import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
 import eu.europeana.metis.mongo.analyzer.model.DatasetAnalysis;
 import eu.europeana.metis.mongo.analyzer.utilities.RecordListFields;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +20,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
@@ -38,10 +30,6 @@ import org.slf4j.LoggerFactory;
 public class Analyzer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Analyzer.class);
-  private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-      "yyyy-MM-dd-HHmmss");
-  private static final Path analysisFilePath = Paths
-      .get("analysisReport-" + simpleDateFormat.format(new Date()) + ".log");
 
   private final Datastore datastore;
   private final long counterCheckpoint;
@@ -91,9 +79,9 @@ public class Analyzer {
         datasetId = getDatasetId(aboutPrefix, about, unexpectedAboutValueCounter);
         if (datasetId == null) {
           wrongAboutValueCounter++;
-          continue;
+        } else {
+          analyzeDocument(fieldListsToCheck, datasetIdAndDatasetAnalysis, document, datasetId);
         }
-        analyzeDocument(fieldListsToCheck, datasetIdAndDatasetAnalysis, document, datasetId);
         counter++;
         if (counter % counterCheckpoint == 0 && LOGGER.isInfoEnabled()) {
           LOGGER.info("Analysed {} records from collection {}", counter, collection);
@@ -123,7 +111,8 @@ public class Analyzer {
       }
     });
     if (containsDuplicates.get()) {
-      datasetIdAndDatasetAnalysis.get(datasetId).incrementTotalRecordsWithDuplicates();
+      final DatasetAnalysis datasetAnalysis = datasetIdAndDatasetAnalysis.get(datasetId);
+      datasetAnalysis.getRecordAboutsWithDuplicates().add((String) document.get(ABOUT_FIELD));
     }
   }
 
@@ -166,46 +155,6 @@ public class Analyzer {
     duplicates.values().forEach(v -> datasetAnalysis.getDuplicatesAndQuantity()
         .compute(v, (k, counter) -> (counter == null) ? 1 : counter + 1));
     return datasetAnalysis;
-  }
-
-  private void createAnalysisReportLog(final Map<String, DatasetAnalysis> datasetsWithDuplicates,
-      Long unexpectedAboutValueCounter, long wrongAboutValueCounter, String collection) {
-    final StringBuilder analysisReport = new StringBuilder();
-    analysisReport.append(String.format("Analysis of collection %s%n", collection));
-    final AtomicInteger totalDuplicates = new AtomicInteger();
-    final AtomicInteger totalRecordsWithDuplicates = new AtomicInteger();
-    //Calculate totals
-    datasetsWithDuplicates.forEach((key, value) -> {
-      value.getDuplicatesAndQuantity()
-          .forEach((countersKey, countersValue) -> totalDuplicates.addAndGet(countersValue));
-      totalRecordsWithDuplicates.addAndGet(value.getTotalRecordsWithDuplicates());
-    });
-
-    //Create Report
-    //@formatter:off
-    analysisReport.append(String.format("==============================================================%n"));
-    analysisReport.append(String.format("Unexpected about values total: %s%n", unexpectedAboutValueCounter));
-    analysisReport.append(String.format("Wrong about values total: %s%n", wrongAboutValueCounter));
-    analysisReport.append(String.format("Records with duplicates total: %s%n", totalRecordsWithDuplicates.get()));
-    analysisReport.append(String.format("Duplicate counters total: %s%n", totalDuplicates.get()));
-    analysisReport.append(String.format("Duplicate counters per dataset:%n"));
-    //Per dataset duplicates report
-    datasetsWithDuplicates.forEach((key, value) -> {
-      analysisReport.append(String.format("DatasetId -> %s:%n", key));
-      value.getDuplicatesAndQuantity().forEach((countersKey, countersValue) -> analysisReport
-          .append(String
-              .format("References of duplicates %s - Quantity %s%n", countersKey, countersValue)));
-    });
-    analysisReport.append(String.format("==============================================================%n"));
-
-    try (FileWriter fw = new FileWriter(analysisFilePath.toFile(), true);
-        BufferedWriter bw = new BufferedWriter(fw);
-        PrintWriter out = new PrintWriter(bw)) {
-      out.println(analysisReport.toString());
-    } catch (IOException e) {
-      LOGGER.warn("Exception occurred while writing report to file", e);
-    }
-    //@formatter:on
   }
 
 }

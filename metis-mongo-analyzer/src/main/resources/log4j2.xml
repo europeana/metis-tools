@@ -5,17 +5,15 @@
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
     </Console>
     <File name="ErrorLogs"
-      fileName="error-${date:yyyy-MM-dd-HHmmss}.log">
+      fileName="log/error-${date:yyyy-MM-dd-HHmmss}.log">
       <MarkerFilter marker="ERROR_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
-      <PatternLayout pattern="%m%n" />
+      <PatternLayout pattern="%m%n"/>
     </File>
   </Appenders>
   <Loggers>
     <Root level="INFO">
       <AppenderRef ref="Console"/>
-    </Root>
-    <Logger name="Error" level="WARN">
       <AppenderRef ref="ErrorLogs"/>
-    </Logger>
+    </Root>
   </Loggers>
 </Configuration>

@@ -1,21 +1,19 @@
 package eu.europeana.metis.mongo.analyzer.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class DatasetAnalysis {
 
   private String datasetId;
-  private int totalRecordsWithDuplicates = 0;
+  private List<String> recordAboutsWithDuplicates = new ArrayList<>();
   private Map<Integer, Integer> duplicatesAndQuantity = new HashMap<>();
 
   public DatasetAnalysis(String datasetId) {
     this.datasetId = datasetId;
-  }
-
-  public void incrementTotalRecordsWithDuplicates() {
-    totalRecordsWithDuplicates++;
   }
 
   @Override
@@ -43,12 +41,12 @@ public class DatasetAnalysis {
     this.datasetId = datasetId;
   }
 
-  public int getTotalRecordsWithDuplicates() {
-    return totalRecordsWithDuplicates;
+  public List<String> getRecordAboutsWithDuplicates() {
+    return recordAboutsWithDuplicates;
   }
 
-  public void setTotalRecordsWithDuplicates(int totalRecordsWithDuplicates) {
-    this.totalRecordsWithDuplicates = totalRecordsWithDuplicates;
+  public void setRecordAboutsWithDuplicates(List<String> recordAboutsWithDuplicates) {
+    this.recordAboutsWithDuplicates = recordAboutsWithDuplicates;
   }
 
   public Map<Integer, Integer> getDuplicatesAndQuantity() {
