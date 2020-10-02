@@ -1,7 +1,6 @@
 package eu.europeana.metis.mongo.analyzer;
 
 import static eu.europeana.metis.mongo.analyzer.utilities.ConfigurationPropertiesHolder.ERROR_LOGS_MARKER;
-import static eu.europeana.metis.mongo.analyzer.utilities.ConfigurationPropertiesHolder.STATISTICS_LOGS_MARKER;
 
 import com.mongodb.DBRef;
 import com.mongodb.client.FindIterable;
@@ -9,8 +8,16 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
 import eu.europeana.metis.mongo.analyzer.utilities.RecordListFields;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +35,11 @@ import org.slf4j.LoggerFactory;
 public class Analyzer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Analyzer.class);
+  private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+      "yyyy-MM-dd-HHmmss");
+  private static final Path analysisFilePath = Paths
+      .get("analysisReport-" + simpleDateFormat.format(new Date()) + ".log");
+
   private final Datastore datastore;
   private final long counterCheckpoint;
   private final Document testQuery;
@@ -43,7 +55,7 @@ public class Analyzer {
     this.testQuery = StringUtils.isBlank(testQuery) ? null : new Document(ABOUT_FIELD, testQuery);
   }
 
-  void analyze() {
+  void analyze() throws IOException {
     final List<String> fieldListsToCheck = Arrays.stream(RecordListFields.values())
         .map(RecordListFields::getFieldName).collect(Collectors.toList());
     final List<String> webResourcesField = Collections.singletonList("webResources");
@@ -55,7 +67,7 @@ public class Analyzer {
   }
 
   private void computeDuplicatesCounters(String collection, String aboutPrefix,
-      List<String> fieldListsToCheck) {
+      List<String> fieldListsToCheck) throws IOException {
     final Map<String, Map<Integer, Integer>> datasetsWithDuplicates = new HashMap<>();
     Long unexpectedAboutValueCounter = 0L;
     long wrongAboutValueCounter = 0;
@@ -111,7 +123,7 @@ public class Analyzer {
         datasetId = about.substring(RECORD_ABOUT_PREFIX.length() + 1, about.lastIndexOf("/"));
       }
     } catch (StringIndexOutOfBoundsException e) {
-      LOGGER.info(ERROR_LOGS_MARKER,
+      LOGGER.warn(ERROR_LOGS_MARKER,
           "(provided prefix \"{}\")Could not parse datasetId from about: {}", aboutPrefix, about);
       return null;
     }
@@ -139,26 +151,34 @@ public class Analyzer {
 
   private void duplicatesCountersLog(
       final Map<String, Map<Integer, Integer>> datasetsWithDuplicates,
-      Long unexpectedAboutValueCounter, long wrongAboutValueCounter, String collection) {
-    LOGGER.info(STATISTICS_LOGS_MARKER, "Analysis of collection {}", collection);
+      Long unexpectedAboutValueCounter, long wrongAboutValueCounter, String collection)
+      throws IOException {
+    final StringBuilder analysisReport = new StringBuilder();
+    analysisReport.append(String.format("Analysis of collection %s%n", collection));
     final AtomicInteger totalDuplicates = new AtomicInteger();
     datasetsWithDuplicates.forEach((key, value) -> value
         .forEach((countersKey, countersValue) -> totalDuplicates.addAndGet(countersValue)));
-    LOGGER.info(STATISTICS_LOGS_MARKER,
-        "==============================================================");
-    LOGGER.info(STATISTICS_LOGS_MARKER, "Unexpected about values total: {}",
-        unexpectedAboutValueCounter);
-    LOGGER.info(STATISTICS_LOGS_MARKER, "Wrong about values total: {}", wrongAboutValueCounter);
-    LOGGER.info(STATISTICS_LOGS_MARKER, "Duplicate counters total: {}", totalDuplicates.get());
-    LOGGER.info(STATISTICS_LOGS_MARKER, "Duplicate counters per dataset:");
+    analysisReport
+        .append(String.format("==============================================================%n"));
+    analysisReport
+        .append(String.format("Unexpected about values total: %s%n", unexpectedAboutValueCounter));
+    analysisReport.append(String.format("Wrong about values total: %s%n", wrongAboutValueCounter));
+    analysisReport.append(String.format("Duplicate counters total: %s%n", totalDuplicates.get()));
+    analysisReport.append(String.format("Duplicate counters per dataset:%n"));
     datasetsWithDuplicates.forEach((key, value) -> {
-      LOGGER.info(STATISTICS_LOGS_MARKER, "DatasetId -> {}:", key);
-      value.forEach((countersKey, countersValue) -> LOGGER
-          .info(STATISTICS_LOGS_MARKER, "References of duplicates {} - Quantity {}", countersKey,
-              countersValue));
+      analysisReport.append(String.format("DatasetId -> %s:%n", key));
+      value.forEach((countersKey, countersValue) -> analysisReport.append(String
+          .format("References of duplicates %s - Quantity %s%n", countersKey, countersValue)));
     });
-    LOGGER.info(STATISTICS_LOGS_MARKER,
-        "==============================================================");
+    analysisReport
+        .append(String.format("==============================================================%n"));
+
+    try (FileWriter fw = new FileWriter(analysisFilePath.toFile(),
+        true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+      out.println(analysisReport.toString());
+    } catch (IOException e) {
+      LOGGER.warn("Exception occurred while writing report to file", e);
+    }
   }
 
 }

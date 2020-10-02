@@ -24,9 +24,7 @@ import org.springframework.context.annotation.PropertySources;
 //@formatter:on
 public class ConfigurationPropertiesHolder {
 
-  public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("ANALYSIS_LOGS");
   public static final Marker ERROR_LOGS_MARKER = MarkerFactory.getMarker("ERROR_LOGS");
-
 
   @Value("${truststore.path}")
   public String truststorePath;
