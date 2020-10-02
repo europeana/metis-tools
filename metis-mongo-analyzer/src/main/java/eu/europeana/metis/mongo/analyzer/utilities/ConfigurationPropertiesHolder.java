@@ -44,6 +44,8 @@ public class ConfigurationPropertiesHolder {
   public boolean mongoEnableSSL = false;
   @Value("${mongo.db}")
   public String mongoDb;
+  @Value("${log.counter.checkpoint}")
+  public long logCounterCheckpoint;
 
   public MongoProperties<IllegalArgumentException> getMongoProperties() {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
@@ -107,5 +109,9 @@ public class ConfigurationPropertiesHolder {
 
   public String getMongoDb() {
     return mongoDb;
+  }
+
+  public long getLogCounterCheckpoint() {
+    return logCounterCheckpoint;
   }
 }

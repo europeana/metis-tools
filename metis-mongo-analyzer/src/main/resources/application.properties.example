@@ -17,3 +17,6 @@ mongo.username=
 mongo.password=
 mongo.enableSSL=
 mongo.db=
+
+#Log
+log.counter.checkpoint=1000
