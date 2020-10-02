@@ -8,6 +8,7 @@ import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.metis.mongo.analyzer.utilities.ConfigurationPropertiesHolder;
 import eu.europeana.metis.mongo.analyzer.utilities.RecordListFields;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +25,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * This class is used to create databases based on configuration or initialize the creation of
- * indexes on fields in an already existent database. It should be ran with extreme caution.
+ * This class is used to analyze the mongo record database.
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2020-10-01
@@ -35,7 +35,7 @@ public class MongoAnalyzerMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MongoAnalyzerMain.class);
   private static ConfigurationPropertiesHolder configurationPropertiesHolder;
-  private static final int COUNTER_CHECKPOINT = 1000;
+  private static final int COUNTER_CHECKPOINT = 10;
   private static Datastore datastore;
 
   @SuppressWarnings("java:S3010")
@@ -45,7 +45,7 @@ public class MongoAnalyzerMain {
   }
 
   public static void main(String[] args) throws Exception {
-    LOGGER.info("Starting creation database script");
+    LOGGER.info("Starting database analysis script");
     SpringApplication.run(MongoAnalyzerMain.class, args);
 
     try (ApplicationInitializer applicationInitializer = new ApplicationInitializer(
@@ -62,8 +62,12 @@ public class MongoAnalyzerMain {
     final Map<String, Map<Integer, Integer>> datasetsWithDuplicates = new HashMap<>();
     final List<String> fieldListsToCheck = Arrays.stream(RecordListFields.values())
         .map(RecordListFields::getFieldName).collect(Collectors.toList());
-    // TODO: 01/10/2020 Check collections for Aggregation and EuropeanaAggregation WebResources lists
+    final List<String> webResourcesField = Collections.singletonList("webResources");
     computeDuplicatesCounters(datasetsWithDuplicates, "record", "", fieldListsToCheck);
+    computeDuplicatesCounters(datasetsWithDuplicates, "Aggregation", "/aggregation/provider",
+        webResourcesField);
+    computeDuplicatesCounters(datasetsWithDuplicates, "EuropeanaAggregation",
+        "/aggregation/europeana", webResourcesField);
     LOGGER.info("");
   }
 
@@ -72,8 +76,8 @@ public class MongoAnalyzerMain {
       String aboutPrefix, List<String> fieldListsToCheck) {
     final Document query = new Document("about", "/2022608/AFM_AFM_W169342");
     long counter = 0;
-    try (MongoCursor<Document> cursor = datastore.getDatabase().getCollection(collection)
-        .find(query).cursor()) {
+    try (MongoCursor<Document> cursor = datastore.getDatabase().getCollection(collection).find()
+        .cursor()) {
       LOGGER.info("Checking collection {}", collection);
       while (cursor.hasNext()) {
         final Document doc = cursor.next();
@@ -94,14 +98,14 @@ public class MongoAnalyzerMain {
         });
         counter++;
         if (counter % COUNTER_CHECKPOINT == 0 && LOGGER.isInfoEnabled()) {
-          LOGGER.info("Checked {} records from record {}", counter, collection);
-          LOGGER.info(datasetsWithDuplicates.toString());
+          LOGGER.info("Checked {} records from collection {}", counter, collection);
+          duplicatesCountersLog(datasetsWithDuplicates);
         }
       }
     }
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Finished check of {}", collection);
-      LOGGER.info(datasetsWithDuplicates.toString());
+      LOGGER.info("Finished check of {}, results:", collection);
+      duplicatesCountersLog(datasetsWithDuplicates);
     }
   }
 
@@ -122,7 +126,19 @@ public class MongoAnalyzerMain {
     duplicates.values()
         .forEach(v -> duplicatesCounters.compute(v, (k, counter) -> (counter == null) ? 1 : v + 1));
     return duplicatesCounters;
-
   }
 
+  private static void duplicatesCountersLog(
+      final Map<String, Map<Integer, Integer>> datasetsWithDuplicates) {
+    if (!datasetsWithDuplicates.isEmpty()) {
+      LOGGER.info("==============================================================");
+      LOGGER.info("Duplicate Counters Per Dataset:");
+      datasetsWithDuplicates.forEach((key, value) -> {
+        LOGGER.info("DatasetId -> {}:", key);
+        value.forEach((countersKey, countersValue) -> LOGGER
+            .info("References of duplicates {} - Quantity {}", countersKey, countersValue));
+      });
+      LOGGER.info("==============================================================");
+    }
+  }
 }
