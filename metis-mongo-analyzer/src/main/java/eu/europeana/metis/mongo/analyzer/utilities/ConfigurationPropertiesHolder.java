@@ -23,7 +23,10 @@ import org.springframework.context.annotation.PropertySources;
 })
 //@formatter:on
 public class ConfigurationPropertiesHolder {
+
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("ANALYSIS_LOGS");
+  public static final Marker ERROR_LOGS_MARKER = MarkerFactory.getMarker("ERROR_LOGS");
+
 
   @Value("${truststore.path}")
   public String truststorePath;
@@ -55,6 +58,9 @@ public class ConfigurationPropertiesHolder {
   public String mongoDb;
   @Value("${log.counter.checkpoint}")
   public long logCounterCheckpoint;
+
+  @Value("${test.query.about}")
+  public String testQueryAbout;
 
   public MongoProperties<IllegalArgumentException> getMongoProperties() {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
@@ -122,5 +128,9 @@ public class ConfigurationPropertiesHolder {
 
   public long getLogCounterCheckpoint() {
     return logCounterCheckpoint;
+  }
+
+  public String getTestQueryAbout() {
+    return testQueryAbout;
   }
 }

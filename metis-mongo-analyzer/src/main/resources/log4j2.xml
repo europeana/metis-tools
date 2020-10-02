@@ -9,11 +9,17 @@
       <MarkerFilter marker="ANALYSIS_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%m%n" />
     </File>
+    <File name="ErrorLogs"
+      fileName="error-${date:yyyy-MM-dd-HHmmss}.log">
+      <MarkerFilter marker="ERROR_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="%m%n" />
+    </File>
   </Appenders>
   <Loggers>
     <Root level="INFO">
       <AppenderRef ref="Console"/>
       <AppenderRef ref="AnalysisLogs"/>
+      <AppenderRef ref="ErrorLogs"/>
     </Root>
   </Loggers>
 </Configuration>
