@@ -7,6 +7,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
+import eu.europeana.metis.mongo.analyzer.model.DatasetAnalysis;
 import eu.europeana.metis.mongo.analyzer.utilities.RecordListFields;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -25,7 +26,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.bson.Document;
@@ -55,7 +58,7 @@ public class Analyzer {
     this.testQuery = StringUtils.isBlank(testQuery) ? null : new Document(ABOUT_FIELD, testQuery);
   }
 
-  void analyze() throws IOException {
+  void analyze() {
     final List<String> fieldListsToCheck = Arrays.stream(RecordListFields.values())
         .map(RecordListFields::getFieldName).collect(Collectors.toList());
     final List<String> webResourcesField = Collections.singletonList("webResources");
@@ -67,39 +70,30 @@ public class Analyzer {
   }
 
   private void computeDuplicatesCounters(String collection, String aboutPrefix,
-      List<String> fieldListsToCheck) throws IOException {
-    final Map<String, Map<Integer, Integer>> datasetsWithDuplicates = new HashMap<>();
-    Long unexpectedAboutValueCounter = 0L;
+      List<String> fieldListsToCheck) {
+    final Map<String, DatasetAnalysis> datasetIdAndDatasetAnalysis = new HashMap<>();
+    final AtomicLong unexpectedAboutValueCounter = new AtomicLong(0);
     long wrongAboutValueCounter = 0;
     long counter = 0;
+    //Create find query
     final FindIterable<Document> findIterable = Optional.ofNullable(testQuery)
         .map(query -> new Document(ABOUT_FIELD, aboutPrefix + query.get(ABOUT_FIELD)))
         .map(datastore.getDatabase().getCollection(collection)::find)
         .orElseGet(datastore.getDatabase().getCollection(collection)::find);
+
     try (MongoCursor<Document> cursor = findIterable.cursor()) {
       LOGGER.info("Analysing collection {}", collection);
       while (cursor.hasNext()) {
-        final Document doc = cursor.next();
+        final Document document = cursor.next();
 
-        final String about = (String) doc.get(ABOUT_FIELD);
+        final String about = (String) document.get(ABOUT_FIELD);
         final String datasetId;
         datasetId = getDatasetId(aboutPrefix, about, unexpectedAboutValueCounter);
         if (datasetId == null) {
           wrongAboutValueCounter++;
           continue;
         }
-        final List<List<DBRef>> lists = fieldListsToCheck.stream().map(doc::get)
-            .filter(Objects::nonNull).map(o -> (List<DBRef>) o).collect(Collectors.toList());
-
-        lists.forEach(list -> {
-          final Map<DBRef, Integer> duplicates = findDuplicates(list);
-          if (!duplicates.isEmpty()) {
-            final Map<Integer, Integer> duplicatesCounters = Optional
-                .ofNullable(datasetsWithDuplicates.get(datasetId)).orElseGet(HashMap::new);
-            datasetsWithDuplicates
-                .put(datasetId, updateDuplicatesCounters(duplicates, duplicatesCounters));
-          }
-        });
+        analyzeDocument(fieldListsToCheck, datasetIdAndDatasetAnalysis, document, datasetId);
         counter++;
         if (counter % counterCheckpoint == 0 && LOGGER.isInfoEnabled()) {
           LOGGER.info("Analysed {} records from collection {}", counter, collection);
@@ -107,20 +101,45 @@ public class Analyzer {
       }
     }
     if (LOGGER.isInfoEnabled()) {
-      duplicatesCountersLog(datasetsWithDuplicates, unexpectedAboutValueCounter,
+      createAnalysisReportLog(datasetIdAndDatasetAnalysis, unexpectedAboutValueCounter.get(),
           wrongAboutValueCounter, collection);
     }
   }
 
-  private String getDatasetId(String aboutPrefix, String about, Long unexpectedAboutValueCounter) {
+  private void analyzeDocument(List<String> fieldListsToCheck,
+      Map<String, DatasetAnalysis> datasetIdAndDatasetAnalysis, Document document,
+      String datasetId) {
+    final List<List<DBRef>> lists = fieldListsToCheck.stream().map(document::get)
+        .filter(Objects::nonNull).map(o -> (List<DBRef>) o).collect(Collectors.toList());
+
+    AtomicBoolean containsDuplicates = new AtomicBoolean(false);
+    lists.forEach(list -> {
+      final Map<DBRef, Integer> duplicates = findDuplicates(list);
+      if (!duplicates.isEmpty()) {
+        containsDuplicates.set(true);
+        datasetIdAndDatasetAnalysis.compute(datasetId,
+            (k, v) -> (v == null) ? updateDuplicatesCounters(duplicates, new DatasetAnalysis(k))
+                : updateDuplicatesCounters(duplicates, v));
+      }
+    });
+    if (containsDuplicates.get()) {
+      datasetIdAndDatasetAnalysis.get(datasetId).incrementTotalRecordsWithDuplicates();
+    }
+  }
+
+  private String getDatasetId(String aboutPrefix, String about,
+      AtomicLong unexpectedAboutValueCounter) {
     final String datasetId;
     try {
       if (about.startsWith(aboutPrefix)) {
         datasetId = about.substring(aboutPrefix.length() + 1, about.lastIndexOf("/"));
       } else {
         //Fallback to record about prefix
-        unexpectedAboutValueCounter++;
+        unexpectedAboutValueCounter.incrementAndGet();
         datasetId = about.substring(RECORD_ABOUT_PREFIX.length() + 1, about.lastIndexOf("/"));
+        LOGGER.warn(ERROR_LOGS_MARKER,
+            "(provided prefix \"{}\")Unexpected about structure, about value: {}", aboutPrefix,
+            about);
       }
     } catch (StringIndexOutOfBoundsException e) {
       LOGGER.warn(ERROR_LOGS_MARKER,
@@ -142,43 +161,51 @@ public class Analyzer {
     return duplicates;
   }
 
-  private <T> Map<Integer, Integer> updateDuplicatesCounters(Map<T, Integer> duplicates,
-      Map<Integer, Integer> duplicatesCounters) {
-    duplicates.values()
-        .forEach(v -> duplicatesCounters.compute(v, (k, counter) -> (counter == null) ? 1 : v + 1));
-    return duplicatesCounters;
+  private <T> DatasetAnalysis updateDuplicatesCounters(Map<T, Integer> duplicates,
+      DatasetAnalysis datasetAnalysis) {
+    duplicates.values().forEach(v -> datasetAnalysis.getDuplicatesAndQuantity()
+        .compute(v, (k, counter) -> (counter == null) ? 1 : counter + 1));
+    return datasetAnalysis;
   }
 
-  private void duplicatesCountersLog(
-      final Map<String, Map<Integer, Integer>> datasetsWithDuplicates,
-      Long unexpectedAboutValueCounter, long wrongAboutValueCounter, String collection)
-      throws IOException {
+  private void createAnalysisReportLog(final Map<String, DatasetAnalysis> datasetsWithDuplicates,
+      Long unexpectedAboutValueCounter, long wrongAboutValueCounter, String collection) {
     final StringBuilder analysisReport = new StringBuilder();
     analysisReport.append(String.format("Analysis of collection %s%n", collection));
     final AtomicInteger totalDuplicates = new AtomicInteger();
-    datasetsWithDuplicates.forEach((key, value) -> value
-        .forEach((countersKey, countersValue) -> totalDuplicates.addAndGet(countersValue)));
-    analysisReport
-        .append(String.format("==============================================================%n"));
-    analysisReport
-        .append(String.format("Unexpected about values total: %s%n", unexpectedAboutValueCounter));
+    final AtomicInteger totalRecordsWithDuplicates = new AtomicInteger();
+    //Calculate totals
+    datasetsWithDuplicates.forEach((key, value) -> {
+      value.getDuplicatesAndQuantity()
+          .forEach((countersKey, countersValue) -> totalDuplicates.addAndGet(countersValue));
+      totalRecordsWithDuplicates.addAndGet(value.getTotalRecordsWithDuplicates());
+    });
+
+    //Create Report
+    //@formatter:off
+    analysisReport.append(String.format("==============================================================%n"));
+    analysisReport.append(String.format("Unexpected about values total: %s%n", unexpectedAboutValueCounter));
     analysisReport.append(String.format("Wrong about values total: %s%n", wrongAboutValueCounter));
+    analysisReport.append(String.format("Records with duplicates total: %s%n", totalRecordsWithDuplicates.get()));
     analysisReport.append(String.format("Duplicate counters total: %s%n", totalDuplicates.get()));
     analysisReport.append(String.format("Duplicate counters per dataset:%n"));
+    //Per dataset duplicates report
     datasetsWithDuplicates.forEach((key, value) -> {
       analysisReport.append(String.format("DatasetId -> %s:%n", key));
-      value.forEach((countersKey, countersValue) -> analysisReport.append(String
-          .format("References of duplicates %s - Quantity %s%n", countersKey, countersValue)));
+      value.getDuplicatesAndQuantity().forEach((countersKey, countersValue) -> analysisReport
+          .append(String
+              .format("References of duplicates %s - Quantity %s%n", countersKey, countersValue)));
     });
-    analysisReport
-        .append(String.format("==============================================================%n"));
+    analysisReport.append(String.format("==============================================================%n"));
 
-    try (FileWriter fw = new FileWriter(analysisFilePath.toFile(),
-        true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+    try (FileWriter fw = new FileWriter(analysisFilePath.toFile(), true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        PrintWriter out = new PrintWriter(bw)) {
       out.println(analysisReport.toString());
     } catch (IOException e) {
       LOGGER.warn("Exception occurred while writing report to file", e);
     }
+    //@formatter:on
   }
 
 }
