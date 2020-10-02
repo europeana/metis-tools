@@ -1,9 +1,12 @@
 package eu.europeana.metis.mongo.analyzer.utilities;
 
 import eu.europeana.metis.mongo.MongoProperties;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
 /**
  * Contains all properties that are required for execution.
@@ -13,8 +16,14 @@ import org.springframework.context.annotation.PropertySource;
  * @since 2020-10-01
  */
 @Configuration
-@PropertySource({"classpath:application.properties"})
+//@formatter:off
+@PropertySources({
+    @PropertySource(value = "file:application.properties", ignoreResourceNotFound = true),
+    @PropertySource("classpath:application.properties")
+})
+//@formatter:on
 public class ConfigurationPropertiesHolder {
+  public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("ANALYSIS_LOGS");
 
   @Value("${truststore.path}")
   public String truststorePath;

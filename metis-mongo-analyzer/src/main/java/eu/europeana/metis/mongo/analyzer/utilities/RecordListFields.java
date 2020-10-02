@@ -11,7 +11,7 @@ public enum RecordListFields {
   CONCEPTS("concepts"),
   AGGREGATIONS("aggregations"),
   PROVIDEDCHOS("providedCHOs");
-  //@formatter:off
+  //@formatter:on
 
   private String fieldName;
 

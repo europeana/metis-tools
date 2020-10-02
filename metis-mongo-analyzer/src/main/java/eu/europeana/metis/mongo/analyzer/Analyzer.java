@@ -1,5 +1,7 @@
 package eu.europeana.metis.mongo.analyzer;
 
+import static eu.europeana.metis.mongo.analyzer.utilities.ConfigurationPropertiesHolder.STATISTICS_LOGS_MARKER;
+
 import com.mongodb.DBRef;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -42,12 +45,11 @@ public class Analyzer {
     final List<String> fieldListsToCheck = Arrays.stream(RecordListFields.values())
         .map(RecordListFields::getFieldName).collect(Collectors.toList());
     final List<String> webResourcesField = Collections.singletonList("webResources");
-    computeDuplicatesCounters(datasetsWithDuplicates, "record", "", fieldListsToCheck);
-    computeDuplicatesCounters(datasetsWithDuplicates, "Aggregation", AGGREGATION_ABOUT_PREFIX,
-        webResourcesField);
+//    computeDuplicatesCounters(datasetsWithDuplicates, "record", "", fieldListsToCheck);
+//    computeDuplicatesCounters(datasetsWithDuplicates, "Aggregation", AGGREGATION_ABOUT_PREFIX,
+//        webResourcesField);
     computeDuplicatesCounters(datasetsWithDuplicates, "EuropeanaAggregation",
         EUROPEANA_AGGREGATION_ABOUT_PREFIX, webResourcesField);
-    LOGGER.info("");
   }
 
   private void computeDuplicatesCounters(Map<String, Map<Integer, Integer>> datasetsWithDuplicates,
@@ -79,13 +81,11 @@ public class Analyzer {
         counter++;
         if (counter % counterCheckpoint == 0 && LOGGER.isInfoEnabled()) {
           LOGGER.info("Analysed {} records from collection {}", counter, collection);
-          duplicatesCountersLog(datasetsWithDuplicates);
         }
       }
     }
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Analysing checking collection {}", collection);
-      duplicatesCountersLog(datasetsWithDuplicates);
+      duplicatesCountersLog(datasetsWithDuplicates, collection);
     }
   }
 
@@ -109,16 +109,24 @@ public class Analyzer {
   }
 
   private void duplicatesCountersLog(
-      final Map<String, Map<Integer, Integer>> datasetsWithDuplicates) {
+      final Map<String, Map<Integer, Integer>> datasetsWithDuplicates, String collection) {
     if (!datasetsWithDuplicates.isEmpty()) {
-      LOGGER.info("==============================================================");
-      LOGGER.info("Duplicate Counters Per Dataset:");
+      LOGGER.info(STATISTICS_LOGS_MARKER, "Analysis of collection {}", collection);
+      final AtomicInteger totalDuplicates = new AtomicInteger();
+      datasetsWithDuplicates.forEach((key, value) -> value
+          .forEach((countersKey, countersValue) -> totalDuplicates.addAndGet(countersValue)));
+      LOGGER.info(STATISTICS_LOGS_MARKER,
+          "==============================================================");
+      LOGGER.info(STATISTICS_LOGS_MARKER, "Duplicate Counters Total: {}", totalDuplicates.get());
+      LOGGER.info(STATISTICS_LOGS_MARKER, "Duplicate Counters Per Dataset:");
       datasetsWithDuplicates.forEach((key, value) -> {
-        LOGGER.info("DatasetId -> {}:", key);
+        LOGGER.info(STATISTICS_LOGS_MARKER, "DatasetId -> {}:", key);
         value.forEach((countersKey, countersValue) -> LOGGER
-            .info("References of duplicates {} - Quantity {}", countersKey, countersValue));
+            .info(STATISTICS_LOGS_MARKER, "References of duplicates {} - Quantity {}", countersKey,
+                countersValue));
       });
-      LOGGER.info("==============================================================");
+      LOGGER.info(STATISTICS_LOGS_MARKER,
+          "==============================================================");
     }
   }
 
