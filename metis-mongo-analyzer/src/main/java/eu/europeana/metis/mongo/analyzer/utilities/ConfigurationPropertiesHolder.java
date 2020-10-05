@@ -1,6 +1,7 @@
 package eu.europeana.metis.mongo.analyzer.utilities;
 
 import eu.europeana.metis.mongo.MongoProperties;
+import eu.europeana.metis.mongo.analyzer.model.Mode;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +28,9 @@ public class ConfigurationPropertiesHolder {
   public static final Marker ERROR_LOGS_MARKER = MarkerFactory.getMarker("ERROR_LOGS");
 
   @Value("${truststore.path}")
-  public String truststorePath;
+  private String truststorePath;
   @Value("${truststore.password}")
-  public String truststorePassword;
+  private String truststorePassword;
   @Value("${socks.proxy.enabled}")
   private boolean socksProxyEnabled = false;
   @Value("${socks.proxy.host}")
@@ -41,24 +42,29 @@ public class ConfigurationPropertiesHolder {
   @Value("${socks.proxy.password}")
   private String socksProxyPassword;
   @Value("${mongo.hosts}")
-  public String[] mongoHosts;
+  private String[] mongoHosts;
   @Value("${mongo.port}")
-  public int[] mongoPorts;
+  private int[] mongoPorts;
   @Value("${mongo.authentication.db}")
-  public String mongoAuthenticationDb;
+  private String mongoAuthenticationDb;
   @Value("${mongo.username}")
-  public String mongoUsername;
+  private String mongoUsername;
   @Value("${mongo.password}")
-  public String mongoPassword;
+  private String mongoPassword;
   @Value("${mongo.enableSSL}")
-  public boolean mongoEnableSSL = false;
+  private boolean mongoEnableSSL = false;
   @Value("${mongo.db}")
-  public String mongoDb;
+  private String mongoDb;
   @Value("${log.counter.checkpoint}")
-  public long logCounterCheckpoint;
+  private long logCounterCheckpoint;
 
-  @Value("${test.query.about}")
-  public String testQueryAbout;
+  @Value("${mode}")
+  private Mode mode;
+  @Value("${record.about.to.check}")
+  private String recordAboutToCheck;
+
+  @Value("${file.path.with.corrupted.records}")
+  private String filePathWithCorruptedRecords;
 
   public MongoProperties<IllegalArgumentException> getMongoProperties() {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
@@ -128,7 +134,15 @@ public class ConfigurationPropertiesHolder {
     return logCounterCheckpoint;
   }
 
-  public String getTestQueryAbout() {
-    return testQueryAbout;
+  public Mode getMode() {
+    return mode;
+  }
+
+  public String getRecordAboutToCheck() {
+    return recordAboutToCheck;
+  }
+
+  public String getFilePathWithCorruptedRecords() {
+    return filePathWithCorruptedRecords;
   }
 }

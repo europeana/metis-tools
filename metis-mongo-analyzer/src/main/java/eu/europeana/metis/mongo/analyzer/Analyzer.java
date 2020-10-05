@@ -88,6 +88,7 @@ public class Analyzer {
         }
       }
     }
+    LOGGER.info("Analysed {} records from collection {}", counter, collection);
     if (LOGGER.isInfoEnabled()) {
       createAnalysisReportLog(datasetIdAndDatasetAnalysis, unexpectedAboutValueCounter.get(),
           wrongAboutValueCounter, collection);

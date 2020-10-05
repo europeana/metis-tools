@@ -11,7 +11,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * This class is used to analyze the mongo record database.
+ * This class is used to analyze, reconstruct or check(readability with morphia) the mongo record
+ * database.
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2020-10-01
@@ -29,18 +30,39 @@ public class MongoAnalyzerMain {
   }
 
   public static void main(String[] args) throws Exception {
-    LOGGER.info("Starting database analysis script");
     SpringApplication.run(MongoAnalyzerMain.class, args);
+    LOGGER.info("Starting database script with mode: {}", configurationPropertiesHolder.getMode());
 
     try (ApplicationInitializer applicationInitializer = new ApplicationInitializer(
         configurationPropertiesHolder)) {
       MongoClient mongoClient = applicationInitializer.getMongoClient();
-      Datastore datastore = new EdmMongoServerImpl(mongoClient,
-          applicationInitializer.getMongoDatabase(), false).getDatastore();
-      final Analyzer analyzer = new Analyzer(datastore, configurationPropertiesHolder.getTestQueryAbout(),
-          configurationPropertiesHolder.logCounterCheckpoint);
-      analyzer.analyze();
+      final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(mongoClient,
+          applicationInitializer.getMongoDatabase(), false);
+      final Datastore datastore = edmMongoServer.getDatastore();
+      switch (configurationPropertiesHolder.getMode()) {
+        case ANALYZE:
+          final Analyzer analyzer = new Analyzer(datastore,
+              configurationPropertiesHolder.getRecordAboutToCheck(),
+              configurationPropertiesHolder.getLogCounterCheckpoint());
+          analyzer.analyze();
+          break;
+        case RECONSTRUCT:
+          final Reconstructor reconstructor = new Reconstructor(edmMongoServer,
+              configurationPropertiesHolder.getRecordAboutToCheck(),
+              configurationPropertiesHolder.getLogCounterCheckpoint(),
+              configurationPropertiesHolder.getMode(),
+              configurationPropertiesHolder.getFilePathWithCorruptedRecords());
+          reconstructor.reconstruct();
+          break;
+        case CHECK:
+          final RecordChecker recordChecker = new RecordChecker(edmMongoServer,
+              configurationPropertiesHolder.getLogCounterCheckpoint(),
+              configurationPropertiesHolder.getRecordAboutToCheck(),
+              configurationPropertiesHolder.getFilePathWithCorruptedRecords());
+          recordChecker.check();
+          break;
+      }
     }
-    LOGGER.info("Finished database analysis script");
+    LOGGER.info("Finished database script with mode: {}", configurationPropertiesHolder.getMode());
   }
 }
