@@ -13,6 +13,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * This class is used to analyze, reconstruct or check(readability with morphia) the mongo record
  * database.
+ * <p>
+ * Mode options see {@link eu.europeana.metis.mongo.analyzer.model.Mode})
+ * <ul>
+ *   <li>Analyse a specific record or the whole database</li>
+ *   <li>Check if a specific record or a list of records can be read using morphia and {@link EdmMongoServerImpl}</li>
+ *   <li>Reconstruct affected fields from a specific record or a list of records</li>
+ * </ul>
+ * </p>
+ *
+ * </p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2020-10-01

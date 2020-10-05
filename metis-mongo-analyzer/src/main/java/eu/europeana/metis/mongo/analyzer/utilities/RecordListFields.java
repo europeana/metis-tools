@@ -1,5 +1,8 @@
 package eu.europeana.metis.mongo.analyzer.utilities;
 
+/**
+ * List fields with {@link dev.morphia.annotations.Reference}s in the record database.
+ */
 public enum RecordListFields {
   //@formatter:off
   PROXIES("proxies"),

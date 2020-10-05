@@ -1,9 +1,9 @@
 package eu.europeana.metis.mongo.analyzer.model;
 
 public class DatasetIdMetadata {
-  private String datasetId;
-  private String about;
-  private AboutState aboutState;
+  private final String datasetId;
+  private final String about;
+  private final AboutState aboutState;
 
   public DatasetIdMetadata(String datasetId, String about, AboutState aboutState) {
     this.datasetId = datasetId;

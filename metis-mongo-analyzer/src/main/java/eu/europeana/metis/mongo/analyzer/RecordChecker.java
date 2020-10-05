@@ -12,6 +12,10 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Checks whether a specific record or a list of records are readable by using morphia and {@link
+ * EdmMongoServerImpl}
+ */
 public class RecordChecker {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RecordChecker.class);
@@ -20,8 +24,8 @@ public class RecordChecker {
   private final String recordAboutToCheck;
   private final Path pathWithCorruptedRecords;
 
-  public RecordChecker(EdmMongoServerImpl edmMongoServer, long counterCheckpoint, @Nullable String recordAboutToCheck,
-      String filePathWithCorruptedRecords) {
+  public RecordChecker(EdmMongoServerImpl edmMongoServer, long counterCheckpoint,
+      @Nullable String recordAboutToCheck, String filePathWithCorruptedRecords) {
     this.edmMongoServer = edmMongoServer;
     this.counterCheckpoint = counterCheckpoint;
     this.pathWithCorruptedRecords = Paths.get(filePathWithCorruptedRecords);
@@ -42,7 +46,7 @@ public class RecordChecker {
   private void checkReadOfCorruptedRecord(EdmMongoServerImpl edmMongoServer,
       List<String> recordAbouts) {
     int counterFailures = 0;
-    int counter =0;
+    int counter = 0;
     for (String about : recordAbouts) {
       try {
         edmMongoServer.getFullBean(about);

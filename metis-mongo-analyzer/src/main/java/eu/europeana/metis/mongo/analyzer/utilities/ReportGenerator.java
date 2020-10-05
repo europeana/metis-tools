@@ -17,6 +17,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Generates report to files, with data provided.
+ */
 public class ReportGenerator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReportGenerator.class);
@@ -42,7 +45,8 @@ public class ReportGenerator {
   public static void writeToFile(Path path, String text) {
     if (StringUtils.isNotBlank(text)) {
       final Path writePath = Path.of(REPORT_DIRECTORY.toString(), path.toString());
-      try (FileWriter fw = new FileWriter(writePath.toFile(), true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(
+      try (FileWriter fw = new FileWriter(writePath.toFile(),
+          true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(
           bw)) {
         out.println(text);
       } catch (IOException e) {
@@ -51,8 +55,7 @@ public class ReportGenerator {
     }
   }
 
-  public static void createAnalysisReport(
-      final Map<String, DatasetAnalysis> datasetsWithDuplicates,
+  public static void createAnalysisReport(final Map<String, DatasetAnalysis> datasetsWithDuplicates,
       List<String> missingPrefixAbouts, List<String> unparsableAbouts, String collection) {
     final StringBuilder analysisReport = new StringBuilder();
     analysisReport.append(String.format("Analysis of collection %s%n", collection));

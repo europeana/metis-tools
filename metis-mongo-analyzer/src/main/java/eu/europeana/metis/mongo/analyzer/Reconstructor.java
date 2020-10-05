@@ -20,6 +20,9 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Recostruct a specific record or a list of records provided.
+ */
 public class Reconstructor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Reconstructor.class);

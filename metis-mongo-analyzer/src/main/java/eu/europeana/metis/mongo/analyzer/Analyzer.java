@@ -28,6 +28,9 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Analyzer to analyse a record or a whole database.
+ */
 public class Analyzer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Analyzer.class);

@@ -33,15 +33,16 @@ public class ApplicationInitializer implements AutoCloseable {
       throws TrustStoreConfigurationException {
 
     // Load the trust store file.
-    LOGGER.info("Append default truststore with custom truststore");
     if (StringUtils.isNotEmpty(propertiesHolder.getTruststorePath()) && StringUtils
         .isNotEmpty(propertiesHolder.getTruststorePassword())) {
+      LOGGER.info("Append default truststore with custom truststore");
       CustomTruststoreAppender.appendCustomTrustoreToDefault(propertiesHolder.getTruststorePath(),
           propertiesHolder.getTruststorePassword());
     }
 
     // Initialize the socks proxy.
     if (propertiesHolder.isSocksProxyEnabled()) {
+      LOGGER.info("Enable socks proxy for the application");
       System.setProperty("socksProxyHost", propertiesHolder.getSocksProxyHost());
       System.setProperty("socksProxyPort", propertiesHolder.getSocksProxyPort());
       Authenticator.setDefault(new Authenticator() {
