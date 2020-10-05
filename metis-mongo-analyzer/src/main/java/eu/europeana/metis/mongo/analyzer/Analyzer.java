@@ -1,15 +1,17 @@
 package eu.europeana.metis.mongo.analyzer;
 
-import static eu.europeana.metis.mongo.analyzer.utilities.ConfigurationPropertiesHolder.ERROR_LOGS_MARKER;
-import static eu.europeana.metis.mongo.analyzer.utilities.ReportGenerator.createAnalysisReportLog;
+import static eu.europeana.metis.mongo.analyzer.utilities.ReportGenerator.createAnalysisReport;
 
 import com.mongodb.DBRef;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
+import eu.europeana.metis.mongo.analyzer.model.AboutState;
 import eu.europeana.metis.mongo.analyzer.model.DatasetAnalysis;
+import eu.europeana.metis.mongo.analyzer.model.DatasetIdMetadata;
 import eu.europeana.metis.mongo.analyzer.utilities.RecordListFields;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,7 +22,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.bson.Document;
@@ -33,17 +34,17 @@ public class Analyzer {
 
   private final Datastore datastore;
   private final long counterCheckpoint;
-  private final Document testQuery;
+  private final String recordAboutToCheck;
   private static final String ABOUT_FIELD = "about";
   private static final String RECORD_ABOUT_PREFIX = "";
   private static final String AGGREGATION_ABOUT_PREFIX = "/aggregation/provider";
   private static final String EUROPEANA_AGGREGATION_ABOUT_PREFIX = "/aggregation/europeana";
 
-  public Analyzer(final Datastore datastore, @Nullable String testQuery,
+  public Analyzer(final Datastore datastore, @Nullable String recordAboutToCheck,
       final long counterCheckpoint) {
     this.datastore = datastore;
     this.counterCheckpoint = counterCheckpoint;
-    this.testQuery = StringUtils.isBlank(testQuery) ? null : new Document(ABOUT_FIELD, testQuery);
+    this.recordAboutToCheck = recordAboutToCheck;
   }
 
   void analyze() {
@@ -60,27 +61,31 @@ public class Analyzer {
   private void computeDuplicatesCounters(String collection, String aboutPrefix,
       List<String> fieldListsToCheck) {
     final Map<String, DatasetAnalysis> datasetIdAndDatasetAnalysis = new HashMap<>();
-    final AtomicLong unexpectedAboutValueCounter = new AtomicLong(0);
-    long wrongAboutValueCounter = 0;
-    long counter = 0;
     //Create find query
-    final FindIterable<Document> findIterable = Optional.ofNullable(testQuery)
-        .map(query -> new Document(ABOUT_FIELD, aboutPrefix + query.get(ABOUT_FIELD)))
+    final FindIterable<Document> findIterable = Optional.ofNullable(recordAboutToCheck)
+        .filter(StringUtils::isNotBlank)
+        .map(about -> new Document(ABOUT_FIELD, aboutPrefix + about))
         .map(datastore.getDatabase().getCollection(collection)::find)
         .orElseGet(datastore.getDatabase().getCollection(collection)::find);
 
+    long counter = 0;
+    List<String> missingPrefixAbouts = new ArrayList<>();
+    List<String> unparsableAbouts = new ArrayList<>();
     try (MongoCursor<Document> cursor = findIterable.cursor()) {
       LOGGER.info("Analysing collection {}", collection);
       while (cursor.hasNext()) {
         final Document document = cursor.next();
 
         final String about = (String) document.get(ABOUT_FIELD);
-        final String datasetId;
-        datasetId = getDatasetId(aboutPrefix, about, unexpectedAboutValueCounter);
-        if (datasetId == null) {
-          wrongAboutValueCounter++;
+        final DatasetIdMetadata datasetIdMetadata;
+        datasetIdMetadata = getDatasetIdMetadata(aboutPrefix, about);
+        if (datasetIdMetadata.getAboutState() == AboutState.UNPARSABLE) {
+          unparsableAbouts.add(about);
+        } else if (datasetIdMetadata.getAboutState() == AboutState.MISSING_PREFIX) {
+          missingPrefixAbouts.add(about);
         } else {
-          analyzeDocument(fieldListsToCheck, datasetIdAndDatasetAnalysis, document, datasetId);
+          analyzeDocument(fieldListsToCheck, datasetIdAndDatasetAnalysis, document,
+              datasetIdMetadata.getDatasetId());
         }
         counter++;
         if (counter % counterCheckpoint == 0 && LOGGER.isInfoEnabled()) {
@@ -90,8 +95,8 @@ public class Analyzer {
     }
     LOGGER.info("Analysed {} records from collection {}", counter, collection);
     if (LOGGER.isInfoEnabled()) {
-      createAnalysisReportLog(datasetIdAndDatasetAnalysis, unexpectedAboutValueCounter.get(),
-          wrongAboutValueCounter, collection);
+      createAnalysisReport(datasetIdAndDatasetAnalysis, missingPrefixAbouts, unparsableAbouts,
+          collection);
     }
   }
 
@@ -117,26 +122,25 @@ public class Analyzer {
     }
   }
 
-  private String getDatasetId(String aboutPrefix, String about,
-      AtomicLong unexpectedAboutValueCounter) {
-    final String datasetId;
+  private DatasetIdMetadata getDatasetIdMetadata(String aboutPrefix, String about) {
+    String datasetId = null;
+    AboutState aboutState = AboutState.CORRECT;
     try {
       if (about.startsWith(aboutPrefix)) {
         datasetId = about.substring(aboutPrefix.length() + 1, about.lastIndexOf("/"));
       } else {
         //Fallback to record about prefix
-        unexpectedAboutValueCounter.incrementAndGet();
         datasetId = about.substring(RECORD_ABOUT_PREFIX.length() + 1, about.lastIndexOf("/"));
-        LOGGER.warn(ERROR_LOGS_MARKER,
-            "(provided prefix \"{}\")Unexpected about structure, about value: {}", aboutPrefix,
-            about);
+        aboutState = AboutState.MISSING_PREFIX;
+        LOGGER.debug("(provided prefix \"{}\")Unexpected about structure, about value: {}",
+            aboutPrefix, about);
       }
     } catch (StringIndexOutOfBoundsException e) {
-      LOGGER.warn(ERROR_LOGS_MARKER,
-          "(provided prefix \"{}\")Could not parse datasetId from about: {}", aboutPrefix, about);
-      return null;
+      aboutState = AboutState.UNPARSABLE;
+      LOGGER.debug("(provided prefix \"{}\")Could not parse datasetId from about: {}", aboutPrefix,
+          about);
     }
-    return datasetId;
+    return new DatasetIdMetadata(datasetId, about, aboutState);
   }
 
   private <T> Map<T, Integer> findDuplicates(List<T> listWithDuplicates) {

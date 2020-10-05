@@ -47,13 +47,14 @@ public class RecordChecker {
       try {
         edmMongoServer.getFullBean(about);
       } catch (EuropeanaException e) {
-        LOGGER.warn("Cannot read record with about {}", about);
+        LOGGER.debug("Cannot read record with about {}", about);
         counterFailures++;
       }
 
       counter++;
       if (counter % counterCheckpoint == 0 && LOGGER.isInfoEnabled()) {
         LOGGER.info("Reconstructed {} records from collection {}", counter, "record");
+        LOGGER.info("Unsuccessful read(s): {}", counterFailures);
       }
     }
     LOGGER.info("Checked {} records from collection {}", counter, "record");

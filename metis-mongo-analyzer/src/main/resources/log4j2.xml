@@ -4,16 +4,10 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
     </Console>
-    <File name="ErrorLogs"
-      fileName="log/error-${date:yyyy-MM-dd-HHmmss}.log">
-      <MarkerFilter marker="ERROR_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
-      <PatternLayout pattern="%m%n"/>
-    </File>
   </Appenders>
   <Loggers>
     <Root level="INFO">
       <AppenderRef ref="Console"/>
-      <AppenderRef ref="ErrorLogs"/>
     </Root>
   </Loggers>
 </Configuration>

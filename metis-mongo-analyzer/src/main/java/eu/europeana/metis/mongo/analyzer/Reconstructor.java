@@ -6,8 +6,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
-import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
-import eu.europeana.metis.mongo.analyzer.model.Mode;
 import eu.europeana.metis.mongo.analyzer.utilities.RecordListFields;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,19 +24,17 @@ public class Reconstructor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Reconstructor.class);
 
-  private final EdmMongoServerImpl edmMongoServer;
+  private final Datastore datastore;
   private final long counterCheckpoint;
   private final String recordAboutToCheck;
-  private final Mode mode;
   private static final String ABOUT_FIELD = "about";
   private final Path pathWithCorruptedRecords;
 
-  public Reconstructor(EdmMongoServerImpl edmMongoServer, @Nullable String recordAboutToCheck,
-      final long counterCheckpoint, final Mode mode, String filePathWithCorruptedRecords) {
-    this.edmMongoServer = edmMongoServer;
+  public Reconstructor(Datastore datastore, @Nullable String recordAboutToCheck,
+      final long counterCheckpoint, String filePathWithCorruptedRecords) {
+    this.datastore = datastore;
     this.counterCheckpoint = counterCheckpoint;
     this.recordAboutToCheck = recordAboutToCheck;
-    this.mode = mode;
     this.pathWithCorruptedRecords = Paths.get(filePathWithCorruptedRecords);
   }
 
@@ -50,12 +46,9 @@ public class Reconstructor {
     } else {
       recordAbouts = List.of(recordAboutToCheck);
     }
-    if (mode == Mode.RECONSTRUCT) {
-      final Datastore datastore = edmMongoServer.getDatastore();
-      final List<String> fieldListsToCheck = Arrays.stream(RecordListFields.values())
-          .map(RecordListFields::getFieldName).collect(Collectors.toList());
-      reconstructRecords(datastore, "record", recordAbouts, fieldListsToCheck);
-    }
+    final List<String> fieldListsToCheck = Arrays.stream(RecordListFields.values())
+        .map(RecordListFields::getFieldName).collect(Collectors.toList());
+    reconstructRecords(datastore, "record", recordAbouts, fieldListsToCheck);
   }
 
   private void reconstructRecords(Datastore datastore, String collection, List<String> recordAbouts,

@@ -2,8 +2,6 @@ package eu.europeana.metis.mongo.analyzer.utilities;
 
 import eu.europeana.metis.mongo.MongoProperties;
 import eu.europeana.metis.mongo.analyzer.model.Mode;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -24,8 +22,6 @@ import org.springframework.context.annotation.PropertySources;
 })
 //@formatter:on
 public class ConfigurationPropertiesHolder {
-
-  public static final Marker ERROR_LOGS_MARKER = MarkerFactory.getMarker("ERROR_LOGS");
 
   @Value("${truststore.path}")
   private String truststorePath;

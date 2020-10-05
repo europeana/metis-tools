@@ -40,17 +40,16 @@ public class MongoAnalyzerMain {
           applicationInitializer.getMongoDatabase(), false);
       final Datastore datastore = edmMongoServer.getDatastore();
       switch (configurationPropertiesHolder.getMode()) {
-        case ANALYZE:
+        case ANALYSE:
           final Analyzer analyzer = new Analyzer(datastore,
               configurationPropertiesHolder.getRecordAboutToCheck(),
               configurationPropertiesHolder.getLogCounterCheckpoint());
           analyzer.analyze();
           break;
         case RECONSTRUCT:
-          final Reconstructor reconstructor = new Reconstructor(edmMongoServer,
+          final Reconstructor reconstructor = new Reconstructor(datastore,
               configurationPropertiesHolder.getRecordAboutToCheck(),
               configurationPropertiesHolder.getLogCounterCheckpoint(),
-              configurationPropertiesHolder.getMode(),
               configurationPropertiesHolder.getFilePathWithCorruptedRecords());
           reconstructor.reconstruct();
           break;

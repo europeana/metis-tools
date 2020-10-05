@@ -23,7 +23,7 @@ log.counter.checkpoint=1000
 
 #If filled in, it takes precedence over the file provided
 record.about.to.check=
-#One of ANALYZE, RECONSTRUCT, CHECK
+#One of ANALYSE, RECONSTRUCT, CHECK
 mode=
-#Only valid for RECOSTRUCT or CHECK modes
+#Only valid for RECONSTRUCT or CHECK modes
 file.path.with.corrupted.records=
