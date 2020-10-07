@@ -23,28 +23,24 @@ import org.slf4j.LoggerFactory;
 public class ReportGenerator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReportGenerator.class);
-  private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-      "yyyy-MM-dd-HHmmss");
-  private static final String REPORT_DATE = simpleDateFormat.format(new Date());
-  private static final File REPORT_DIRECTORY = new File("report-" + REPORT_DATE);
-  public static final Path ANALYSIS_FILE_PATH = Paths.get("analysisReport-" + REPORT_DATE + ".txt");
-  public static final String RECORDS_WITH_DUPLICATES_SUFFIX =
-      "recordsWithDuplicates-" + REPORT_DATE + ".txt";
-  public static final Path MISSING_PREFIX_ABOUT_FILE_PATH = Paths
-      .get("missingPrefixAbouts-" + REPORT_DATE + ".txt");
-  public static final Path UNPARSABLE_ABOUT_FILE_PATH = Paths
-      .get("unparsableAbouts-" + REPORT_DATE + ".txt");
+  private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
+  private final String reportDate = simpleDateFormat.format(new Date());
+  private final File reportDirectory = new File("report-" + reportDate);
+  private final Path analysisFilePath = Paths.get("analysisReport-" + reportDate + ".txt");
+  private final String recordsWithDuplicatesSuffix = "recordsWithDuplicates-" + reportDate + ".txt";
+  private final Path missingPrefixAboutFilePath = Paths
+      .get("missingPrefixAbouts-" + reportDate + ".txt");
+  private final Path unparsableAboutFilePath = Paths.get("unparsableAbouts-" + reportDate + ".txt");
 
-  static {
-    REPORT_DIRECTORY.mkdir();
+  public ReportGenerator() {
+    if (!reportDirectory.mkdir()) {
+      LOGGER.warn("Mkdir of {} directory failed, maybe it's already present", reportDirectory);
+    }
   }
 
-  private ReportGenerator() {
-  }
-
-  public static void writeToFile(Path path, String text) {
+  public void writeToFile(Path path, String text) {
     if (StringUtils.isNotBlank(text)) {
-      final Path writePath = Path.of(REPORT_DIRECTORY.toString(), path.toString());
+      final Path writePath = Path.of(reportDirectory.toString(), path.toString());
       try (FileWriter fw = new FileWriter(writePath.toFile(),
           true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(
           bw)) {
@@ -55,7 +51,7 @@ public class ReportGenerator {
     }
   }
 
-  public static void createAnalysisReport(final Map<String, DatasetAnalysis> datasetsWithDuplicates,
+  public void createAnalysisReport(final Map<String, DatasetAnalysis> datasetsWithDuplicates,
       List<String> missingPrefixAbouts, List<String> unparsableAbouts, String collection) {
     final StringBuilder analysisReport = new StringBuilder();
     analysisReport.append(String.format("Analysis of collection %s%n", collection));
@@ -91,15 +87,15 @@ public class ReportGenerator {
               .format("References of duplicates %s - Quantity %s%n", countersKey, countersValue)));
     });
     analysisReport.append(String.format("==============================================================%n"));
-    writeToFile(ANALYSIS_FILE_PATH, analysisReport.toString());
-    writeToFile(Paths.get(collection+ "_" + RECORDS_WITH_DUPLICATES_SUFFIX), recordAboutsLines.toString());
-    writeToFile(Paths.get(collection+ "_" + MISSING_PREFIX_ABOUT_FILE_PATH), missingPrefixAboutsLines.toString());
-    writeToFile(Paths.get(collection+ "_" + UNPARSABLE_ABOUT_FILE_PATH), unparsableAboutsLines.toString());
+    writeToFile(analysisFilePath, analysisReport.toString());
+    writeToFile(Paths.get(collection+ "_" + recordsWithDuplicatesSuffix), recordAboutsLines.toString());
+    writeToFile(Paths.get(collection+ "_" + missingPrefixAboutFilePath), missingPrefixAboutsLines.toString());
+    writeToFile(Paths.get(collection+ "_" + unparsableAboutFilePath), unparsableAboutsLines.toString());
     //@formatter:on
   }
 
-  private static void calculateTotals(DatasetAnalysis datasetAnalysis,
-      AtomicInteger totalDuplicates, AtomicInteger totalRecordsWithDuplicates) {
+  private void calculateTotals(DatasetAnalysis datasetAnalysis, AtomicInteger totalDuplicates,
+      AtomicInteger totalRecordsWithDuplicates) {
     datasetAnalysis.getDuplicatesAndQuantity()
         .forEach((countersKey, countersValue) -> totalDuplicates.addAndGet(countersValue));
     totalRecordsWithDuplicates.addAndGet(datasetAnalysis.getRecordAboutsWithDuplicates().size());

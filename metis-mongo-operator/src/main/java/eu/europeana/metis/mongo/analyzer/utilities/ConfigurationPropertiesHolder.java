@@ -5,7 +5,6 @@ import eu.europeana.metis.mongo.analyzer.model.Mode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 
 /**
  * Contains all properties that are required for execution.
@@ -15,12 +14,8 @@ import org.springframework.context.annotation.PropertySources;
  * @since 2020-10-01
  */
 @Configuration
-//@formatter:off
-@PropertySources({
-    @PropertySource(value = "file:application.properties", ignoreResourceNotFound = true),
-    @PropertySource("classpath:application.properties")
-})
-//@formatter:on
+@PropertySource(value = "file:application.properties", ignoreResourceNotFound = true)
+@PropertySource("classpath:application.properties")
 public class ConfigurationPropertiesHolder {
 
   @Value("${truststore.path}")

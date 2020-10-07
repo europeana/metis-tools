@@ -1,7 +1,5 @@
 package eu.europeana.metis.mongo.analyzer;
 
-import static eu.europeana.metis.mongo.analyzer.utilities.ReportGenerator.createAnalysisReport;
-
 import com.mongodb.DBRef;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
@@ -13,6 +11,7 @@ import eu.europeana.metis.mongo.analyzer.model.AboutState;
 import eu.europeana.metis.mongo.analyzer.model.DatasetAnalysis;
 import eu.europeana.metis.mongo.analyzer.model.DatasetIdMetadata;
 import eu.europeana.metis.mongo.analyzer.utilities.RecordListFields;
+import eu.europeana.metis.mongo.analyzer.utilities.ReportGenerator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -101,10 +100,9 @@ public class Analyzer implements Operator {
       }
     }
     LOGGER.info("Analysed {} records from collection {}", counter, collection);
-    if (LOGGER.isInfoEnabled()) {
-      createAnalysisReport(datasetIdAndDatasetAnalysis, missingPrefixAbouts, unparsableAbouts,
-          collection);
-    }
+    new ReportGenerator()
+        .createAnalysisReport(datasetIdAndDatasetAnalysis, missingPrefixAbouts, unparsableAbouts,
+            collection);
   }
 
   private void analyzeDocument(List<String> fieldListsToCheck,
