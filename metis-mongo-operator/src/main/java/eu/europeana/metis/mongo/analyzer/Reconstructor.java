@@ -1,21 +1,22 @@
 package eu.europeana.metis.mongo.analyzer;
 
+import static eu.europeana.metis.mongo.analyzer.utilities.RecordIdsHelper.getRecordIds;
+
 import com.mongodb.DBRef;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
+import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.metis.mongo.analyzer.utilities.RecordListFields;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,32 +24,29 @@ import org.slf4j.LoggerFactory;
 /**
  * Recostruct a specific record or a list of records provided.
  */
-public class Reconstructor {
+public class Reconstructor implements Operator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Reconstructor.class);
+  private static final String ABOUT_FIELD = "about";
 
   private final Datastore datastore;
   private final long counterCheckpoint;
   private final String recordAboutToCheck;
-  private static final String ABOUT_FIELD = "about";
   private final Path pathWithCorruptedRecords;
 
-  public Reconstructor(Datastore datastore, @Nullable String recordAboutToCheck,
-      final long counterCheckpoint, String filePathWithCorruptedRecords) {
-    this.datastore = datastore;
+  public Reconstructor(MongoClient mongoClient, String databaseName,
+      @Nullable String recordAboutToCheck, final long counterCheckpoint,
+      String filePathWithCorruptedRecords) {
+    final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(mongoClient, databaseName,
+        false);
+    this.datastore = edmMongoServer.getDatastore();
     this.counterCheckpoint = counterCheckpoint;
     this.recordAboutToCheck = recordAboutToCheck;
     this.pathWithCorruptedRecords = Paths.get(filePathWithCorruptedRecords);
   }
 
-  public void reconstruct() throws IOException {
-    final List<String> recordAbouts;
-    if (StringUtils.isBlank(recordAboutToCheck)) {
-      //Read all corrupted record abouts
-      recordAbouts = Files.readAllLines(pathWithCorruptedRecords);
-    } else {
-      recordAbouts = List.of(recordAboutToCheck);
-    }
+  public void operate() {
+    List<String> recordAbouts = getRecordIds(recordAboutToCheck, pathWithCorruptedRecords);
     final List<String> fieldListsToCheck = Arrays.stream(RecordListFields.values())
         .map(RecordListFields::getFieldName).collect(Collectors.toList());
     reconstructRecords(datastore, "record", recordAbouts, fieldListsToCheck);

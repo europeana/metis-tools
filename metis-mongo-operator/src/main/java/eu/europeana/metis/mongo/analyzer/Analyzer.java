@@ -4,9 +4,11 @@ import static eu.europeana.metis.mongo.analyzer.utilities.ReportGenerator.create
 
 import com.mongodb.DBRef;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
+import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.metis.mongo.analyzer.model.AboutState;
 import eu.europeana.metis.mongo.analyzer.model.DatasetAnalysis;
 import eu.europeana.metis.mongo.analyzer.model.DatasetIdMetadata;
@@ -31,26 +33,28 @@ import org.slf4j.LoggerFactory;
 /**
  * Analyzer to analyse a record or a whole database.
  */
-public class Analyzer {
+public class Analyzer implements Operator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Analyzer.class);
-
-  private final Datastore datastore;
-  private final long counterCheckpoint;
-  private final String recordAboutToCheck;
   private static final String ABOUT_FIELD = "about";
   private static final String RECORD_ABOUT_PREFIX = "";
   private static final String AGGREGATION_ABOUT_PREFIX = "/aggregation/provider";
   private static final String EUROPEANA_AGGREGATION_ABOUT_PREFIX = "/aggregation/europeana";
 
-  public Analyzer(final Datastore datastore, @Nullable String recordAboutToCheck,
-      final long counterCheckpoint) {
-    this.datastore = datastore;
+  private final Datastore datastore;
+  private final long counterCheckpoint;
+  private final String recordAboutToCheck;
+
+  public Analyzer(MongoClient mongoClient, String databaseName, @Nullable String recordAboutToCheck,
+      long counterCheckpoint) {
+    final EdmMongoServerImpl edmMongoServer = new EdmMongoServerImpl(mongoClient, databaseName,
+        false);
+    this.datastore = edmMongoServer.getDatastore();
     this.counterCheckpoint = counterCheckpoint;
     this.recordAboutToCheck = recordAboutToCheck;
   }
 
-  void analyze() {
+  public void operate() {
     final List<String> fieldListsToCheck = Arrays.stream(RecordListFields.values())
         .map(RecordListFields::getFieldName).collect(Collectors.toList());
     final List<String> webResourcesField = Collections.singletonList("webResources");
