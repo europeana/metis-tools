@@ -2,8 +2,8 @@ package eu.europeana.metis.creator.utilities;
 
 import eu.europeana.metis.mongo.MongoProperties;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 
 /**
  * Contains all properties that are required for execution.
@@ -12,8 +12,9 @@ import org.springframework.stereotype.Component;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2020-03-11
  */
-@Component
-@PropertySource({"classpath:application.properties"})
+@Configuration
+@PropertySource(value = "file:application.properties", ignoreResourceNotFound = true)
+@PropertySource("classpath:application.properties")
 public class ConfigurationPropertiesHolder {
 
   @Value("${creation.database.type}")

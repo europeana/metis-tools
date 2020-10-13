@@ -8,8 +8,8 @@ import eu.europeana.metis.mongo.RecordRedirectDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * This class is used to create databases based on configuration or initialize the creation of
@@ -18,19 +18,20 @@ import org.springframework.context.annotation.Configuration;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2020-03-11
  */
-@Configuration
-@ComponentScan
+@SpringBootApplication
 public class DatabaseCreatorMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseCreatorMain.class);
   private static ConfigurationPropertiesHolder configurationPropertiesHolder;
 
+  @SuppressWarnings("java:S3010")
   @Autowired
   public DatabaseCreatorMain(ConfigurationPropertiesHolder configurationPropertiesHolder) {
     DatabaseCreatorMain.configurationPropertiesHolder = configurationPropertiesHolder;
   }
 
   public static void main(String[] args) throws Exception {
+    SpringApplication.run(DatabaseCreatorMain.class, args);
     LOGGER.info("Starting creation database script");
 
     try (ApplicationInitializer applicationInitializer = new ApplicationInitializer(
