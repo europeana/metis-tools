@@ -1,4 +1,4 @@
-package eu.europeana.metis.creator.utilities;
+package eu.europeana.metis.enrichment.utilities;
 
 import eu.europeana.enrichment.api.external.model.LabelInfo;
 import eu.europeana.enrichment.internal.model.AbstractEnrichmentEntity;
@@ -144,22 +144,25 @@ public class EnrichmentTermUtils {
     return resources.toArray(new String[0]);
   }
 
-  private static List<LabelInfo> createLabelInfoList(
+  public static List<LabelInfo> createLabelInfoList(
       AbstractEnrichmentEntity abstractEnrichmentEntity) {
-    final Map<String, List<String>> combinedLabels = abstractEnrichmentEntity.getPrefLabel();
+    final Map<String, List<String>> combinedLabels = new HashMap<>();
     final Map<String, List<String>> prefLabel = abstractEnrichmentEntity.getPrefLabel();
     final Map<String, List<String>> altLabel = abstractEnrichmentEntity.getAltLabel();
 
-    prefLabel.forEach((key, value) -> combinedLabels.merge(key, value,
-        (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).map(String::toLowerCase).distinct()
-            .collect(Collectors.toList())));
-    altLabel.forEach((key, value) -> combinedLabels.merge(key, value,
-        (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).map(String::toLowerCase).distinct()
-            .collect(Collectors.toList())));
+    if (prefLabel != null) {
+      prefLabel.forEach((key, value) -> combinedLabels.merge(key, value,
+          (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).map(String::toLowerCase).distinct()
+              .collect(Collectors.toList())));
+    }
+    if (altLabel != null) {
+      altLabel.forEach((key, value) -> combinedLabels.merge(key, value,
+          (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).map(String::toLowerCase).distinct()
+              .collect(Collectors.toList())));
+    }
 
-    return combinedLabels.entrySet().stream().map(
-        entry -> new LabelInfo(entry.getValue(), new ArrayList<>(entry.getValue()), entry.getKey()))
-        .collect(Collectors.toList());
+    return combinedLabels.entrySet().stream()
+        .map(entry -> new LabelInfo(entry.getValue(), entry.getKey())).collect(Collectors.toList());
   }
 
 }

@@ -1,12 +1,8 @@
-package eu.europeana.metis.creator;
+package eu.europeana.metis.enrichment;
 
 import com.mongodb.client.MongoClient;
-import eu.europeana.enrichment.internal.model.EnrichmentTerm;
-import eu.europeana.enrichment.service.dao.EnrichmentDao;
-import eu.europeana.metis.creator.utilities.ConfigurationPropertiesHolder;
-import eu.europeana.metis.creator.utilities.EnrichmentTermUtils;
-import eu.europeana.metis.creator.utilities.MongoPopulator;
-import java.util.List;
+import eu.europeana.metis.enrichment.utilities.ConfigurationPropertiesHolder;
+import eu.europeana.metis.enrichment.utilities.MongoOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,15 +31,23 @@ public class EnrichmentPopulatorMain {
     SpringApplication.run(EnrichmentPopulatorMain.class, args);
     LOGGER.info("Starting population database script");
 
-    final List<EnrichmentTerm> timespansFromDocument = EnrichmentTermUtils
-        .getTimespansFromDocument(TIMESPAN_FILE_WITH_XMLS);
-
     try (ApplicationInitializer applicationInitializer = new ApplicationInitializer(
         configurationPropertiesHolder)) {
       final MongoClient mongoClient = applicationInitializer.getMongoClient();
-      final EnrichmentDao enrichmentDao = new EnrichmentDao(mongoClient,
+      final MongoOperations mongoOperations = new MongoOperations(mongoClient,
           configurationPropertiesHolder.getMongoDb());
-      MongoPopulator.replaceSemiumWithEntities(enrichmentDao, timespansFromDocument);
+      //Fix className in Organization Address
+      mongoOperations.updateClassNameInAddress();
+      LOGGER.info("Fixed address fields");
+
+      //Get timespans from file and update the matching ones in the database
+      mongoOperations.updateTimespanEntitiesFromFile(TIMESPAN_FILE_WITH_XMLS);
+      LOGGER.info("Updated timespans");
+
+      //Update all enrichmentTerms labelInfos
+      LOGGER.info("Starting update of LabelInfo, it will take a few minutes");
+      mongoOperations.updateEnrichmentTermsLabelInfos();
+      LOGGER.info("Updated all LabelInfos");
     }
     LOGGER.info("Finished population database script");
   }

@@ -1,4 +1,4 @@
-package eu.europeana.metis.creator.utilities;
+package eu.europeana.metis.enrichment.utilities;
 
 import eu.europeana.metis.mongo.MongoProperties;
 import org.springframework.beans.factory.annotation.Value;
