@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * Initialize MongoClient
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2020-03-11
+ * @since 2020-10-15
  */
 public class ApplicationInitializer implements AutoCloseable {
 
