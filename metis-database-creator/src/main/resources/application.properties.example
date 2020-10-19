@@ -22,5 +22,5 @@ mongo.authentication.db=
 mongo.username=
 mongo.password=
 mongo.enableSSL=
-#Can be a coma separated value so that multiple similar dbs can created at once
+#Can be a coma separated value so that multiple similar dbs can be created at once
 mongo.db=
