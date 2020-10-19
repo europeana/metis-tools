@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,23 +83,22 @@ public class EnrichmentTermUtils {
     //isNextInSequence
     final List<Element> isNextInSequenceList = XmlUtil.getAsElementList(
         timeSpan.getElementsByTagNameNS(Namespace.EDM.getUri(), "isNextInSequence"));
-    final String[] isNextInSequence = getArrayFromElements(isNextInSequenceList);
+    final String[] isNextInSequence = getListFromElements(isNextInSequenceList)
+        .toArray(new String[0]);
     timespanEnrichmentEntity
-        .setIsNextInSequence(isNextInSequence.length == 0 ? null : isNextInSequence);
+        .setIsNextInSequence(isNextInSequence.length == 0 ? null : isNextInSequence[0]);
 
     //sameAs
     final List<Element> sameAsList = XmlUtil
         .getAsElementList(timeSpan.getElementsByTagNameNS(OWL_NAMESPACE, "sameAs"));
-    final String[] owlSameAs = getArrayFromElements(sameAsList);
-    timespanEnrichmentEntity.setOwlSameAs(owlSameAs.length == 0 ? null : owlSameAs);
+    final List<String> owlSameAs = getListFromElements(sameAsList);
+    timespanEnrichmentEntity.setOwlSameAs(owlSameAs);
 
     final EnrichmentTerm enrichmentTerm = new EnrichmentTerm();
     enrichmentTerm.setEntityType(EntityType.TIMESPAN);
     enrichmentTerm.setParent(timespanEnrichmentEntity.getIsPartOf().get("def").get(0));
-    enrichmentTerm.setCodeUri(rdfAbout);
     enrichmentTerm.setEnrichmentEntity(timespanEnrichmentEntity);
     enrichmentTerm.setLabelInfos(createLabelInfoList(timespanEnrichmentEntity));
-    enrichmentTerm.setOwlSameAs(Optional.of(owlSameAs).map(Arrays::asList).orElse(null));
 
     return enrichmentTerm;
   }
@@ -132,7 +130,7 @@ public class EnrichmentTermUtils {
 
   }
 
-  private static String[] getArrayFromElements(List<Element> elements) {
+  private static List<String> getListFromElements(List<Element> elements) {
     List<String> resources = new ArrayList<>();
     for (Element element : elements) {
       final String resource = element.getAttributeNodeNS(Namespace.RDF.getUri(), "resource")
@@ -141,7 +139,7 @@ public class EnrichmentTermUtils {
         resources.add(resource);
       }
     }
-    return resources.toArray(new String[0]);
+    return resources;
   }
 
   public static List<LabelInfo> createLabelInfoList(
@@ -164,5 +162,15 @@ public class EnrichmentTermUtils {
     return combinedLabels.entrySet().stream()
         .map(entry -> new LabelInfo(entry.getValue(), entry.getKey())).collect(Collectors.toList());
   }
+
+//  public static List<String> createOwlSameAsList(EnrichmentTerm enrichmentTerm) {
+//    final Stream<String> owlSameAsInTerm = Optional.ofNullable(enrichmentTerm.getOwlSameAs())
+//        .stream().flatMap(Collection::stream);
+//    final AbstractEnrichmentEntity enrichmentEntity = enrichmentTerm.getEnrichmentEntity();
+//    final Stream<String> owlSameAsInEntity = Optional.ofNullable(enrichmentEntity.getOwlSameAs())
+//        .stream().flatMap(Collection::stream);
+//    return Stream.concat(owlSameAsInTerm, owlSameAsInEntity).distinct()
+//        .collect(Collectors.toList());
+//  }
 
 }

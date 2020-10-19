@@ -5,12 +5,10 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import eu.europeana.enrichment.api.external.model.LabelInfo;
 import eu.europeana.enrichment.internal.model.EnrichmentTerm;
-import eu.europeana.enrichment.internal.model.TimespanEnrichmentEntity;
 import eu.europeana.enrichment.service.dao.EnrichmentDao;
 import eu.europeana.enrichment.utils.EntityType;
 import eu.europeana.normalization.util.XmlException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,10 +25,11 @@ public class MongoOperations {
   public void replaceSemiumWithEntities(EnrichmentDao enrichmentDao,
       List<EnrichmentTerm> enrichmentTerms) {
     for (EnrichmentTerm enrichmentTerm : enrichmentTerms) {
-      final String semiumId = Arrays
-          .stream(((TimespanEnrichmentEntity) enrichmentTerm.getEnrichmentEntity()).getOwlSameAs())
+      final String semiumId = enrichmentTerm.getEnrichmentEntity().getOwlSameAs().stream()
           .filter(owlSameAs -> owlSameAs.contains("semium")).findFirst().orElseThrow();
       enrichmentDao.deleteEnrichmentTerms(EntityType.TIMESPAN, List.of(semiumId));
+      enrichmentDao.deleteEnrichmentTerms(EntityType.TIMESPAN,
+          List.of(enrichmentTerm.getEnrichmentEntity().getAbout()));
       enrichmentDao.saveEnrichmentTerm(enrichmentTerm);
     }
   }
@@ -49,24 +48,37 @@ public class MongoOperations {
     mongoDatabase.runCommand(command);
   }
 
-  public void updateTimespanEntitiesFromFile(String timespanFileWithXmls) throws IOException, XmlException {
+  public void updateTimespanEntitiesFromFile(String timespanFileWithXmls)
+      throws IOException, XmlException {
     final List<EnrichmentTerm> enrichmentTermTimespans = EnrichmentTermUtils
         .getTimespansFromDocument(timespanFileWithXmls);
     replaceSemiumWithEntities(enrichmentDao, enrichmentTermTimespans);
   }
 
-  public void updateEnrichmentTermsLabelInfos() {
+  public void updateEnrichmentTermsFields() {
     final List<EnrichmentTerm> allEnrichmentTermsByFields = enrichmentDao
         .getAllEnrichmentTermsByFields(Collections.emptyList());
-    updateLabelInfos(allEnrichmentTermsByFields);
+    updateFields(allEnrichmentTermsByFields);
     saveAll(enrichmentDao, allEnrichmentTermsByFields);
   }
 
-  private void updateLabelInfos(List<EnrichmentTerm> enrichmentTerms) {
+  private void updateFields(List<EnrichmentTerm> enrichmentTerms) {
     for (EnrichmentTerm enrichmentTerm : enrichmentTerms) {
+      //LabelInfos update
       final List<LabelInfo> labelInfoList = EnrichmentTermUtils
           .createLabelInfoList(enrichmentTerm.getEnrichmentEntity());
       enrichmentTerm.setLabelInfos(labelInfoList);
+      //      //owlSameAs update
+      //      enrichmentTerm.getEnrichmentEntity()
+      //          .setOwlSameAs(EnrichmentTermUtils.createOwlSameAsList(enrichmentTerm));
+      //      enrichmentTerm.setOwlSameAs(null);
+      //      //Remove codeUri from enrichmentTerm
+      //      final String entityAbout = enrichmentTerm.getEnrichmentEntity().getAbout();
+      //      if (StringUtils.isBlank(entityAbout)) {
+      //        enrichmentTerm.getEnrichmentEntity().setAbout(enrichmentTerm.getCodeUri());
+      //      }
+      //      enrichmentTerm.setCodeUri(null);
+
     }
   }
 }

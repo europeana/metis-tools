@@ -44,10 +44,10 @@ public class EnrichmentPopulatorMain {
       mongoOperations.updateTimespanEntitiesFromFile(TIMESPAN_FILE_WITH_XMLS);
       LOGGER.info("Updated timespans");
 
-      //Update all enrichmentTerms labelInfos
-      LOGGER.info("Starting update of LabelInfo, it will take a few minutes");
-      mongoOperations.updateEnrichmentTermsLabelInfos();
-      LOGGER.info("Updated all LabelInfos");
+      //Update all EnrichmentTerms fields
+      LOGGER.info("Starting update of EnrichmentTerms fields, it will take a few minutes");
+      mongoOperations.updateEnrichmentTermsFields();
+      LOGGER.info("Updated all EnrichmentTerms fields");
     }
     LOGGER.info("Finished population database script");
   }
