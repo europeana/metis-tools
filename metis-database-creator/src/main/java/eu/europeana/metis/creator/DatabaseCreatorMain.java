@@ -1,10 +1,12 @@
 package eu.europeana.metis.creator;
 
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.creator.utilities.ConfigurationPropertiesHolder;
 import eu.europeana.metis.mongo.RecordRedirectDao;
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,15 +39,19 @@ public class DatabaseCreatorMain {
     try (ApplicationInitializer applicationInitializer = new ApplicationInitializer(
         configurationPropertiesHolder)) {
       final MongoClient mongoClient = applicationInitializer.getMongoClient();
-      switch (configurationPropertiesHolder.creationDatabaseType) {
+      if (configurationPropertiesHolder.getDatabaseDropFirst()) {
+        Arrays.stream(configurationPropertiesHolder.getMongoDb()).map(mongoClient::getDatabase)
+            .forEach(MongoDatabase::drop);
+      }
+      switch (configurationPropertiesHolder.getCreationDatabaseType()) {
         case RECORD_REDIRECT:
-          initializeRecordRedirectDatabase(mongoClient, configurationPropertiesHolder.mongoDb);
+          initializeRecordRedirectDatabase(mongoClient, configurationPropertiesHolder.getMongoDb());
           break;
         case METIS_CORE:
-          initializeMetisCoreDatabase(mongoClient, configurationPropertiesHolder.mongoDb);
+          initializeMetisCoreDatabase(mongoClient, configurationPropertiesHolder.getMongoDb());
           break;
         case RECORD:
-          initializeRecordDatabase(mongoClient, configurationPropertiesHolder.mongoDb);
+          initializeRecordDatabase(mongoClient, configurationPropertiesHolder.getMongoDb());
           break;
         default:
           LOGGER.info("No creation database type supplied.");
@@ -55,15 +61,21 @@ public class DatabaseCreatorMain {
   }
 
   private static void initializeRecordRedirectDatabase(MongoClient mongoClient,
-      String databaseName) {
-    new RecordRedirectDao(mongoClient, databaseName, true);
+      String[] databaseNames) {
+    Arrays.stream(databaseNames).forEach(databaseName -> {
+      new RecordRedirectDao(mongoClient, databaseName, true);
+    });
   }
 
-  private static void initializeMetisCoreDatabase(MongoClient mongoClient, String databaseName) {
-    new MorphiaDatastoreProviderImpl(mongoClient, databaseName, true);
+  private static void initializeMetisCoreDatabase(MongoClient mongoClient, String[] databaseNames) {
+    Arrays.stream(databaseNames).forEach(databaseName -> {
+      new MorphiaDatastoreProviderImpl(mongoClient, databaseName, true);
+    });
   }
 
-  private static void initializeRecordDatabase(MongoClient mongoClient, String databaseName) {
-    new EdmMongoServerImpl(mongoClient, databaseName, true);
+  private static void initializeRecordDatabase(MongoClient mongoClient, String[] databaseNames) {
+    Arrays.stream(databaseNames).forEach(databaseName -> {
+      new EdmMongoServerImpl(mongoClient, databaseName, true);
+    });
   }
 }

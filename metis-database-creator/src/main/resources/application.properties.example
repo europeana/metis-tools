@@ -1,5 +1,7 @@
 #Specify the type of the database to be created RECORD_REDIRECT, RECORD, METIS_CORE
 creation.database.type=
+#Set to true if a drop of the existing database should occur first
+database.drop.first=
 
 #Truststore
 truststore.path=
@@ -20,4 +22,5 @@ mongo.authentication.db=
 mongo.username=
 mongo.password=
 mongo.enableSSL=
+#Can be a coma separated value so that multiple similar dbs can created at once
 mongo.db=

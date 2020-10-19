@@ -18,11 +18,13 @@ import org.springframework.context.annotation.PropertySource;
 public class ConfigurationPropertiesHolder {
 
   @Value("${creation.database.type}")
-  public  CreationDatabaseType creationDatabaseType;
+  private  CreationDatabaseType creationDatabaseType;
+  @Value("${database.drop.first}")
+  private Boolean databaseDropFirst;
   @Value("${truststore.path}")
-  public  String truststorePath;
+  private  String truststorePath;
   @Value("${truststore.password}")
-  public  String truststorePassword;
+  private  String truststorePassword;
   @Value("${socks.proxy.enabled}")
   private boolean socksProxyEnabled;
   @Value("${socks.proxy.host}")
@@ -34,19 +36,19 @@ public class ConfigurationPropertiesHolder {
   @Value("${socks.proxy.password}")
   private String socksProxyPassword;
   @Value("${mongo.hosts}")
-  public  String[] mongoHosts;
+  private  String[] mongoHosts;
   @Value("${mongo.port}")
-  public  int[] mongoPorts;
+  private  int[] mongoPorts;
   @Value("${mongo.authentication.db}")
-  public  String mongoAuthenticationDb;
+  private  String mongoAuthenticationDb;
   @Value("${mongo.username}")
-  public  String mongoUsername;
+  private  String mongoUsername;
   @Value("${mongo.password}")
   public  String mongoPassword;
   @Value("${mongo.enableSSL}")
-  public  boolean mongoEnableSSL;
+  private  boolean mongoEnableSSL;
   @Value("${mongo.db}")
-  public  String mongoDb;
+  private  String[] mongoDb;
 
   public MongoProperties<IllegalArgumentException> getMongoProperties() {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
@@ -58,6 +60,10 @@ public class ConfigurationPropertiesHolder {
 
   public CreationDatabaseType getCreationDatabaseType() {
     return creationDatabaseType;
+  }
+
+  public Boolean getDatabaseDropFirst() {
+    return databaseDropFirst;
   }
 
   public String getTruststorePath() {
@@ -112,7 +118,7 @@ public class ConfigurationPropertiesHolder {
     return mongoEnableSSL;
   }
 
-  public String getMongoDb() {
+  public String[] getMongoDb() {
     return mongoDb;
   }
 }
