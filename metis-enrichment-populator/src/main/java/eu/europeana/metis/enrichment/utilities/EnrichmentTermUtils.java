@@ -148,29 +148,33 @@ public class EnrichmentTermUtils {
     final Map<String, List<String>> prefLabel = abstractEnrichmentEntity.getPrefLabel();
     final Map<String, List<String>> altLabel = abstractEnrichmentEntity.getAltLabel();
 
-    if (prefLabel != null) {
-      prefLabel.forEach((key, value) -> combinedLabels.merge(key, value,
-          (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).map(String::toLowerCase).distinct()
-              .collect(Collectors.toList())));
-    }
-    if (altLabel != null) {
-      altLabel.forEach((key, value) -> combinedLabels.merge(key, value,
-          (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).map(String::toLowerCase).distinct()
-              .collect(Collectors.toList())));
-    }
+    copyToCombinedLabels(combinedLabels, prefLabel);
+    copyToCombinedLabels(combinedLabels, altLabel);
 
     return combinedLabels.entrySet().stream()
         .map(entry -> new LabelInfo(entry.getValue(), entry.getKey())).collect(Collectors.toList());
   }
 
-//  public static List<String> createOwlSameAsList(EnrichmentTerm enrichmentTerm) {
-//    final Stream<String> owlSameAsInTerm = Optional.ofNullable(enrichmentTerm.getOwlSameAs())
-//        .stream().flatMap(Collection::stream);
-//    final AbstractEnrichmentEntity enrichmentEntity = enrichmentTerm.getEnrichmentEntity();
-//    final Stream<String> owlSameAsInEntity = Optional.ofNullable(enrichmentEntity.getOwlSameAs())
-//        .stream().flatMap(Collection::stream);
-//    return Stream.concat(owlSameAsInTerm, owlSameAsInEntity).distinct()
-//        .collect(Collectors.toList());
-//  }
+  private static void copyToCombinedLabels(Map<String, List<String>> combinedLabels,
+      Map<String, List<String>> prefLabel) {
+    if (prefLabel != null) {
+      prefLabel.forEach((key, value) -> {
+        value = value.stream().map(String::toLowerCase).collect(Collectors.toList());
+        combinedLabels.merge(key, value,
+            (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).distinct()
+                .collect(Collectors.toList()));
+      });
+    }
+  }
+
+  //  public static List<String> createOwlSameAsList(EnrichmentTerm enrichmentTerm) {
+  //    final Stream<String> owlSameAsInTerm = Optional.ofNullable(enrichmentTerm.getOwlSameAs())
+  //        .stream().flatMap(Collection::stream);
+  //    final AbstractEnrichmentEntity enrichmentEntity = enrichmentTerm.getEnrichmentEntity();
+  //    final Stream<String> owlSameAsInEntity = Optional.ofNullable(enrichmentEntity.getOwlSameAs())
+  //        .stream().flatMap(Collection::stream);
+  //    return Stream.concat(owlSameAsInTerm, owlSameAsInEntity).distinct()
+  //        .collect(Collectors.toList());
+  //  }
 
 }

@@ -5,12 +5,16 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import eu.europeana.enrichment.api.external.model.LabelInfo;
 import eu.europeana.enrichment.internal.model.EnrichmentTerm;
+import eu.europeana.enrichment.internal.model.TimespanEnrichmentEntity;
 import eu.europeana.enrichment.service.dao.EnrichmentDao;
-import eu.europeana.enrichment.utils.EntityType;
 import eu.europeana.normalization.util.XmlException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class MongoOperations {
 
@@ -24,13 +28,27 @@ public class MongoOperations {
 
   public void replaceSemiumWithEntities(EnrichmentDao enrichmentDao,
       List<EnrichmentTerm> enrichmentTerms) {
+    // TODO: 20/10/2020 Change to update the children
     for (EnrichmentTerm enrichmentTerm : enrichmentTerms) {
       final String semiumId = enrichmentTerm.getEnrichmentEntity().getOwlSameAs().stream()
           .filter(owlSameAs -> owlSameAs.contains("semium")).findFirst().orElseThrow();
-      enrichmentDao.deleteEnrichmentTerms(EntityType.TIMESPAN, List.of(semiumId));
-      enrichmentDao.deleteEnrichmentTerms(EntityType.TIMESPAN,
-          List.of(enrichmentTerm.getEnrichmentEntity().getAbout()));
-      enrichmentDao.saveEnrichmentTerm(enrichmentTerm);
+
+      final List<Pair<String, String>> fieldNamesAndValues = new ArrayList<>();
+      fieldNamesAndValues.add(new ImmutablePair<>("parent", semiumId));
+      final List<EnrichmentTerm> children = enrichmentDao
+          .getAllEnrichmentTermsByFields(fieldNamesAndValues);
+      final String parentAbout = enrichmentTerm.getEnrichmentEntity().getAbout();
+      children.forEach(child -> {
+        child.setParent(parentAbout);
+        final HashMap<String, List<String>> isPartOf = new HashMap<>();
+        isPartOf.put("def", List.of(parentAbout));
+        ((TimespanEnrichmentEntity) (child.getEnrichmentEntity())).setIsPartOf(isPartOf);
+        enrichmentDao.saveEnrichmentTerm(child);
+      });
+      //      enrichmentDao.deleteEnrichmentTerms(EntityType.TIMESPAN, List.of(semiumId));
+      //      enrichmentDao.deleteEnrichmentTerms(EntityType.TIMESPAN,
+      //          List.of(enrichmentTerm.getEnrichmentEntity().getAbout()));
+//      enrichmentDao.saveEnrichmentTerm(enrichmentTerm);
     }
   }
 
