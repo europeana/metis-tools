@@ -18,7 +18,7 @@ public class EnrichmentPopulatorMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EnrichmentPopulatorMain.class);
   private static ConfigurationPropertiesHolder configurationPropertiesHolder;
-  private static final String TIMESPAN_FILE_WITH_XMLS = "/tmp/timespans.xml";
+  private static final String TIMESPAN_FILE_WITH_XMLS = "/tmp/timespans_new.xml";
 
 
   @SuppressWarnings("java:S3010")
@@ -36,17 +36,11 @@ public class EnrichmentPopulatorMain {
       final MongoClient mongoClient = applicationInitializer.getMongoClient();
       final MongoOperations mongoOperations = new MongoOperations(mongoClient,
           configurationPropertiesHolder.getMongoDb());
-      //Fix className in Organization Address
-      mongoOperations.updateClassNameInAddress();
-      LOGGER.info("Fixed address fields");
 
       //Get timespans from file and update the matching ones in the database
       mongoOperations.updateTimespanEntitiesFromFile(TIMESPAN_FILE_WITH_XMLS);
       LOGGER.info("Updated timespans");
 
-      //Update all EnrichmentTerms fields
-      LOGGER.info("Starting update of EnrichmentTerms fields, it will take a few minutes");
-      mongoOperations.updateEnrichmentTermsFields();
       LOGGER.info("Updated all EnrichmentTerms fields");
     }
     LOGGER.info("Finished population database script");
