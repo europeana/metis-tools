@@ -1,4 +1,4 @@
-package eu.europeana.metis.creator.utilities;
+package eu.europeana.metis.enrichment.utilities;
 
 import eu.europeana.metis.mongo.MongoProperties;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.PropertySource;
  * <p>During construction will read properties from the specified file from the classpath.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2020-03-11
+ * @since 2020-10-15
  */
 @Configuration
 @PropertySource(value = "file:application.properties", ignoreResourceNotFound = true)

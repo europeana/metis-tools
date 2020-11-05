@@ -1,7 +1,7 @@
-package eu.europeana.metis.creator;
+package eu.europeana.metis.enrichment;
 
 import com.mongodb.client.MongoClient;
-import eu.europeana.metis.creator.utilities.ConfigurationPropertiesHolder;
+import eu.europeana.metis.enrichment.utilities.ConfigurationPropertiesHolder;
 import eu.europeana.metis.mongo.MongoClientProvider;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * Initialize MongoClient
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2020-03-11
+ * @since 2020-10-15
  */
 public class ApplicationInitializer implements AutoCloseable {
 
