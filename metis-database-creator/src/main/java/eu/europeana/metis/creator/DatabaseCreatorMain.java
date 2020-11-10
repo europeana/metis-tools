@@ -2,10 +2,10 @@ package eu.europeana.metis.creator;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
-import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.creator.utilities.ConfigurationPropertiesHolder;
-import eu.europeana.metis.mongo.RecordRedirectDao;
+import eu.europeana.metis.mongo.dao.RecordDao;
+import eu.europeana.metis.mongo.dao.RecordRedirectDao;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import org.slf4j.Logger;
@@ -94,6 +94,6 @@ public class DatabaseCreatorMain {
    * @return the initializer for record database
    */
   private static BiConsumer<MongoClient, String> getRecordDatabaseInitializer() {
-    return (mongoClient, databaseName) -> new EdmMongoServerImpl(mongoClient, databaseName, true);
+    return (mongoClient, databaseName) -> new RecordDao(mongoClient, databaseName, true);
   }
 }

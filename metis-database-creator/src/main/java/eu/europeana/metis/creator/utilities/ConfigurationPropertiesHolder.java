@@ -1,6 +1,6 @@
 package eu.europeana.metis.creator.utilities;
 
-import eu.europeana.metis.mongo.MongoProperties;
+import eu.europeana.metis.mongo.connection.MongoProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
