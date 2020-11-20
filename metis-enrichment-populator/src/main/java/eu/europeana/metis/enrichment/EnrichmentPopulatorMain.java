@@ -37,11 +37,10 @@ public class EnrichmentPopulatorMain {
       final MongoOperations mongoOperations = new MongoOperations(mongoClient,
           configurationPropertiesHolder.getMongoDb());
 
-      //Get timespans from file and update the matching ones in the database
-      mongoOperations.updateTimespanEntitiesFromFile(TIMESPAN_FILE_WITH_XMLS);
-      LOGGER.info("Updated timespans");
-
-      LOGGER.info("Updated all EnrichmentTerms fields");
+      LOGGER.info("Start update");
+//      mongoOperations.updateIsPartOfParentField(EntityType.PLACE);
+//      mongoOperations.updateIsPartOfParentField(EntityType.TIMESPAN);
+      LOGGER.info("End update");
     }
     LOGGER.info("Finished population database script");
   }

@@ -2,7 +2,7 @@ package eu.europeana.metis.enrichment;
 
 import com.mongodb.client.MongoClient;
 import eu.europeana.metis.enrichment.utilities.ConfigurationPropertiesHolder;
-import eu.europeana.metis.mongo.MongoClientProvider;
+import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import java.net.Authenticator;
