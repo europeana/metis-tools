@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -89,8 +90,8 @@ public class PropertiesHolder {
     } else {
       LOGGER.info(
           "{} properties file does NOT exist, probably running in standalone .jar mode where the properties file should be on the same directory "
-              + "as the .jar file is. Will try to load {} properties file",
-          filePathInResources, configurationFileName);
+              + "as the .jar file is. Will try to load {} properties file", filePathInResources,
+          configurationFileName);
       filePath = configurationFileName;
     }
     try {
@@ -101,20 +102,22 @@ public class PropertiesHolder {
 
     //General parameters
     minParallelDatasets = Integer.parseInt(properties.getProperty("min.parallel.datasets"));
-    maxParallelThreadsPerDataset = Integer.parseInt(properties.getProperty("max.parallel.threads.per.dataset"));
-    startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
-    endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
+    maxParallelThreadsPerDataset = Integer
+        .parseInt(properties.getProperty("max.parallel.threads.per.dataset"));
+    startFromDatasetIndex =
+        StringUtils.isBlank(properties.getProperty("start.from.dataset.index")) ? 0
+            : Integer.parseInt(properties.getProperty("start.from.dataset.index"));
+    endAtDatasetIndex =
+        StringUtils.isBlank(properties.getProperty("end.at.dataset.index")) ? Integer.MAX_VALUE
+            : Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
     datasetIdsToProcess = properties.getProperty("dataset.ids.to.process").split(",");
-    identityProcess = Boolean
-        .parseBoolean(properties.getProperty("identity.process"));
-    enablePostProcess = Boolean
-        .parseBoolean(properties.getProperty("enable.post.process"));
+    identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
+    enablePostProcess = Boolean.parseBoolean(properties.getProperty("enable.post.process"));
     invalidatePluginTypes = Arrays
         .stream(properties.getProperty("invalidate.plugin.types").split(","))
-        .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(
-            Collectors.toList());
+        .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(Collectors.toList());
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
 

@@ -10,8 +10,8 @@ The multiplication of `min.parallel.datasets` with `max.parallel.threads.per.dat
 So for example if `min.parallel.datasets` 3 and `max.parallel.threads.per.dataset` 24, there can be maximum 72 datasets run in parallel with 1 thread available to them.  
 Or 3 big datasets with 24 threads each. And any combination in between. The threads per dataset is calculated based on the page size and the total number of pages of the dataset.
 For the REPROCESS_ALL_FAILED mode only paralellization of datasets is implemented so the `max.parallel.threads.per.dataset` should be 1 and the `min.parallel.datasets` should be set to the amount of parallel datasets.
-- `start.from.dataset.index` -> The index of the dataset in the ordered list from metis core, where the script should start from
-- `end.at.dataset.index` -> The index of the dataset in the ordered list from metis core, where the script should end at(exclusive)
+- `start.from.dataset.index` -> The index of the dataset in the list from where the processing should start from. 0 if no value provided
+- `end.at.dataset.index` -> The index of the dataset in the list from where the processing should end at. Max integer if no value provided
 - `source.mongo.page.size` -> The page size when reading from mongo
 - `mode` -> The mode of the script. DEFAULT, REPROCESS_ALL_FAILED
 - `dataset.ids.to.process` -> A comma separated list of dataset ids to process bypassing processing all dataset ids
