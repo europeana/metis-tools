@@ -2,6 +2,7 @@ package eu.europeana.metis.reprocessing.dao;
 
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
+import dev.morphia.DeleteOptions;
 import dev.morphia.Morphia;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.query.FindOptions;
@@ -72,7 +73,7 @@ public class MongoDestinationMongoDao {
   public void deleteAllSuccessfulReprocessedFailedRecords() {
     Query<FailedRecord> query = mongoDestinationDatastore.createQuery(FailedRecord.class);
     query.field(SUCCESSFULLY_REPROCESSED).equal(true);
-    mongoDestinationDatastore.delete(query);
+    query.delete(new DeleteOptions().multi(true));
   }
 
   private MongoInitializer prepareMongoDestinationConfiguration() {

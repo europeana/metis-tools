@@ -38,6 +38,7 @@ public class BasicConfiguration {
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
   private final IndexerPool indexerPool;
   private final Mode mode;
+  private final boolean identityProcess;
   private final List<ExecutablePluginType> invalidatePluginTypes;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private ExtraConfiguration extraConfiguration;
@@ -56,6 +57,7 @@ public class BasicConfiguration {
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
     indexerPool = new IndexerPool(indexerFactory, 600, 60);
     mode = propertiesHolder.mode;
+    identityProcess = propertiesHolder.identityProcess;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
   }
@@ -147,6 +149,10 @@ public class BasicConfiguration {
 
   public Mode getMode() {
     return mode;
+  }
+
+  public boolean isIdentityProcess() {
+    return identityProcess;
   }
 
   public List<ExecutablePluginType> getInvalidatePluginTypes() {

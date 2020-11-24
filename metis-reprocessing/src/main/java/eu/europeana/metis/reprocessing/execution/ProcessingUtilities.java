@@ -29,7 +29,20 @@ public class ProcessingUtilities {
   }
 
   public static RDF processFullBean(FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {
+    if (basicConfiguration.isIdentityProcess()) {
+      return EdmUtils.toRDF(fullBean, true);
+    } else {
+      return process(fullBean);
+    }
+  }
+
+  private static RDF identityProcess(FullBeanImpl fullBean) {
     return EdmUtils.toRDF(fullBean, true);
+  }
+
+  private static RDF process(FullBeanImpl fullBean) {
+    // TODO: 24/11/2020 Extend to the implementation that modifies the record
+    return null;
   }
 
   //  /**

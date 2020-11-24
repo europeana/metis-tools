@@ -8,6 +8,8 @@ source.mongo.page.size=
 #Possible values DEFAULT, REPROCESS_ALL_FAILED. The REPROCESS_ALL_FAILED will process only the
 #failed records for a dataset even if it's not previously completely processed.
 mode=DEFAULT
+#Set to true to do a simple read and then write reindex, without altering the record
+identity.process=
 invalidate.plugin.types=
 reprocess.based.on.plugin.type=
 
