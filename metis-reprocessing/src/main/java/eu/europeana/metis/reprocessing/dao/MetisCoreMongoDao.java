@@ -50,7 +50,7 @@ public class MetisCoreMongoDao {
   }
 
   public List<String> getAllDatasetIds() {
-    Query<Dataset> query = metisCoreDatastore.createQuery(Dataset.class);
+    Query<Dataset> query = metisCoreDatastore.find(Dataset.class);
     final List<Dataset> datasets = MorphiaUtils.getListOfQueryRetryable(query);
     return datasets.stream().map(Dataset::getDatasetId).collect(Collectors.toList());
   }
@@ -72,7 +72,7 @@ public class MetisCoreMongoDao {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.metisCoreMongoHosts,
         propertiesHolder.metisCoreMongoPorts, propertiesHolder.metisCoreMongoAuthenticationDb,
         propertiesHolder.metisCoreMongoUsername, propertiesHolder.metisCoreMongoPassword,
-        propertiesHolder.metisCoreMongoEnablessl, propertiesHolder.metisCoreMongoDb);
+        propertiesHolder.metisCoreMongoEnablessl);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

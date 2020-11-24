@@ -1,8 +1,9 @@
 package eu.europeana.metis.reprocessing.execution;
 
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
-import static java.util.Map.Entry.*;
-import static java.util.stream.Collectors.*;
+import static java.util.Map.Entry.comparingByValue;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
@@ -10,7 +11,6 @@ import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,7 +68,7 @@ public class ExecutorManager {
 
   public void startReprocessing() throws InterruptedException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
-    final Map<String, Long> datasetsWithSize = getDatasetWithSize();
+    final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
     AtomicInteger atomicIndex = new AtomicInteger(0);
     final List<DatasetStatus> datasetStatuses = datasetsWithSize.entrySet().stream()
         .filter(entry -> entry.getValue() > 0).sorted(Collections.reverseOrder(comparingByValue()))
@@ -139,11 +139,11 @@ public class ExecutorManager {
     timer.cancel();
   }
 
-  private Map<String, Long> getDatasetWithSize() {
-    if (basicConfiguration.getDatasetIdsToProcess().length > 0) {
-      return getDatasetWithSizeFromProvidedList();
-    } else {
+  private Map<String, Long> getDatasetsWithSize() {
+    if (basicConfiguration.getDatasetIdsToProcess().isEmpty()) {
       return getDatasetWithSizeFromCore();
+    } else {
+      return getDatasetWithSizeFromProvidedList();
     }
   }
 
@@ -154,7 +154,7 @@ public class ExecutorManager {
   }
 
   private Map<String, Long> getDatasetWithSizeFromProvidedList() {
-    return Arrays.stream(basicConfiguration.getDatasetIdsToProcess()).collect(
+    return basicConfiguration.getDatasetIdsToProcess().stream().collect(
         toMap(Function.identity(), datasetId -> basicConfiguration.getMongoSourceMongoDao()
             .getTotalRecordsForDataset(datasetId)));
   }
@@ -169,12 +169,14 @@ public class ExecutorManager {
   private DatasetStatus retrieveOrInitializeDatasetStatus(String datasetId, int indexInOrderedList,
       long totalRecordsForDataset) {
     if (basicConfiguration.isRemoveDatasetBeforeProcess()) {
+      LOGGER.info("Removing datasetStatus and dataset record from database");
       basicConfiguration.getMongoDestinationMongoDao().deleteDatasetStatus(datasetId);
       try {
         basicConfiguration.getIndexer().removeAll(datasetId, new Date());
       } catch (IndexingException e) {
         LOGGER.warn("Could not remove dataset records {}", datasetId);
       }
+      LOGGER.info("Removed datasetStatus and dataset record from database");
     }
     DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
         .getDatasetStatus(datasetId);

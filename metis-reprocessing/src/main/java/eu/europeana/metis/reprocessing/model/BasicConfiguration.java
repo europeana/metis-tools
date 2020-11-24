@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -44,7 +46,7 @@ public class BasicConfiguration {
   private final boolean identityProcess;
   private final boolean enablePostProcess;
   private final boolean removeDatasetBeforeProcess;
-  private final String[] datasetIdsToProcess;
+  private final List<String> datasetIdsToProcess;
   private final List<ExecutablePluginType> invalidatePluginTypes;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private ExtraConfiguration extraConfiguration;
@@ -53,10 +55,10 @@ public class BasicConfiguration {
       throws IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException {
     this.propertiesHolder = propertiesHolder;
     //Create metis core dao only if there aren't any specific datasets to process
-    if (propertiesHolder.datasetIdsToProcess.length > 0) {
-      metisCoreMongoDao = null;
-    } else {
+    if (propertiesHolder.datasetIdsToProcess == null) {
       metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
+    } else {
+      metisCoreMongoDao = null;
     }
     mongoSourceMongoDao = new MongoSourceMongoDao(propertiesHolder);
     mongoDestinationMongoDao = new MongoDestinationMongoDao(propertiesHolder);
@@ -69,7 +71,8 @@ public class BasicConfiguration {
     indexerPool = new IndexerPool(indexerFactory, 600, 60);
     indexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
-    datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
+    datasetIdsToProcess = propertiesHolder.datasetIdsToProcess == null ? Collections.emptyList()
+        : Arrays.asList(propertiesHolder.datasetIdsToProcess);
     identityProcess = propertiesHolder.identityProcess;
     enablePostProcess = propertiesHolder.enablePostProcess;
     removeDatasetBeforeProcess = propertiesHolder.removeDatasetBeforeProcess;
@@ -165,7 +168,7 @@ public class BasicConfiguration {
     return mode;
   }
 
-  public String[] getDatasetIdsToProcess() {
+  public List<String> getDatasetIdsToProcess() {
     return datasetIdsToProcess;
   }
 

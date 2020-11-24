@@ -30,21 +30,22 @@ public class ProcessingUtilities {
 
   public static RDF processFullBean(FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {
     if (basicConfiguration.isIdentityProcess()) {
-      final RDF rdf = EdmUtils.toRDF(fullBean, true);
-      //Remove quality annotations because EdmUtils prefixes them with an http domain. They will
-      // be recalculated during indexing
-      rdf.setQualityAnnotationList(null);
-      return rdf;
+      return identityProcess(fullBean);
     } else {
       return process(fullBean);
     }
   }
 
   private static RDF identityProcess(FullBeanImpl fullBean) {
-    return EdmUtils.toRDF(fullBean, true);
+    final RDF rdf = EdmUtils.toRDF(fullBean, true);
+    //Remove quality annotations because EdmUtils prefixes them with an http domain. They will
+    // be recalculated during indexing
+    rdf.setQualityAnnotationList(null);
+    return rdf;
   }
 
   private static RDF process(FullBeanImpl fullBean) {
+    final RDF rdf = identityProcess(fullBean);
     // TODO: 24/11/2020 Extend to the implementation that modifies the record
     return null;
   }

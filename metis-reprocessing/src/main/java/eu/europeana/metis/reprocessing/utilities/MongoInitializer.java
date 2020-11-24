@@ -18,11 +18,10 @@ public class MongoInitializer {
   private final String mongoUsername;
   private final String mongoPassword;
   private final boolean mongoEnablessl;
-  private final String mongoDb;
   private MongoClient mongoClient;
 
   public MongoInitializer(String[] mongoHosts, int[] mongoPorts, String mongoAuthenticationDb,
-      String mongoUsername, String mongoPassword, boolean mongoEnablessl, String mongoDb) {
+      String mongoUsername, String mongoPassword, boolean mongoEnablessl) {
     this.mongoHosts = mongoHosts;
     this.mongoPorts = mongoPorts;
     this.mongoAuthenticationDb = mongoAuthenticationDb;
@@ -30,7 +29,6 @@ public class MongoInitializer {
     this.mongoPassword = mongoPassword;
 
     this.mongoEnablessl = mongoEnablessl;
-    this.mongoDb = mongoDb;
   }
 
   public void initializeMongoClient() {

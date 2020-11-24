@@ -57,32 +57,31 @@ public class MongoSourceMongoDao {
 
 
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
-    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
-    query.field("about").startsWith("/" + datasetId + "/");
-
+    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
+    query.filter(Filters.regex("about").pattern("^/" + datasetId + "/"));
     return MorphiaUtils.getListOfQueryRetryable(query,
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE));
   }
 
   public List<FullBeanImpl> getRecordsFromList(List<String> recordIds) {
     List<FullBeanImpl> fullBeans = new ArrayList<>();
-    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
+    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
     recordIds.forEach(recordId -> {
-      query.field("about").equal(recordId);
+      query.filter(Filters.eq("about", recordId));
       fullBeans.add(ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::first));
     });
     return fullBeans;
   }
 
   public long getTotalRecordsForDataset(String datasetId) {
-    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
-    query.field("about").startsWith("/" + datasetId + "/");
+    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
+    query.filter(Filters.regex("about").pattern("^/" + datasetId + "/"));
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::count);
   }
 
   public WebResourceMetaInfoImpl getTechnicalMetadataFromSource(String resourceUrlInMd5) {
     final Query<WebResourceMetaInfoImpl> query = mongoSourceDatastore
-        .createQuery(WebResourceMetaInfoImpl.class);
+        .find(WebResourceMetaInfoImpl.class);
     return query.filter(Filters.eq(ID, resourceUrlInMd5)).first();
   }
 
@@ -90,7 +89,7 @@ public class MongoSourceMongoDao {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.sourceMongoHosts,
         propertiesHolder.sourceMongoPorts, propertiesHolder.sourceMongoAuthenticationDb,
         propertiesHolder.sourceMongoUsername, propertiesHolder.sourceMongoPassword,
-        propertiesHolder.sourceMongoEnablessl, propertiesHolder.sourceMongoDb);
+        propertiesHolder.sourceMongoEnablessl);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

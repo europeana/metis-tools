@@ -43,7 +43,7 @@ The changes on the implementation, per reprocessing operation should be limited 
 functional interfaces
 - `ProcessingUtilities` That contains all functionality for processing records and datasets
 - `IndexingUtilities` That contains all functionality for indexing records
-- `AfterReProcessingUtilities` That contains all functionality for after reprocessing of all records, once per dataset  
+- `PostReProcessingUtilities` That contains all functionality for after reprocessing of all records, once per dataset  
 
 Depending on the operation classes can be created and removed when not required anymore.
 

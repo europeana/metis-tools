@@ -113,7 +113,9 @@ public class PropertiesHolder {
             : Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
-    datasetIdsToProcess = properties.getProperty("dataset.ids.to.process").split(",");
+    datasetIdsToProcess =
+        StringUtils.isBlank(properties.getProperty("dataset.ids.to.process")) ? null
+            : properties.getProperty("dataset.ids.to.process").split(",");
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     enablePostProcess = Boolean.parseBoolean(properties.getProperty("enable.post.process"));
     removeDatasetBeforeProcess = Boolean
