@@ -38,6 +38,7 @@ public class PropertiesHolder {
   public final int sourceMongoPageSize;
   public final Mode mode;
   public final boolean identityProcess;
+  public final boolean enablePostProcess;
   public final List<ExecutablePluginType> invalidatePluginTypes;
   public final ExecutablePluginType reprocessBasedOnPluginType;
 
@@ -106,6 +107,8 @@ public class PropertiesHolder {
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
     identityProcess = Boolean
         .parseBoolean(properties.getProperty("identity.process"));
+    enablePostProcess = Boolean
+        .parseBoolean(properties.getProperty("enable.post.process"));
     invalidatePluginTypes = Arrays
         .stream(properties.getProperty("invalidate.plugin.types").split(","))
         .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(

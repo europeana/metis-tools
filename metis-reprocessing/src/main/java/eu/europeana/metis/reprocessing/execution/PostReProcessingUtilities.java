@@ -49,12 +49,13 @@ public class PostReProcessingUtilities {
    */
   public static void postProcess(String datasetId, Date startDate, Date endDate,
       BasicConfiguration basicConfiguration) {
-    updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
+    if (basicConfiguration.isEnablePostProcess()) {
+      updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
+    }
   }
 
   public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,
       Date endDate, BasicConfiguration basicConfiguration) {
-    // TODO: 21-5-19 Enable methods when ready
     createReindexWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
     setInvalidFlagToPlugins(datasetId, basicConfiguration);
   }

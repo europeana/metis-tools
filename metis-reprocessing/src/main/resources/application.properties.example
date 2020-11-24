@@ -10,6 +10,8 @@ source.mongo.page.size=
 mode=DEFAULT
 #Set to true to do a simple read and then write reindex, without altering the record
 identity.process=
+#Keep this to false, unless you know what you are doing
+enable.post.process=
 invalidate.plugin.types=
 reprocess.based.on.plugin.type=
 

@@ -39,6 +39,7 @@ public class BasicConfiguration {
   private final IndexerPool indexerPool;
   private final Mode mode;
   private final boolean identityProcess;
+  private final boolean enablePostProcess;
   private final List<ExecutablePluginType> invalidatePluginTypes;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private ExtraConfiguration extraConfiguration;
@@ -58,6 +59,7 @@ public class BasicConfiguration {
     indexerPool = new IndexerPool(indexerFactory, 600, 60);
     mode = propertiesHolder.mode;
     identityProcess = propertiesHolder.identityProcess;
+    enablePostProcess = propertiesHolder.enablePostProcess;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
   }
@@ -153,6 +155,10 @@ public class BasicConfiguration {
 
   public boolean isIdentityProcess() {
     return identityProcess;
+  }
+
+  public boolean isEnablePostProcess() {
+    return enablePostProcess;
   }
 
   public List<ExecutablePluginType> getInvalidatePluginTypes() {

@@ -15,6 +15,7 @@ For the REPROCESS_ALL_FAILED mode only paralellization of datasets is implemente
 - `source.mongo.page.size` -> The page size when reading from mongo
 - `mode` -> The mode of the script. DEFAULT, REPROCESS_ALL_FAILED
 - `identity.process` -> Set to true to do a simple read and then write reindex, without altering the record
+- `enable.post.process` -> Set to true only when the metis core has to be updated too, this is enabled when everything is tested and the final execution is performed. For regular operations keep this value false
 - `invalidate.plugin.types` -> The plugins in metis core to invalidate at the end of the reprocessing of a dataset
 - `reprocess.based.on.plugin.type` -> The plugin where the reprocessed dataset in preview should be based upon 
 
