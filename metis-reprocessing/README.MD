@@ -17,6 +17,7 @@ For the REPROCESS_ALL_FAILED mode only paralellization of datasets is implemente
 - `dataset.ids.to.process` -> A comma separated list of dataset ids to process bypassing processing all dataset ids
 - `identity.process` -> Set to true to do a simple read and then write reindex, without altering the record
 - `enable.post.process` -> Set to true only when the metis core has to be updated too, this is enabled when everything is tested and the final execution is performed. For regular operations keep this value false
+- `remove.dataset.before.process=` -> Set to true if a dataset that was already processed from a previous execution(even if it wasn't full processed) needs to be reprocessed
 - `invalidate.plugin.types` -> The plugins in metis core to invalidate at the end of the reprocessing of a dataset
 - `reprocess.based.on.plugin.type` -> The plugin where the reprocessed dataset in preview should be based upon 
 

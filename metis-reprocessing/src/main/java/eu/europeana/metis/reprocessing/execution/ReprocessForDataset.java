@@ -66,11 +66,12 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   @Override
-  public Void call() throws ExecutionException, InterruptedException {
+  public Void call() throws ExecutionException, InterruptedException, IndexingException {
     return reprocessDataset();
   }
 
-  private Void reprocessDataset() throws ExecutionException, InterruptedException {
+  private Void reprocessDataset()
+      throws ExecutionException, InterruptedException, IndexingException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing starting", prefixDatasetidLog);
 
     if (basicConfiguration.getMode() == Mode.DEFAULT) {
@@ -153,7 +154,7 @@ public class ReprocessForDataset implements Callable<Void> {
   }
 
   private void loopOverAllRecordsAndProcess(boolean processFailedOnly)
-      throws ExecutionException, InterruptedException {
+      throws ExecutionException, InterruptedException, IndexingException {
     nextPage = getStartingNextPage(processFailedOnly);
     if (!processFailedOnly) {
       datasetStatus.setStartDate(new Date());
@@ -165,6 +166,7 @@ public class ReprocessForDataset implements Callable<Void> {
       defaultOperation();
     }
 
+    // TODO: 24/11/2020 This might need to be disabled on a real reindexing because there are a lot of small datasets
     //Commit changes
     //The indexer shouldn't be closed here, therefore it's not initialized in a
     //try-with-resources block

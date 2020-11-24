@@ -4,6 +4,7 @@ import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTI
 import static java.util.Map.Entry.*;
 import static java.util.stream.Collectors.*;
 
+import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
@@ -129,7 +130,7 @@ public class ExecutorManager {
       try {
         //Check and log for exceptions
         completedFuture.get();
-      } catch (ExecutionException e) {
+      } catch (Exception e) {
         LOGGER.error(EXECUTION_LOGS_MARKER, "An exception occurred in a callable.", e);
       }
       reprocessedDatasets++;
@@ -167,6 +168,14 @@ public class ExecutorManager {
    */
   private DatasetStatus retrieveOrInitializeDatasetStatus(String datasetId, int indexInOrderedList,
       long totalRecordsForDataset) {
+    if (basicConfiguration.isRemoveDatasetBeforeProcess()) {
+      basicConfiguration.getMongoDestinationMongoDao().deleteDatasetStatus(datasetId);
+      try {
+        basicConfiguration.getIndexer().removeAll(datasetId, new Date());
+      } catch (IndexingException e) {
+        LOGGER.warn("Could not remove dataset records {}", datasetId);
+      }
+    }
     DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
         .getDatasetStatus(datasetId);
     if (retrievedDatasetStatus == null) {

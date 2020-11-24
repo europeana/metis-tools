@@ -14,6 +14,8 @@ dataset.ids.to.process=
 identity.process=
 #Keep this to false, unless you know what you are doing
 enable.post.process=
+#Set to true if a dataset that was already process from a previous execution needs to be reprocessed
+remove.dataset.before.process=
 invalidate.plugin.types=
 reprocess.based.on.plugin.type=
 
@@ -56,17 +58,3 @@ zookeeper.destination.chroot=
 zookeeper.destination.defaultCollection=
 
 #EXTRA CONFIGURATION
-#Mongo Cache
-mongo.cache.hosts=
-mongo.cache.port=
-mongo.cache.authentication.db=
-mongo.cache.username=
-mongo.cache.password=
-mongo.cache.enableSSL=false
-mongo.cache.db=
-
-#S3
-s3.access.key=
-s3.secret.key=
-s3.endpoint=
-s3.bucket=

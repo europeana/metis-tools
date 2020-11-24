@@ -59,6 +59,11 @@ public class MongoDestinationMongoDao {
         .filter(Filters.eq(DATASET_ID, datasetId)).first();
   }
 
+  public void deleteDatasetStatus(String datasetId) {
+    mongoDestinationDatastore.find(DatasetStatus.class).filter(Filters.eq(DATASET_ID, datasetId))
+        .delete();
+  }
+
   public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
     ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> mongoDestinationDatastore.save(datasetStatus));
