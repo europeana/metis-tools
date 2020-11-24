@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.model;
 
+import eu.europeana.indexing.Indexer;
 import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingSettings;
@@ -11,6 +12,7 @@ import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,6 +39,7 @@ public class BasicConfiguration {
   private final MongoSourceMongoDao mongoSourceMongoDao;
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
   private final IndexerPool indexerPool;
+  private final Indexer indexer;
   private final Mode mode;
   private final boolean identityProcess;
   private final boolean enablePostProcess;
@@ -63,6 +66,7 @@ public class BasicConfiguration {
     prepareZookeeperSettings(indexingSettings);
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
     indexerPool = new IndexerPool(indexerFactory, 600, 60);
+    indexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
@@ -85,6 +89,10 @@ public class BasicConfiguration {
 
   public IndexerPool getIndexerPool() {
     return indexerPool;
+  }
+
+  public Indexer getIndexer() {
+    return indexer;
   }
 
   public ExtraConfiguration getExtraConfiguration() {
@@ -175,10 +183,13 @@ public class BasicConfiguration {
     return reprocessBasedOnPluginType;
   }
 
-  public void close() {
-    metisCoreMongoDao.close();
+  public void close() throws IOException {
+    if (metisCoreMongoDao != null) {
+      metisCoreMongoDao.close();
+    }
     mongoSourceMongoDao.close();
     mongoDestinationMongoDao.close();
     indexerPool.close();
+    indexer.close();
   }
 }

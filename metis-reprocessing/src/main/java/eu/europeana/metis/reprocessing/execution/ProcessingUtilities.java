@@ -30,7 +30,11 @@ public class ProcessingUtilities {
 
   public static RDF processFullBean(FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {
     if (basicConfiguration.isIdentityProcess()) {
-      return EdmUtils.toRDF(fullBean, true);
+      final RDF rdf = EdmUtils.toRDF(fullBean, true);
+      //Remove quality annotations because EdmUtils prefixes them with an http domain. They will
+      // be recalculated during indexing
+      rdf.setQualityAnnotationList(null);
+      return rdf;
     } else {
       return process(fullBean);
     }

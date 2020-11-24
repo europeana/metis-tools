@@ -53,8 +53,8 @@ public class ReprocessForDataset implements Callable<Void> {
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Integer> completionService;
 
-  ReprocessForDataset(DatasetStatus datasetStatus,
-      BasicConfiguration basicConfiguration, int maxParallelPageThreads) {
+  ReprocessForDataset(DatasetStatus datasetStatus, BasicConfiguration basicConfiguration,
+      int maxParallelPageThreads) {
     this.datasetId = datasetStatus.getDatasetId();
     this.basicConfiguration = basicConfiguration;
     this.prefixDatasetidLog = String.format("DatasetId: %s", this.datasetId);
@@ -101,8 +101,8 @@ public class ReprocessForDataset implements Callable<Void> {
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing end", prefixDatasetidLog);
     LOGGER
         .info(EXECUTION_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);
-    LOGGER.info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog,
-        datasetStatus);
+    LOGGER
+        .info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetidLog, datasetStatus);
     close();
     return null;
   }
@@ -164,6 +164,15 @@ public class ReprocessForDataset implements Callable<Void> {
     } else {
       defaultOperation();
     }
+
+    //Commit changes
+    //The indexer shouldn't be closed here, therefore it's not initialized in a
+    //try-with-resources block
+    try {
+      basicConfiguration.getIndexer().triggerFlushOfPendingChanges(true);
+    } catch (IndexingException e) {
+      LOGGER.warn("Could not commit changes to solr, changes will be visible after auto commit", e);
+    }
   }
 
   private void failedRecordsOperation(int nextPage) {
@@ -171,8 +180,9 @@ public class ReprocessForDataset implements Callable<Void> {
     List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(nextPage);
     long counterFailedRecordsProcessed = 0;
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing number of records: {}",
-          prefixDatasetidLog, nextPageOfRecords.size());
+      LOGGER
+          .info(EXECUTION_LOGS_MARKER, "{} - Processing number of records: {}", prefixDatasetidLog,
+              nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final String exceptionStackTrace = processAndIndex(fullBean);
         updateProcessFailedOnlyCounts(exceptionStackTrace, fullBean.getAbout());
@@ -280,12 +290,10 @@ public class ReprocessForDataset implements Callable<Void> {
       final List<FailedRecord> nextPageOfFailedRecords = basicConfiguration
           .getMongoDestinationMongoDao().getNextPageOfFailedRecords(datasetId, nextPage);
       final List<String> failedRecordsUrls = nextPageOfFailedRecords.stream()
-          .map(FailedRecord::getFailedUrl)
-          .collect(Collectors.toList());
+          .map(FailedRecord::getFailedUrl).collect(Collectors.toList());
       return basicConfiguration.getMongoSourceMongoDao().getRecordsFromList(failedRecordsUrls);
     } else {
-      return basicConfiguration.getMongoSourceMongoDao()
-          .getNextPageOfRecords(datasetId, nextPage);
+      return basicConfiguration.getMongoSourceMongoDao().getNextPageOfRecords(datasetId, nextPage);
     }
   }
 
@@ -350,8 +358,7 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
-  private RDF processRecord(FullBeanImpl fullBean)
-      throws ProcessingException {
+  private RDF processRecord(FullBeanImpl fullBean) throws ProcessingException {
     final long startTimeProcess = System.nanoTime();
     try {
       return basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
@@ -366,8 +373,7 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
-  private void indexRecord(RDF rdf)
-      throws IndexingException {
+  private void indexRecord(RDF rdf) throws IndexingException {
     final long startTimeIndex = System.nanoTime();
     try {
       basicConfiguration.getExtraConfiguration().getRdfIndexer()

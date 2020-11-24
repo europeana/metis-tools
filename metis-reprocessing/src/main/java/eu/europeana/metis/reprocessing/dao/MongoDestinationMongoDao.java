@@ -46,9 +46,9 @@ public class MongoDestinationMongoDao {
   }
 
   public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
-    Query<FailedRecord> query = mongoDestinationDatastore.createQuery(FailedRecord.class);
-    query.field(FAILED_URL).startsWith("/" + datasetId + "/").field(SUCCESSFULLY_REPROCESSED)
-        .equal(false);
+    Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
+    query.filter(Filters.regex(FAILED_URL).pattern("^/" + datasetId + "/"))
+        .filter(Filters.eq(SUCCESSFULLY_REPROCESSED, false));
     return MorphiaUtils.getListOfQueryRetryable(query,
         new FindOptions().skip(nextPage * MongoSourceMongoDao.PAGE_SIZE)
             .limit(MongoSourceMongoDao.PAGE_SIZE));
@@ -71,8 +71,8 @@ public class MongoDestinationMongoDao {
   }
 
   public void deleteAllSuccessfulReprocessedFailedRecords() {
-    Query<FailedRecord> query = mongoDestinationDatastore.createQuery(FailedRecord.class);
-    query.field(SUCCESSFULLY_REPROCESSED).equal(true);
+    Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
+    query.filter(Filters.eq(SUCCESSFULLY_REPROCESSED, true));
     query.delete(new DeleteOptions().multi(true));
   }
 

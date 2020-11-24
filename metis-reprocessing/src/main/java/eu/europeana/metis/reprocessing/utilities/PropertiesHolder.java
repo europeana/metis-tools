@@ -125,8 +125,14 @@ public class PropertiesHolder {
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     metisCoreMongoHosts = properties.getProperty("mongo.metis.core.hosts").split(",");
-    metisCoreMongoPorts = Arrays.stream(properties.getProperty("mongo.metis.core.port").split(","))
-        .mapToInt(Integer::parseInt).toArray();
+
+    if (StringUtils.isBlank(properties.getProperty("mongo.metis.core.port"))) {
+      metisCoreMongoPorts = null;
+    } else {
+      metisCoreMongoPorts = Arrays
+          .stream(properties.getProperty("mongo.metis.core.port").split(","))
+          .mapToInt(Integer::parseInt).toArray();
+    }
     metisCoreMongoAuthenticationDb = properties.getProperty("mongo.metis.core.authentication.db");
     metisCoreMongoUsername = properties.getProperty("mongo.metis.core.username");
     metisCoreMongoPassword = properties.getProperty("mongo.metis.core.password");
