@@ -15,10 +15,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${version.maven.compiler.plugin}</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <testSource>1.8</testSource>
-          <testTarget>1.8</testTarget>
+          <release>11</release>
         </configuration>
       </plugin>
       <plugin>
@@ -49,11 +46,11 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.6.1</version.maven.compiler.plugin>
-    <version.metis>1.5.0-SNAPSHOT</version.metis>
-    <version.corelib>2.8.8-SNAPSHOT</version.corelib>
+    <version.metis>3-SNAPSHOT</version.metis>
+    <version.corelib>2.12.0-SNAPSHOT</version.corelib>
     <!-- These two versions are interdependent. -->
-    <version.slf4j>1.7.25</version.slf4j>
-    <version.log4j>2.9.1</version.log4j>
+    <version.slf4j>1.7.30</version.slf4j>
+    <version.log4j>2.13.2</version.log4j>
   </properties>
 
   <dependencies>
@@ -118,5 +115,29 @@
     </dependency>
   </dependencies>
 
-
+  <repositories>
+    <!--Release repositories-->
+    <repository>
+      <id>libs-release</id>
+      <name>libs-release</name>
+      <url>http://artifactory.eanadev.org/artifactory/libs-release</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>libs-snapshot</id>
+      <name>libs-snapshot</name>
+      <url>http://artifactory.eanadev.org/artifactory/libs-snapshot</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>

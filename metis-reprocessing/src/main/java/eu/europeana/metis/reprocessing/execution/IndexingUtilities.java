@@ -1,14 +1,13 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
-import eu.europeana.metis.utils.ExternalRequestUtil;
-import java.util.Collections;
-import java.util.Map;
-import org.apache.zookeeper.KeeperException.SessionExpiredException;
+import eu.europeana.metis.schema.jibx.RDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains functionality for indexing.
@@ -20,8 +19,7 @@ import org.apache.zookeeper.KeeperException.SessionExpiredException;
  */
 public class IndexingUtilities {
 
-  private static final Map<Class<?>, String> exceptionMap = Collections
-      .singletonMap(SessionExpiredException.class, "Session expired");
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndexingUtilities.class);
 
   private IndexingUtilities() {
   }
@@ -34,14 +32,19 @@ public class IndexingUtilities {
    * @param basicConfiguration the configuration class that contains required properties
    * @throws IndexingException if an exception occurred during indexing
    */
-  public static void indexRdf(RDF rdf, Boolean preserveTimestamps,
+  public static void indexRecord(RDF rdf, Boolean preserveTimestamps,
       BasicConfiguration basicConfiguration) throws IndexingException {
     try {
       final IndexerPool indexerPool = basicConfiguration.getIndexerPool();
-      ExternalRequestUtil.retryableExternalRequest(() -> {
-        indexerPool.indexRdf(rdf, preserveTimestamps);
+      ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> {
+        try {
+          indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
+        } catch (IndexingException e) {
+          LOGGER.warn("Could not index rdf with about {}",
+              rdf.getProvidedCHOList().get(0).getAbout());
+        }
         return null;
-      }, exceptionMap);
+      });
     } catch (Exception e) {
       throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
     }

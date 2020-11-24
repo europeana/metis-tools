@@ -1,12 +1,8 @@
 package eu.europeana.metis.reprocessing.utilities;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions.Builder;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+import com.mongodb.client.MongoClient;
+import eu.europeana.metis.mongo.connection.MongoClientProvider;
+import eu.europeana.metis.mongo.connection.MongoProperties;
 
 /**
  * Initialize MongoClient
@@ -38,34 +34,15 @@ public class MongoInitializer {
   }
 
   public void initializeMongoClient() {
-    if (mongoHosts.length != mongoPorts.length
-        && mongoPorts.length != 1) {
-      throw new IllegalArgumentException("Mongo hosts and ports are not properly configured.");
-    }
+    mongoClient = new MongoClientProvider<>(getMongoProperties()).createMongoClient();
+  }
 
-    List<ServerAddress> serverAddresses = new ArrayList<>();
-    for (int i = 0; i < mongoHosts.length; i++) {
-      ServerAddress address;
-      if (mongoHosts.length == mongoPorts.length) {
-        address = new ServerAddress(mongoHosts[i], mongoPorts[i]);
-      } else { // Same port for all
-        address = new ServerAddress(mongoHosts[i], mongoPorts[0]);
-      }
-      serverAddresses.add(address);
-    }
-
-    Builder optionsBuilder = new Builder();
-    optionsBuilder.sslEnabled(mongoEnablessl);
-    optionsBuilder.connectionsPerHost(2000);
-    if (StringUtils.isEmpty(mongoDb) || StringUtils.isEmpty(mongoUsername) || StringUtils
-        .isEmpty(mongoPassword)) {
-      mongoClient = new MongoClient(serverAddresses, optionsBuilder.build());
-    } else {
-      MongoCredential mongoCredential = MongoCredential
-          .createCredential(mongoUsername, mongoAuthenticationDb,
-              mongoPassword.toCharArray());
-      mongoClient = new MongoClient(serverAddresses, mongoCredential, optionsBuilder.build());
-    }
+  private MongoProperties<IllegalArgumentException> getMongoProperties() {
+    final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
+        IllegalArgumentException::new);
+    mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
+        mongoPassword, mongoEnablessl, null);
+    return mongoProperties;
   }
 
   public void close() {

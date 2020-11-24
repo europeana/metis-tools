@@ -3,7 +3,6 @@ package eu.europeana.metis.reprocessing.execution;
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.STATISTICS_LOGS_MARKER;
 
-import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
@@ -12,6 +11,7 @@ import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.model.Mode;
+import eu.europeana.metis.schema.jibx.RDF;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Date;

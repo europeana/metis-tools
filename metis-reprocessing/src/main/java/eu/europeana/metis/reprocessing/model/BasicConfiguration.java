@@ -10,12 +10,12 @@ import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.utils.CustomTruststoreAppender;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class BasicConfiguration {
   private ExtraConfiguration extraConfiguration;
 
   public BasicConfiguration(PropertiesHolder propertiesHolder)
-      throws TrustStoreConfigurationException, IndexingException, URISyntaxException {
+      throws IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException {
     this.propertiesHolder = propertiesHolder;
     metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
     mongoSourceMongoDao = new MongoSourceMongoDao(propertiesHolder);
@@ -161,9 +161,6 @@ public class BasicConfiguration {
     metisCoreMongoDao.close();
     mongoSourceMongoDao.close();
     mongoDestinationMongoDao.close();
-    if (extraConfiguration != null) {
-      extraConfiguration.close();
-    }
     indexerPool.close();
   }
 }

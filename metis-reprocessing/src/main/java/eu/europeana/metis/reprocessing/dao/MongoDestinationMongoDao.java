@@ -1,18 +1,20 @@
 package eu.europeana.metis.reprocessing.dao;
 
-import com.mongodb.MongoClient;
-import eu.europeana.corelib.edm.exceptions.MongoDBException;
-import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
+import com.mongodb.client.MongoClient;
+import dev.morphia.Datastore;
+import dev.morphia.Morphia;
+import dev.morphia.mapping.Mapper;
+import dev.morphia.query.FindOptions;
+import dev.morphia.query.Query;
+import dev.morphia.query.experimental.filters.Filters;
+import eu.europeana.metis.mongo.dao.RecordDao;
+import eu.europeana.metis.mongo.utils.MorphiaUtils;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
-import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.List;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.query.FindOptions;
-import org.mongodb.morphia.query.Query;
 
 /**
  * Mongo Dao for destination mongo.
@@ -46,23 +48,24 @@ public class MongoDestinationMongoDao {
     Query<FailedRecord> query = mongoDestinationDatastore.createQuery(FailedRecord.class);
     query.field(FAILED_URL).startsWith("/" + datasetId + "/").field(SUCCESSFULLY_REPROCESSED)
         .equal(false);
-    return ExternalRequestUtil.retryableExternalRequestConnectionReset(() -> query.asList(
+    return MorphiaUtils.getListOfQueryRetryable(query,
         new FindOptions().skip(nextPage * MongoSourceMongoDao.PAGE_SIZE)
-            .limit(MongoSourceMongoDao.PAGE_SIZE)));
+            .limit(MongoSourceMongoDao.PAGE_SIZE));
   }
 
   public DatasetStatus getDatasetStatus(String datasetId) {
-    return mongoDestinationDatastore.find(DatasetStatus.class).filter(DATASET_ID, datasetId).get();
+    return mongoDestinationDatastore.find(DatasetStatus.class)
+        .filter(Filters.eq(DATASET_ID, datasetId)).first();
   }
 
   public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
-    ExternalRequestUtil.retryableExternalRequestConnectionReset(
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> mongoDestinationDatastore.save(datasetStatus));
   }
 
   public void storeFailedRecordToDb(FailedRecord failedRecord) {
     //Will replace it if already existent
-    ExternalRequestUtil.retryableExternalRequestConnectionReset(
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> mongoDestinationDatastore.save(failedRecord));
   }
 
@@ -73,24 +76,20 @@ public class MongoDestinationMongoDao {
   }
 
   private MongoInitializer prepareMongoDestinationConfiguration() {
-    MongoInitializer mongoInitializer = new MongoInitializer(
-        propertiesHolder.destinationMongoHosts,
-        propertiesHolder.destinationMongoPorts,
-        propertiesHolder.destinationMongoAuthenticationDb,
-        propertiesHolder.destinationMongoUsername,
-        propertiesHolder.destinationMongoPassword,
-        propertiesHolder.destinationMongoEnablessl,
-        propertiesHolder.destinationMongoDb);
+    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.destinationMongoHosts,
+        propertiesHolder.destinationMongoPorts, propertiesHolder.destinationMongoAuthenticationDb,
+        propertiesHolder.destinationMongoUsername, propertiesHolder.destinationMongoPassword,
+        propertiesHolder.destinationMongoEnablessl, propertiesHolder.destinationMongoDb);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }
 
   private static Datastore createMongoDestinationDatastore(MongoClient mongoClient,
       String databaseName) {
-    Morphia morphia = new Morphia();
-    morphia.map(DatasetStatus.class);
-    morphia.map(FailedRecord.class);
-    final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
+    final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName);
+    final Mapper mapper = datastore.getMapper();
+    mapper.map(DatasetStatus.class);
+    mapper.map(FailedRecord.class);
     //Ensure indexes, to create them in destination only
     datastore.ensureIndexes();
     return datastore;
@@ -99,11 +98,7 @@ public class MongoDestinationMongoDao {
   private static void createIndexesForDestinationMongoRecords(MongoClient mongoClient,
       String databaseName) {
     //Ignore object since we are using the IndexerImpl
-    try {
-      new EdmMongoServerImpl(mongoClient, databaseName, true);
-    } catch (MongoDBException e) {
-      e.printStackTrace();
-    }
+    new RecordDao(mongoClient, databaseName, true);
   }
 
   public void close() {

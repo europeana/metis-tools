@@ -1,14 +1,14 @@
 package eu.europeana.metis.technical.metadata.generation.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import eu.europeana.metis.core.workflow.HasMongoObjectId;
-import eu.europeana.metis.json.ObjectIdSerializer;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexed;
 import eu.europeana.metis.mediaprocessing.model.ResourceMetadata;
+import eu.europeana.metis.mongo.model.HasMongoObjectId;
+import eu.europeana.metis.mongo.utils.ObjectIdSerializer;
 import java.util.List;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.IndexOptions;
-import org.mongodb.morphia.annotations.Indexed;
 
 /**
  * Model class that contains the {@link ResourceMetadata} and a list containing {@link

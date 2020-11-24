@@ -1,15 +1,18 @@
 package eu.europeana.metis.reprocessing.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import eu.europeana.metis.core.workflow.HasMongoObjectId;
-import eu.europeana.metis.json.ObjectIdSerializer;
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexes;
+import eu.europeana.metis.mongo.model.HasMongoObjectId;
+import eu.europeana.metis.mongo.utils.ObjectIdSerializer;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.IndexOptions;
-import org.mongodb.morphia.annotations.Indexed;
 
 /**
  * Model class for containing dataset status information.
@@ -17,13 +20,13 @@ import org.mongodb.morphia.annotations.Indexed;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-14
  */
+@Entity
+@Indexes({@Index(fields = {@Field("datasetId")}, options = @IndexOptions(unique = true))})
 public class DatasetStatus implements HasMongoObjectId {
 
   @Id
   @JsonSerialize(using = ObjectIdSerializer.class)
   private ObjectId id;
-
-  @Indexed(options = @IndexOptions(unique = true))
   private String datasetId;
   private int indexInOrderedList;
   private Date startDate;
@@ -157,10 +160,10 @@ public class DatasetStatus implements HasMongoObjectId {
     return String.format(
         "ObjectId: %s, datasetId: %s, totalRecords: %d, totalProcessed: %d, totalFailedRecords: %d, "
             + "totalTimeProcessingInSecs: %fs = %fh, totalTimeIndexingInSecs: %fs = %fh, "
-            + "averageTimeRecordProcessingInSecs: %fs, averageTimeRecordIndexingInSecs: %fs",
-        id, datasetId, totalRecords, totalProcessed, totalFailedRecords,
-        totalTimeProcessingInSecs, secondsTimeToHours(totalTimeProcessingInSecs),
-        totalTimeIndexingInSecs, secondsTimeToHours(totalTimeIndexingInSecs),
-        averageTimeRecordProcessingInSecs, averageTimeRecordIndexingInSecs);
+            + "averageTimeRecordProcessingInSecs: %fs, averageTimeRecordIndexingInSecs: %fs", id,
+        datasetId, totalRecords, totalProcessed, totalFailedRecords, totalTimeProcessingInSecs,
+        secondsTimeToHours(totalTimeProcessingInSecs), totalTimeIndexingInSecs,
+        secondsTimeToHours(totalTimeIndexingInSecs), averageTimeRecordProcessingInSecs,
+        averageTimeRecordIndexingInSecs);
   }
 }
