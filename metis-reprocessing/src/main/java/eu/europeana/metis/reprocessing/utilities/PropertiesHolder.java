@@ -37,6 +37,7 @@ public class PropertiesHolder {
   public final int endAtDatasetIndex;
   public final int sourceMongoPageSize;
   public final Mode mode;
+  public final String[] datasetIdsToProcess;
   public final boolean identityProcess;
   public final boolean enablePostProcess;
   public final List<ExecutablePluginType> invalidatePluginTypes;
@@ -105,6 +106,7 @@ public class PropertiesHolder {
     endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
+    datasetIdsToProcess = properties.getProperty("dataset.ids.to.process").split(",");
     identityProcess = Boolean
         .parseBoolean(properties.getProperty("identity.process"));
     enablePostProcess = Boolean

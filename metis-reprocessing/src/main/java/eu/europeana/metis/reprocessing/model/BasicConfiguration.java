@@ -40,6 +40,7 @@ public class BasicConfiguration {
   private final Mode mode;
   private final boolean identityProcess;
   private final boolean enablePostProcess;
+  private final String[] datasetIdsToProcess;
   private final List<ExecutablePluginType> invalidatePluginTypes;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private ExtraConfiguration extraConfiguration;
@@ -47,7 +48,12 @@ public class BasicConfiguration {
   public BasicConfiguration(PropertiesHolder propertiesHolder)
       throws IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException {
     this.propertiesHolder = propertiesHolder;
-    metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
+    //Create metis core dao only if there aren't any specific datasets to process
+    if (propertiesHolder.datasetIdsToProcess.length > 0) {
+      metisCoreMongoDao = null;
+    } else {
+      metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
+    }
     mongoSourceMongoDao = new MongoSourceMongoDao(propertiesHolder);
     mongoDestinationMongoDao = new MongoDestinationMongoDao(propertiesHolder);
 
@@ -58,6 +64,7 @@ public class BasicConfiguration {
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
     indexerPool = new IndexerPool(indexerFactory, 600, 60);
     mode = propertiesHolder.mode;
+    datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
     enablePostProcess = propertiesHolder.enablePostProcess;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
@@ -84,13 +91,11 @@ public class BasicConfiguration {
     return extraConfiguration;
   }
 
-  public void setExtraConfiguration(
-      ExtraConfiguration extraConfiguration) {
+  public void setExtraConfiguration(ExtraConfiguration extraConfiguration) {
     this.extraConfiguration = extraConfiguration;
   }
 
-  private void prepareMongoSettings(IndexingSettings indexingSettings)
-      throws IndexingException {
+  private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
     for (int i = 0; i < propertiesHolder.destinationMongoHosts.length; i++) {
       if (propertiesHolder.destinationMongoHosts.length
           == propertiesHolder.destinationMongoPorts.length) {
@@ -103,15 +108,13 @@ public class BasicConfiguration {
                 propertiesHolder.destinationMongoPorts[0]));
       }
     }
-    indexingSettings
-        .setMongoDatabaseName(propertiesHolder.destinationMongoDb);
+    indexingSettings.setMongoDatabaseName(propertiesHolder.destinationMongoDb);
     if (StringUtils.isEmpty(propertiesHolder.destinationMongoAuthenticationDb) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoUsername) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoPassword)) {
       LOGGER.info("Mongo credentials not provided");
     } else {
-      indexingSettings.setMongoCredentials(
-          propertiesHolder.destinationMongoUsername,
+      indexingSettings.setMongoCredentials(propertiesHolder.destinationMongoUsername,
           propertiesHolder.destinationMongoPassword,
           propertiesHolder.destinationMongoAuthenticationDb);
     }
@@ -143,14 +146,17 @@ public class BasicConfiguration {
                 propertiesHolder.destinationZookeeperPorts[0]));
       }
     }
-    indexingSettings
-        .setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
+    indexingSettings.setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
     indexingSettings
         .setZookeeperDefaultCollection(propertiesHolder.destinationZookeeperDefaultCollection);
   }
 
   public Mode getMode() {
     return mode;
+  }
+
+  public String[] getDatasetIdsToProcess() {
+    return datasetIdsToProcess;
   }
 
   public boolean isIdentityProcess() {

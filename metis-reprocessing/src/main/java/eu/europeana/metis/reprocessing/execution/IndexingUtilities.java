@@ -35,6 +35,8 @@ public class IndexingUtilities {
   public static void indexRecord(RDF rdf, Boolean preserveTimestamps,
       BasicConfiguration basicConfiguration) throws IndexingException {
     try {
+      //The indexer pool shouldn't be closed here, therefore it's not initialized in a
+      // try-with-resources block
       final IndexerPool indexerPool = basicConfiguration.getIndexerPool();
       ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> {
         try {
