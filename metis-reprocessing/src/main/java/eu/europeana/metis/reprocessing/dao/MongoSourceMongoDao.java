@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.dao;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
@@ -78,10 +79,12 @@ public class MongoSourceMongoDao {
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::count);
   }
 
-  public WebResourceMetaInfoImpl getTechnicalMetadataFromSource(String resourceUrlInMd5) {
+  public List<WebResourceMetaInfoImpl> getTechnicalMetadataForHashCodes(List<String> hashCodes) {
     final Query<WebResourceMetaInfoImpl> query = mongoSourceDatastore
         .find(WebResourceMetaInfoImpl.class);
-    return query.filter(Filters.eq(ID, resourceUrlInMd5)).first();
+    final BasicDBObject basicObject = new BasicDBObject("$in", hashCodes);
+    query.filter(Filters.eq("_id", basicObject));
+    return MorphiaUtils.getListOfQueryRetryable(query);
   }
 
   private MongoInitializer prepareMongoSourceConfiguration() {
