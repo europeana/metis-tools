@@ -78,6 +78,11 @@ public class MongoDestinationMongoDao {
         .delete();
   }
 
+  public void deleteAll() {
+    mongoDestinationDatastore.getDatabase().drop();
+    mongoDestinationDatastore.ensureIndexes();
+  }
+
   public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
     ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> mongoDestinationDatastore.save(datasetStatus));

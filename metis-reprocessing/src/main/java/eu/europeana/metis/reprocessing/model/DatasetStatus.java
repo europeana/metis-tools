@@ -20,7 +20,7 @@ import org.bson.types.ObjectId;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-14
  */
-@Entity
+@Entity("DatasetStatus")
 @Indexes({@Index(fields = {@Field("datasetId")}, options = @IndexOptions(unique = true))})
 public class DatasetStatus implements HasMongoObjectId {
 

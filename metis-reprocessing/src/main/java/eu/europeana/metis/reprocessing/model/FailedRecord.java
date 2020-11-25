@@ -9,7 +9,7 @@ import dev.morphia.annotations.Id;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-20
  */
-@Entity
+@Entity("FailedRecord")
 public class FailedRecord {
 
   @Id

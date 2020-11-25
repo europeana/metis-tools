@@ -170,7 +170,7 @@ public class ProcessDataset implements Callable<Void> {
     //try-with-resources block
     try {
       LOGGER.info("Commit changes for dataset {}", datasetId);
-      basicConfiguration.getIndexer().triggerFlushOfPendingChanges(true);
+      basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
       LOGGER.info("Committed changes for dataset {}", datasetId);
     } catch (IndexingException e) {
       LOGGER.warn("Could not commit changes to solr, changes will be visible after auto commit", e);

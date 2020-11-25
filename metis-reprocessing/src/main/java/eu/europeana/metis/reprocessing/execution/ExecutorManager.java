@@ -10,6 +10,7 @@ import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +66,20 @@ public class ExecutorManager {
     completionService = new ExecutorCompletionService<>(threadPool);
 
     this.basicConfiguration = basicConfiguration;
+  }
+
+  public void clearDatabases() {
+    if (basicConfiguration.isClearDatabasesBeforeProcess()) {
+      LOGGER.info("Clearing database");
+      basicConfiguration.getMongoDestinationMongoDao().deleteAll();
+      try {
+        basicConfiguration.getDestinationCompoundSolrClient().getSolrClient().deleteByQuery("*:*");
+        basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
+      } catch (SolrServerException | IOException | IndexingException e) {
+        LOGGER.warn("Could not cleanup solr", e);
+      }
+      LOGGER.info("Cleared database");
+    }
   }
 
   public void startReprocessing() throws InterruptedException {
@@ -154,8 +170,8 @@ public class ExecutorManager {
   }
 
   private Map<String, Long> getDatasetWithSizeFromProvidedList() {
-    return basicConfiguration.getDatasetIdsToProcess().stream().collect(
-        toMap(Function.identity(), datasetId -> basicConfiguration.getMongoSourceMongoDao()
+    return basicConfiguration.getDatasetIdsToProcess().stream().collect(toMap(Function.identity(),
+        datasetId -> basicConfiguration.getMongoSourceMongoDao()
             .getTotalRecordsForDataset(datasetId)));
   }
 
@@ -168,16 +184,6 @@ public class ExecutorManager {
    */
   private DatasetStatus retrieveOrInitializeDatasetStatus(String datasetId, int indexInOrderedList,
       long totalRecordsForDataset) {
-    if (basicConfiguration.isRemoveDatasetBeforeProcess()) {
-      LOGGER.info("Removing datasetStatus and dataset record from database");
-      basicConfiguration.getMongoDestinationMongoDao().deleteDatasetStatus(datasetId);
-      try {
-        basicConfiguration.getIndexer().removeAll(datasetId, new Date());
-      } catch (IndexingException e) {
-        LOGGER.warn("Could not remove dataset records {}", datasetId);
-      }
-      LOGGER.info("Removed datasetStatus and dataset record from database");
-    }
     DatasetStatus retrievedDatasetStatus = basicConfiguration.getMongoDestinationMongoDao()
         .getDatasetStatus(datasetId);
     if (retrievedDatasetStatus == null) {

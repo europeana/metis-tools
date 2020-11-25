@@ -11,6 +11,8 @@ import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.solr.client.CompoundSolrClient;
+import eu.europeana.metis.solr.connection.SolrClientProvider;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -40,11 +42,12 @@ public class BasicConfiguration {
   private final MetisCoreMongoDao metisCoreMongoDao;
   private final MongoSourceMongoDao mongoSourceMongoDao;
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
-  private final IndexerPool indexerPool;
-  private final Indexer indexer;
+  private final CompoundSolrClient destinationCompoundSolrClient;
+  private final IndexerPool destinationIndexerPool;
+  private final Indexer destinationIndexer;
   private final Mode mode;
   private final boolean identityProcess;
-  private final boolean removeDatasetBeforeProcess;
+  private final boolean clearDatabasesBeforeProcess;
   private final List<String> datasetIdsToProcess;
   private final List<ExecutablePluginType> invalidatePluginTypes;
   private final ExecutablePluginType reprocessBasedOnPluginType;
@@ -66,14 +69,15 @@ public class BasicConfiguration {
     prepareMongoSettings(indexingSettings);
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
+    destinationCompoundSolrClient = new SolrClientProvider<>(indexingSettings.getSolrProperties()).createSolrClient();
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
-    indexerPool = new IndexerPool(indexerFactory, 600, 60);
-    indexer = indexerFactory.getIndexer();
+    destinationIndexerPool = new IndexerPool(indexerFactory, 600, 60);
+    destinationIndexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess == null ? Collections.emptyList()
         : Arrays.asList(propertiesHolder.datasetIdsToProcess);
     identityProcess = propertiesHolder.identityProcess;
-    removeDatasetBeforeProcess = propertiesHolder.removeDatasetBeforeProcess;
+    clearDatabasesBeforeProcess = propertiesHolder.clearDatabasesBeforeProcess;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
   }
@@ -90,12 +94,16 @@ public class BasicConfiguration {
     return mongoDestinationMongoDao;
   }
 
-  public IndexerPool getIndexerPool() {
-    return indexerPool;
+  public CompoundSolrClient getDestinationCompoundSolrClient() {
+    return destinationCompoundSolrClient;
   }
 
-  public Indexer getIndexer() {
-    return indexer;
+  public IndexerPool getDestinationIndexerPool() {
+    return destinationIndexerPool;
+  }
+
+  public Indexer getDestinationIndexer() {
+    return destinationIndexer;
   }
 
   public ExtraConfiguration getExtraConfiguration() {
@@ -174,8 +182,8 @@ public class BasicConfiguration {
     return identityProcess;
   }
 
-  public boolean isRemoveDatasetBeforeProcess() {
-    return removeDatasetBeforeProcess;
+  public boolean isClearDatabasesBeforeProcess() {
+    return clearDatabasesBeforeProcess;
   }
 
   public List<ExecutablePluginType> getInvalidatePluginTypes() {
@@ -192,7 +200,8 @@ public class BasicConfiguration {
     }
     mongoSourceMongoDao.close();
     mongoDestinationMongoDao.close();
-    indexerPool.close();
-    indexer.close();
+    destinationCompoundSolrClient.close();
+    destinationIndexerPool.close();
+    destinationIndexer.close();
   }
 }

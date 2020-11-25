@@ -37,7 +37,7 @@ public class IndexUtilities {
     try {
       //The indexer pool shouldn't be closed here, therefore it's not initialized in a
       // try-with-resources block
-      final IndexerPool indexerPool = basicConfiguration.getIndexerPool();
+      final IndexerPool indexerPool = basicConfiguration.getDestinationIndexerPool();
       ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> {
         try {
           indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
