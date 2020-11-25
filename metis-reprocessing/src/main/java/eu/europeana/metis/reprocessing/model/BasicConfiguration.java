@@ -44,7 +44,6 @@ public class BasicConfiguration {
   private final Indexer indexer;
   private final Mode mode;
   private final boolean identityProcess;
-  private final boolean enablePostProcess;
   private final boolean removeDatasetBeforeProcess;
   private final List<String> datasetIdsToProcess;
   private final List<ExecutablePluginType> invalidatePluginTypes;
@@ -74,7 +73,6 @@ public class BasicConfiguration {
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess == null ? Collections.emptyList()
         : Arrays.asList(propertiesHolder.datasetIdsToProcess);
     identityProcess = propertiesHolder.identityProcess;
-    enablePostProcess = propertiesHolder.enablePostProcess;
     removeDatasetBeforeProcess = propertiesHolder.removeDatasetBeforeProcess;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
@@ -174,10 +172,6 @@ public class BasicConfiguration {
 
   public boolean isIdentityProcess() {
     return identityProcess;
-  }
-
-  public boolean isEnablePostProcess() {
-    return enablePostProcess;
   }
 
   public boolean isRemoveDatasetBeforeProcess() {

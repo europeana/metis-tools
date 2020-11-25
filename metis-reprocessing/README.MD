@@ -14,7 +14,8 @@ For the REPROCESS_ALL_FAILED mode only paralellization of datasets is implemente
 - `end.at.dataset.index` -> The index of the dataset in the list from where the processing should end at. Max integer if no value provided
 - `source.mongo.page.size` -> The page size when reading from mongo
 - `mode` -> The mode of the script. DEFAULT, REPROCESS_ALL_FAILED
-- `dataset.ids.to.process` -> A comma separated list of dataset ids to process bypassing processing all dataset ids
+- `dataset.ids.to.process` -> A comma separated list of dataset ids to process bypassing processing all dataset ids.  
+If this field is empty then the metis core mongo configuration is required so that datasetIds are fetched from there. Otherwise it's not required.
 - `identity.process` -> Set to true to do a simple read and then write reindex, without altering the record
 - `enable.post.process` -> Set to true only when the metis core has to be updated too, this is enabled when everything is tested and the final execution is performed. For regular operations keep this value false
 - `remove.dataset.before.process=` -> Set to true if a dataset that was already processed from a previous execution(even if it wasn't full processed) needs to be reprocessed

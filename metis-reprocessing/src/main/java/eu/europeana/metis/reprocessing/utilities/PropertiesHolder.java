@@ -40,7 +40,6 @@ public class PropertiesHolder {
   public final Mode mode;
   public final String[] datasetIdsToProcess;
   public final boolean identityProcess;
-  public final boolean enablePostProcess;
   public final boolean removeDatasetBeforeProcess;
   public final List<ExecutablePluginType> invalidatePluginTypes;
   public final ExecutablePluginType reprocessBasedOnPluginType;
@@ -117,7 +116,6 @@ public class PropertiesHolder {
         StringUtils.isBlank(properties.getProperty("dataset.ids.to.process")) ? null
             : properties.getProperty("dataset.ids.to.process").split(",");
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
-    enablePostProcess = Boolean.parseBoolean(properties.getProperty("enable.post.process"));
     removeDatasetBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("remove.dataset.before.process"));
     invalidatePluginTypes = Arrays

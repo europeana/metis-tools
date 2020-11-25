@@ -21,11 +21,11 @@ import org.slf4j.LoggerFactory;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-15
  */
-public class ProcessingUtilities {
+public class ProcessUtilities {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessingUtilities.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessUtilities.class);
 
-  private ProcessingUtilities() {
+  private ProcessUtilities() {
   }
 
   public static RDF processFullBean(FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {

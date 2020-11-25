@@ -32,9 +32,9 @@ import org.bson.types.ObjectId;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-22
  */
-public class PostReProcessingUtilities {
+public class PostProcessUtilities {
 
-  private PostReProcessingUtilities() {
+  private PostProcessUtilities() {
   }
 
   /**
@@ -50,9 +50,7 @@ public class PostReProcessingUtilities {
   public static void postProcess(String datasetId, Date startDate, Date endDate,
       BasicConfiguration basicConfiguration) {
     // TODO: 25/11/2020 Add copy of WebResourceMetaInfo in Mongo?
-    if (basicConfiguration.isEnablePostProcess()) {
-      updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
-    }
+    updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
   }
 
   public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,

@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-17
  */
-public class IndexingUtilities {
+public class IndexUtilities {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IndexingUtilities.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndexUtilities.class);
 
-  private IndexingUtilities() {
+  private IndexUtilities() {
   }
 
   /**

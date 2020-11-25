@@ -43,18 +43,16 @@ public class MongoSourceMongoDao {
   public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   private final MongoInitializer sourceMongoInitializer;
-  private Datastore mongoSourceDatastore;
-  private PropertiesHolder propertiesHolder;
+  private final Datastore mongoSourceDatastore;
+  private final PropertiesHolder propertiesHolder;
 
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
-    // TODO: 8-6-19 Create a pool of connections, to speed up the read/write on db?
     this.propertiesHolder = propertiesHolder;
     PAGE_SIZE = propertiesHolder.sourceMongoPageSize;
     sourceMongoInitializer = prepareMongoSourceConfiguration();
     mongoSourceDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
         propertiesHolder.sourceMongoDb);
   }
-
 
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
     Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);

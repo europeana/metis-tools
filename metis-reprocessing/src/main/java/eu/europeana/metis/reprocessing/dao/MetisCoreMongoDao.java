@@ -33,9 +33,9 @@ public class MetisCoreMongoDao {
   private static final Logger LOGGER = LoggerFactory.getLogger(MetisCoreMongoDao.class);
   private static final String DATASET_ID = "datasetId";
   private final MongoInitializer metisCoreMongoInitializer;
-  private Datastore metisCoreDatastore;
+  private final Datastore metisCoreDatastore;
+  private final PropertiesHolder propertiesHolder;
   private final WorkflowExecutionDao workflowExecutionDao;
-  private PropertiesHolder propertiesHolder;
 
   public MetisCoreMongoDao(PropertiesHolder propertiesHolder)
       throws CustomTruststoreAppender.TrustStoreConfigurationException {

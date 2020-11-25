@@ -98,6 +98,10 @@ public class ReprocessForDataset implements Callable<Void> {
           prefixDatasetIdLog, datasetStatus.getTotalFailedRecords());
       //Process only failed records no matter if the dataset has already been completed
       loopOverAllFailedRecordsAndProcess();
+    } else if (basicConfiguration.getMode() == Mode.POST_PROCESS) {
+      postProcess();
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Applied after reprocessing function",
+          prefixDatasetIdLog);
     }
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing end", prefixDatasetIdLog);
     LOGGER
@@ -150,9 +154,6 @@ public class ReprocessForDataset implements Callable<Void> {
     basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     defaultOperation();
     commitSolrChanges();
-    postReProcess();
-    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Applied after reprocessing function",
-        prefixDatasetIdLog);
   }
 
   private void loopOverAllFailedRecordsAndProcess() {
@@ -202,7 +203,7 @@ public class ReprocessForDataset implements Callable<Void> {
    * Default processing operation.
    * <p>It calculates all sorts of statistics provided in the {@link DatasetStatus} in the
    * datastore. Creates new {@link PageProcess} classes and starts them under the thread pool, while
-   * finalizing the operation by running {@link #postReProcess()} when all records have been
+   * finalizing the operation by running {@link #postProcess()} when all records have been
    * processed.
    */
   private void defaultOperation() throws InterruptedException, ExecutionException {
@@ -381,7 +382,7 @@ public class ReprocessForDataset implements Callable<Void> {
     }
   }
 
-  private void postReProcess() {
+  private void postProcess() {
     try {
       basicConfiguration.getExtraConfiguration().getAfterReprocessProcessor()
           .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),

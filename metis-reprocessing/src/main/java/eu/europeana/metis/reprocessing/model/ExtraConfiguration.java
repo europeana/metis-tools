@@ -3,9 +3,9 @@ package eu.europeana.metis.reprocessing.model;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
-import eu.europeana.metis.reprocessing.execution.IndexingUtilities;
-import eu.europeana.metis.reprocessing.execution.PostReProcessingUtilities;
-import eu.europeana.metis.reprocessing.execution.ProcessingUtilities;
+import eu.europeana.metis.reprocessing.execution.IndexUtilities;
+import eu.europeana.metis.reprocessing.execution.PostProcessUtilities;
+import eu.europeana.metis.reprocessing.execution.ProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import eu.europeana.metis.schema.jibx.RDF;
@@ -30,9 +30,9 @@ public class ExtraConfiguration {
     final PropertiesHolderExtension propertiesHolderExtension = propertiesHolder
         .getPropertiesHolderExtension();
 
-    this.fullBeanProcessor = ProcessingUtilities::processFullBean;
-    this.rdfIndexer = IndexingUtilities::indexRecord;
-    this.afterReprocessProcessor = PostReProcessingUtilities::postProcess;
+    this.fullBeanProcessor = ProcessUtilities::processFullBean;
+    this.rdfIndexer = IndexUtilities::indexRecord;
+    this.afterReprocessProcessor = PostProcessUtilities::postProcess;
   }
 
   public ThrowingBiFunction<FullBeanImpl, BasicConfiguration, RDF> getFullBeanProcessor() {

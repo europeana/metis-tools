@@ -8,6 +8,20 @@ import dev.morphia.mapping.Mapper;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.experimental.filters.Filters;
+import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.corelib.solr.entity.AgentImpl;
+import eu.europeana.corelib.solr.entity.AggregationImpl;
+import eu.europeana.corelib.solr.entity.BasicProxyImpl;
+import eu.europeana.corelib.solr.entity.ConceptImpl;
+import eu.europeana.corelib.solr.entity.ConceptSchemeImpl;
+import eu.europeana.corelib.solr.entity.EuropeanaAggregationImpl;
+import eu.europeana.corelib.solr.entity.EventImpl;
+import eu.europeana.corelib.solr.entity.PhysicalThingImpl;
+import eu.europeana.corelib.solr.entity.PlaceImpl;
+import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
+import eu.europeana.corelib.solr.entity.ProxyImpl;
+import eu.europeana.corelib.solr.entity.TimespanImpl;
+import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mongo.dao.RecordDao;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
@@ -32,12 +46,11 @@ public class MongoDestinationMongoDao {
   private static final String SUCCESSFULLY_REPROCESSED = "successfullyReprocessed";
 
   private final MongoInitializer destinationMongoInitializer;
-  private Datastore mongoDestinationDatastore;
-  private PropertiesHolder propertiesHolder;
+  private final Datastore mongoDestinationDatastore;
+  private final PropertiesHolder propertiesHolder;
 
   public MongoDestinationMongoDao(PropertiesHolder propertiesHolder) {
     this.propertiesHolder = propertiesHolder;
-    //Mongo Destination
     destinationMongoInitializer = prepareMongoDestinationConfiguration();
     mongoDestinationDatastore = createMongoDestinationDatastore(
         destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoDb);
@@ -96,6 +109,21 @@ public class MongoDestinationMongoDao {
     final Mapper mapper = datastore.getMapper();
     mapper.map(DatasetStatus.class);
     mapper.map(FailedRecord.class);
+
+    mapper.map(FullBeanImpl.class);
+    mapper.map(ProvidedCHOImpl.class);
+    mapper.map(AgentImpl.class);
+    mapper.map(AggregationImpl.class);
+    mapper.map(ConceptImpl.class);
+    mapper.map(ProxyImpl.class);
+    mapper.map(PlaceImpl.class);
+    mapper.map(TimespanImpl.class);
+    mapper.map(WebResourceImpl.class);
+    mapper.map(EuropeanaAggregationImpl.class);
+    mapper.map(EventImpl.class);
+    mapper.map(PhysicalThingImpl.class);
+    mapper.map(ConceptSchemeImpl.class);
+    mapper.map(BasicProxyImpl.class);
     //Ensure indexes, to create them in destination only
     datastore.ensureIndexes();
     return datastore;
