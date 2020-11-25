@@ -8,6 +8,7 @@ import dev.morphia.mapping.Mapper;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.experimental.filters.Filters;
+import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
@@ -124,6 +125,7 @@ public class MongoDestinationMongoDao {
     mapper.map(PhysicalThingImpl.class);
     mapper.map(ConceptSchemeImpl.class);
     mapper.map(BasicProxyImpl.class);
+    mapper.map(WebResourceMetaInfoImpl.class);
     //Ensure indexes, to create them in destination only
     datastore.ensureIndexes();
     return datastore;

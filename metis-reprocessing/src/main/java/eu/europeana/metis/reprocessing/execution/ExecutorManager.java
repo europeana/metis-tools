@@ -116,7 +116,7 @@ public class ExecutorManager {
         case DEFAULT:
         case REPROCESS_ALL_FAILED:
         default:
-          callable = new ReprocessForDataset(datasetStatus, basicConfiguration,
+          callable = new ProcessDataset(datasetStatus, basicConfiguration,
               maxParallelThreadsPerDataset);
       }
       final Future<Void> submit = completionService.submit(callable);

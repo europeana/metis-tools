@@ -40,6 +40,7 @@ public class MongoSourceMongoDao {
 
   private static final String ID = "_id";
   private static final int DEFAULT_PAGE_SIZE = 200;
+  public static final String ABOUT = "about";
   public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   private final MongoInitializer sourceMongoInitializer;
@@ -56,7 +57,7 @@ public class MongoSourceMongoDao {
 
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
     Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
-    query.filter(Filters.regex("about").pattern("^/" + datasetId + "/"));
+    query.filter(Filters.regex(ABOUT).pattern("^/" + datasetId + "/"));
     return MorphiaUtils.getListOfQueryRetryable(query,
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE));
   }
@@ -65,7 +66,7 @@ public class MongoSourceMongoDao {
     List<FullBeanImpl> fullBeans = new ArrayList<>();
     Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
     recordIds.forEach(recordId -> {
-      query.filter(Filters.eq("about", recordId));
+      query.filter(Filters.eq(ABOUT, recordId));
       fullBeans.add(ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::first));
     });
     return fullBeans;
@@ -73,7 +74,7 @@ public class MongoSourceMongoDao {
 
   public long getTotalRecordsForDataset(String datasetId) {
     Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
-    query.filter(Filters.regex("about").pattern("^/" + datasetId + "/"));
+    query.filter(Filters.regex(ABOUT).pattern("^/" + datasetId + "/"));
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::count);
   }
 
@@ -110,6 +111,7 @@ public class MongoSourceMongoDao {
     mapper.map(PhysicalThingImpl.class);
     mapper.map(ConceptSchemeImpl.class);
     mapper.map(BasicProxyImpl.class);
+    mapper.map(WebResourceMetaInfoImpl.class);
     return datastore;
   }
 

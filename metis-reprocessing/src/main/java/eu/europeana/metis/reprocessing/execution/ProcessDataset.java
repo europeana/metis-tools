@@ -40,9 +40,9 @@ import org.slf4j.LoggerFactory;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-14
  */
-public class ReprocessForDataset implements Callable<Void> {
+public class ProcessDataset implements Callable<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReprocessForDataset.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDataset.class);
   private final String prefixDatasetIdLog;
   private final String datasetId;
   private final DatasetStatus datasetStatus;
@@ -53,7 +53,7 @@ public class ReprocessForDataset implements Callable<Void> {
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Integer> completionService;
 
-  ReprocessForDataset(DatasetStatus datasetStatus, BasicConfiguration basicConfiguration,
+  ProcessDataset(DatasetStatus datasetStatus, BasicConfiguration basicConfiguration,
       int maxParallelPageThreads) {
     this.datasetId = datasetStatus.getDatasetId();
     this.basicConfiguration = basicConfiguration;
@@ -67,10 +67,10 @@ public class ReprocessForDataset implements Callable<Void> {
 
   @Override
   public Void call() throws ExecutionException, InterruptedException, IndexingException {
-    return reprocessDataset();
+    return processDataset();
   }
 
-  private Void reprocessDataset()
+  private Void processDataset()
       throws ExecutionException, InterruptedException, IndexingException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing starting", prefixDatasetIdLog);
 
