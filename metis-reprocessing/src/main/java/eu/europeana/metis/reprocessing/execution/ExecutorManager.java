@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 public class ExecutorManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorManager.class);
-  private static final String REPROCESSED_DATASETS_STR = "Reprocessed datasets: {}";
+  private static final String PROCESSED_DATASETS_STR = "Processed datasets: {}";
   private final BasicConfiguration basicConfiguration;
   private final int maxParallelThreadsPerDataset;
   private final int totalAllowedThreads;
@@ -102,7 +102,7 @@ public class ExecutorManager {
     int reprocessedDatasets = 0;
 
     int countOfTotalCurrentThreads = 0;
-    final HashMap<Future, Integer> futureConsumedThreadsHashMap = new HashMap<>();
+    final HashMap<Future<Void>, Integer> futureConsumedThreadsHashMap = new HashMap<>();
 
     for (int i = startFromDatasetIndex; i < endAtDatasetIndex && i < datasetStatuses.size(); i++) {
       final DatasetStatus datasetStatus = datasetStatuses.get(i);
@@ -124,13 +124,14 @@ public class ExecutorManager {
         parallelDatasets--;
         countOfTotalCurrentThreads -= futureConsumedThreads;
         reprocessedDatasets++;
-        LOGGER.info(REPROCESSED_DATASETS_STR, reprocessedDatasets);
-        LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
+        LOGGER.info(PROCESSED_DATASETS_STR, reprocessedDatasets);
+        LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, reprocessedDatasets);
       }
       Callable<Void> callable;
       switch (basicConfiguration.getMode()) {
         case DEFAULT:
         case REPROCESS_ALL_FAILED:
+        case POST_PROCESS:
         default:
           callable = new ProcessDataset(datasetStatus, basicConfiguration,
               maxParallelThreadsPerDataset);
@@ -150,9 +151,23 @@ public class ExecutorManager {
         LOGGER.error(EXECUTION_LOGS_MARKER, "An exception occurred in a callable.", e);
       }
       reprocessedDatasets++;
-      LOGGER.info(EXECUTION_LOGS_MARKER, REPROCESSED_DATASETS_STR, reprocessedDatasets);
+      LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, reprocessedDatasets);
     }
+    commitSolrChanges();
     timer.cancel();
+  }
+
+  private void commitSolrChanges() {
+    //Commit changes
+    //The indexer shouldn't be closed here, therefore it's not initialized in a
+    //try-with-resources block
+    try {
+      LOGGER.info("Commit changes");
+      basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
+      LOGGER.info("Committed changes");
+    } catch (IndexingException e) {
+      LOGGER.warn("Could not commit changes to solr, changes will be visible after auto commit", e);
+    }
   }
 
   private Map<String, Long> getDatasetsWithSize() {

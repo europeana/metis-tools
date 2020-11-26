@@ -66,20 +66,20 @@ public class ProcessDataset implements Callable<Void> {
   }
 
   @Override
-  public Void call() throws ExecutionException, InterruptedException, IndexingException {
-    return processDataset();
+  public Void call() throws ExecutionException, InterruptedException {
+    processDataset();
+    return null;
   }
 
-  private Void processDataset()
-      throws ExecutionException, InterruptedException, IndexingException {
-    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing starting", prefixDatasetIdLog);
-
+  private void processDataset() throws ExecutionException, InterruptedException {
+    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing start", prefixDatasetIdLog);
+    final long startProcess = System.nanoTime();
     if (basicConfiguration.getMode() == Mode.DEFAULT) {
       if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
         LOGGER.info(EXECUTION_LOGS_MARKER,
             "{} - Reprocessing not started because it was already completely processed with totalRecords: {} - totalProcessed: {}",
             prefixDatasetIdLog, datasetStatus.getTotalRecords(), datasetStatus.getTotalProcessed());
-        return null;
+        return;
       }
       //Process normally if not completely processed
       loopOverAllRecordsAndProcess();
@@ -91,7 +91,7 @@ public class ProcessDataset implements Callable<Void> {
               "{} - Reprocessing not started because mode is: {} and there are no failed records",
               prefixDatasetIdLog, basicConfiguration.getMode().name());
         }
-        return null;
+        return;
       }
       LOGGER.info(EXECUTION_LOGS_MARKER,
           "{} - Reprocessing will happen only on previously failed records, number of which is {}",
@@ -103,13 +103,16 @@ public class ProcessDataset implements Callable<Void> {
       LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Applied after reprocessing function",
           prefixDatasetIdLog);
     }
-    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Reprocessing end", prefixDatasetIdLog);
+    final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startProcess);
+    datasetStatus
+        .setActualTimeProcessAndIndex(datasetStatus.getActualTimeProcessAndIndex() + elapsedTime);
+    basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing end", prefixDatasetIdLog);
     LOGGER
         .info(EXECUTION_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
     LOGGER
         .info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
     close();
-    return null;
   }
 
   /**
@@ -153,7 +156,6 @@ public class ProcessDataset implements Callable<Void> {
     datasetStatus.setStartDate(new Date());
     basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     defaultOperation();
-    commitSolrChanges();
   }
 
   private void loopOverAllFailedRecordsAndProcess() {
@@ -161,20 +163,6 @@ public class ProcessDataset implements Callable<Void> {
     // always 0(zero).
     nextPage = 0;
     failedRecordsOperation(nextPage);
-    commitSolrChanges();
-  }
-
-  private void commitSolrChanges() {
-    //Commit changes
-    //The indexer shouldn't be closed here, therefore it's not initialized in a
-    //try-with-resources block
-    try {
-      LOGGER.info("Commit changes for dataset {}", datasetId);
-      basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
-      LOGGER.info("Committed changes for dataset {}", datasetId);
-    } catch (IndexingException e) {
-      LOGGER.warn("Could not commit changes to solr, changes will be visible after auto commit", e);
-    }
   }
 
   private void failedRecordsOperation(int nextPage) {
@@ -358,11 +346,10 @@ public class ProcessDataset implements Callable<Void> {
       return basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
           .apply(fullBean, basicConfiguration);
     } finally {
-      final long endTimeProcess = System.nanoTime();
-      final long elapsedTime = endTimeProcess - startTimeProcess;
+      final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeProcess);
       synchronized (this) {
         datasetStatus.setTotalTimeProcessingInSecs(
-            datasetStatus.getTotalTimeProcessingInSecs() + nanoTimeToSeconds(elapsedTime));
+            datasetStatus.getTotalTimeProcessingInSecs() + elapsedTime);
       }
     }
   }
@@ -373,11 +360,10 @@ public class ProcessDataset implements Callable<Void> {
       basicConfiguration.getExtraConfiguration().getRdfIndexer()
           .accept(rdf, true, basicConfiguration);
     } finally {
-      final long endTimeIndex = System.nanoTime();
-      final long elapsedTime = endTimeIndex - startTimeIndex;
+      final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeIndex);
       synchronized (this) {
-        datasetStatus.setTotalTimeIndexingInSecs(
-            datasetStatus.getTotalTimeIndexingInSecs() + nanoTimeToSeconds(elapsedTime));
+        datasetStatus
+            .setTotalTimeIndexingInSecs(datasetStatus.getTotalTimeIndexingInSecs() + elapsedTime);
       }
     }
   }

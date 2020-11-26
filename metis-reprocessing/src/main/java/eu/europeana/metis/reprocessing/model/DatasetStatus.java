@@ -35,6 +35,7 @@ public class DatasetStatus implements HasMongoObjectId {
   private volatile long totalProcessed;
   private volatile long totalFailedRecords;
   private volatile Set<Integer> pagesProcessed = new HashSet<>();
+  private volatile double actualTimeProcessAndIndex;
   private volatile double totalTimeProcessingInSecs;
   private volatile double totalTimeIndexingInSecs;
   private volatile double averageTimeRecordProcessingInSecs;
@@ -114,6 +115,14 @@ public class DatasetStatus implements HasMongoObjectId {
     return pagesProcessed;
   }
 
+  public double getActualTimeProcessAndIndex() {
+    return actualTimeProcessAndIndex;
+  }
+
+  public void setActualTimeProcessAndIndex(double actualTimeProcessAndIndex) {
+    this.actualTimeProcessAndIndex = actualTimeProcessAndIndex;
+  }
+
   public double getTotalTimeProcessingInSecs() {
     return totalTimeProcessingInSecs;
   }
@@ -159,11 +168,13 @@ public class DatasetStatus implements HasMongoObjectId {
   public String toString() {
     return String.format(
         "ObjectId: %s, datasetId: %s, totalRecords: %d, totalProcessed: %d, totalFailedRecords: %d, "
-            + "totalTimeProcessingInSecs: %fs = %fh, totalTimeIndexingInSecs: %fs = %fh, "
+            + "actualTimeProcessAndIndex: %fs = %fh, totalTimeProcessingInSecs: %fs = %fh, "
+            + "totalTimeIndexingInSecs: %fs = %fh, "
             + "averageTimeRecordProcessingInSecs: %fs, averageTimeRecordIndexingInSecs: %fs", id,
-        datasetId, totalRecords, totalProcessed, totalFailedRecords, totalTimeProcessingInSecs,
-        secondsTimeToHours(totalTimeProcessingInSecs), totalTimeIndexingInSecs,
-        secondsTimeToHours(totalTimeIndexingInSecs), averageTimeRecordProcessingInSecs,
-        averageTimeRecordIndexingInSecs);
+        datasetId, totalRecords, totalProcessed, totalFailedRecords, actualTimeProcessAndIndex,
+        secondsTimeToHours(actualTimeProcessAndIndex),
+        totalTimeProcessingInSecs, secondsTimeToHours(totalTimeProcessingInSecs),
+        totalTimeIndexingInSecs, secondsTimeToHours(totalTimeIndexingInSecs),
+        averageTimeRecordProcessingInSecs, averageTimeRecordIndexingInSecs);
   }
 }
