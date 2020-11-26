@@ -45,7 +45,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.maven.compiler.plugin>3.6.1</version.maven.compiler.plugin>
+    <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
     <version.metis>3-SNAPSHOT</version.metis>
     <version.corelib>2.12.0-SNAPSHOT</version.corelib>
     <!-- These two versions are interdependent. -->
@@ -86,6 +86,10 @@
         <exclusion>
           <groupId>org.apache.solr</groupId>
           <artifactId>solr-solrj</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

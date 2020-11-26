@@ -23,7 +23,6 @@ import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-import eu.europeana.metis.mongo.dao.RecordDao;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
@@ -55,8 +54,6 @@ public class MongoDestinationMongoDao {
     destinationMongoInitializer = prepareMongoDestinationConfiguration();
     mongoDestinationDatastore = createMongoDestinationDatastore(
         destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoDb);
-    createIndexesForDestinationMongoRecords(destinationMongoInitializer.getMongoClient(),
-        propertiesHolder.destinationMongoDb);
   }
 
   public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
@@ -134,12 +131,6 @@ public class MongoDestinationMongoDao {
     //Ensure indexes, to create them in destination only
     datastore.ensureIndexes();
     return datastore;
-  }
-
-  private static void createIndexesForDestinationMongoRecords(MongoClient mongoClient,
-      String databaseName) {
-    //Ignore object since we are using the IndexerImpl
-    new RecordDao(mongoClient, databaseName, true);
   }
 
   public void close() {
