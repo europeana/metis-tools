@@ -90,6 +90,7 @@ public class ExecutorManager {
         .filter(entry -> entry.getValue() > 0).sorted(Collections.reverseOrder(comparingByValue()))
         .map(entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
             atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Calculated order of datasets for processing");
 
     Date startDate = new Date();
     Timer timer = new Timer();

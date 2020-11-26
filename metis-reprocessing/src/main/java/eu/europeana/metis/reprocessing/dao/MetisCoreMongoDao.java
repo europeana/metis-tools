@@ -5,7 +5,10 @@ import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTI
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
+import dev.morphia.mapping.DiscriminatorFunction;
 import dev.morphia.mapping.Mapper;
+import dev.morphia.mapping.MapperOptions;
+import dev.morphia.mapping.NamingStrategy;
 import dev.morphia.query.Query;
 import dev.morphia.query.experimental.filters.Filters;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
@@ -78,7 +81,10 @@ public class MetisCoreMongoDao {
   }
 
   private static Datastore createMetisCoreDatastore(MongoClient mongoClient, String databaseName) {
-    final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName);
+    MapperOptions mapperOptions = MapperOptions.builder().discriminatorKey("className")
+        .discriminator(DiscriminatorFunction.className())
+        .collectionNaming(NamingStrategy.identity()).build();
+    final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName, mapperOptions);
     final Mapper mapper = datastore.getMapper();
     mapper.map(Dataset.class);
     return datastore;
