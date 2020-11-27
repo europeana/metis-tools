@@ -1,5 +1,7 @@
 package eu.europeana.metis.reprocessing.execution;
 
+import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
@@ -42,7 +44,7 @@ public class IndexUtilities {
         try {
           indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
         } catch (IndexingException e) {
-          LOGGER.warn("Could not index rdf with about {}",
+          LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not index rdf with about {}",
               rdf.getProvidedCHOList().get(0).getAbout());
         }
         return null;

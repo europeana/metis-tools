@@ -1,5 +1,7 @@
 package eu.europeana.metis.reprocessing.execution;
 
+import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+
 import eu.europeana.corelib.definitions.edm.beans.FullBean;
 import eu.europeana.corelib.definitions.edm.entity.Aggregation;
 import eu.europeana.corelib.definitions.edm.entity.WebResource;
@@ -126,7 +128,7 @@ public class ProcessUtilities {
           hashCodes.put(hashCodeIsShownAt, webResource);
         }
       } catch (MediaExtractionException e) {
-        LOGGER.warn("Something went wrong during hash, skipping web resource metadata {}",
+        LOGGER.warn(EXECUTION_LOGS_MARKER, "Something went wrong during hash, skipping web resource metadata {}",
             webResource.getAbout());
       }
     }
@@ -216,7 +218,7 @@ public class ProcessUtilities {
   //        enrichedRdf.enrichResource(resourceMetadata);
   //      }
   //    } catch (MediaExtractionException e) {
-  //      LOGGER.warn("Could not enrich with technical metadata of resourceUrl: {}", resourceUrl, e);
+  //      LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not enrich with technical metadata of resourceUrl: {}", resourceUrl, e);
   //    }
   //  }
 
@@ -307,7 +309,7 @@ public class ProcessUtilities {
   //    // TODO: 11-7-19 Better way to do this? To avoid checking S3..
   //    ArrayList<Thumbnail> thumbnails = new ArrayList<>();
   //    String targetNameLarge = md5Hex + "-LARGE";
-  //    LOGGER.info("Get thumbnail target names existence from S3");
+  //    LOGGER.info(EXECUTION_LOGS_MARKER, "Get thumbnail target names existence from S3");
   //    if (doesThumbnailExistInS3(amazonS3Client, s3Bucket, targetNameLarge)) {
   //      final ThumbnailImpl thumbnail = new ThumbnailImpl(resourceUrl, targetNameLarge);
   //      //Close immediately, the contained files are not required.

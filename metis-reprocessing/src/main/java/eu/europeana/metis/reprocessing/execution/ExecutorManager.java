@@ -70,15 +70,15 @@ public class ExecutorManager {
 
   public void clearDatabases() {
     if (basicConfiguration.isClearDatabasesBeforeProcess()) {
-      LOGGER.info("Clearing database");
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Clearing database");
       basicConfiguration.getMongoDestinationMongoDao().deleteAll();
       try {
         basicConfiguration.getDestinationCompoundSolrClient().getSolrClient().deleteByQuery("*:*");
         basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
       } catch (SolrServerException | IOException | IndexingException e) {
-        LOGGER.warn("Could not cleanup solr", e);
+        LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not cleanup solr", e);
       }
-      LOGGER.info("Cleared database");
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Cleared database");
     }
   }
 
@@ -163,11 +163,11 @@ public class ExecutorManager {
     //The indexer shouldn't be closed here, therefore it's not initialized in a
     //try-with-resources block
     try {
-      LOGGER.info("Commit changes");
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Commit changes");
       basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
-      LOGGER.info("Committed changes");
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Committed changes");
     } catch (IndexingException e) {
-      LOGGER.warn("Could not commit changes to solr, changes will be visible after auto commit", e);
+      LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not commit changes to solr, changes will be visible after auto commit", e);
     }
   }
 

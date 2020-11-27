@@ -1,5 +1,7 @@
 package eu.europeana.metis.reprocessing.model;
 
+import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+
 import eu.europeana.indexing.Indexer;
 import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
@@ -131,7 +133,7 @@ public class BasicConfiguration {
     if (StringUtils.isEmpty(propertiesHolder.destinationMongoAuthenticationDb) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoUsername) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoPassword)) {
-      LOGGER.info("Mongo credentials not provided");
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Mongo credentials not provided");
     } else {
       indexingSettings.setMongoCredentials(propertiesHolder.destinationMongoUsername,
           propertiesHolder.destinationMongoPassword,
