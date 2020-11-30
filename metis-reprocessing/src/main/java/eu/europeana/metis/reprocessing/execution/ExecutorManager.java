@@ -88,14 +88,7 @@ public class ExecutorManager {
     if (basicConfiguration.getMode().equals(Mode.DEFAULT)) {
       clearDatabases();
     }
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
-    final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
-    AtomicInteger atomicIndex = new AtomicInteger(0);
-    final List<DatasetStatus> datasetStatuses = datasetsWithSize.entrySet().stream()
-        .filter(entry -> entry.getValue() > 0).sorted(Collections.reverseOrder(comparingByValue()))
-        .map(entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
-            atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Calculated order of datasets for processing");
+    final List<DatasetStatus> datasetStatuses = getDatasetStatuses();
 
     Date startDate = new Date();
     Timer timer = new Timer();
@@ -154,6 +147,23 @@ public class ExecutorManager {
     }
     commitSolrChanges();
     timer.cancel();
+  }
+
+  private List<DatasetStatus> getDatasetStatuses() {
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
+    final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
+    AtomicInteger atomicIndex = new AtomicInteger(0);
+    final List<DatasetStatus> datasetStatuses = datasetsWithSize.entrySet().stream()
+        .filter(entry -> entry.getValue() > 0).sorted(Collections.reverseOrder(comparingByValue()))
+        .map(entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
+            atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
+    // TODO: 30/11/2020 To be tested by removing the exception catch in the IndexingUtilities so
+    //  that a Failed record is created, potentially during a full reindex
+    if (basicConfiguration.getMode().equals(Mode.REPROCESS_ALL_FAILED)) {
+      datasetStatuses.removeIf(datasetStatus -> datasetStatus.getTotalFailedRecords() > 0);
+    }
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Calculated order of datasets for processing");
+    return datasetStatuses;
   }
 
   private void commitSolrChanges() {
