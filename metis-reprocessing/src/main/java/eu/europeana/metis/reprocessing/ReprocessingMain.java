@@ -35,7 +35,6 @@ public class ReprocessingMain {
 
     final ExecutorManager executorManager = new ExecutorManager(basicConfiguration,
         propertiesHolder);
-    executorManager.clearDatabases();
     executorManager.startReprocessing();
     executorManager.close();
     basicConfiguration.close();

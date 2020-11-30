@@ -14,7 +14,7 @@ mode=DEFAULT
 dataset.ids.to.process=
 #Set to true to do a simple read and then write reindex, without altering the record
 identity.process=
-#Set to true if we want to clear the database before we start a new process
+#Set to true if we want to clear the database before we start a new process, used for DEFAULT mode only
 clear.databases.before.process=
 invalidate.plugin.types=
 reprocess.based.on.plugin.type=

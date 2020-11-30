@@ -1,7 +1,5 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
-
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
@@ -40,15 +38,10 @@ public class IndexUtilities {
       //The indexer pool shouldn't be closed here, therefore it's not initialized in a
       // try-with-resources block
       final IndexerPool indexerPool = basicConfiguration.getDestinationIndexerPool();
-      ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> {
-        try {
-          indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
-        } catch (IndexingException e) {
-          LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not index rdf with about {}",
-              rdf.getProvidedCHOList().get(0).getAbout());
-        }
+      ExternalRequestUtil.retryableExternalRequest(() -> {
+        indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
         return null;
-      });
+      }, ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
     } catch (Exception e) {
       throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
     }

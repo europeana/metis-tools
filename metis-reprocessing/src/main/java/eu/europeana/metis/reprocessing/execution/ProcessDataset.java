@@ -86,8 +86,8 @@ public class ProcessDataset implements Callable<Void> {
     } else if (basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED) {
       if (datasetStatus.getTotalFailedRecords() <= 0) {
         //Do not process dataset further cause we only process failed ones
-        if (LOGGER.isInfoEnabled()) {
-          LOGGER.info(EXECUTION_LOGS_MARKER,
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(EXECUTION_LOGS_MARKER,
               "{} - Reprocessing not started because mode is: {} and there are no failed records",
               prefixDatasetIdLog, basicConfiguration.getMode().name());
         }

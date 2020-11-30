@@ -9,6 +9,7 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
+import eu.europeana.metis.reprocessing.model.Mode;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import java.io.IOException;
 import java.time.Duration;
@@ -83,6 +84,10 @@ public class ExecutorManager {
   }
 
   public void startReprocessing() throws InterruptedException {
+    //In default mode we try cleanup
+    if (basicConfiguration.getMode().equals(Mode.DEFAULT)) {
+      clearDatabases();
+    }
     LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
     final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
     AtomicInteger atomicIndex = new AtomicInteger(0);
@@ -128,15 +133,8 @@ public class ExecutorManager {
         LOGGER.info(PROCESSED_DATASETS_STR, reprocessedDatasets);
         LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, reprocessedDatasets);
       }
-      Callable<Void> callable;
-      switch (basicConfiguration.getMode()) {
-        case DEFAULT:
-        case REPROCESS_ALL_FAILED:
-        case POST_PROCESS:
-        default:
-          callable = new ProcessDataset(datasetStatus, basicConfiguration,
-              maxParallelThreadsPerDataset);
-      }
+      Callable<Void> callable = new ProcessDataset(datasetStatus, basicConfiguration,
+          maxParallelThreadsPerDataset);
       final Future<Void> submit = completionService.submit(callable);
       futureConsumedThreadsHashMap.put(submit, maxThreadsConsumedByDataset);
       parallelDatasets++;
@@ -167,7 +165,8 @@ public class ExecutorManager {
       basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
       LOGGER.info(EXECUTION_LOGS_MARKER, "Committed changes");
     } catch (IndexingException e) {
-      LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not commit changes to solr, changes will be visible after auto commit", e);
+      LOGGER.warn(EXECUTION_LOGS_MARKER,
+          "Could not commit changes to solr, changes will be visible after auto commit", e);
     }
   }
 

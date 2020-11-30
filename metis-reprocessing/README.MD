@@ -20,7 +20,7 @@ POST_PROCESS to run a post process action.
 - `dataset.ids.to.process` -> A comma separated list of dataset ids to process bypassing processing all dataset ids.  
 If this field is empty then the metis core mongo configuration is required so that datasetIds are fetched from there. Otherwise it's not required.
 - `identity.process` -> Set to true to do a simple read and then write reindex, without altering the record
-- `clear.databases.before.process=` -> Set to true if we want to clear the database before we start a new process
+- `clear.databases.before.process=` -> Set to true if we want to clear the database before we start a new process, used for DEFAULT mode only
 - `invalidate.plugin.types` -> The plugins in metis core to invalidate during POST_PROCESS
 - `reprocess.based.on.plugin.type` -> The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon 
 
