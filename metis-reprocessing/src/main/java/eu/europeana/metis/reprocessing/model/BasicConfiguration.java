@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -79,8 +77,7 @@ public class BasicConfiguration {
     destinationIndexerPool = new IndexerPool(indexerFactory, 600, 60);
     destinationIndexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
-    datasetIdsToProcess = propertiesHolder.datasetIdsToProcess == null ? Collections.emptyList()
-        : Arrays.asList(propertiesHolder.datasetIdsToProcess);
+    datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
     clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;

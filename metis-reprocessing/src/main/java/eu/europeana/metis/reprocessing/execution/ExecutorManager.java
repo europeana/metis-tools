@@ -78,6 +78,10 @@ public class ExecutorManager {
       checkForCleaningDatabases();
       //We only clean dbs and return
       return;
+    } else if (basicConfiguration.getMode().equals(Mode.POST_CLEAN)) {
+      //We only clean/remove the collections that were creating for assisting the processing
+      basicConfiguration.getMongoDestinationMongoDao().dropTemporaryCollections();
+      return;
     }
     final List<DatasetStatus> datasetStatuses = getDatasetStatuses();
     if (CollectionUtils.isEmpty(datasetStatuses)) {

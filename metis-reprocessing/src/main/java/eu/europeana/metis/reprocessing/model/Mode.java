@@ -7,7 +7,7 @@ package eu.europeana.metis.reprocessing.model;
  * @since 2019-04-19
  */
 public enum Mode {
-  DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS, CLEAN;
+  DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS, POST_CLEAN, CLEAN;
 
   public static Mode getModeFromEnumName(String enumName) {
     for (Mode mode : Mode.values()) {

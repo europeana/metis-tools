@@ -50,7 +50,6 @@ public class PostProcessUtilities {
   public static void postProcess(String datasetId, Date startDate, Date endDate,
       BasicConfiguration basicConfiguration) {
     updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
-    basicConfiguration.getMongoDestinationMongoDao().dropTemporaryCollections();
   }
 
   public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,

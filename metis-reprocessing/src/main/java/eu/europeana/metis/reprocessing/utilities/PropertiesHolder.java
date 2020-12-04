@@ -39,7 +39,7 @@ public class PropertiesHolder {
   public final int endAtDatasetIndex;
   public final int sourceMongoPageSize;
   public final Mode mode;
-  public final String[] datasetIdsToProcess;
+  public final List<String> datasetIdsToProcess;
   public final boolean identityProcess;
   public final boolean cleanDatabasesBeforeProcess;
   public final ExecutablePluginType reprocessBasedOnPluginType;
@@ -114,9 +114,9 @@ public class PropertiesHolder {
             : Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
-    datasetIdsToProcess =
-        StringUtils.isBlank(properties.getProperty("dataset.ids.to.process")) ? null
-            : properties.getProperty("dataset.ids.to.process").split(",");
+
+    datasetIdsToProcess = Arrays.stream(properties.getProperty("dataset.ids.to.process").split(","))
+        .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
@@ -124,9 +124,8 @@ public class PropertiesHolder {
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
     invalidatePluginTypes = Arrays
         .stream(properties.getProperty("invalidate.plugin.types").split(","))
-        .filter(StringUtils::isNotBlank)
-        .map(String::trim).map(ExecutablePluginType::getPluginTypeFromEnumName)
-        .collect(Collectors.toList());
+        .filter(StringUtils::isNotBlank).map(String::trim)
+        .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(Collectors.toList());
 
     if (mode.equals(Mode.POST_PROCESS) && (reprocessBasedOnPluginType == null || CollectionUtils
         .isEmpty(invalidatePluginTypes))) {

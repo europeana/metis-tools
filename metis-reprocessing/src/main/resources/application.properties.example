@@ -5,11 +5,12 @@ max.parallel.threads.per.dataset=
 start.from.dataset.index=
 end.at.dataset.index=
 source.mongo.page.size=
-#Possible values CLEAN, DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS. The REPROCESS_ALL_FAILED will process only the
-#failed records for a dataset even if it's not previously completely processed.
-#POST_PROCESS mode is to be used after everything is final and the last step needs to be executed.
-#Don't use this mode unless you know what you are doing.
+#Possible values CLEAN, DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS, POST_CLEAN.
+#DEFAULT for a normal operation of process and index.
 #CLEAN mode is to be used to just clean the destination databases, it does no processing
+#REPROCESS_ALL_FAILED will process only the failed records for a dataset even if it's not previously completely processed.
+#POST_PROCESS mode is to be used after everything is final and the last step needs to be executed. Don't use this mode unless you know what you are doing.
+#POST_CLEAN mode is to be used to just remove the destination temporary databases, it does no processing
 mode=DEFAULT
 #A list of dataset ids to process instead of all the datasets
 dataset.ids.to.process=
@@ -17,7 +18,9 @@ dataset.ids.to.process=
 identity.process=
 #Set to true if we want to clear the database before we start a new process. Only applicable for DEFAULT Mode
 clean.databases.before.process=
+#The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon. For example ENRICHMENT. MUST not be empty if mode is POST_PROCESS
 reprocess.based.on.plugin.type=
+#The plugins in metis core to invalidate during POST_PROCESS. For example if the base plugin type was ENRICHMENT then the plugins that have to be invalidated would be the ones following ENRICHMENT. MUST not be empty if mode is POST_PROCESS
 invalidate.plugin.types=
 
 #Truststore
