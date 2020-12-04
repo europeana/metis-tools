@@ -73,7 +73,7 @@ public class ProcessDataset implements Callable<Void> {
 
   private void processDataset() throws ExecutionException, InterruptedException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing start", prefixDatasetIdLog);
-    final long startProcess = System.nanoTime();
+    final long startProcessTime = System.nanoTime();
     if (basicConfiguration.getMode() == Mode.DEFAULT) {
       if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
         LOGGER.info(EXECUTION_LOGS_MARKER,
@@ -83,6 +83,7 @@ public class ProcessDataset implements Callable<Void> {
       }
       //Process normally if not completely processed
       loopOverAllRecordsAndProcess();
+      finalizeDatasetStatus(startProcessTime);
     } else if (basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED) {
       if (datasetStatus.getTotalFailedRecords() <= 0) {
         //Do not process dataset further cause we only process failed ones
@@ -98,21 +99,25 @@ public class ProcessDataset implements Callable<Void> {
           prefixDatasetIdLog, datasetStatus.getTotalFailedRecords());
       //Process only failed records no matter if the dataset has already been completed
       loopOverAllFailedRecordsAndProcess();
+      finalizeDatasetStatus(startProcessTime);
     } else if (basicConfiguration.getMode() == Mode.POST_PROCESS) {
       postProcess();
-      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Applied after reprocessing function",
+      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Applied post processing function",
           prefixDatasetIdLog);
     }
+    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing end", prefixDatasetIdLog);
+    close();
+  }
+
+  private void finalizeDatasetStatus(long startProcess) {
     final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startProcess);
     datasetStatus
         .setActualTimeProcessAndIndex(datasetStatus.getActualTimeProcessAndIndex() + elapsedTime);
     basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
-    LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing end", prefixDatasetIdLog);
     LOGGER
         .info(EXECUTION_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
     LOGGER
         .info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
-    close();
   }
 
   /**

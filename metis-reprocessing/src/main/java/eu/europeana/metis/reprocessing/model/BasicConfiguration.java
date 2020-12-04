@@ -58,8 +58,10 @@ public class BasicConfiguration {
   public BasicConfiguration(PropertiesHolder propertiesHolder)
       throws IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException {
     this.propertiesHolder = propertiesHolder;
-    //Create metis core dao only if there aren't any specific datasets to process
-    if (propertiesHolder.datasetIdsToProcess == null) {
+    //Create metis core dao only if there aren't any specific datasets to process and mode not
+    // POST_PROCESS
+    if (propertiesHolder.datasetIdsToProcess == null || propertiesHolder.mode
+        .equals(Mode.POST_PROCESS)) {
       metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
     } else {
       metisCoreMongoDao = null;
@@ -71,7 +73,8 @@ public class BasicConfiguration {
     prepareMongoSettings(indexingSettings);
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
-    destinationCompoundSolrClient = new SolrClientProvider<>(indexingSettings.getSolrProperties()).createSolrClient();
+    destinationCompoundSolrClient = new SolrClientProvider<>(indexingSettings.getSolrProperties())
+        .createSolrClient();
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
     destinationIndexerPool = new IndexerPool(indexerFactory, 600, 60);
     destinationIndexer = indexerFactory.getIndexer();
