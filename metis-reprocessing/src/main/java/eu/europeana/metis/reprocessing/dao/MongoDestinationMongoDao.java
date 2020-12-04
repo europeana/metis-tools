@@ -65,6 +65,10 @@ public class MongoDestinationMongoDao {
             .limit(MongoSourceMongoDao.PAGE_SIZE));
   }
 
+  public List<DatasetStatus> getAllDatasetStatuses() {
+    return MorphiaUtils.getListOfQueryRetryable(mongoDestinationDatastore.find(DatasetStatus.class));
+  }
+
   public DatasetStatus getDatasetStatus(String datasetId) {
     return mongoDestinationDatastore.find(DatasetStatus.class)
         .filter(Filters.eq(DATASET_ID, datasetId)).first();

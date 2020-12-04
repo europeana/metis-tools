@@ -49,7 +49,6 @@ public class PostProcessUtilities {
    */
   public static void postProcess(String datasetId, Date startDate, Date endDate,
       BasicConfiguration basicConfiguration) {
-    // TODO: 25/11/2020 Add copy of WebResourceMetaInfo in Mongo?
     updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
   }
 

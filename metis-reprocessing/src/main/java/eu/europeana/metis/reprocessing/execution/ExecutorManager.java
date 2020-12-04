@@ -69,20 +69,6 @@ public class ExecutorManager {
     this.basicConfiguration = basicConfiguration;
   }
 
-  public void clearDatabases() {
-    if (basicConfiguration.isClearDatabasesBeforeProcess()) {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Clearing database");
-      basicConfiguration.getMongoDestinationMongoDao().deleteAll();
-      try {
-        basicConfiguration.getDestinationCompoundSolrClient().getSolrClient().deleteByQuery("*:*");
-        basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
-      } catch (SolrServerException | IOException | IndexingException e) {
-        LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not cleanup solr", e);
-      }
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Cleared database");
-    }
-  }
-
   public void startReprocessing() throws InterruptedException {
     //In default mode we try cleanup
     if (basicConfiguration.getMode().equals(Mode.DEFAULT)) {
@@ -151,19 +137,38 @@ public class ExecutorManager {
 
   private List<DatasetStatus> getDatasetStatuses() {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
-    final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
-    AtomicInteger atomicIndex = new AtomicInteger(0);
-    final List<DatasetStatus> datasetStatuses = datasetsWithSize.entrySet().stream()
-        .filter(entry -> entry.getValue() > 0).sorted(Collections.reverseOrder(comparingByValue()))
-        .map(entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
-            atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
-    // TODO: 30/11/2020 To be tested by removing the exception catch in the IndexingUtilities so
-    //  that a Failed record is created, potentially during a full reindex
+
+    final List<DatasetStatus> datasetStatuses;
     if (basicConfiguration.getMode().equals(Mode.REPROCESS_ALL_FAILED)) {
-      datasetStatuses.removeIf(datasetStatus -> datasetStatus.getTotalFailedRecords() > 0);
+      datasetStatuses = basicConfiguration.getMongoDestinationMongoDao().getAllDatasetStatuses();
+      datasetStatuses.removeIf(datasetStatus -> datasetStatus.getTotalFailedRecords() <= 0);
+    } else if (basicConfiguration.getMode().equals(Mode.POST_PROCESS)) {
+      datasetStatuses = basicConfiguration.getMongoDestinationMongoDao().getAllDatasetStatuses();
+    } else {
+      //We want the biggest datasets to start first
+      final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
+      AtomicInteger atomicIndex = new AtomicInteger(0);
+      datasetStatuses = datasetsWithSize.entrySet().stream().filter(entry -> entry.getValue() > 0)
+          .sorted(Collections.reverseOrder(comparingByValue())).map(
+              entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
+                  atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
     }
     LOGGER.info(EXECUTION_LOGS_MARKER, "Calculated order of datasets for processing");
     return datasetStatuses;
+  }
+
+  public void clearDatabases() {
+    if (basicConfiguration.isClearDatabasesBeforeProcess()) {
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Clearing database");
+      basicConfiguration.getMongoDestinationMongoDao().deleteAll();
+      try {
+        basicConfiguration.getDestinationCompoundSolrClient().getSolrClient().deleteByQuery("*:*");
+        basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
+      } catch (SolrServerException | IOException | IndexingException e) {
+        LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not cleanup solr", e);
+      }
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Cleared database");
+    }
   }
 
   private void commitSolrChanges() {
@@ -185,6 +190,14 @@ public class ExecutorManager {
       return getDatasetWithSizeFromCore();
     } else {
       return getDatasetWithSizeFromProvidedList();
+    }
+  }
+
+  private List<String> getDatasetsWithoutSize() {
+    if (basicConfiguration.getDatasetIdsToProcess().isEmpty()) {
+      return basicConfiguration.getMetisCoreMongoDao().getAllDatasetIds();
+    } else {
+      return basicConfiguration.getDatasetIdsToProcess();
     }
   }
 
