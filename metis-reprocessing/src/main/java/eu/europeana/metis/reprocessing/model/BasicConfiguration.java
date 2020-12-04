@@ -79,7 +79,7 @@ public class BasicConfiguration {
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess == null ? Collections.emptyList()
         : Arrays.asList(propertiesHolder.datasetIdsToProcess);
     identityProcess = propertiesHolder.identityProcess;
-    clearDatabasesBeforeProcess = propertiesHolder.clearDatabasesBeforeProcess;
+    clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
   }
@@ -140,7 +140,7 @@ public class BasicConfiguration {
           propertiesHolder.destinationMongoAuthenticationDb);
     }
 
-    if (propertiesHolder.destinationMongoEnablessl) {
+    if (propertiesHolder.destinationMongoEnableSSL) {
       indexingSettings.setMongoEnableSsl();
     }
   }

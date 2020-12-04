@@ -75,7 +75,7 @@ public class MetisCoreMongoDao {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.metisCoreMongoHosts,
         propertiesHolder.metisCoreMongoPorts, propertiesHolder.metisCoreMongoAuthenticationDb,
         propertiesHolder.metisCoreMongoUsername, propertiesHolder.metisCoreMongoPassword,
-        propertiesHolder.metisCoreMongoEnablessl);
+        propertiesHolder.metisCoreMongoEnableSSL);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

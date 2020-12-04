@@ -40,7 +40,7 @@ public class PropertiesHolder {
   public final Mode mode;
   public final String[] datasetIdsToProcess;
   public final boolean identityProcess;
-  public final boolean clearDatabasesBeforeProcess;
+  public final boolean cleanDatabasesBeforeProcess;
   public final List<ExecutablePluginType> invalidatePluginTypes;
   public final ExecutablePluginType reprocessBasedOnPluginType;
 
@@ -52,7 +52,7 @@ public class PropertiesHolder {
   public final String metisCoreMongoAuthenticationDb;
   public final String metisCoreMongoUsername;
   public final String metisCoreMongoPassword;
-  public final boolean metisCoreMongoEnablessl;
+  public final boolean metisCoreMongoEnableSSL;
   public final String metisCoreMongoDb;
   //Mongo Source
   public final String[] sourceMongoHosts;
@@ -60,7 +60,7 @@ public class PropertiesHolder {
   public final String sourceMongoAuthenticationDb;
   public final String sourceMongoUsername;
   public final String sourceMongoPassword;
-  public final boolean sourceMongoEnablessl;
+  public final boolean sourceMongoEnableSSL;
   public final String sourceMongoDb;
   //Mongo Destination
   public final String[] destinationMongoHosts;
@@ -68,7 +68,7 @@ public class PropertiesHolder {
   public final String destinationMongoAuthenticationDb;
   public final String destinationMongoUsername;
   public final String destinationMongoPassword;
-  public final boolean destinationMongoEnablessl;
+  public final boolean destinationMongoEnableSSL;
   public final String destinationMongoDb;
   //Solr/Zookeeper Destination
   public final String[] destinationSolrHosts;
@@ -116,8 +116,8 @@ public class PropertiesHolder {
         StringUtils.isBlank(properties.getProperty("dataset.ids.to.process")) ? null
             : properties.getProperty("dataset.ids.to.process").split(",");
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
-    clearDatabasesBeforeProcess = Boolean
-        .parseBoolean(properties.getProperty("clear.databases.before.process"));
+    cleanDatabasesBeforeProcess = Boolean
+        .parseBoolean(properties.getProperty("clean.databases.before.process"));
     invalidatePluginTypes = Arrays
         .stream(properties.getProperty("invalidate.plugin.types").split(","))
         .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(Collectors.toList());
@@ -139,7 +139,7 @@ public class PropertiesHolder {
     metisCoreMongoAuthenticationDb = properties.getProperty("mongo.metis.core.authentication.db");
     metisCoreMongoUsername = properties.getProperty("mongo.metis.core.username");
     metisCoreMongoPassword = properties.getProperty("mongo.metis.core.password");
-    metisCoreMongoEnablessl = Boolean
+    metisCoreMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
     metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
 
@@ -150,7 +150,7 @@ public class PropertiesHolder {
     sourceMongoAuthenticationDb = properties.getProperty("mongo.source.authentication.db");
     sourceMongoUsername = properties.getProperty("mongo.source.username");
     sourceMongoPassword = properties.getProperty("mongo.source.password");
-    sourceMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
+    sourceMongoEnableSSL = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
     sourceMongoDb = properties.getProperty("mongo.source.db");
 
     //Mongo Destination
@@ -162,7 +162,7 @@ public class PropertiesHolder {
         .getProperty("mongo.destination.authentication.db");
     destinationMongoUsername = properties.getProperty("mongo.destination.username");
     destinationMongoPassword = properties.getProperty("mongo.destination.password");
-    destinationMongoEnablessl = Boolean
+    destinationMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
 

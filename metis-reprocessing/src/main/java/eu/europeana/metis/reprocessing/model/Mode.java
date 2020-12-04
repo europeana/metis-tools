@@ -7,9 +7,7 @@ package eu.europeana.metis.reprocessing.model;
  * @since 2019-04-19
  */
 public enum Mode {
-  DEFAULT,
-  REPROCESS_ALL_FAILED,
-  POST_PROCESS;
+  DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS, CLEAN;
 
   public static Mode getModeFromEnumName(String enumName) {
     for (Mode mode : Mode.values()) {
@@ -17,6 +15,6 @@ public enum Mode {
         return mode;
       }
     }
-    return DEFAULT;
+    throw new IllegalArgumentException("Wrong Mode supplied");
   }
 }

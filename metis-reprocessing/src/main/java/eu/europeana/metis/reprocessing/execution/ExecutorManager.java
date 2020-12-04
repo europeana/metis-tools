@@ -72,7 +72,11 @@ public class ExecutorManager {
   public void startReprocessing() throws InterruptedException {
     //In default mode we try cleanup
     if (basicConfiguration.getMode().equals(Mode.DEFAULT)) {
-      clearDatabases();
+      checkForCleaningDatabases();
+    } else if (basicConfiguration.getMode().equals(Mode.CLEAN)) {
+      checkForCleaningDatabases();
+      //We only clean dbs and return
+      return;
     }
     final List<DatasetStatus> datasetStatuses = getDatasetStatuses();
 
@@ -157,9 +161,10 @@ public class ExecutorManager {
     return datasetStatuses;
   }
 
-  public void clearDatabases() {
-    if (basicConfiguration.isClearDatabasesBeforeProcess()) {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Clearing database");
+  public void checkForCleaningDatabases() {
+    if (basicConfiguration.getMode().equals(Mode.CLEAN) || basicConfiguration
+        .isClearDatabasesBeforeProcess()) {
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Cleaning database");
       basicConfiguration.getMongoDestinationMongoDao().deleteAll();
       try {
         basicConfiguration.getDestinationCompoundSolrClient().getSolrClient().deleteByQuery("*:*");
@@ -167,7 +172,7 @@ public class ExecutorManager {
       } catch (SolrServerException | IOException | IndexingException e) {
         LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not cleanup solr", e);
       }
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Cleared database");
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Cleaned database");
     }
   }
 

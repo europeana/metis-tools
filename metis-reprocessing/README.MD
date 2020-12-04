@@ -13,14 +13,15 @@ For the REPROCESS_ALL_FAILED mode only parallelization of datasets is implemente
 - `start.from.dataset.index` -> The index of the dataset in the list from where the processing should start from. 0 if no value provided
 - `end.at.dataset.index` -> The index of the dataset in the list from where the processing should end at. Max integer if no value provided
 - `source.mongo.page.size` -> The page size when reading from mongo
-- `mode` -> The mode of the script. DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS.  
+- `mode` -> The mode of the script. CLEAN, DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS.
+CLEAN mode is to be used to just clean the destination databases, it does no processing
 DEFAULT for a normal operation of process and index.  
 REPROCESS_ALL_FAILED for retrying records that were failed during a DEFAULT operation.  
 POST_PROCESS to run a post process action.
 - `dataset.ids.to.process` -> A comma separated list of dataset ids to process bypassing processing all dataset ids.  
 If this field is empty then the metis core mongo configuration is required so that datasetIds are fetched from there. Otherwise it's not required.
 - `identity.process` -> Set to true to do a simple read and then write reindex, without altering the record
-- `clear.databases.before.process=` -> Set to true if we want to clear the database before we start a new process, used for DEFAULT mode only
+- `clean.databases.before.process=` -> Set to true if we want to clean the database before we start a new process, used for DEFAULT mode only
 - `invalidate.plugin.types` -> The plugins in metis core to invalidate during POST_PROCESS
 - `reprocess.based.on.plugin.type` -> The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon 
 

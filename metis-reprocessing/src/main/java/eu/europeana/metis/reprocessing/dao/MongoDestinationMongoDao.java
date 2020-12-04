@@ -12,12 +12,8 @@ import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
-import eu.europeana.corelib.solr.entity.BasicProxyImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
-import eu.europeana.corelib.solr.entity.ConceptSchemeImpl;
 import eu.europeana.corelib.solr.entity.EuropeanaAggregationImpl;
-import eu.europeana.corelib.solr.entity.EventImpl;
-import eu.europeana.corelib.solr.entity.PhysicalThingImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
@@ -105,7 +101,7 @@ public class MongoDestinationMongoDao {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.destinationMongoHosts,
         propertiesHolder.destinationMongoPorts, propertiesHolder.destinationMongoAuthenticationDb,
         propertiesHolder.destinationMongoUsername, propertiesHolder.destinationMongoPassword,
-        propertiesHolder.destinationMongoEnablessl);
+        propertiesHolder.destinationMongoEnableSSL);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }
@@ -127,10 +123,6 @@ public class MongoDestinationMongoDao {
     mapper.map(TimespanImpl.class);
     mapper.map(WebResourceImpl.class);
     mapper.map(EuropeanaAggregationImpl.class);
-    mapper.map(EventImpl.class);
-    mapper.map(PhysicalThingImpl.class);
-    mapper.map(ConceptSchemeImpl.class);
-    mapper.map(BasicProxyImpl.class);
     mapper.map(WebResourceMetaInfoImpl.class);
     //Ensure indexes, to create them in destination only
     datastore.ensureIndexes();
