@@ -62,7 +62,8 @@ public class MongoDestinationMongoDao {
   }
 
   public List<DatasetStatus> getAllDatasetStatuses() {
-    return MorphiaUtils.getListOfQueryRetryable(mongoDestinationDatastore.find(DatasetStatus.class));
+    return MorphiaUtils
+        .getListOfQueryRetryable(mongoDestinationDatastore.find(DatasetStatus.class));
   }
 
   public DatasetStatus getDatasetStatus(String datasetId) {
@@ -78,6 +79,13 @@ public class MongoDestinationMongoDao {
   public void deleteAll() {
     mongoDestinationDatastore.getDatabase().drop();
     mongoDestinationDatastore.ensureIndexes();
+  }
+
+  public void dropTemporaryCollections() {
+    mongoDestinationDatastore.getDatabase().getCollection(DatasetStatus.class.getSimpleName())
+        .drop();
+    mongoDestinationDatastore.getDatabase().getCollection(FailedRecord.class.getSimpleName())
+        .drop();
   }
 
   public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {

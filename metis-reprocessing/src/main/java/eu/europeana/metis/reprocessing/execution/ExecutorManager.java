@@ -198,14 +198,6 @@ public class ExecutorManager {
     }
   }
 
-  private List<String> getDatasetsWithoutSize() {
-    if (basicConfiguration.getDatasetIdsToProcess().isEmpty()) {
-      return basicConfiguration.getMetisCoreMongoDao().getAllDatasetIds();
-    } else {
-      return basicConfiguration.getDatasetIdsToProcess();
-    }
-  }
-
   private Map<String, Long> getDatasetWithSizeFromCore() {
     return basicConfiguration.getMetisCoreMongoDao().getAllDatasetIds().parallelStream().collect(
         toMap(Function.identity(), datasetId -> basicConfiguration.getMongoSourceMongoDao()
@@ -217,7 +209,6 @@ public class ExecutorManager {
         datasetId -> basicConfiguration.getMongoSourceMongoDao()
             .getTotalRecordsForDataset(datasetId)));
   }
-
 
   /**
    * Either get a {@link DatasetStatus} that already exists or generate one.
