@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Contains all properties that are required for execution.
@@ -41,8 +42,8 @@ public class PropertiesHolder {
   public final String[] datasetIdsToProcess;
   public final boolean identityProcess;
   public final boolean cleanDatabasesBeforeProcess;
-  public final List<ExecutablePluginType> invalidatePluginTypes;
   public final ExecutablePluginType reprocessBasedOnPluginType;
+  public final List<ExecutablePluginType> invalidatePluginTypes;
 
   //Metis Core Mongo
   public final String truststorePath;
@@ -85,7 +86,8 @@ public class PropertiesHolder {
     final String filePathInResources = resource == null ? null : resource.getFile();
     String filePath;
     if (filePathInResources != null && new File(filePathInResources).exists()) {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Will try to load {} properties file", filePathInResources);
+      LOGGER
+          .info(EXECUTION_LOGS_MARKER, "Will try to load {} properties file", filePathInResources);
       filePath = filePathInResources;
     } else {
       LOGGER.info(EXECUTION_LOGS_MARKER,
@@ -118,11 +120,20 @@ public class PropertiesHolder {
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
-    invalidatePluginTypes = Arrays
-        .stream(properties.getProperty("invalidate.plugin.types").split(","))
-        .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(Collectors.toList());
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
+    invalidatePluginTypes = Arrays
+        .stream(properties.getProperty("invalidate.plugin.types").split(","))
+        .filter(StringUtils::isNotBlank)
+        .map(String::trim).map(ExecutablePluginType::getPluginTypeFromEnumName)
+        .collect(Collectors.toList());
+
+    if (mode.equals(Mode.POST_PROCESS) && (reprocessBasedOnPluginType == null || CollectionUtils
+        .isEmpty(invalidatePluginTypes))) {
+      throw new IllegalArgumentException(String.format("If mode is: %s, the "
+          + "reprocessBasedOnPluginType must not be null and invalidatePluginTypes must not be "
+          + "empty", Mode.POST_PROCESS));
+    }
 
     //Metis Core Mongo
     truststorePath = properties.getProperty("truststore.path");

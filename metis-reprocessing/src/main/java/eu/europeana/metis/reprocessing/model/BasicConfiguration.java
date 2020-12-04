@@ -51,8 +51,8 @@ public class BasicConfiguration {
   private final boolean identityProcess;
   private final boolean clearDatabasesBeforeProcess;
   private final List<String> datasetIdsToProcess;
-  private final List<ExecutablePluginType> invalidatePluginTypes;
   private final ExecutablePluginType reprocessBasedOnPluginType;
+  private final List<ExecutablePluginType> invalidatePluginTypes;
   private ExtraConfiguration extraConfiguration;
 
   public BasicConfiguration(PropertiesHolder propertiesHolder)
@@ -83,8 +83,8 @@ public class BasicConfiguration {
         : Arrays.asList(propertiesHolder.datasetIdsToProcess);
     identityProcess = propertiesHolder.identityProcess;
     clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
-    invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
+    invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
 
   public MetisCoreMongoDao getMetisCoreMongoDao() {
@@ -191,12 +191,12 @@ public class BasicConfiguration {
     return clearDatabasesBeforeProcess;
   }
 
-  public List<ExecutablePluginType> getInvalidatePluginTypes() {
-    return invalidatePluginTypes;
-  }
-
   public ExecutablePluginType getReprocessBasedOnPluginType() {
     return reprocessBasedOnPluginType;
+  }
+
+  public List<ExecutablePluginType> getInvalidatePluginTypes() {
+    return invalidatePluginTypes;
   }
 
   public void close() throws IOException {

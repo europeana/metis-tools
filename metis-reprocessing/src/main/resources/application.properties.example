@@ -17,8 +17,8 @@ dataset.ids.to.process=
 identity.process=
 #Set to true if we want to clear the database before we start a new process. Only applicable for DEFAULT Mode
 clean.databases.before.process=
-invalidate.plugin.types=
 reprocess.based.on.plugin.type=
+invalidate.plugin.types=
 
 #Truststore
 truststore.path=

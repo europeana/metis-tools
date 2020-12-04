@@ -22,8 +22,8 @@ POST_PROCESS to run a post process action.
 If this field is empty then the metis core mongo configuration is required so that datasetIds are fetched from there. Otherwise it's not required.
 - `identity.process` -> Set to true to do a simple read and then write reindex, without altering the record
 - `clean.databases.before.process=` -> Set to true if we want to clean the database before we start a new process, used for DEFAULT mode only
-- `invalidate.plugin.types` -> The plugins in metis core to invalidate during POST_PROCESS
-- `reprocess.based.on.plugin.type` -> The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon 
+- `reprocess.based.on.plugin.type` -> The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon. For example ENRICHMENT. MUST not be empty if mode is POST_PROCESS
+- `invalidate.plugin.types` -> The plugins in metis core to invalidate during POST_PROCESS. For example if the base plugin type was ENRICHMENT then the plugins that have to be invalidated would be the ones following ENRICHMENT. MUST not be empty if mode is POST_PROCESS 
 
 **Checking progress**  
 The script would create DatasetStatus entries in the destination mongo, where all progress information of a dataset

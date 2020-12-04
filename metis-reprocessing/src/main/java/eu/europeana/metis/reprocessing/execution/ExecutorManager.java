@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Contains the {@link ExecutorService} class and handles the parallelization of the tasks.
@@ -79,6 +80,10 @@ public class ExecutorManager {
       return;
     }
     final List<DatasetStatus> datasetStatuses = getDatasetStatuses();
+    if (CollectionUtils.isEmpty(datasetStatuses)) {
+      LOGGER.error("No available dataset statuses");
+      return;
+    }
 
     Date startDate = new Date();
     Timer timer = new Timer();
