@@ -71,6 +71,10 @@ public class ExecutorManager {
   }
 
   public void startReprocessing() throws InterruptedException {
+    LOGGER.info(EXECUTION_LOGS_MARKER, "Starting with mode, startIndex, endIndex, "
+            + "totalAllowedThreads: {}, {}, {}, {}",
+        basicConfiguration.getMode(), startFromDatasetIndex, endAtDatasetIndex,
+        totalAllowedThreads);
     //In default mode we try cleanup
     if (basicConfiguration.getMode().equals(Mode.DEFAULT)) {
       checkForCleaningDatabases();
