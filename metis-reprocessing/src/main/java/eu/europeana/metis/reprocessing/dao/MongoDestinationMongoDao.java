@@ -1,18 +1,31 @@
 package eu.europeana.metis.reprocessing.dao;
 
-import com.mongodb.MongoClient;
-import eu.europeana.corelib.edm.exceptions.MongoDBException;
-import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
+import com.mongodb.client.MongoClient;
+import dev.morphia.Datastore;
+import dev.morphia.DeleteOptions;
+import dev.morphia.Morphia;
+import dev.morphia.mapping.Mapper;
+import dev.morphia.query.FindOptions;
+import dev.morphia.query.Query;
+import dev.morphia.query.experimental.filters.Filters;
+import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
+import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.corelib.solr.entity.AgentImpl;
+import eu.europeana.corelib.solr.entity.AggregationImpl;
+import eu.europeana.corelib.solr.entity.ConceptImpl;
+import eu.europeana.corelib.solr.entity.EuropeanaAggregationImpl;
+import eu.europeana.corelib.solr.entity.PlaceImpl;
+import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
+import eu.europeana.corelib.solr.entity.ProxyImpl;
+import eu.europeana.corelib.solr.entity.TimespanImpl;
+import eu.europeana.corelib.solr.entity.WebResourceImpl;
+import eu.europeana.metis.mongo.utils.MorphiaUtils;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
-import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.List;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.query.FindOptions;
-import org.mongodb.morphia.query.Query;
 
 /**
  * Mongo Dao for destination mongo.
@@ -29,81 +42,99 @@ public class MongoDestinationMongoDao {
   private static final String SUCCESSFULLY_REPROCESSED = "successfullyReprocessed";
 
   private final MongoInitializer destinationMongoInitializer;
-  private Datastore mongoDestinationDatastore;
-  private PropertiesHolder propertiesHolder;
+  private final Datastore mongoDestinationDatastore;
+  private final PropertiesHolder propertiesHolder;
 
   public MongoDestinationMongoDao(PropertiesHolder propertiesHolder) {
     this.propertiesHolder = propertiesHolder;
-    //Mongo Destination
     destinationMongoInitializer = prepareMongoDestinationConfiguration();
     mongoDestinationDatastore = createMongoDestinationDatastore(
         destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoDb);
-    createIndexesForDestinationMongoRecords(destinationMongoInitializer.getMongoClient(),
-        propertiesHolder.destinationMongoDb);
   }
 
   public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
-    Query<FailedRecord> query = mongoDestinationDatastore.createQuery(FailedRecord.class);
-    query.field(FAILED_URL).startsWith("/" + datasetId + "/").field(SUCCESSFULLY_REPROCESSED)
-        .equal(false);
-    return ExternalRequestUtil.retryableExternalRequestConnectionReset(() -> query.asList(
+    Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
+    query.filter(Filters.regex(FAILED_URL).pattern("^/" + datasetId + "/"))
+        .filter(Filters.eq(SUCCESSFULLY_REPROCESSED, false));
+    return MorphiaUtils.getListOfQueryRetryable(query,
         new FindOptions().skip(nextPage * MongoSourceMongoDao.PAGE_SIZE)
-            .limit(MongoSourceMongoDao.PAGE_SIZE)));
+            .limit(MongoSourceMongoDao.PAGE_SIZE));
+  }
+
+  public List<DatasetStatus> getAllDatasetStatuses() {
+    return MorphiaUtils
+        .getListOfQueryRetryable(mongoDestinationDatastore.find(DatasetStatus.class));
   }
 
   public DatasetStatus getDatasetStatus(String datasetId) {
-    return mongoDestinationDatastore.find(DatasetStatus.class).filter(DATASET_ID, datasetId).get();
+    return mongoDestinationDatastore.find(DatasetStatus.class)
+        .filter(Filters.eq(DATASET_ID, datasetId)).first();
+  }
+
+  public void deleteDatasetStatus(String datasetId) {
+    mongoDestinationDatastore.find(DatasetStatus.class).filter(Filters.eq(DATASET_ID, datasetId))
+        .delete();
+  }
+
+  public void deleteAll() {
+    mongoDestinationDatastore.getDatabase().drop();
+    mongoDestinationDatastore.ensureIndexes();
+  }
+
+  public void dropTemporaryCollections() {
+    mongoDestinationDatastore.getDatabase().getCollection(DatasetStatus.class.getSimpleName())
+        .drop();
+    mongoDestinationDatastore.getDatabase().getCollection(FailedRecord.class.getSimpleName())
+        .drop();
   }
 
   public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
-    ExternalRequestUtil.retryableExternalRequestConnectionReset(
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> mongoDestinationDatastore.save(datasetStatus));
   }
 
   public void storeFailedRecordToDb(FailedRecord failedRecord) {
     //Will replace it if already existent
-    ExternalRequestUtil.retryableExternalRequestConnectionReset(
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> mongoDestinationDatastore.save(failedRecord));
   }
 
   public void deleteAllSuccessfulReprocessedFailedRecords() {
-    Query<FailedRecord> query = mongoDestinationDatastore.createQuery(FailedRecord.class);
-    query.field(SUCCESSFULLY_REPROCESSED).equal(true);
-    mongoDestinationDatastore.delete(query);
+    Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
+    query.filter(Filters.eq(SUCCESSFULLY_REPROCESSED, true));
+    query.delete(new DeleteOptions().multi(true));
   }
 
   private MongoInitializer prepareMongoDestinationConfiguration() {
-    MongoInitializer mongoInitializer = new MongoInitializer(
-        propertiesHolder.destinationMongoHosts,
-        propertiesHolder.destinationMongoPorts,
-        propertiesHolder.destinationMongoAuthenticationDb,
-        propertiesHolder.destinationMongoUsername,
-        propertiesHolder.destinationMongoPassword,
-        propertiesHolder.destinationMongoEnablessl,
-        propertiesHolder.destinationMongoDb);
+    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.destinationMongoHosts,
+        propertiesHolder.destinationMongoPorts, propertiesHolder.destinationMongoAuthenticationDb,
+        propertiesHolder.destinationMongoUsername, propertiesHolder.destinationMongoPassword,
+        propertiesHolder.destinationMongoEnableSSL);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }
 
   private static Datastore createMongoDestinationDatastore(MongoClient mongoClient,
       String databaseName) {
-    Morphia morphia = new Morphia();
-    morphia.map(DatasetStatus.class);
-    morphia.map(FailedRecord.class);
-    final Datastore datastore = morphia.createDatastore(mongoClient, databaseName);
+    final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName);
+    final Mapper mapper = datastore.getMapper();
+    mapper.map(DatasetStatus.class);
+    mapper.map(FailedRecord.class);
+
+    mapper.map(FullBeanImpl.class);
+    mapper.map(ProvidedCHOImpl.class);
+    mapper.map(AgentImpl.class);
+    mapper.map(AggregationImpl.class);
+    mapper.map(ConceptImpl.class);
+    mapper.map(ProxyImpl.class);
+    mapper.map(PlaceImpl.class);
+    mapper.map(TimespanImpl.class);
+    mapper.map(WebResourceImpl.class);
+    mapper.map(EuropeanaAggregationImpl.class);
+    mapper.map(WebResourceMetaInfoImpl.class);
     //Ensure indexes, to create them in destination only
     datastore.ensureIndexes();
     return datastore;
-  }
-
-  private static void createIndexesForDestinationMongoRecords(MongoClient mongoClient,
-      String databaseName) {
-    //Ignore object since we are using the IndexerImpl
-    try {
-      new EdmMongoServerImpl(mongoClient, databaseName, true);
-    } catch (MongoDBException e) {
-      e.printStackTrace();
-    }
   }
 
   public void close() {

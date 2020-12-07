@@ -1,14 +1,16 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import eu.europeana.corelib.definitions.jibx.RDF;
+import com.mongodb.MongoWriteException;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
-import eu.europeana.metis.utils.ExternalRequestUtil;
-import java.util.Collections;
+import eu.europeana.metis.schema.jibx.RDF;
+import java.util.HashMap;
 import java.util.Map;
-import org.apache.zookeeper.KeeperException.SessionExpiredException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains functionality for indexing.
@@ -18,12 +20,18 @@ import org.apache.zookeeper.KeeperException.SessionExpiredException;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-17
  */
-public class IndexingUtilities {
+public class IndexUtilities {
 
-  private static final Map<Class<?>, String> exceptionMap = Collections
-      .singletonMap(SessionExpiredException.class, "Session expired");
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndexUtilities.class);
+  private static final Map<Class<?>, String> retryExceptions;
 
-  private IndexingUtilities() {
+  static {
+    retryExceptions = new HashMap<>(
+        ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
+    retryExceptions.put(MongoWriteException.class, "E11000 duplicate key error collection");
+  }
+
+  private IndexUtilities() {
   }
 
   /**
@@ -34,14 +42,17 @@ public class IndexingUtilities {
    * @param basicConfiguration the configuration class that contains required properties
    * @throws IndexingException if an exception occurred during indexing
    */
-  public static void indexRdf(RDF rdf, Boolean preserveTimestamps,
+  public static void indexRecord(RDF rdf, Boolean preserveTimestamps,
       BasicConfiguration basicConfiguration) throws IndexingException {
+
     try {
-      final IndexerPool indexerPool = basicConfiguration.getIndexerPool();
+      //The indexer pool shouldn't be closed here, therefore it's not initialized in a
+      // try-with-resources block
+      final IndexerPool indexerPool = basicConfiguration.getDestinationIndexerPool();
       ExternalRequestUtil.retryableExternalRequest(() -> {
-        indexerPool.indexRdf(rdf, preserveTimestamps);
+        indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
         return null;
-      }, exceptionMap);
+      }, retryExceptions);
     } catch (Exception e) {
       throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
     }

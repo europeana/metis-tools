@@ -10,10 +10,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Contains all properties that are required for execution.
@@ -37,8 +39,11 @@ public class PropertiesHolder {
   public final int endAtDatasetIndex;
   public final int sourceMongoPageSize;
   public final Mode mode;
-  public final List<ExecutablePluginType> invalidatePluginTypes;
+  public final List<String> datasetIdsToProcess;
+  public final boolean identityProcess;
+  public final boolean cleanDatabasesBeforeProcess;
   public final ExecutablePluginType reprocessBasedOnPluginType;
+  public final List<ExecutablePluginType> invalidatePluginTypes;
 
   //Metis Core Mongo
   public final String truststorePath;
@@ -48,7 +53,7 @@ public class PropertiesHolder {
   public final String metisCoreMongoAuthenticationDb;
   public final String metisCoreMongoUsername;
   public final String metisCoreMongoPassword;
-  public final boolean metisCoreMongoEnablessl;
+  public final boolean metisCoreMongoEnableSSL;
   public final String metisCoreMongoDb;
   //Mongo Source
   public final String[] sourceMongoHosts;
@@ -56,7 +61,7 @@ public class PropertiesHolder {
   public final String sourceMongoAuthenticationDb;
   public final String sourceMongoUsername;
   public final String sourceMongoPassword;
-  public final boolean sourceMongoEnablessl;
+  public final boolean sourceMongoEnableSSL;
   public final String sourceMongoDb;
   //Mongo Destination
   public final String[] destinationMongoHosts;
@@ -64,7 +69,7 @@ public class PropertiesHolder {
   public final String destinationMongoAuthenticationDb;
   public final String destinationMongoUsername;
   public final String destinationMongoPassword;
-  public final boolean destinationMongoEnablessl;
+  public final boolean destinationMongoEnableSSL;
   public final String destinationMongoDb;
   //Solr/Zookeeper Destination
   public final String[] destinationSolrHosts;
@@ -81,13 +86,14 @@ public class PropertiesHolder {
     final String filePathInResources = resource == null ? null : resource.getFile();
     String filePath;
     if (filePathInResources != null && new File(filePathInResources).exists()) {
-      LOGGER.info("Will try to load {} properties file", filePathInResources);
+      LOGGER
+          .info(EXECUTION_LOGS_MARKER, "Will try to load {} properties file", filePathInResources);
       filePath = filePathInResources;
     } else {
-      LOGGER.info(
+      LOGGER.info(EXECUTION_LOGS_MARKER,
           "{} properties file does NOT exist, probably running in standalone .jar mode where the properties file should be on the same directory "
-              + "as the .jar file is. Will try to load {} properties file",
-          filePathInResources, configurationFileName);
+              + "as the .jar file is. Will try to load {} properties file", filePathInResources,
+          configurationFileName);
       filePath = configurationFileName;
     }
     try {
@@ -98,28 +104,52 @@ public class PropertiesHolder {
 
     //General parameters
     minParallelDatasets = Integer.parseInt(properties.getProperty("min.parallel.datasets"));
-    maxParallelThreadsPerDataset = Integer.parseInt(properties.getProperty("max.parallel.threads.per.dataset"));
-    startFromDatasetIndex = Integer.parseInt(properties.getProperty("start.from.dataset.index"));
-    endAtDatasetIndex = Integer.parseInt(properties.getProperty("end.at.dataset.index"));
+    maxParallelThreadsPerDataset = Integer
+        .parseInt(properties.getProperty("max.parallel.threads.per.dataset"));
+    startFromDatasetIndex =
+        StringUtils.isBlank(properties.getProperty("start.from.dataset.index")) ? 0
+            : Integer.parseInt(properties.getProperty("start.from.dataset.index"));
+    endAtDatasetIndex =
+        StringUtils.isBlank(properties.getProperty("end.at.dataset.index")) ? Integer.MAX_VALUE
+            : Integer.parseInt(properties.getProperty("end.at.dataset.index"));
     sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
-    invalidatePluginTypes = Arrays
-        .stream(properties.getProperty("invalidate.plugin.types").split(","))
-        .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(
-            Collectors.toList());
+
+    datasetIdsToProcess = Arrays.stream(properties.getProperty("dataset.ids.to.process").split(","))
+        .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+    identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
+    cleanDatabasesBeforeProcess = Boolean
+        .parseBoolean(properties.getProperty("clean.databases.before.process"));
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
+    invalidatePluginTypes = Arrays
+        .stream(properties.getProperty("invalidate.plugin.types").split(","))
+        .filter(StringUtils::isNotBlank).map(String::trim)
+        .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(Collectors.toList());
+
+    if (mode.equals(Mode.POST_PROCESS) && (reprocessBasedOnPluginType == null || CollectionUtils
+        .isEmpty(invalidatePluginTypes))) {
+      throw new IllegalArgumentException(String.format("If mode is: %s, the "
+          + "reprocessBasedOnPluginType must not be null and invalidatePluginTypes must not be "
+          + "empty", Mode.POST_PROCESS));
+    }
 
     //Metis Core Mongo
     truststorePath = properties.getProperty("truststore.path");
     truststorePassword = properties.getProperty("truststore.password");
     metisCoreMongoHosts = properties.getProperty("mongo.metis.core.hosts").split(",");
-    metisCoreMongoPorts = Arrays.stream(properties.getProperty("mongo.metis.core.port").split(","))
-        .mapToInt(Integer::parseInt).toArray();
+
+    if (StringUtils.isBlank(properties.getProperty("mongo.metis.core.port"))) {
+      metisCoreMongoPorts = null;
+    } else {
+      metisCoreMongoPorts = Arrays
+          .stream(properties.getProperty("mongo.metis.core.port").split(","))
+          .mapToInt(Integer::parseInt).toArray();
+    }
     metisCoreMongoAuthenticationDb = properties.getProperty("mongo.metis.core.authentication.db");
     metisCoreMongoUsername = properties.getProperty("mongo.metis.core.username");
     metisCoreMongoPassword = properties.getProperty("mongo.metis.core.password");
-    metisCoreMongoEnablessl = Boolean
+    metisCoreMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
     metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
 
@@ -130,7 +160,7 @@ public class PropertiesHolder {
     sourceMongoAuthenticationDb = properties.getProperty("mongo.source.authentication.db");
     sourceMongoUsername = properties.getProperty("mongo.source.username");
     sourceMongoPassword = properties.getProperty("mongo.source.password");
-    sourceMongoEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
+    sourceMongoEnableSSL = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
     sourceMongoDb = properties.getProperty("mongo.source.db");
 
     //Mongo Destination
@@ -142,7 +172,7 @@ public class PropertiesHolder {
         .getProperty("mongo.destination.authentication.db");
     destinationMongoUsername = properties.getProperty("mongo.destination.username");
     destinationMongoPassword = properties.getProperty("mongo.destination.password");
-    destinationMongoEnablessl = Boolean
+    destinationMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
 

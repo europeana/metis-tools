@@ -7,8 +7,9 @@ import eu.europeana.metis.reprocessing.execution.ExecutorManager;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.utils.CustomTruststoreAppender;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,14 +21,12 @@ import org.slf4j.LoggerFactory;
  */
 public class ReprocessingMain {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(ReprocessingMain.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReprocessingMain.class);
   private static final String CONFIGURATION_FILE = "application.properties";
-  private static final PropertiesHolder propertiesHolder = new PropertiesHolder(
-      CONFIGURATION_FILE);
+  private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args)
-      throws TrustStoreConfigurationException, InterruptedException, IndexingException, URISyntaxException {
+      throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script");
 
     final BasicConfiguration basicConfiguration = new BasicConfiguration(propertiesHolder);

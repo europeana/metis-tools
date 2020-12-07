@@ -1,6 +1,13 @@
 package eu.europeana.metis.reprocessing.dao;
 
-import com.mongodb.MongoClient;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoClient;
+import dev.morphia.Datastore;
+import dev.morphia.Morphia;
+import dev.morphia.mapping.Mapper;
+import dev.morphia.query.FindOptions;
+import dev.morphia.query.Query;
+import dev.morphia.query.experimental.filters.Filters;
 import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
@@ -16,15 +23,12 @@ import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
+import eu.europeana.metis.mongo.utils.MorphiaUtils;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
-import eu.europeana.metis.utils.ExternalRequestUtil;
 import java.util.ArrayList;
 import java.util.List;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.query.FindOptions;
-import org.mongodb.morphia.query.Query;
 
 /**
  * Mongo Dao for source records.
@@ -37,81 +41,81 @@ public class MongoSourceMongoDao {
 
   private static final String ID = "_id";
   private static final int DEFAULT_PAGE_SIZE = 200;
+  public static final String ABOUT = "about";
   public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   private final MongoInitializer sourceMongoInitializer;
-  private Datastore mongoSourceDatastore;
-  private PropertiesHolder propertiesHolder;
+  private final Datastore mongoSourceDatastore;
+  private final PropertiesHolder propertiesHolder;
 
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
-    // TODO: 8-6-19 Create a pool of connections, to speed up the read/write on db?
     this.propertiesHolder = propertiesHolder;
     PAGE_SIZE = propertiesHolder.sourceMongoPageSize;
     sourceMongoInitializer = prepareMongoSourceConfiguration();
-    mongoSourceDatastore = createMongoSourceDatastore(
-        sourceMongoInitializer.getMongoClient(), propertiesHolder.sourceMongoDb);
+    mongoSourceDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
+        propertiesHolder.sourceMongoDb);
   }
 
-
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
-    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
-    query.field("about").startsWith("/" + datasetId + "/");
-    return ExternalRequestUtil.retryableExternalRequestConnectionReset(() -> query.asList(
-        new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE)));
+    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
+    query.filter(Filters.regex(ABOUT).pattern("^/" + datasetId + "/"));
+    return MorphiaUtils.getListOfQueryRetryable(query,
+        new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE));
   }
 
   public List<FullBeanImpl> getRecordsFromList(List<String> recordIds) {
     List<FullBeanImpl> fullBeans = new ArrayList<>();
-    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
+    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
     recordIds.forEach(recordId -> {
-      query.field("about").equal(recordId);
-      fullBeans.add(ExternalRequestUtil.retryableExternalRequestConnectionReset(query::get));
+      query.filter(Filters.eq(ABOUT, recordId));
+      fullBeans.add(ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::first));
     });
     return fullBeans;
   }
 
   public long getTotalRecordsForDataset(String datasetId) {
-    Query<FullBeanImpl> query = mongoSourceDatastore.createQuery(FullBeanImpl.class);
-    query.field("about").startsWith("/" + datasetId + "/");
-    return ExternalRequestUtil.retryableExternalRequestConnectionReset(query::count);
+    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
+    query.filter(Filters.regex(ABOUT).pattern("^/" + datasetId + "/"));
+    return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::count);
   }
 
-  public WebResourceMetaInfoImpl getTechnicalMetadataFromSource(String resourceUrlInMd5) {
+  public List<WebResourceMetaInfoImpl> getTechnicalMetadataForHashCodes(List<String> hashCodes) {
     final Query<WebResourceMetaInfoImpl> query = mongoSourceDatastore
-        .createQuery(WebResourceMetaInfoImpl.class);
-    return query.field(ID).equal(resourceUrlInMd5).get();
+        .find(WebResourceMetaInfoImpl.class);
+    final BasicDBObject basicObject = new BasicDBObject("$in", hashCodes);
+    query.filter(Filters.eq("_id", basicObject));
+    return MorphiaUtils.getListOfQueryRetryable(query);
   }
 
   private MongoInitializer prepareMongoSourceConfiguration() {
-    MongoInitializer mongoInitializer = new MongoInitializer(
-        propertiesHolder.sourceMongoHosts,
-        propertiesHolder.sourceMongoPorts,
-        propertiesHolder.sourceMongoAuthenticationDb,
-        propertiesHolder.sourceMongoUsername,
-        propertiesHolder.sourceMongoPassword,
-        propertiesHolder.sourceMongoEnablessl, propertiesHolder.sourceMongoDb);
+    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.sourceMongoHosts,
+        propertiesHolder.sourceMongoPorts, propertiesHolder.sourceMongoAuthenticationDb,
+        propertiesHolder.sourceMongoUsername, propertiesHolder.sourceMongoPassword,
+        propertiesHolder.sourceMongoEnableSSL);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }
 
   private static Datastore createMongoSourceDatastore(MongoClient mongoClient,
       String databaseName) {
-    Morphia morphia = new Morphia();
-    morphia.map(FullBeanImpl.class);
-    morphia.map(ProvidedCHOImpl.class);
-    morphia.map(AgentImpl.class);
-    morphia.map(AggregationImpl.class);
-    morphia.map(ConceptImpl.class);
-    morphia.map(ProxyImpl.class);
-    morphia.map(PlaceImpl.class);
-    morphia.map(TimespanImpl.class);
-    morphia.map(WebResourceImpl.class);
-    morphia.map(EuropeanaAggregationImpl.class);
-    morphia.map(EventImpl.class);
-    morphia.map(PhysicalThingImpl.class);
-    morphia.map(ConceptSchemeImpl.class);
-    morphia.map(BasicProxyImpl.class);
-    return morphia.createDatastore(mongoClient, databaseName);
+    final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName);
+    final Mapper mapper = datastore.getMapper();
+    mapper.map(FullBeanImpl.class);
+    mapper.map(ProvidedCHOImpl.class);
+    mapper.map(AgentImpl.class);
+    mapper.map(AggregationImpl.class);
+    mapper.map(ConceptImpl.class);
+    mapper.map(ProxyImpl.class);
+    mapper.map(PlaceImpl.class);
+    mapper.map(TimespanImpl.class);
+    mapper.map(WebResourceImpl.class);
+    mapper.map(EuropeanaAggregationImpl.class);
+    mapper.map(EventImpl.class);
+    mapper.map(PhysicalThingImpl.class);
+    mapper.map(ConceptSchemeImpl.class);
+    mapper.map(BasicProxyImpl.class);
+    mapper.map(WebResourceMetaInfoImpl.class);
+    return datastore;
   }
 
   public void close() {

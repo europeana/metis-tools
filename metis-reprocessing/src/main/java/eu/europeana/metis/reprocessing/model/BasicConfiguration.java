@@ -1,5 +1,8 @@
 package eu.europeana.metis.reprocessing.model;
 
+import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
+
+import eu.europeana.indexing.Indexer;
 import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingSettings;
@@ -10,12 +13,15 @@ import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.solr.client.CompoundSolrClient;
+import eu.europeana.metis.solr.connection.SolrClientProvider;
+import eu.europeana.metis.utils.CustomTruststoreAppender;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +42,28 @@ public class BasicConfiguration {
   private final MetisCoreMongoDao metisCoreMongoDao;
   private final MongoSourceMongoDao mongoSourceMongoDao;
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
-  private final IndexerPool indexerPool;
+  private final CompoundSolrClient destinationCompoundSolrClient;
+  private final IndexerPool destinationIndexerPool;
+  private final Indexer destinationIndexer;
   private final Mode mode;
-  private final List<ExecutablePluginType> invalidatePluginTypes;
+  private final boolean identityProcess;
+  private final boolean clearDatabasesBeforeProcess;
+  private final List<String> datasetIdsToProcess;
   private final ExecutablePluginType reprocessBasedOnPluginType;
+  private final List<ExecutablePluginType> invalidatePluginTypes;
   private ExtraConfiguration extraConfiguration;
 
   public BasicConfiguration(PropertiesHolder propertiesHolder)
-      throws TrustStoreConfigurationException, IndexingException, URISyntaxException {
+      throws IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException {
     this.propertiesHolder = propertiesHolder;
-    metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
+    //Create metis core dao only if there aren't any specific datasets to process and mode not
+    // POST_PROCESS
+    if (propertiesHolder.datasetIdsToProcess == null || propertiesHolder.mode
+        .equals(Mode.POST_PROCESS)) {
+      metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
+    } else {
+      metisCoreMongoDao = null;
+    }
     mongoSourceMongoDao = new MongoSourceMongoDao(propertiesHolder);
     mongoDestinationMongoDao = new MongoDestinationMongoDao(propertiesHolder);
 
@@ -53,11 +71,17 @@ public class BasicConfiguration {
     prepareMongoSettings(indexingSettings);
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
+    destinationCompoundSolrClient = new SolrClientProvider<>(indexingSettings.getSolrProperties())
+        .createSolrClient();
     IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
-    indexerPool = new IndexerPool(indexerFactory, 600, 60);
+    destinationIndexerPool = new IndexerPool(indexerFactory, 600, 60);
+    destinationIndexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
-    invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
+    datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
+    identityProcess = propertiesHolder.identityProcess;
+    clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
+    invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
 
   public MetisCoreMongoDao getMetisCoreMongoDao() {
@@ -72,21 +96,27 @@ public class BasicConfiguration {
     return mongoDestinationMongoDao;
   }
 
-  public IndexerPool getIndexerPool() {
-    return indexerPool;
+  public CompoundSolrClient getDestinationCompoundSolrClient() {
+    return destinationCompoundSolrClient;
+  }
+
+  public IndexerPool getDestinationIndexerPool() {
+    return destinationIndexerPool;
+  }
+
+  public Indexer getDestinationIndexer() {
+    return destinationIndexer;
   }
 
   public ExtraConfiguration getExtraConfiguration() {
     return extraConfiguration;
   }
 
-  public void setExtraConfiguration(
-      ExtraConfiguration extraConfiguration) {
+  public void setExtraConfiguration(ExtraConfiguration extraConfiguration) {
     this.extraConfiguration = extraConfiguration;
   }
 
-  private void prepareMongoSettings(IndexingSettings indexingSettings)
-      throws IndexingException {
+  private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
     for (int i = 0; i < propertiesHolder.destinationMongoHosts.length; i++) {
       if (propertiesHolder.destinationMongoHosts.length
           == propertiesHolder.destinationMongoPorts.length) {
@@ -99,20 +129,18 @@ public class BasicConfiguration {
                 propertiesHolder.destinationMongoPorts[0]));
       }
     }
-    indexingSettings
-        .setMongoDatabaseName(propertiesHolder.destinationMongoDb);
+    indexingSettings.setMongoDatabaseName(propertiesHolder.destinationMongoDb);
     if (StringUtils.isEmpty(propertiesHolder.destinationMongoAuthenticationDb) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoUsername) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoPassword)) {
-      LOGGER.info("Mongo credentials not provided");
+      LOGGER.info(EXECUTION_LOGS_MARKER, "Mongo credentials not provided");
     } else {
-      indexingSettings.setMongoCredentials(
-          propertiesHolder.destinationMongoUsername,
+      indexingSettings.setMongoCredentials(propertiesHolder.destinationMongoUsername,
           propertiesHolder.destinationMongoPassword,
           propertiesHolder.destinationMongoAuthenticationDb);
     }
 
-    if (propertiesHolder.destinationMongoEnablessl) {
+    if (propertiesHolder.destinationMongoEnableSSL) {
       indexingSettings.setMongoEnableSsl();
     }
   }
@@ -139,8 +167,7 @@ public class BasicConfiguration {
                 propertiesHolder.destinationZookeeperPorts[0]));
       }
     }
-    indexingSettings
-        .setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
+    indexingSettings.setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
     indexingSettings
         .setZookeeperDefaultCollection(propertiesHolder.destinationZookeeperDefaultCollection);
   }
@@ -149,21 +176,34 @@ public class BasicConfiguration {
     return mode;
   }
 
-  public List<ExecutablePluginType> getInvalidatePluginTypes() {
-    return invalidatePluginTypes;
+  public List<String> getDatasetIdsToProcess() {
+    return datasetIdsToProcess;
+  }
+
+  public boolean isIdentityProcess() {
+    return identityProcess;
+  }
+
+  public boolean isClearDatabasesBeforeProcess() {
+    return clearDatabasesBeforeProcess;
   }
 
   public ExecutablePluginType getReprocessBasedOnPluginType() {
     return reprocessBasedOnPluginType;
   }
 
-  public void close() {
-    metisCoreMongoDao.close();
+  public List<ExecutablePluginType> getInvalidatePluginTypes() {
+    return invalidatePluginTypes;
+  }
+
+  public void close() throws IOException {
+    if (metisCoreMongoDao != null) {
+      metisCoreMongoDao.close();
+    }
     mongoSourceMongoDao.close();
     mongoDestinationMongoDao.close();
-    if (extraConfiguration != null) {
-      extraConfiguration.close();
-    }
-    indexerPool.close();
+    destinationCompoundSolrClient.close();
+    destinationIndexerPool.close();
+    destinationIndexer.close();
   }
 }
