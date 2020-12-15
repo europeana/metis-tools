@@ -9,6 +9,9 @@ import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
+import eu.europeana.enrichment.rest.client.EnrichmentWorker;
+import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
+import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
@@ -48,7 +51,7 @@ public class ProcessUtilities {
     if (basicConfiguration.isIdentityProcess()) {
       return identityProcess(fullBean, basicConfiguration.getMongoSourceMongoDao());
     } else {
-      return process(fullBean, basicConfiguration.getMongoSourceMongoDao());
+      return process(fullBean, basicConfiguration);
     }
   }
 
@@ -59,6 +62,24 @@ public class ProcessUtilities {
     //Remove quality annotations because EdmUtils prefixes them with an http domain. They will
     // be recalculated during indexing
     rdf.setQualityAnnotationList(null);
+    return rdf;
+  }
+
+  private static RDF process(FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {
+    RDF rdf = identityProcess(fullBean, basicConfiguration.getMongoSourceMongoDao());
+    rdf = compute(basicConfiguration, rdf);
+    return rdf;
+  }
+
+  private static RDF compute(BasicConfiguration basicConfiguration, RDF rdf) {
+    //Modify this method accordingly
+    try {
+      final EnrichmentWorker enrichmentWorker = basicConfiguration.getExtraConfiguration()
+          .getEnrichmentWorker();
+      rdf = enrichmentWorker.process(rdf, enrichmentWorker.getSupportedModes());
+    } catch (EnrichmentException | DereferenceException e) {
+      LOGGER.warn("Something went wrong during enrichment/dereference", e);
+    }
     return rdf;
   }
 
@@ -133,12 +154,6 @@ public class ProcessUtilities {
             webResource.getAbout());
       }
     }
-  }
-
-  private static RDF process(FullBeanImpl fullBean, MongoSourceMongoDao mongoSourceMongoDao) {
-    final RDF rdf = identityProcess(fullBean, mongoSourceMongoDao);
-    // TODO: 24/11/2020 Extend to the implementation that modifies the record
-    return null;
   }
 
   /**

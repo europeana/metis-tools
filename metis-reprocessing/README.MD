@@ -61,4 +61,8 @@ Extra classes created:
 - `TechnicalMetadataWrapper` This class was copied from an other project to a package `eu.europeana.metis.technical.metadata.generation.model` 
 so that morphia would not throw an error during reading
 - `ThumbnailWrapper` This class was copied from an other project to a package `eu.europeana.metis.technical.metadata.generation.model` 
-so that morphia would not throw an error during reading
+so that morphia would not throw an error during reading  
+
+<u>*Version 2*</u>
+- `enrichment.url` The url for enrichment
+- `dereference.url` The url for dereference

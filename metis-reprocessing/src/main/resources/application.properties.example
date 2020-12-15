@@ -62,3 +62,5 @@ zookeeper.destination.chroot=
 zookeeper.destination.defaultCollection=
 
 #EXTRA CONFIGURATION
+enrichment.url=
+dereference.url=

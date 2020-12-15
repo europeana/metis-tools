@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Basic configuration of the re-processing operation.
@@ -58,7 +59,7 @@ public class BasicConfiguration {
     this.propertiesHolder = propertiesHolder;
     //Create metis core dao only if there aren't any specific datasets to process and mode not
     // POST_PROCESS
-    if (propertiesHolder.datasetIdsToProcess == null || propertiesHolder.mode
+    if (CollectionUtils.isEmpty(propertiesHolder.datasetIdsToProcess) || propertiesHolder.mode
         .equals(Mode.POST_PROCESS)) {
       metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
     } else {
