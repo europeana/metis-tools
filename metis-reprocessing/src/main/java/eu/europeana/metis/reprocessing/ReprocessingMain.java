@@ -2,6 +2,8 @@ package eu.europeana.metis.reprocessing;
 
 import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 
+import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
+import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.execution.ExecutorManager;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
@@ -26,7 +28,7 @@ public class ReprocessingMain {
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args)
-      throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException {
+      throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException, DereferenceException, EnrichmentException {
     LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script");
 
     final BasicConfiguration basicConfiguration = new BasicConfiguration(propertiesHolder);

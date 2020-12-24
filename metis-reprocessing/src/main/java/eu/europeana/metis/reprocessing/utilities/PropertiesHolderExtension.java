@@ -10,6 +10,11 @@ import java.util.Properties;
  */
 public class PropertiesHolderExtension {
 
+  public final String enrichmentUrl;
+  public final String dereferenceUrl;
+
   PropertiesHolderExtension(Properties properties) {
+    enrichmentUrl = properties.getProperty("enrichment.url");
+    dereferenceUrl = properties.getProperty("dereference.url");
   }
 }

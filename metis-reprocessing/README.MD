@@ -41,6 +41,9 @@ When running the script, log files will be generated based on timestamp:
 - `execution-{date}.log` -> Contains general logs of the execution
 - `statistics-{date}.log` -> Contains the final counts at the end of the execution
 
+Example command:  
+`java -Dlog4j.configurationFile=log4j2.xml -jar metis-reprocessing-1.0-SNAPSHOT-jar-with-dependencies.jar`
+
 **Modifying implementation for a future reprocess operation**
 The changes on the implementation, per reprocessing operation should be limited in the following files:  
 - `PropertysHolderExtension` For the extra required properties from the properties file
@@ -50,7 +53,7 @@ functional interfaces
 - `IndexUtilities` That contains all functionality for indexing records
 - `PostProcessingUtilities` That contains all functionality for after reprocessing of all records, once per dataset  
 
-Depending on the operation classes can be created and removed when not required anymore.
+Depending on the operation, classes can be created and removed when not required anymore.
 
 **Per reprocess operation information**  
 <u>*Version 1(Summer 2019)*</u>  
@@ -61,4 +64,8 @@ Extra classes created:
 - `TechnicalMetadataWrapper` This class was copied from an other project to a package `eu.europeana.metis.technical.metadata.generation.model` 
 so that morphia would not throw an error during reading
 - `ThumbnailWrapper` This class was copied from an other project to a package `eu.europeana.metis.technical.metadata.generation.model` 
-so that morphia would not throw an error during reading
+so that morphia would not throw an error during reading  
+
+<u>*Version 2*</u>
+- `enrichment.url` The url for enrichment
+- `dereference.url` The url for dereference

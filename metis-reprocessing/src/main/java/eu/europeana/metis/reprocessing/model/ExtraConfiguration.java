@@ -1,6 +1,14 @@
 package eu.europeana.metis.reprocessing.model;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.enrichment.rest.client.EnrichmentWorker;
+import eu.europeana.enrichment.rest.client.EnrichmentWorkerImpl;
+import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
+import eu.europeana.enrichment.rest.client.dereference.DereferencerProvider;
+import eu.europeana.enrichment.rest.client.enrichment.Enricher;
+import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
+import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
+import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.execution.IndexUtilities;
@@ -10,6 +18,7 @@ import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Extra configuration class that is part of {@link BasicConfiguration}.
@@ -26,13 +35,36 @@ public class ExtraConfiguration {
   private final ThrowingTriConsumer<RDF, Boolean, BasicConfiguration> rdfIndexer;
   private final ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> afterReprocessProcessor;
 
-  public ExtraConfiguration(PropertiesHolder propertiesHolder) {
-    final PropertiesHolderExtension propertiesHolderExtension = propertiesHolder
-        .getPropertiesHolderExtension();
+  private EnrichmentWorker enrichmentWorker;
 
+  public ExtraConfiguration(PropertiesHolder propertiesHolder)
+      throws DereferenceException, EnrichmentException {
     this.fullBeanProcessor = ProcessUtilities::processFullBean;
     this.rdfIndexer = IndexUtilities::indexRecord;
     this.afterReprocessProcessor = PostProcessUtilities::postProcess;
+
+    initializeAdditionalElements(propertiesHolder);
+  }
+
+  private void initializeAdditionalElements(PropertiesHolder propertiesHolder)
+      throws DereferenceException, EnrichmentException {
+    final PropertiesHolderExtension propertiesHolderExtension = propertiesHolder
+        .getPropertiesHolderExtension();
+
+    Enricher enricher = null;
+    Dereferencer dereferencer = null;
+    if (StringUtils.isNotBlank(propertiesHolderExtension.enrichmentUrl)) {
+      final EnricherProvider enricherProvider = new EnricherProvider();
+      enricherProvider.setEnrichmentUrl(propertiesHolderExtension.enrichmentUrl);
+      enricher = enricherProvider.create();
+      if (StringUtils.isNotBlank(propertiesHolderExtension.dereferenceUrl)) {
+        final DereferencerProvider dereferencerProvider = new DereferencerProvider();
+        dereferencerProvider.setEnrichmentUrl(propertiesHolderExtension.enrichmentUrl);
+        dereferencerProvider.setDereferenceUrl(propertiesHolderExtension.dereferenceUrl);
+        dereferencer = dereferencerProvider.create();
+      }
+    }
+    enrichmentWorker = new EnrichmentWorkerImpl(dereferencer, enricher);
   }
 
   public ThrowingBiFunction<FullBeanImpl, BasicConfiguration, RDF> getFullBeanProcessor() {
@@ -45,6 +77,10 @@ public class ExtraConfiguration {
 
   public ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> getAfterReprocessProcessor() {
     return afterReprocessProcessor;
+  }
+
+  public EnrichmentWorker getEnrichmentWorker() {
+    return enrichmentWorker;
   }
 
   @FunctionalInterface
