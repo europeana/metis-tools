@@ -1,7 +1,5 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
-
 import eu.europeana.corelib.definitions.edm.beans.FullBean;
 import eu.europeana.corelib.definitions.edm.entity.Aggregation;
 import eu.europeana.corelib.definitions.edm.entity.WebResource;
@@ -149,8 +147,7 @@ public class ProcessUtilities {
           hashCodes.put(hashCodeIsShownAt, webResource);
         }
       } catch (MediaExtractionException e) {
-        LOGGER.warn(EXECUTION_LOGS_MARKER,
-            "Something went wrong during hash, skipping web resource metadata {}",
+        LOGGER.warn("Something went wrong during hash, skipping web resource metadata {}",
             webResource.getAbout());
       }
     }

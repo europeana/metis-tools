@@ -1,7 +1,5 @@
 package eu.europeana.metis.reprocessing.dao;
 
-import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
-
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
@@ -68,7 +66,7 @@ public class MetisCoreMongoDao {
       throws CustomTruststoreAppender.TrustStoreConfigurationException {
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
         .isNotEmpty(propertiesHolder.truststorePassword)) {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Append default truststore with custom truststore");
+      LOGGER.info("Append default truststore with custom truststore");
       CustomTruststoreAppender.appendCustomTrustoreToDefault(propertiesHolder.truststorePath,
           propertiesHolder.truststorePassword);
     }

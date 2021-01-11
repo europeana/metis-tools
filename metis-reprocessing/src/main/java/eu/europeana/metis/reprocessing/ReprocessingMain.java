@@ -1,7 +1,5 @@
 package eu.europeana.metis.reprocessing;
 
-import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
-
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.indexing.exception.IndexingException;
@@ -12,6 +10,7 @@ import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,19 +28,31 @@ public class ReprocessingMain {
 
   public static void main(String[] args)
       throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException, DereferenceException, EnrichmentException {
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Starting script");
+    LOGGER.info("Starting script");
 
     final BasicConfiguration basicConfiguration = new BasicConfiguration(propertiesHolder);
     final ExtraConfiguration extraConfiguration = new ExtraConfiguration(propertiesHolder);
     basicConfiguration.setExtraConfiguration(extraConfiguration);
 
-    final ExecutorManager executorManager = new ExecutorManager(basicConfiguration,
-        propertiesHolder);
-    executorManager.startReprocessing();
-    executorManager.close();
+    boolean startExecution = true;
+    if (basicConfiguration.isClearDatabasesBeforeProcess()) {
+      System.out.println(
+          "Script parameter to clear databases before start is set to true, " + "continue? y/n");
+      try (Scanner input = new Scanner(System.in)) {
+        char c = input.next().charAt(0);
+        if (c != 'y') {
+          startExecution = false;
+        }
+      }
+    }
+
+    if (startExecution) {
+      final ExecutorManager executorManager = new ExecutorManager(basicConfiguration,
+          propertiesHolder);
+      executorManager.startReprocessing();
+      executorManager.close();
+    }
     basicConfiguration.close();
-    LOGGER.info(EXECUTION_LOGS_MARKER, "End script");
+    LOGGER.info("End script");
   }
-
-
 }

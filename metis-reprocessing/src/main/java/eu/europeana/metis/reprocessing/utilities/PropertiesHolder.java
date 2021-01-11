@@ -29,7 +29,6 @@ import org.springframework.util.CollectionUtils;
 public class PropertiesHolder {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesHolder.class);
-  public static final Marker EXECUTION_LOGS_MARKER = MarkerFactory.getMarker("EXECUTION_LOGS");
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
 
   //General parameters
@@ -86,11 +85,10 @@ public class PropertiesHolder {
     final String filePathInResources = resource == null ? null : resource.getFile();
     String filePath;
     if (filePathInResources != null && new File(filePathInResources).exists()) {
-      LOGGER
-          .info(EXECUTION_LOGS_MARKER, "Will try to load {} properties file", filePathInResources);
+      LOGGER.info("Will try to load {} properties file", filePathInResources);
       filePath = filePathInResources;
     } else {
-      LOGGER.info(EXECUTION_LOGS_MARKER,
+      LOGGER.info(
           "{} properties file does NOT exist, probably running in standalone .jar mode where the properties file should be on the same directory "
               + "as the .jar file is. Will try to load {} properties file", filePathInResources,
           configurationFileName);

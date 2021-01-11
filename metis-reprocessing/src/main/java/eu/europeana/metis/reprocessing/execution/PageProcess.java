@@ -1,7 +1,5 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
-
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import java.util.List;
@@ -38,7 +36,7 @@ public class PageProcess implements Callable<Integer> {
     int nextPage = processDataset.getNextPageAndIncrement();
     List<FullBeanImpl> nextPageOfRecords = processDataset.getFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "{} - Processing page: {}, range of records: {} - {}",
+      LOGGER.info("{} - Processing page: {}, range of records: {} - {}",
           prefixDatasetidLog, nextPage, nextPage * MongoSourceMongoDao.PAGE_SIZE,
           ((nextPage + 1) * MongoSourceMongoDao.PAGE_SIZE) - 1);
       processDataset.processRecords(nextPageOfRecords);

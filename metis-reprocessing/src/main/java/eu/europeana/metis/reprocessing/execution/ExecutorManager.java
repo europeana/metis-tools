@@ -1,6 +1,5 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.EXECUTION_LOGS_MARKER;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -71,10 +70,10 @@ public class ExecutorManager {
   }
 
   public void startReprocessing() throws InterruptedException {
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Starting with mode, startIndex, endIndex, "
-            + "totalAllowedThreads: {}, {}, {}, {}",
-        basicConfiguration.getMode(), startFromDatasetIndex, endAtDatasetIndex,
-        totalAllowedThreads);
+    LOGGER
+        .info("Starting with mode, startIndex, endIndex, " + "totalAllowedThreads: {}, {}, {}, {}",
+            basicConfiguration.getMode(), startFromDatasetIndex, endAtDatasetIndex,
+            totalAllowedThreads);
     //In default mode we try cleanup
     if (basicConfiguration.getMode().equals(Mode.DEFAULT)) {
       checkForCleaningDatabases();
@@ -119,7 +118,7 @@ public class ExecutorManager {
           //Check and log for exceptions
           completedFuture.get();
         } catch (ExecutionException e) {
-          LOGGER.error(EXECUTION_LOGS_MARKER, "An exception occurred in a callable.", e);
+          LOGGER.error("An exception occurred in a callable.", e);
         }
         final Integer futureConsumedThreads = futureConsumedThreadsHashMap.get(completedFuture);
         futureConsumedThreadsHashMap.remove(completedFuture);
@@ -127,7 +126,7 @@ public class ExecutorManager {
         countOfTotalCurrentThreads -= futureConsumedThreads;
         reprocessedDatasets++;
         LOGGER.info(PROCESSED_DATASETS_STR, reprocessedDatasets);
-        LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, reprocessedDatasets);
+        LOGGER.info(PROCESSED_DATASETS_STR, reprocessedDatasets);
       }
       Callable<Void> callable = new ProcessDataset(datasetStatus, basicConfiguration,
           maxParallelThreadsPerDataset);
@@ -143,17 +142,17 @@ public class ExecutorManager {
         //Check and log for exceptions
         completedFuture.get();
       } catch (Exception e) {
-        LOGGER.error(EXECUTION_LOGS_MARKER, "An exception occurred in a callable.", e);
+        LOGGER.error("An exception occurred in a callable.", e);
       }
       reprocessedDatasets++;
-      LOGGER.info(EXECUTION_LOGS_MARKER, PROCESSED_DATASETS_STR, reprocessedDatasets);
+      LOGGER.info(PROCESSED_DATASETS_STR, reprocessedDatasets);
     }
     commitSolrChanges();
     timer.cancel();
   }
 
   private List<DatasetStatus> getDatasetStatuses() {
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Calculating order of datasets for processing..");
+    LOGGER.info("Calculating order of datasets for processing..");
 
     final List<DatasetStatus> datasetStatuses;
     if (basicConfiguration.getMode().equals(Mode.REPROCESS_ALL_FAILED)) {
@@ -170,22 +169,22 @@ public class ExecutorManager {
               entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
                   atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
     }
-    LOGGER.info(EXECUTION_LOGS_MARKER, "Calculated order of datasets for processing");
+    LOGGER.info("Calculated order of datasets for processing");
     return datasetStatuses;
   }
 
   public void checkForCleaningDatabases() {
     if (basicConfiguration.getMode().equals(Mode.CLEAN) || basicConfiguration
         .isClearDatabasesBeforeProcess()) {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Cleaning database");
+      LOGGER.info("Cleaning database");
       basicConfiguration.getMongoDestinationMongoDao().deleteAll();
       try {
         basicConfiguration.getDestinationCompoundSolrClient().getSolrClient().deleteByQuery("*:*");
         basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
       } catch (SolrServerException | IOException | IndexingException e) {
-        LOGGER.warn(EXECUTION_LOGS_MARKER, "Could not cleanup solr", e);
+        LOGGER.warn("Could not cleanup solr", e);
       }
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Cleaned database");
+      LOGGER.info("Cleaned database");
     }
   }
 
@@ -194,12 +193,11 @@ public class ExecutorManager {
     //The indexer shouldn't be closed here, therefore it's not initialized in a
     //try-with-resources block
     try {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Commit changes");
+      LOGGER.info("Commit changes");
       basicConfiguration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Committed changes");
+      LOGGER.info("Committed changes");
     } catch (IndexingException e) {
-      LOGGER.warn(EXECUTION_LOGS_MARKER,
-          "Could not commit changes to solr, changes will be visible after auto commit", e);
+      LOGGER.warn("Could not commit changes to solr, changes will be visible after auto commit", e);
     }
   }
 
@@ -271,7 +269,7 @@ public class ExecutorManager {
     }
 
     public void run() {
-      LOGGER.info(EXECUTION_LOGS_MARKER, "Scheduled calculation of projection speed started");
+      LOGGER.info("Scheduled calculation of projection speed started");
       Date nowDate = new Date();
       long secondsInBetween = (nowDate.getTime() - startDate.getTime()) / 1000;
       //Only calculate projected date if a defined time threshold has passed
@@ -294,7 +292,7 @@ public class ExecutorManager {
       final Date projectedEndDate = Date.from(startDate.toInstant()
           .plus(Duration.ofMinutes((long) (totalHoursRequiredWithoutPreviouslyProcessed * 60))));
 
-      LOGGER.info(EXECUTION_LOGS_MARKER, String.format(
+      LOGGER.info(String.format(
           "Average time required, with current speed, for a full reprocess: %.2f Hours, projected end date: %s",
           totalHoursRequired, projectedEndDate));
     }

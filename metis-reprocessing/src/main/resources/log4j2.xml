@@ -6,7 +6,6 @@
     </Console>
     <File name="ExecutionLogs"
       fileName="logs/metis-reprocessing/execution-${date:yyyy-MM-dd-HHmmss}.log">
-      <MarkerFilter marker="EXECUTION_LOGS" onMatch="ACCEPT" onMismatch="DENY"/>
       <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p %C:%L [%t] - %m%n"/>
     </File>
     <File name="StatisticsLogs"
