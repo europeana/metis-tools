@@ -6,7 +6,7 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.execution.ExecutorManager;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
 import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,15 +24,13 @@ public class ReprocessingMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReprocessingMain.class);
   private static final String CONFIGURATION_FILE = "application.properties";
-  private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
+  private static final PropertiesHolderExtension propertiesHolder = new PropertiesHolderExtension(CONFIGURATION_FILE);
 
   public static void main(String[] args)
       throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException, DereferenceException, EnrichmentException {
     LOGGER.info("Starting script");
 
-    final BasicConfiguration basicConfiguration = new BasicConfiguration(propertiesHolder);
-    final ExtraConfiguration extraConfiguration = new ExtraConfiguration(propertiesHolder);
-    basicConfiguration.setExtraConfiguration(extraConfiguration);
+    final BasicConfiguration basicConfiguration = new ExtraConfiguration(propertiesHolder);
 
     boolean startExecution = true;
     if (basicConfiguration.isClearDatabasesBeforeProcess()) {

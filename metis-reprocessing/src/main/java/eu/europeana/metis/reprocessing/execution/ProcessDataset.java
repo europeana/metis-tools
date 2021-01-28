@@ -341,7 +341,7 @@ public class ProcessDataset implements Callable<Void> {
   private RDF processRecord(FullBeanImpl fullBean) throws ProcessingException {
     final long startTimeProcess = System.nanoTime();
     try {
-      return basicConfiguration.getExtraConfiguration().getFullBeanProcessor()
+      return basicConfiguration.getFullBeanProcessor()
           .apply(fullBean, basicConfiguration);
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeProcess);
@@ -355,7 +355,7 @@ public class ProcessDataset implements Callable<Void> {
   private void indexRecord(RDF rdf) throws IndexingException {
     final long startTimeIndex = System.nanoTime();
     try {
-      basicConfiguration.getExtraConfiguration().getRdfIndexer()
+      basicConfiguration.getRdfIndexer()
           .accept(rdf, true, basicConfiguration);
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeIndex);
@@ -368,7 +368,7 @@ public class ProcessDataset implements Callable<Void> {
 
   private void postProcess() {
     try {
-      basicConfiguration.getExtraConfiguration().getAfterReprocessProcessor()
+      basicConfiguration.getAfterReprocessProcessor()
           .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),
               basicConfiguration);
     } catch (ProcessingException e) {

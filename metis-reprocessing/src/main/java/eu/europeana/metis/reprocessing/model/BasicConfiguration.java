@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.model;
 
+import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.Indexer;
 import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
@@ -10,7 +11,9 @@ import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
+import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.solr.client.CompoundSolrClient;
 import eu.europeana.metis.solr.connection.SolrClientProvider;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
@@ -18,6 +21,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,17 +31,17 @@ import org.springframework.util.CollectionUtils;
 /**
  * Basic configuration of the re-processing operation.
  * <p>Functionality here should be the same for each re-processing.
- * Internally it holds {@link BasicConfiguration#extraConfiguration} that should contain the
+ * Extend this class with a class that should also contain the
  * functionality per re-process operation.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */
-public class BasicConfiguration {
+public abstract class BasicConfiguration {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BasicConfiguration.class);
 
-  private final PropertiesHolder propertiesHolder;
+  private final PropertiesHolderExtension propertiesHolder;
   private final MetisCoreMongoDao metisCoreMongoDao;
   private final MongoSourceMongoDao mongoSourceMongoDao;
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
@@ -50,9 +54,8 @@ public class BasicConfiguration {
   private final List<String> datasetIdsToProcess;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private final List<ExecutablePluginType> invalidatePluginTypes;
-  private ExtraConfiguration extraConfiguration;
 
-  public BasicConfiguration(PropertiesHolder propertiesHolder)
+  protected BasicConfiguration(PropertiesHolderExtension propertiesHolder)
       throws IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException {
     this.propertiesHolder = propertiesHolder;
     //Create metis core dao only if there aren't any specific datasets to process and mode not
@@ -105,14 +108,6 @@ public class BasicConfiguration {
 
   public Indexer getDestinationIndexer() {
     return destinationIndexer;
-  }
-
-  public ExtraConfiguration getExtraConfiguration() {
-    return extraConfiguration;
-  }
-
-  public void setExtraConfiguration(ExtraConfiguration extraConfiguration) {
-    this.extraConfiguration = extraConfiguration;
   }
 
   private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
@@ -195,6 +190,14 @@ public class BasicConfiguration {
     return invalidatePluginTypes;
   }
 
+  public abstract ThrowingBiFunction<FullBeanImpl, BasicConfiguration, RDF> getFullBeanProcessor();
+
+  public abstract ThrowingTriConsumer<RDF, Boolean, BasicConfiguration> getRdfIndexer();
+
+  public abstract ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> getAfterReprocessProcessor();
+
+  public abstract RDF processRDF(RDF rdf);
+
   public void close() throws IOException {
     if (metisCoreMongoDao != null) {
       metisCoreMongoDao.close();
@@ -204,5 +207,23 @@ public class BasicConfiguration {
     destinationCompoundSolrClient.close();
     destinationIndexerPool.close();
     destinationIndexer.close();
+  }
+
+  @FunctionalInterface
+  public interface ThrowingBiFunction<T, U, R> {
+
+    R apply(T t, U u) throws ProcessingException;
+  }
+
+  @FunctionalInterface
+  public interface ThrowingTriConsumer<K, V, S> {
+
+    void accept(K k, V v, S s) throws IndexingException;
+  }
+
+  @FunctionalInterface
+  public interface ThrowingQuadConsumer<K, V, S, T> {
+
+    void accept(K k, V v, S s, T t) throws ProcessingException;
   }
 }

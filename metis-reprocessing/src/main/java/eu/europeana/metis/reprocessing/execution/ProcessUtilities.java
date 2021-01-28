@@ -7,9 +7,6 @@ import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-import eu.europeana.enrichment.rest.client.EnrichmentWorker;
-import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
-import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.BasicConfiguration;
@@ -70,15 +67,7 @@ public class ProcessUtilities {
   }
 
   private static RDF compute(BasicConfiguration basicConfiguration, RDF rdf) {
-    //Modify this method accordingly
-    try {
-      final EnrichmentWorker enrichmentWorker = basicConfiguration.getExtraConfiguration()
-          .getEnrichmentWorker();
-      rdf = enrichmentWorker.process(rdf, enrichmentWorker.getSupportedModes());
-    } catch (EnrichmentException | DereferenceException e) {
-      LOGGER.warn("Something went wrong during enrichment/dereference", e);
-    }
-    return rdf;
+    return basicConfiguration.processRDF(rdf);
   }
 
   private static void injectWebResourceMetaInfo(final FullBean fullBean,

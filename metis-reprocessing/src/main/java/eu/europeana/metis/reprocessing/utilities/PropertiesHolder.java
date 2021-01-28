@@ -77,10 +77,9 @@ public class PropertiesHolder {
   public final String destinationZookeeperChroot;
   public final String destinationZookeeperDefaultCollection;
 
-  private final PropertiesHolderExtension propertiesHolderExtension;
+  public final Properties properties = new Properties();
 
   public PropertiesHolder(String configurationFileName) {
-    Properties properties = new Properties();
     final URL resource = getClass().getClassLoader().getResource(configurationFileName);
     final String filePathInResources = resource == null ? null : resource.getFile();
     String filePath;
@@ -183,11 +182,5 @@ public class PropertiesHolder {
     destinationZookeeperChroot = properties.getProperty("zookeeper.destination.chroot");
     destinationZookeeperDefaultCollection = properties
         .getProperty("zookeeper.destination.defaultCollection");
-
-    this.propertiesHolderExtension = new PropertiesHolderExtension(properties);
-  }
-
-  public PropertiesHolderExtension getPropertiesHolderExtension() {
-    return propertiesHolderExtension;
   }
 }

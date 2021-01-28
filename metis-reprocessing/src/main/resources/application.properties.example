@@ -64,3 +64,12 @@ zookeeper.destination.defaultCollection=
 #EXTRA CONFIGURATION
 enrichment.url=
 dereference.url=
+
+#Mongo Enrichment
+mongo.enrichment.hosts=
+mongo.enrichment.port=
+mongo.enrichment.authentication.db=
+mongo.enrichment.username=
+mongo.enrichment.password=
+mongo.enrichment.enableSSL=false
+mongo.enrichment.db=
