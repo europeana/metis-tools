@@ -6,7 +6,7 @@ NO_PATTERN="<deletedRecord>no</deletedRecord>"
 PERSISTENT_PATTERN="<deletedRecord>persistent</deletedRecord>"
 TRANSIENT_PATTERN="<deletedRecord>transient</deletedRecord>"
 
-RESPONSE=$(xargs -r < ${PATH_TO_FILE_WITH_URLS} curl)
+RESPONSE=$(cat ${PATH_TO_FILE_WITH_URLS} | xargs printf '%s?verb=Identify\n' | xargs curl -m 30)
 
 REPOSITORIES_NO_NO=$(echo ${RESPONSE} | grep -o ${NO_PATTERN} | wc -l)
 REPOSITORIES_PERSISTENT_NO=$(echo ${RESPONSE} | grep -o ${PERSISTENT_PATTERN} | wc -l)
