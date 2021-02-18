@@ -1,9 +1,11 @@
 package eu.europeana.metis.execution.utilities;
 
-import dev.morphia.aggregation.AggregationPipeline;
-import dev.morphia.query.Criteria;
+import dev.morphia.aggregation.experimental.Aggregation;
+import dev.morphia.aggregation.experimental.stages.Sort;
+import dev.morphia.aggregation.experimental.stages.Unwind;
 import dev.morphia.query.Query;
-import dev.morphia.query.Sort;
+import dev.morphia.query.experimental.filters.Filter;
+import dev.morphia.query.experimental.filters.Filters;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
@@ -88,11 +90,11 @@ public class ExecutorManager {
     allPluginsStatusesAverageMaintainer.addAverageMaintainer(averageMaintainerFailed);
 
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
-        "All {} pluginTypes and all pluginStatuses together - {}",
-        pluginTypes.size(), allPluginsStatusesAverageMaintainer);
+        "All {} pluginTypes and all pluginStatuses together - {}", pluginTypes.size(),
+        allPluginsStatusesAverageMaintainer);
     LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER,
-        "\nAll {} pluginTypes and all pluginStatuses together - {}",
-        pluginTypes.size(), allPluginsStatusesAverageMaintainer);
+        "\nAll {} pluginTypes and all pluginStatuses together - {}", pluginTypes.size(),
+        allPluginsStatusesAverageMaintainer);
   }
 
   /**
@@ -112,20 +114,19 @@ public class ExecutorManager {
     for (PluginType pluginType : pluginTypes) {
       final AverageMaintainer averageMaintainer = calculationForPluginTypeAndFinalStatus(pluginType,
           pluginStatus, fromDate, toDate);
-      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
-          "PluginType: {}, PluginStatus: {} - {}",
+      LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER, "PluginType: {}, PluginStatus: {} - {}",
           pluginType, pluginStatus, averageMaintainer);
-      LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER, "{} - {}", pluginType,
-          averageMaintainer);
+      LOGGER
+          .info(PropertiesHolder.STATISTICS_LOGS_MARKER, "{} - {}", pluginType, averageMaintainer);
       allPluginsAverageMaintainer.addAverageMaintainer(averageMaintainer);
     }
 
     LOGGER.info(PropertiesHolder.EXECUTION_LOGS_MARKER,
-        "All {} pluginTypes and pluginStatus {} together - {}",
-        pluginTypes.size(), pluginStatus, allPluginsAverageMaintainer);
+        "All {} pluginTypes and pluginStatus {} together - {}", pluginTypes.size(), pluginStatus,
+        allPluginsAverageMaintainer);
     LOGGER.info(PropertiesHolder.STATISTICS_LOGS_MARKER,
-        "All {} pluginTypes and pluginStatus {} together - {}",
-        pluginTypes.size(), pluginStatus, allPluginsAverageMaintainer);
+        "All {} pluginTypes and pluginStatus {} together - {}", pluginTypes.size(), pluginStatus,
+        allPluginsAverageMaintainer);
     return allPluginsAverageMaintainer;
   }
 
@@ -141,28 +142,27 @@ public class ExecutorManager {
   private Iterator<WorkflowExecution> getIteratorForPluginTypeAndStatus(PluginType pluginType,
       PluginStatus pluginStatus, Date fromDate, Date toDate) {
     Query<WorkflowExecution> query = morphiaDatastoreProvider.getDatastore()
-        .createQuery(WorkflowExecution.class);
+        .find(WorkflowExecution.class);
     query.disableValidation();
 
-    AggregationPipeline aggregation = morphiaDatastoreProvider.getDatastore()
-        .createAggregation(WorkflowExecution.class);
+    final Aggregation<WorkflowExecution> aggregation = morphiaDatastoreProvider.getDatastore()
+        .aggregate(WorkflowExecution.class);
 
     String dateFieldToCheck = FINISHED_DATE;
     if (pluginStatus == PluginStatus.FAILED || pluginStatus == PluginStatus.CANCELLED) {
       dateFieldToCheck = UPDATED_DATE;
     }
 
-    Criteria[] criteria = {
-        query.criteria(METIS_PLUGINS + "." + PLUGIN_TYPE).equal(pluginType),
-        query.criteria(METIS_PLUGINS + "." + PLUGIN_STATUS).equal(pluginStatus),
-        query.criteria(METIS_PLUGINS + "." + dateFieldToCheck).greaterThanOrEq(fromDate),
-        query.criteria(METIS_PLUGINS + "." + dateFieldToCheck).lessThanOrEq(toDate)
-    };
-    query.and(criteria);
+    final Filter pluginTypeFilter = Filters.eq(METIS_PLUGINS + "." + PLUGIN_TYPE, pluginType);
+    final Filter pluginStatusFilter = Filters.eq(METIS_PLUGINS + "." + PLUGIN_STATUS, pluginStatus);
+    final Filter fromDateFilter = Filters.gte(METIS_PLUGINS + "." + dateFieldToCheck, fromDate);
+    final Filter toDateFilter = Filters.lte(METIS_PLUGINS + "." + dateFieldToCheck, toDate);
+    final Filter combinedFilters = Filters
+        .and(pluginTypeFilter, pluginStatusFilter, fromDateFilter, toDateFilter);
 
-    return aggregation.unwind(METIS_PLUGINS).match(query)
-        .sort(Sort.ascending(METIS_PLUGINS + "." + dateFieldToCheck))
-        .aggregate(WorkflowExecution.class);
+    return aggregation.unwind(Unwind.on(METIS_PLUGINS)).match(combinedFilters)
+        .sort(Sort.on().ascending(METIS_PLUGINS + "." + dateFieldToCheck))
+        .execute(WorkflowExecution.class);
   }
 
   /**
@@ -193,11 +193,9 @@ public class ExecutorManager {
             }
             LOGGER.debug(PropertiesHolder.EXECUTION_LOGS_MARKER,
                 "Started Date: {}, Finished Date: {}, totalRecords: {}, with average speed {} r/s",
-                dateFormat.format(abstractMetisPlugin.getStartedDate()),
-                dateFormat.format(endDate),
+                dateFormat.format(abstractMetisPlugin.getStartedDate()), dateFormat.format(endDate),
                 ((AbstractExecutablePlugin) abstractMetisPlugin).getExecutionProgress()
-                    .getProcessedRecords(),
-                sampleAverageInSecs);
+                    .getProcessedRecords(), sampleAverageInSecs);
           }
         }
       }

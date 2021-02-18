@@ -1,12 +1,8 @@
 package eu.europeana.metis.execution.utilities;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions.Builder;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+import com.mongodb.client.MongoClient;
+import eu.europeana.metis.mongo.connection.MongoClientProvider;
+import eu.europeana.metis.mongo.connection.MongoProperties;
 
 /**
  * Initialize MongoClient
@@ -16,42 +12,35 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class MongoInitializer {
 
-  private final PropertiesHolder propertiesHolder;
+  private final String[] mongoHosts;
+  private final int[] mongoPorts;
+  private final String mongoAuthenticationDb;
+  private final String mongoUsername;
+  private final String mongoPassword;
+  private final boolean mongoEnablessl;
   private MongoClient mongoClient;
 
-  public MongoInitializer(PropertiesHolder propertiesHolder) {
-    this.propertiesHolder = propertiesHolder;
+  public MongoInitializer(String[] mongoHosts, int[] mongoPorts, String mongoAuthenticationDb,
+      String mongoUsername, String mongoPassword, boolean mongoEnablessl) {
+    this.mongoHosts = mongoHosts;
+    this.mongoPorts = mongoPorts;
+    this.mongoAuthenticationDb = mongoAuthenticationDb;
+    this.mongoUsername = mongoUsername;
+    this.mongoPassword = mongoPassword;
+
+    this.mongoEnablessl = mongoEnablessl;
   }
 
   public void initializeMongoClient() {
-    if (propertiesHolder.mongoHosts.length != propertiesHolder.mongoPorts.length
-        && propertiesHolder.mongoPorts.length != 1) {
-      throw new IllegalArgumentException("Mongo hosts and ports are not properly configured.");
-    }
+    mongoClient = new MongoClientProvider<>(getMongoProperties()).createMongoClient();
+  }
 
-    List<ServerAddress> serverAddresses = new ArrayList<>();
-    for (int i = 0; i < propertiesHolder.mongoHosts.length; i++) {
-      ServerAddress address;
-      if (propertiesHolder.mongoHosts.length == propertiesHolder.mongoPorts.length) {
-        address = new ServerAddress(propertiesHolder.mongoHosts[i], propertiesHolder.mongoPorts[i]);
-      } else { // Same port for all
-        address = new ServerAddress(propertiesHolder.mongoHosts[i], propertiesHolder.mongoPorts[0]);
-      }
-      serverAddresses.add(address);
-    }
-
-    Builder optionsBuilder = new Builder();
-    optionsBuilder.sslEnabled(propertiesHolder.mongoEnablessl);
-    if (StringUtils.isEmpty(propertiesHolder.mongoDb) || StringUtils
-        .isEmpty(propertiesHolder.mongoUsername) || StringUtils
-        .isEmpty(propertiesHolder.mongoPassword)) {
-      mongoClient = new MongoClient(serverAddresses, optionsBuilder.build());
-    } else {
-      MongoCredential mongoCredential = MongoCredential
-          .createCredential(propertiesHolder.mongoUsername, propertiesHolder.mongoAuthenticationDb,
-              propertiesHolder.mongoPassword.toCharArray());
-      mongoClient = new MongoClient(serverAddresses, mongoCredential, optionsBuilder.build());
-    }
+  private MongoProperties<IllegalArgumentException> getMongoProperties() {
+    final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
+        IllegalArgumentException::new);
+    mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
+        mongoPassword, mongoEnablessl, null);
+    return mongoProperties;
   }
 
   public void close() {

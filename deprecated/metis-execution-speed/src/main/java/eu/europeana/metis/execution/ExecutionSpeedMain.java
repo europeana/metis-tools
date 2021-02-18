@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class ExecutionSpeedMain {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionSpeedMain.class);
-  private static final String CONFIGURATION_FILE = "application.properties";
+  private static final String CONFIGURATION_FILE = "application-prod.properties";
   private static final PropertiesHolder propertiesHolder = new PropertiesHolder(CONFIGURATION_FILE);
 
   public static void main(String[] args)
@@ -51,7 +51,10 @@ public class ExecutionSpeedMain {
       CustomTruststoreAppender.appendCustomTrustoreToDefault(propertiesHolder.truststorePath,
           propertiesHolder.truststorePassword);
     }
-    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder);
+    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.mongoHosts,
+        propertiesHolder.mongoPorts, propertiesHolder.mongoAuthenticationDb,
+        propertiesHolder.mongoUsername, propertiesHolder.mongoPassword,
+        propertiesHolder.mongoEnablessl);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }
