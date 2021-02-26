@@ -12,6 +12,7 @@ import dev.morphia.query.experimental.filters.Filters;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
+import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
@@ -85,6 +86,7 @@ public class MetisCoreMongoDao {
     final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName, mapperOptions);
     final Mapper mapper = datastore.getMapper();
     mapper.map(Dataset.class);
+    mapper.map(WorkflowExecution.class);
     return datastore;
   }
 

@@ -26,8 +26,7 @@ public class IndexUtilities {
   private static final Map<Class<?>, String> retryExceptions;
 
   static {
-    retryExceptions = new HashMap<>(
-        ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
+    retryExceptions = new HashMap<>(ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
     retryExceptions.put(MongoWriteException.class, "E11000 duplicate key error collection");
   }
 
@@ -50,7 +49,7 @@ public class IndexUtilities {
       // try-with-resources block
       final IndexerPool indexerPool = basicConfiguration.getDestinationIndexerPool();
       ExternalRequestUtil.retryableExternalRequest(() -> {
-        indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
+        indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false, false);
         return null;
       }, retryExceptions);
     } catch (Exception e) {

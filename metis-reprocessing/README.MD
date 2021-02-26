@@ -12,7 +12,7 @@ Or 3 big datasets with 24 threads each. And any combination in between. The thre
 For the REPROCESS_ALL_FAILED mode only parallelization of datasets is implemented so the `max.parallel.threads.per.dataset` should be 1 and the `min.parallel.datasets` should be set to the amount of parallel datasets.
 - `start.from.dataset.index` -> The index of the dataset in the list from where the processing should start from. 0 if no value provided
 - `end.at.dataset.index` -> The index of the dataset in the list from where the processing should end at. Max integer if no value provided
-- `source.mongo.page.size` -> The page size when reading from mongo
+- `source.mongo.page.size` -> The page size when reading from mongo, keep the same on subsequent executions otherwise unexpected behavior might occur
 - `mode` -> The mode of the script:  
   CLEAN mode is to be used to just clean the destination databases, it does no processing.   
   DEFAULT for a normal operation of process and index.  

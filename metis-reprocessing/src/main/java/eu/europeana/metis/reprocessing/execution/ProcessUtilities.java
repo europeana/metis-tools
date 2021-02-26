@@ -53,11 +53,7 @@ public class ProcessUtilities {
   private static RDF identityProcess(FullBeanImpl fullBean,
       MongoSourceMongoDao mongoSourceMongoDao) {
     injectWebResourceMetaInfo(fullBean, mongoSourceMongoDao);
-    final RDF rdf = EdmUtils.toRDF(fullBean, true);
-    //Remove quality annotations because EdmUtils prefixes them with an http domain. They will
-    // be recalculated during indexing
-    rdf.setQualityAnnotationList(null);
-    return rdf;
+    return EdmUtils.toRDF(fullBean, true);
   }
 
   private static RDF process(FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {
@@ -103,12 +99,12 @@ public class ProcessUtilities {
         urls.add(aggregation.getEdmObject());
       }
 
-      checkMatchingWebResourcesAndGeenerateHash(fullBean.getAbout(), aggregation, urls, hashCodes);
+      checkMatchingWebResourcesAndGenerateHash(fullBean.getAbout(), aggregation, urls, hashCodes);
     }
     return hashCodes;
   }
 
-  private static void checkMatchingWebResourcesAndGeenerateHash(String fullBeanAbout,
+  private static void checkMatchingWebResourcesAndGenerateHash(String fullBeanAbout,
       Aggregation aggregation, Set<String> urls, Map<String, WebResource> hashCodes) {
     for (final WebResource webResource : aggregation.getWebResources()) {
       if (!urls.contains(webResource.getAbout().trim())) {

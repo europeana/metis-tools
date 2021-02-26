@@ -99,6 +99,12 @@ public class MongoDestinationMongoDao {
         () -> mongoDestinationDatastore.save(failedRecord));
   }
 
+  public void deleteFailedRecordFromDb(FailedRecord failedRecord) {
+    //Will replace it if already existent
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
+        () -> mongoDestinationDatastore.delete(failedRecord));
+  }
+
   public void deleteAllSuccessfulReprocessedFailedRecords() {
     Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
     query.filter(Filters.eq(SUCCESSFULLY_REPROCESSED, true));

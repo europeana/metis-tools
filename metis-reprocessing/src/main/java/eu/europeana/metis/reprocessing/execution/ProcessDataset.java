@@ -33,8 +33,7 @@ import org.slf4j.LoggerFactory;
  * This class is a {@link Callable} class that would be initialized with a {@link #datasetId}.
  * <p>It is responsible of re-processing a dataset as a whole, by paging records from the
  * database, while keeping track of it's dataset status. This class should not require modification
- * and only provided functionality in the {@link BasicConfiguration#getExtraConfiguration()} should
- * be modifiable.</p>
+ * and only provided functionality in the {@link BasicConfiguration} should be modifiable.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-14
@@ -130,25 +129,6 @@ public class ProcessDataset implements Callable<Void> {
     } else {
       startingPage = IntStream.range(0, pagesProcessed.size())
           .filter(idx -> !pagesProcessed.contains(idx)).findFirst().orElse(pagesProcessed.size());
-
-      //This can possibly happen if the PAGE_SIZE is changed on a subsequent execution
-      //It should be valid even if there are missing pages if the page size is the same
-      final boolean isPagingValid =
-          MongoSourceMongoDao.PAGE_SIZE * pagesProcessed.size() <= datasetStatus.getTotalProcessed()
-              && datasetStatus.getTotalProcessed() / pagesProcessed.size()
-              <= (MongoSourceMongoDao.PAGE_SIZE * 2) - 1;
-
-      if (!isPagingValid) {
-        startingPage = (int) (datasetStatus.getTotalProcessed() / MongoSourceMongoDao.PAGE_SIZE);
-        //Fix processed pages.
-        pagesProcessed.clear();
-        if (startingPage != 0) {
-          IntStream.range(0, startingPage).forEach(pagesProcessed::add);
-        }
-      }
-      //Fix totalProcessed
-      datasetStatus.setTotalProcessed((long) MongoSourceMongoDao.PAGE_SIZE * pagesProcessed.size());
-      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     }
     return startingPage;
   }
@@ -161,30 +141,35 @@ public class ProcessDataset implements Callable<Void> {
   }
 
   private void loopOverAllFailedRecordsAndProcess() {
-    //For an execution of processing only previously failed records the starting page index is
-    // always 0(zero).
-    nextPage = 0;
-    failedRecordsOperation(nextPage);
+    failedRecordsOperation();
   }
 
-  private void failedRecordsOperation(int nextPage) {
+  private void failedRecordsOperation() {
+    //For an execution of processing only previously failed records the starting page index is
+    // always 0(zero). And since we update individual records nextPage remains at 0 on each iteration.
+    int nextPage = 0;
     final long totalFailedRecords = datasetStatus.getTotalFailedRecords();
-    List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(nextPage);
+    List<FailedRecord> failedRecords = getFailedRecords(nextPage);
+    List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(failedRecords);
     long counterFailedRecordsProcessed = 0;
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("{} - Processing number of records: {}", prefixDatasetIdLog,
           nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final String exceptionStackTrace = processAndIndex(fullBean);
-        updateProcessFailedOnlyCounts(exceptionStackTrace, fullBean.getAbout());
+        failedRecords.stream()
+            .filter(failedRecord -> failedRecord.getFailedUrl().equals(fullBean.getAbout()))
+            .findFirst().ifPresent(
+            foundFailedRecord -> updateProcessFailedOnlyCounts(exceptionStackTrace,
+                fullBean.getAbout(), foundFailedRecord));
       }
       counterFailedRecordsProcessed += nextPageOfRecords.size();
       LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
           prefixDatasetIdLog, counterFailedRecordsProcessed, totalFailedRecords);
-      nextPage++;
-      nextPageOfRecords = getFailedFullBeans(nextPage);
+      failedRecords = getFailedRecords(nextPage);
+      nextPageOfRecords = getFailedFullBeans(failedRecords);
     }
-    basicConfiguration.getMongoDestinationMongoDao().deleteAllSuccessfulReprocessedFailedRecords();
+    //    basicConfiguration.getMongoDestinationMongoDao().deleteAllSuccessfulReprocessedFailedRecords();
   }
 
   /**
@@ -256,17 +241,20 @@ public class ProcessDataset implements Callable<Void> {
   }
 
   /**
-   * Get the next page of {@link FullBeanImpl}s from the failed record database.
+   * Get the {@link FullBeanImpl}s representation from the failed records provided.
    *
-   * @param nextPage the next page of records
+   * @param failedRecords the failed records
    * @return the list of records
    */
-  private List<FullBeanImpl> getFailedFullBeans(int nextPage) {
-    final List<FailedRecord> nextPageOfFailedRecords = basicConfiguration
-        .getMongoDestinationMongoDao().getNextPageOfFailedRecords(datasetId, nextPage);
-    final List<String> failedRecordsUrls = nextPageOfFailedRecords.stream()
-        .map(FailedRecord::getFailedUrl).collect(Collectors.toList());
+  private List<FullBeanImpl> getFailedFullBeans(List<FailedRecord> failedRecords) {
+    final List<String> failedRecordsUrls = failedRecords.stream().map(FailedRecord::getFailedUrl)
+        .collect(Collectors.toList());
     return basicConfiguration.getMongoSourceMongoDao().getRecordsFromList(failedRecordsUrls);
+  }
+
+  private List<FailedRecord> getFailedRecords(int nextPage) {
+    return basicConfiguration.getMongoDestinationMongoDao()
+        .getNextPageOfFailedRecords(datasetId, nextPage);
   }
 
   /**
@@ -293,12 +281,13 @@ public class ProcessDataset implements Callable<Void> {
     return "";
   }
 
-  private void updateProcessFailedOnlyCounts(String exceptionStackTrace, String resourceId) {
-    updateProcessCounts(exceptionStackTrace, true, resourceId);
+  private void updateProcessFailedOnlyCounts(String exceptionStackTrace, String resourceId,
+      FailedRecord foundFailedRecord) {
+    updateProcessCounts(exceptionStackTrace, true, resourceId, foundFailedRecord);
   }
 
   private void updateProcessCounts(String exceptionStackTrace, String resourceId) {
-    updateProcessCounts(exceptionStackTrace, false, resourceId);
+    updateProcessCounts(exceptionStackTrace, false, resourceId, null);
   }
 
   /**
@@ -312,23 +301,24 @@ public class ProcessDataset implements Callable<Void> {
    * @param resourceId the processed record identifier
    */
   private void updateProcessCounts(String exceptionStackTrace, boolean processFailedOnly,
-      String resourceId) {
+      String resourceId, FailedRecord foundFailedRecord) {
     synchronized (this) {
       if (StringUtils.isNotBlank(resourceId)) {
         if (StringUtils.isBlank(exceptionStackTrace)) {
           if (processFailedOnly) {
-            //Replace the already existent failed record with indication that it was successfully reprocessed
-            final FailedRecord failedRecord = new FailedRecord(resourceId);
-            failedRecord.setSuccessfullyReprocessed(true);
-            basicConfiguration.getMongoDestinationMongoDao().storeFailedRecordToDb(failedRecord);
+            basicConfiguration.getMongoDestinationMongoDao()
+                .deleteFailedRecordFromDb(foundFailedRecord);
             datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() - 1);
             basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
           } else {
             datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
           }
         } else {
-          basicConfiguration.getMongoDestinationMongoDao()
-              .storeFailedRecordToDb(new FailedRecord(resourceId, exceptionStackTrace));
+          final FailedRecord failedRecord = new FailedRecord(resourceId, exceptionStackTrace);
+          if (foundFailedRecord != null) {
+            failedRecord.setId(foundFailedRecord.getId());
+          }
+          basicConfiguration.getMongoDestinationMongoDao().storeFailedRecordToDb(failedRecord);
           if (!processFailedOnly) {
             datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
             datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
@@ -341,8 +331,7 @@ public class ProcessDataset implements Callable<Void> {
   private RDF processRecord(FullBeanImpl fullBean) throws ProcessingException {
     final long startTimeProcess = System.nanoTime();
     try {
-      return basicConfiguration.getFullBeanProcessor()
-          .apply(fullBean, basicConfiguration);
+      return basicConfiguration.getFullBeanProcessor().apply(fullBean, basicConfiguration);
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeProcess);
       synchronized (this) {
@@ -355,8 +344,7 @@ public class ProcessDataset implements Callable<Void> {
   private void indexRecord(RDF rdf) throws IndexingException {
     final long startTimeIndex = System.nanoTime();
     try {
-      basicConfiguration.getRdfIndexer()
-          .accept(rdf, true, basicConfiguration);
+      basicConfiguration.getRdfIndexer().accept(rdf, true, basicConfiguration);
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeIndex);
       synchronized (this) {

@@ -82,7 +82,7 @@ public class ExecutorManager {
       //We only clean dbs and return
       return;
     } else if (basicConfiguration.getMode().equals(Mode.POST_CLEAN)) {
-      //We only clean/remove the collections that were creating for assisting the processing
+      //We only clean/remove the collections that were created for assisting the processing
       basicConfiguration.getMongoDestinationMongoDao().dropTemporaryCollections();
       return;
     }
