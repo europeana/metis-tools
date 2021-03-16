@@ -3,9 +3,9 @@ package eu.europeana.metis.remove.utils;
 import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.SetupRelatedIndexingException;
-import eu.europeana.metis.mongo.MongoProperties;
-import eu.europeana.metis.mongo.MongoProperties.ReadPreferenceValue;
-import eu.europeana.metis.utils.InetAddressUtil;
+import eu.europeana.metis.mongo.connection.MongoProperties;
+import eu.europeana.metis.mongo.connection.MongoProperties.ReadPreferenceValue;
+import eu.europeana.metis.network.InetAddressUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -137,7 +137,8 @@ public class PropertiesHolder {
   private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
     indexingSettings.getMongoProperties().setAllProperties(publishMongoHosts,
             publishMongoPorts, publishMongoAuthenticationDb, publishMongoUsername,
-            publishMongoPassword, publishMongoEnablessl, ReadPreferenceValue.PRIMARY);
+            publishMongoPassword, publishMongoEnablessl,
+            eu.europeana.metis.mongo.connection.MongoProperties.ReadPreferenceValue.PRIMARY);
     indexingSettings.setMongoDatabaseName(publishMongoDb);
   }
 

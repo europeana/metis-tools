@@ -14,7 +14,7 @@ import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.remove.utils.Application;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
-import eu.europeana.metis.utils.ExternalRequestUtil;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -156,7 +156,7 @@ public class RemovePluginsMain {
         datastoreProvider.getDatastore().createQuery(WorkflowExecution.class).disableValidation();
     query.field("metisPlugins").elemMatch(pluginQuery);
     final WorkflowExecution result = ExternalRequestUtil
-            .retryableExternalRequestConnectionReset(() -> query.first(new FindOptions()));
+            .retryableExternalRequestForNetworkExceptions(() -> query.first(new FindOptions()));
     if (result != null) {
       LOGGER.error("Could not remove plugin execution with ID {} and type {} in workflow with ID "
                       + "{}: there seems to be a successor of this plugin in workflow with ID {}.",
@@ -198,7 +198,7 @@ public class RemovePluginsMain {
     if (MODE == Mode.MARK_AS_DELETED) {
       if (executionAndPlugin.getRight() instanceof AbstractExecutablePlugin) {
         ((AbstractExecutablePlugin) executionAndPlugin.getRight()).setDataStatus(DataStatus.DELETED);
-        ExternalRequestUtil.retryableExternalRequestConnectionReset(
+        ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
             () -> datastoreProvider.getDatastore().save(executionAndPlugin.getLeft()));
       }
       return;
@@ -207,7 +207,7 @@ public class RemovePluginsMain {
     // If there is only one plugin, we remove the execution and we are done.
     final WorkflowExecution execution = executionAndPlugin.getLeft();
     if (execution.getMetisPlugins().size() == 1) {
-      ExternalRequestUtil.retryableExternalRequestConnectionReset(
+      ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
           () -> datastoreProvider.getDatastore().delete(execution));
       return;
     }
@@ -225,7 +225,7 @@ public class RemovePluginsMain {
     execution.setWorkflowStatus(determineWorkflowStatus(execution.getMetisPlugins()));
 
     // Save the new execution.
-    ExternalRequestUtil.retryableExternalRequestConnectionReset(
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> datastoreProvider.getDatastore().save(execution));
   }
 

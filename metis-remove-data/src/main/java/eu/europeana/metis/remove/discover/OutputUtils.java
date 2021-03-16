@@ -1,7 +1,7 @@
 package eu.europeana.metis.remove.discover;
 
 import com.opencsv.CSVWriter;
-import eu.europeana.metis.CommonStringValues;
+import eu.europeana.metis.utils.CommonStringValues;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.MetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.DataStatus;
@@ -66,7 +66,7 @@ final class OutputUtils {
       final DateFormat dateFormat = new SimpleDateFormat(CommonStringValues.DATE_FORMAT, Locale.US);
       nodesToRemove.stream().filter(node -> node.getPlugin() instanceof AbstractExecutablePlugin)
           .filter(node -> node.getPlugin().getStartedDate() != null)
-          .filter(node -> ((AbstractExecutablePlugin) node.getPlugin()).getDataStatus() != DataStatus.DELETED)
+          .filter(node -> node.getPlugin().getDataStatus() != DataStatus.DELETED)
           .forEach(node ->
               writer.writeNext(new String[]{
                   node.getExecution().getEcloudDatasetId(),

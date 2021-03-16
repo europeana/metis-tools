@@ -154,16 +154,17 @@ class ExecutionPluginForest {
       }
     }
 
-    // Check: we only expect harvesting and reindexing plugins to have no ancestor.
+    // Check: we only expect harvesting, depublishing and reindexing plugins to have no ancestor.
     final boolean isHarvesting =
         node.getType() == PluginType.OAIPMH_HARVEST || node.getType() == PluginType.HTTP_HARVEST;
     final boolean isReindexing = node.getType() == PluginType.REINDEX_TO_PREVIEW
         || node.getType() == PluginType.REINDEX_TO_PUBLISH;
+    final boolean isDepublishing = node.getType() == PluginType.DEPUBLISH;
     if (isHarvesting && previous != null) {
       throw new IllegalStateException("Problem with plugin " + node.getId()
           + ": this is a harvesting plugin with a predecessor.");
     }
-    if (!isHarvesting && !isReindexing && previous == null) {
+    if (!isHarvesting && !isReindexing && !isDepublishing && previous == null) {
       throw new IllegalStateException("Problem with plugin " + node.getId()
           + ": this plugin requires a predecessor but none was found.");
     }

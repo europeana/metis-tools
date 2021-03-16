@@ -1,7 +1,7 @@
 package eu.europeana.metis.remove.utils;
 
-import com.mongodb.MongoClient;
-import eu.europeana.metis.mongo.MongoClientProvider;
+import com.mongodb.client.MongoClient;
+import eu.europeana.metis.mongo.connection.MongoClientProvider;
 
 /**
  * Initialize MongoClient

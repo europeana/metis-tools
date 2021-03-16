@@ -1,13 +1,15 @@
 package eu.europeana.metis.remove.discover;
 
-import com.mongodb.DBCollection;
+import com.mongodb.client.MongoCollection;
 import dev.morphia.query.Query;
+import dev.morphia.query.experimental.filters.Filters;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.ExecutionProgress;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
-import eu.europeana.metis.utils.ExternalRequestUtil;
+import eu.europeana.metis.mongo.utils.MorphiaUtils;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,7 +18,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,17 +127,20 @@ abstract class AbstractOrphanIdentification {
         .map(AbstractExecutablePlugin::getExecutionProgress)
         .map(ExecutionProgress::getProcessedRecords).orElse(0);
     LOGGER.info("{} iterations are needed:", iterations.size());
+    int totalRecords = 0;
     for (int i = 0; i < iterations.size(); i++) {
       final List<ExecutionPluginNode> nodesToRemove = iterations.get(i);
       final long linkCheckingExecutions = nodesToRemove.stream().map(ExecutionPluginNode::getType)
           .filter(type -> type == PluginType.LINK_CHECKING).count();
       final long nonExecutablePlugins = nodesToRemove.stream().map(ExecutionPluginNode::getPlugin)
           .filter(plugin -> !(plugin instanceof AbstractExecutablePlugin)).count();
+      final int recordCount = nodesToRemove.stream().mapToInt(recordCounter).sum();
       LOGGER.info(
           " ... Iteration {}: remove {} nodes ({} records). This includes {} link checking plugins and {} non-executable plugins.",
-          i, nodesToRemove.size(), nodesToRemove.stream().mapToInt(recordCounter).sum(),
-          linkCheckingExecutions, nonExecutablePlugins);
+          i, nodesToRemove.size(), recordCount, linkCheckingExecutions, nonExecutablePlugins);
+      totalRecords += recordCount;
     }
+    LOGGER.info("{} records will be removed.", totalRecords);
 
     // Return just the first iteration.
     return iterations.get(0);
@@ -160,16 +164,20 @@ abstract class AbstractOrphanIdentification {
   abstract List<ExecutionPluginNode> identifyOrphans(ExecutionPluginForest forest);
 
   private Set<String> getDatasetIds() {
-    final DBCollection collection = morphiaDatastoreProvider.getDatastore()
-        .getCollection(WorkflowExecution.class);
-    final List<?> datasetIds = ExternalRequestUtil
-        .retryableExternalRequestConnectionReset(() -> collection.distinct("datasetId"));
-    return datasetIds.stream().map(entry -> (String) entry).collect(Collectors.toSet());
+    final MongoCollection<WorkflowExecution> collection = morphiaDatastoreProvider.getDatastore()
+            .getMapper().getCollection(WorkflowExecution.class);
+    return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> {
+      final Set<String> datasetIds = new HashSet<>();
+      collection.distinct("datasetId", String.class).cursor().forEachRemaining(datasetIds::add);
+      return datasetIds;
+    });
   }
 
   private List<WorkflowExecution> getWorkflowExecutions(String datasetId) {
-    final Query<WorkflowExecution> query = morphiaDatastoreProvider.getDatastore()
-        .createQuery(WorkflowExecution.class).field("datasetId").equal(datasetId);
-    return ExternalRequestUtil.retryableExternalRequestConnectionReset(query::asList);
+    return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> {
+      final Query<WorkflowExecution> query = morphiaDatastoreProvider.getDatastore()
+              .find(WorkflowExecution.class).filter(Filters.eq("datasetId", datasetId));
+      return MorphiaUtils.getListOfQueryRetryable(query);
+    });
   }
 }
