@@ -60,7 +60,7 @@ public class PostProcessUtilities {
 
   private static void createReindexWorkflowExecutions(String datasetId, Date startDate,
       Date endDate, BasicConfiguration basicConfiguration) {
-    final PluginWithExecutionId<ExecutablePlugin> lastExecutionToBeBasedOn = basicConfiguration
+    final PluginWithExecutionId<ExecutablePlugin<?>> lastExecutionToBeBasedOn = basicConfiguration
         .getMetisCoreMongoDao().getWorkflowExecutionDao()
         .getLatestSuccessfulExecutablePlugin(datasetId,
             Collections.singleton(basicConfiguration.getReprocessBasedOnPluginType()), false);
@@ -115,7 +115,7 @@ public class PostProcessUtilities {
         .getInvalidatePluginTypes();
     final WorkflowExecutionDao workflowExecutionDao = basicConfiguration.getMetisCoreMongoDao()
         .getWorkflowExecutionDao();
-    final List<PluginWithExecutionId<ExecutablePlugin>> deprecatedPlugins = invalidatePluginTypes
+    final List<PluginWithExecutionId<ExecutablePlugin<?>>> deprecatedPlugins = invalidatePluginTypes
         .stream().map(executablePluginType -> workflowExecutionDao
             .getLatestSuccessfulExecutablePlugin(datasetId,
                 Collections.singleton(executablePluginType), false)).filter(Objects::nonNull)

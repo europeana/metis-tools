@@ -49,7 +49,7 @@ public class IndexUtilities {
       // try-with-resources block
       final IndexerPool indexerPool = basicConfiguration.getDestinationIndexerPool();
       ExternalRequestUtil.retryableExternalRequest(() -> {
-        indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false, false);
+        indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
         return null;
       }, retryExceptions);
     } catch (Exception e) {
