@@ -39,7 +39,7 @@ public class MongoInitializer {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
         IllegalArgumentException::new);
     mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
-        mongoPassword, mongoEnablessl, null);
+        mongoPassword, mongoEnablessl, null, "Metis Reprocessing");
     return mongoProperties;
   }
 
