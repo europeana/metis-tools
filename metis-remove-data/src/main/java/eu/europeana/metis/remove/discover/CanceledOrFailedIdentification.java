@@ -11,11 +11,9 @@ public class CanceledOrFailedIdentification extends AbstractOrphanIdentification
    * Constructor.
    *
    * @param morphiaDatastoreProvider Access to the database.
-   * @param discoveryMode The discoveryMode in which to operate.
    */
-  CanceledOrFailedIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider,
-      DiscoveryMode discoveryMode) {
-    super(morphiaDatastoreProvider, discoveryMode);
+  CanceledOrFailedIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider) {
+    super(morphiaDatastoreProvider, DiscoveryMode.ORPHANS_WITH_ONLY_DELETED_DESCENDANTS);
   }
 
   @Override

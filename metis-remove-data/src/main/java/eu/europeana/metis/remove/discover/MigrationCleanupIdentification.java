@@ -56,10 +56,9 @@ class MigrationCleanupIdentification extends AbstractOrphanIdentification {
    * Constructor.
    *
    * @param morphiaDatastoreProvider Access to the database.
-   * @param discoveryMode The discoveryMode in which to operate.
    */
-  MigrationCleanupIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider, DiscoveryMode discoveryMode) {
-    super(morphiaDatastoreProvider, discoveryMode);
+  MigrationCleanupIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider) {
+    super(morphiaDatastoreProvider, DiscoveryMode.ORPHANS_WITHOUT_DESCENDANTS);
   }
 
   @Override

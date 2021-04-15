@@ -1,6 +1,5 @@
 package eu.europeana.metis.remove.discover;
 
-import eu.europeana.metis.remove.discover.AbstractOrphanIdentification.DiscoveryMode;
 import eu.europeana.metis.remove.utils.Application;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import java.io.IOException;
@@ -13,7 +12,6 @@ public class DatasetSpecificIdentificationMain extends AbstractOrphanIdentificat
 
   @Override
   AbstractOrphanIdentification createOrphansDiscoverer(Application application) {
-    return new DatasetSpecificIdentification(application.getDatastoreProvider(),
-        DiscoveryMode.DISCOVER_ONLY_CHILDLESS_ORPHANS);
+    return new DatasetSpecificIdentification(application.getDatastoreProvider());
   }
 }

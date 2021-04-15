@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,19 +38,29 @@ abstract class AbstractOrphanIdentification {
   enum DiscoveryMode {
 
     /**
-     * This mode removes all orphans and their descendants.
+     * This mode discovers only identified orphans or their descendants that have no children. The
+     * deleted status of the orphan or its children is not taken into account. Note: in case that
+     * we're removing orphans, we should only use this mode if we intend to completely remove
+     * orphans from the history (rather than mark them as deleted).
      */
-    DISCOVER_ALL_ORPHANS(node -> true),
+    ORPHANS_WITHOUT_DESCENDANTS(node -> node.getChildren().isEmpty(), false),
 
     /**
-     * This mode removes only orphans or their descendants that have no children.
+     * This mode discovers only identified orphans or their descendants that have no children or
+     * only children that are marked as deleted (through {@link eu.europeana.metis.core.workflow.plugins.DataStatus#DELETED}).
+     * The node itself is not allowed to be deleted. Note: in case that we're removing orphans, we
+     * should only use this mode if we intend to mark orphans as deleted (rather than actually
+     * delete the history).
      */
-    DISCOVER_ONLY_CHILDLESS_ORPHANS(node -> node.getChildren().isEmpty());
+    ORPHANS_WITH_ONLY_DELETED_DESCENDANTS(node -> node.getChildren().isEmpty(), true);
 
-    private final Predicate<ExecutionPluginNode> test;
+    private final Predicate<ExecutionPluginNode> orphanTest;
+    private final boolean attemptToIgnoreDeletedPlugins;
 
-    DiscoveryMode(Predicate<ExecutionPluginNode> test) {
-      this.test = test;
+    DiscoveryMode(Predicate<ExecutionPluginNode> orphanTest,
+            boolean attemptToIgnoreDeletedPlugins) {
+      this.orphanTest = orphanTest;
+      this.attemptToIgnoreDeletedPlugins = attemptToIgnoreDeletedPlugins;
     }
   }
 
@@ -91,15 +102,17 @@ abstract class AbstractOrphanIdentification {
           continue;
         }
 
-        // Obtain the orphans for this dataset. If we find none, we mark this dataset to skip.
-        final List<ExecutionPluginNode> orphans = discoverOrphans(datasetId, nodeIdsToSkip);
+        // Obtain the orphans for this dataset, in the right order for removal.
+        final List<ExecutionPluginNode> orphans = discoverOrphans(datasetId, nodeIdsToSkip).stream()
+                .map(ExecutionPluginNode::getAllInOrderOfRemoval).flatMap(List::stream)
+                .filter(discoveryMode.orphanTest).collect(Collectors.toList());
+
+        // If we find no orphans, we mark this dataset to skip. Otherwise, add them for removal.
         if (orphans.isEmpty()) {
           datasetIdsToSkip.add(datasetId);
+        } else {
+          nodesToRemove.addAll(orphans);
         }
-
-        // Add orphans and their descendants in the right order to the list for removal.
-        orphans.stream().map(ExecutionPluginNode::getAllInOrderOfRemoval).flatMap(List::stream)
-            .filter(discoveryMode.test).forEach(nodesToRemove::add);
       }
 
       // If we have no more nodes to remove, we are done.
@@ -151,7 +164,8 @@ abstract class AbstractOrphanIdentification {
     // Creating the forest
     final ExecutionPluginForest forest;
     try {
-      forest = new ExecutionPluginForest(getWorkflowExecutions(datasetId), idsToSkip);
+      forest = new ExecutionPluginForest(getWorkflowExecutions(datasetId),
+              discoveryMode.attemptToIgnoreDeletedPlugins, idsToSkip);
     } catch (RuntimeException e) {
       LOGGER.warn("Problem with dataset {}.", datasetId, e);
       return Collections.emptyList();

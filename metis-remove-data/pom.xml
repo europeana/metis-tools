@@ -16,10 +16,10 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.6.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <testSource>1.8</testSource>
-          <testTarget>1.8</testTarget>
+          <source>11</source>
+          <target>11</target>
+          <testSource>11</testSource>
+          <testTarget>11</testTarget>
         </configuration>
       </plugin>
       <plugin>
@@ -41,7 +41,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.metis>3</version.metis>
+    <version.metis>4-SNAPSHOT</version.metis>
     <version.javax.xml.bind>2.3.1</version.javax.xml.bind>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.25</version.slf4j>
