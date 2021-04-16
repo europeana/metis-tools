@@ -4,6 +4,9 @@ import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Identifies all orphans that belong to a certain dataset.
+ */
 public class DatasetSpecificIdentification extends AbstractOrphanIdentification {
 
   private static final String DATASET_ID_TO_DELETE = "9";
