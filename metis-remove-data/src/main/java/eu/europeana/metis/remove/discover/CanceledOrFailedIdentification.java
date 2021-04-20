@@ -29,12 +29,12 @@ public class CanceledOrFailedIdentification extends AbstractOrphanIdentification
   @Override
   List<ExecutionPluginNode> identifyOrphans(ExecutionPluginForest forest) {
 
-    // Find the most recent successful harvest start date (or the min date if none available).
+    // Find the most recent successful index to publish start date (or the min date if none available).
     // Note: we'll look at the execution start date, to make sure that our comparison below holds.
-    final Predicate<ExecutionPluginNode> sccessfulPublishCheck = node ->
+    final Predicate<ExecutionPluginNode> successfulPublishCheck = node ->
             node.getPlugin().getPluginType() == PluginType.PUBLISH
                     && node.getPlugin().getPluginStatus() == PluginStatus.FINISHED;
-    final Instant latestSuccessfulPublishDate = forest.getNodes(sccessfulPublishCheck)
+    final Instant latestSuccessfulPublishDate = forest.getNodes(successfulPublishCheck)
             .stream().map(ExecutionPluginNode::getExecution)
             .map(WorkflowExecution::getStartedDate).map(Date::toInstant)
             .reduce(Instant.MIN, (i1, i2) -> i1.isAfter(i2) ? i1 : i2);
