@@ -1,8 +1,12 @@
 package eu.europeana.metis.remove.discover;
 
+import eu.europeana.metis.core.dao.DataEvolutionUtils;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPluginMetadata;
+import eu.europeana.metis.core.workflow.plugins.DataStatus;
+import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
+import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +20,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -33,7 +37,9 @@ import java.util.stream.IntStream;
  * non-link checking) such that:
  * <ol>
  * <li>
- * It doesn't have descendants, or, if it does, all descendants are link checking executions.
+ * It doesn't have descendants, or, if it does, all descendants are link checking executions. We
+ * allow link checking descendants because link checking plugins function more as add-ons to other
+ * plugins and we wish to avoid them somehow blocking leaf analysis and identification.
  * </li>
  * <li>
  * It doesn't have a parent, or, if it does, the parent <b>does</b> have at least one descendant
@@ -57,39 +63,71 @@ import java.util.stream.IntStream;
 class ExecutionPluginForest {
 
   private final Map<String, ExecutionPluginNode> nodesById = new HashMap<>();
-  private final Map<PluginLinkByTypeAndTimestamp, ExecutionPluginNode> nodesByTypeAndTimestamp;
   private final List<ExecutionPluginNode> rootNodes;
   private final Set<String> leafNodeIds;
 
-  ExecutionPluginForest(List<WorkflowExecution> executions) {
-    this(executions, Collections.emptySet());
+  ExecutionPluginForest(List<WorkflowExecution> executions, boolean attemptToIgnoreDeletedPlugins) {
+    this(executions, attemptToIgnoreDeletedPlugins, Collections.emptySet());
   }
 
-  ExecutionPluginForest(List<WorkflowExecution> executions, Set<String> ignoredPluginIds) {
+  ExecutionPluginForest(List<WorkflowExecution> executions, boolean attemptToIgnoreDeletedPlugins,
+          Set<String> ignoredPluginIds) {
 
-    // Convert all executions and plugins to nodes and add them to the node map
+    // Convert all executions and plugins to nodes and add them to the node map, depending on
+    // whether they are to be ignored or not. No nodes are linked at this point.
+    final  Map<String, ExecutionPluginNode> ignoredNodesById = new HashMap<>();
     for (WorkflowExecution execution : executions) {
       for (AbstractMetisPlugin plugin : execution.getMetisPlugins()) {
-        if (!ignoredPluginIds.contains(plugin.getId())) {
-          final ExecutionPluginNode node = new ExecutionPluginNode(execution, plugin);
-          nodesById.put(node.getId(), node);
-        }
+        final boolean ignoreNode = ignoredPluginIds.contains(plugin.getId())
+                || (attemptToIgnoreDeletedPlugins && plugin.getDataStatus() == DataStatus.DELETED);
+        final ExecutionPluginNode node = new ExecutionPluginNode(execution, plugin);
+        (ignoreNode ? ignoredNodesById : nodesById).put(node.getId(), node);
       }
     }
 
-    // Add all nodes to the lookup map for predecessors
-    final Function<ExecutionPluginNode, PluginLinkByTypeAndTimestamp> extractTimeAndTimestamp = node -> new PluginLinkByTypeAndTimestamp(
-        node.getType(), node.getPlugin().getStartedDate());
-    this.nodesByTypeAndTimestamp = nodesById.values().stream()
-        .filter(node -> node.getPlugin().getStartedDate() != null)
-        .collect(Collectors.toMap(extractTimeAndTimestamp, Function.identity()));
+    // Add all nodes to the lookup map for predecessors (also ignored ones: they could still have
+    // children that are not to be ignored).
+    final Function<ExecutionPluginNode, PluginLinkByTypeAndTimestamp> extractTimeAndTimestamp =
+            node -> new PluginLinkByTypeAndTimestamp(node.getType(),
+                    node.getPlugin().getStartedDate());
+    final Map<PluginLinkByTypeAndTimestamp, ExecutionPluginNode> predecessorLookup = Stream
+            .concat(nodesById.values().stream(), ignoredNodesById.values().stream())
+            .filter(node -> node.getPlugin().getStartedDate() != null)
+            .collect(Collectors.toMap(extractTimeAndTimestamp, Function.identity()));
 
-    // Link parents and children (predecessors and successors)
-    for (ExecutionPluginNode node : nodesById.values()) {
-      final ExecutionPluginNode predecessor = findPredecessor(node);
-      if (predecessor != null) {
-        predecessor.addChild(node);
+    // Link parents and their children (predecessors and successors). This happens in iterations
+    // because during linking we may find nodes that we planned to ignore but still have children
+    // that we don't want to ignore. We loop until we find no such nodes anymore.
+    final Function<String, ExecutionPluginNode> nodeByIdResolver = id -> Optional
+            .ofNullable(nodesById.get(id)).orElseGet(() -> ignoredNodesById.get(id));
+    Map<String, ExecutionPluginNode> nodesToProcess = nodesById;
+    while (!nodesToProcess.isEmpty()) {
+
+      // We will need a list of nodes that we planned to ignore but need to keep after all.
+      final Map<String, ExecutionPluginNode> ignoredNodesToBeKept = new HashMap<>();
+
+      // We go by all nodes in this iteration and attempt to find the parent.
+      for (ExecutionPluginNode node : nodesToProcess.values()) {
+        final ExecutionPluginNode predecessor = findPredecessor(node, nodeByIdResolver,
+                predecessorLookup::get);
+        if (predecessor != null) {
+
+          // So we have a parent. If we don't have it in our node map yet, we mark it for
+          // processing in the next iteration. We don't add it directly to the node map as we may be
+          // iterating over that very collection (during the first iteration).
+          if (!nodesById.containsKey(predecessor.getId())) {
+            ignoredNodesToBeKept.putIfAbsent(predecessor.getId(), predecessor);
+          }
+
+          // We now add the predecessor as parent for the node.
+          predecessor.addChild(node);
+        }
       }
+
+      // We add all nodes that we need to keep to our master node map. We also put them up for
+      // processing during the next iteration.
+      nodesById.putAll(ignoredNodesToBeKept);
+      nodesToProcess = ignoredNodesToBeKept;
     }
 
     // Compose the list of root nodes
@@ -113,7 +151,9 @@ class ExecutionPluginForest {
     return leafNodeIds.size();
   }
 
-  private ExecutionPluginNode findPredecessor(ExecutionPluginNode node) {
+  private static ExecutionPluginNode findPredecessor(ExecutionPluginNode node,
+          Function<String, ExecutionPluginNode> nodeByIdResolver,
+          Function<PluginLinkByTypeAndTimestamp, ExecutionPluginNode> nodeByTypeAndTimeResolver) {
 
     // Analyze the previous plugin information given in the plugin metadata.
     final Date previousPluginDate = Optional.ofNullable(node.getPlugin().getPluginMetadata())
@@ -125,8 +165,8 @@ class ExecutionPluginForest {
     if (previousPluginDate != null && previousPluginType != null) {
 
       // If a predecessor is named, find it. This is for plugins that have started executing.
-      previous = nodesByTypeAndTimestamp.get(new PluginLinkByTypeAndTimestamp(previousPluginType,
-          previousPluginDate));
+      previous = nodeByTypeAndTimeResolver
+              .apply(new PluginLinkByTypeAndTimestamp(previousPluginType, previousPluginDate));
       if (previous == null) {
         final String message = String
             .format("Problem with plugin %s: cannot find predecessor with date %s and type %s.",
@@ -137,21 +177,13 @@ class ExecutionPluginForest {
 
       // If one of them is present, we have an inconsistency.
       throw new IllegalStateException("Problem with plugin " + node.getId()
-          + ": either the previous plugin type or the previous plugin date is null (but not both).");
+              + ": either the previous plugin type or the previous plugin date is null (but not both).");
     } else {
 
       // Otherwise look at the workflow and get the previous one. This is for plugins that have not
       // started executing (i.e. they are waiting for a previous plugin to finish or they were
       // recursively cancelled due to a previous plugin being cancelled or failing).
-      final int pluginIndex = IntStream.range(0, node.getExecution().getMetisPlugins().size())
-          .filter(index -> node.getExecution().getMetisPlugins().get(index).getId()
-              .equals(node.getId())).findFirst().orElseThrow(IllegalStateException::new);
-      if (pluginIndex > 0) {
-        previous = nodesById
-            .get(node.getExecution().getMetisPlugins().get(pluginIndex - 1).getId());
-      } else {
-        previous = null;
-      }
+      previous = computePredecessorInWorkflow(node, nodeByIdResolver);
     }
 
     // Check: we only expect harvesting, depublishing and reindexing plugins to have no ancestor.
@@ -173,6 +205,39 @@ class ExecutionPluginForest {
     return previous;
   }
 
+  private static ExecutionPluginNode computePredecessorInWorkflow(ExecutionPluginNode node,
+          Function<String, ExecutionPluginNode> nodeByIdResolver) {
+
+    // Determine the type of the previous plugin.
+    final Set<PluginType> predecessorTypes;
+    if (node.getPlugin() instanceof ExecutablePlugin) {
+      // Find the latest one of the right type before the plugin we're processing.
+      final ExecutablePluginType pluginType = ((ExecutablePlugin<?>) node.getPlugin())
+              .getPluginMetadata().getExecutablePluginType();
+      predecessorTypes = DataEvolutionUtils.getPredecessorTypes(pluginType).stream()
+              .map(ExecutablePluginType::toPluginType).collect(Collectors.toSet());
+    } else {
+      // Just find the one immediately before the node plugin we're processing.
+      predecessorTypes = Set.of(PluginType.values());
+    }
+
+    // Loop through the workflow to get the right predecessor plugin.
+    AbstractMetisPlugin previousPlugin = null;
+    for (AbstractMetisPlugin plugin : node.getExecution().getMetisPlugins()) {
+      if (plugin.getId().equals(node.getId())) {
+        // We have reached the plugin we're looking for.
+        break;
+      }
+      if (predecessorTypes.contains(plugin.getPluginType())) {
+        // We have found a candidate.
+        previousPlugin = plugin;
+      }
+    }
+
+    // Done.
+    return previousPlugin == null ? null : nodeByIdResolver.apply(previousPlugin.getId());
+  }
+
   /**
    * This method returns all nodes (leafs or otherwise) that satisfy the given test.
    * @param test The test that the nodes need to satisfy.
@@ -191,8 +256,8 @@ class ExecutionPluginForest {
    * satisfy (see {@link ExecutionPluginNode#findSubtrees(Predicate, Consumer)}).
    * @return The list of non-overlapping subtrees of leafs that satisfy the given test.
    */
-  List<ExecutionPluginNode> getOrphanLeafSubtrees(Predicate<ExecutionPluginNode> subtreeTest) {
-    return getOrphanLeafSubtrees(node -> true, subtreeTest);
+  List<ExecutionPluginNode> getLeafSubtrees(Predicate<ExecutionPluginNode> subtreeTest) {
+    return getLeafSubtrees(node -> true, subtreeTest);
   }
 
   /**
@@ -205,7 +270,7 @@ class ExecutionPluginForest {
    * satisfy (see {@link ExecutionPluginNode#findSubtrees(Predicate, Consumer)}).
    * @return The list of non-overlapping subtrees of leafs that satisfy the given tests.
    */
-  List<ExecutionPluginNode> getOrphanLeafSubtrees(Predicate<ExecutionPluginNode> leafTest,
+  List<ExecutionPluginNode> getLeafSubtrees(Predicate<ExecutionPluginNode> leafTest,
       Predicate<ExecutionPluginNode> subtreeTest) {
     final List<ExecutionPluginNode> result = new ArrayList<>();
     leafNodeIds.stream().map(nodesById::get).filter(leafTest)

@@ -1,19 +1,20 @@
 package eu.europeana.metis.remove.discover;
 
-import eu.europeana.metis.remove.discover.AbstractOrphanIdentification.DiscoveryMode;
 import eu.europeana.metis.remove.utils.Application;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import java.io.IOException;
 
-public class MigrationCleanupIdentificationMain extends AbstractOrphanIdentificationEngine {
+/**
+ * @see MigrationCleanupIdentification for the details.
+ */
+public class MigrationCleanupIdentificationMain extends AbstractPluginIdentificationEngine {
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
-    new MigrationCleanupIdentificationMain().discoverOrphans();
+    new MigrationCleanupIdentificationMain().discoverPlugins();
   }
 
   @Override
-  AbstractOrphanIdentification createOrphansDiscoverer(Application application) {
-    return new MigrationCleanupIdentification(
-        application.getDatastoreProvider(), DiscoveryMode.DISCOVER_ONLY_CHILDLESS_ORPHANS);
+  AbstractPluginIdentification createPluginDiscoverer(Application application) {
+    return new MigrationCleanupIdentification(application.getDatastoreProvider());
   }
 }

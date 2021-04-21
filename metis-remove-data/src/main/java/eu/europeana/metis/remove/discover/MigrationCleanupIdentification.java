@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * <b>This orphan identification is for cleaning up the migration results of the Metis migration in
+ * <b>This plugin identification is for cleaning up the migration results of the Metis migration in
  * 2018. Given an instance of {@link ExecutionPluginForest}, it finds two kinds of nodes that can be
  * safely removed:</b>
  * <ol>
@@ -42,7 +42,7 @@ import java.util.stream.Stream;
  * </li>
  * </ol>
  */
-class MigrationCleanupIdentification extends AbstractOrphanIdentification {
+class MigrationCleanupIdentification extends AbstractPluginIdentification {
 
   /**
    * Create the cutoff date. This date is chosen so that one or two hours of difference (due to time
@@ -56,16 +56,15 @@ class MigrationCleanupIdentification extends AbstractOrphanIdentification {
    * Constructor.
    *
    * @param morphiaDatastoreProvider Access to the database.
-   * @param discoveryMode The discoveryMode in which to operate.
    */
-  MigrationCleanupIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider, DiscoveryMode discoveryMode) {
-    super(morphiaDatastoreProvider, discoveryMode);
+  MigrationCleanupIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider) {
+    super(morphiaDatastoreProvider, DiscoveryMode.PLUGINS_WITHOUT_DESCENDANTS);
   }
 
   @Override
-  List<ExecutionPluginNode> identifyOrphans(ExecutionPluginForest forest) {
+  List<ExecutionPluginNode> identifyPlugins(ExecutionPluginForest forest) {
 
-    // Add the two orphan types to the same list: the sets are disjoint so we won't have duplicates.
+    // Add the two leaf types to the same list: the sets are disjoint so we won't have duplicates.
     final List<ExecutionPluginNode> result = new ArrayList<>();
     result.addAll(getFailedOrCancelledLeafs(forest));
     result.addAll(getFinishedSupersededLeafs(forest));
@@ -83,7 +82,7 @@ class MigrationCleanupIdentification extends AbstractOrphanIdentification {
 
     // Collect all leafs or descendants of leafs that satisfy the criteria. Optimize by checking the
     // time before even considering the leaf node: all descendants must have started later.
-    return forest.getOrphanLeafSubtrees(startedOrCancelledBeforeCheck,
+    return forest.getLeafSubtrees(startedOrCancelledBeforeCheck,
         failedOrCancelledCheck.and(startedOrCancelledBeforeCheck));
   }
 
@@ -110,6 +109,6 @@ class MigrationCleanupIdentification extends AbstractOrphanIdentification {
     // Find the leafs or descendants of leafs that are marked as superseded.
     final Predicate<ExecutionPluginNode> isSuperseded = node -> supersededExecutions
         .contains(node.getId());
-    return forest.getOrphanLeafSubtrees(isSuperseded);
+    return forest.getLeafSubtrees(isSuperseded);
   }
 }

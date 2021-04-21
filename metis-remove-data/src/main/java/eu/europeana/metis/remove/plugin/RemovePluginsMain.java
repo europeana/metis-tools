@@ -3,6 +3,8 @@ package eu.europeana.metis.remove.plugin;
 import com.opencsv.CSVReader;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
+import dev.morphia.query.experimental.filters.Filter;
+import dev.morphia.query.experimental.filters.Filters;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
@@ -42,7 +44,8 @@ public class RemovePluginsMain {
 
   private static final String FILE_FOR_PLUGIN_REMOVAL = "/home/jochen/Desktop/plugins_to_remove.csv";
 
-  private static final Mode MODE = Mode.REMOVE_FROM_DB;
+  /** NOTE: this mode should be set before running. */
+  private static final Mode MODE = Mode.MARK_AS_DELETED;
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
     try (final Application application = Application.initialize()) {
@@ -144,17 +147,20 @@ public class RemovePluginsMain {
     final WorkflowExecution execution = executionAndPlugin.getLeft();
     final AbstractMetisPlugin plugin = executionAndPlugin.getRight();
 
-    // Test that there is no other plugin depending on this one. NOTE: disabling validation on one
-    // of the queries to suppress warnings from Morphia.
-    final Query<AbstractMetisPlugin> pluginQuery = datastoreProvider.getDatastore()
-        .createQuery(AbstractMetisPlugin.class).disableValidation();
-    pluginQuery.field("pluginMetadata.revisionNamePreviousPlugin")
-        .equal(plugin.getPluginType().name());
-    pluginQuery.field("pluginMetadata.revisionTimestampPreviousPlugin")
-        .equal(plugin.getStartedDate());
+    // Test that there is no other plugin depending on this one. NOTE: disabling validation on
+    // the queries to suppress warnings from Morphia. If the mode is to mark as deleted, we will
+    // accept depending plugins that are themselves also deleted.
+    final List<Filter> pluginFilters = new ArrayList<>();
+    pluginFilters.add(Filters.eq("pluginMetadata.revisionNamePreviousPlugin",
+            plugin.getPluginType().name()));
+    pluginFilters.add(Filters.eq("pluginMetadata.revisionTimestampPreviousPlugin",
+            plugin.getStartedDate()));
+    if (MODE == Mode.MARK_AS_DELETED) {
+      pluginFilters.add(Filters.ne("dataStatus", DataStatus.DELETED));
+    }
     final Query<WorkflowExecution> query =
-        datastoreProvider.getDatastore().createQuery(WorkflowExecution.class).disableValidation();
-    query.field("metisPlugins").elemMatch(pluginQuery);
+        datastoreProvider.getDatastore().find(WorkflowExecution.class).disableValidation();
+    query.filter(Filters.elemMatch("metisPlugins", pluginFilters.toArray(new Filter[0])));
     final WorkflowExecution result = ExternalRequestUtil
             .retryableExternalRequestForNetworkExceptions(() -> query.first(new FindOptions()));
     if (result != null) {
@@ -165,7 +171,8 @@ public class RemovePluginsMain {
     }
 
     // Test that if the plugin is not the last one, the next plugin has another source set (meaning
-    // that it is not implicitly a successor of the plugin to be removed).
+    // that it is not implicitly a successor of the plugin to be removed). Note: it is ok for there
+    // to be an implicit successor if that successor is also marked as deleted.
     final int pluginIndex = IntStream.range(0, execution.getMetisPlugins().size())
         .filter(index -> execution.getMetisPlugins().get(index).getId().equals(plugin.getId()))
         .findFirst().orElseThrow(IllegalStateException::new);
@@ -179,7 +186,10 @@ public class RemovePluginsMain {
           && nextPlugin.getPluginMetadata().getRevisionNamePreviousPlugin() != null && !nextPlugin
           .getPluginMetadata().getRevisionNamePreviousPlugin()
           .equals(plugin.getPluginType().name());
-      if (!previousTimestampIsSetAndDifferent && !previousNameIsSetAndDifferent) {
+      final boolean acceptableBecauseMarkedAsDeleted =
+              MODE == Mode.MARK_AS_DELETED && nextPlugin.getDataStatus() == DataStatus.DELETED;
+      if (!previousTimestampIsSetAndDifferent && !previousNameIsSetAndDifferent &&
+              !acceptableBecauseMarkedAsDeleted) {
         LOGGER.error("Could not remove plugin execution with ID {} and type {} in workflow with ID "
                 + "{}: the next plugin in the workflow seems to be the successor of this plugin.",
             plugin.getId(), plugin.getPluginType(), execution.getId());
@@ -197,7 +207,7 @@ public class RemovePluginsMain {
     // If the mode calls for marking as deleted, we do this and are done.
     if (MODE == Mode.MARK_AS_DELETED) {
       if (executionAndPlugin.getRight() instanceof AbstractExecutablePlugin) {
-        ((AbstractExecutablePlugin) executionAndPlugin.getRight()).setDataStatus(DataStatus.DELETED);
+        executionAndPlugin.getRight().setDataStatus(DataStatus.DELETED);
         ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
             () -> datastoreProvider.getDatastore().save(executionAndPlugin.getLeft()));
       }
