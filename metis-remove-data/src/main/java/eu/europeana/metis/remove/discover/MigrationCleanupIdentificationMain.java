@@ -7,14 +7,14 @@ import java.io.IOException;
 /**
  * @see MigrationCleanupIdentification for the details.
  */
-public class MigrationCleanupIdentificationMain extends AbstractOrphanIdentificationEngine {
+public class MigrationCleanupIdentificationMain extends AbstractPluginIdentificationEngine {
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
-    new MigrationCleanupIdentificationMain().discoverOrphans();
+    new MigrationCleanupIdentificationMain().discoverPlugins();
   }
 
   @Override
-  AbstractOrphanIdentification createOrphansDiscoverer(Application application) {
+  AbstractPluginIdentification createPluginDiscoverer(Application application) {
     return new MigrationCleanupIdentification(application.getDatastoreProvider());
   }
 }

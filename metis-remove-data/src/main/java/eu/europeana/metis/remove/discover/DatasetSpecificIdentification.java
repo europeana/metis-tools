@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Identifies all orphans that belong to a certain dataset.
+ * Identifies all plugins that belong to a certain dataset.
  */
-public class DatasetSpecificIdentification extends AbstractOrphanIdentification {
+public class DatasetSpecificIdentification extends AbstractPluginIdentification {
 
   private static final String DATASET_ID_TO_DELETE = "9";
 
@@ -17,13 +17,13 @@ public class DatasetSpecificIdentification extends AbstractOrphanIdentification 
    * @param morphiaDatastoreProvider Access to the database.
    */
   DatasetSpecificIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider) {
-    super(morphiaDatastoreProvider,  DiscoveryMode.ORPHANS_WITHOUT_DESCENDANTS);
+    super(morphiaDatastoreProvider,  DiscoveryMode.PLUGINS_WITHOUT_DESCENDANTS);
   }
 
   @Override
-  List<ExecutionPluginNode> identifyOrphans(ExecutionPluginForest forest) {
+  List<ExecutionPluginNode> identifyPlugins(ExecutionPluginForest forest) {
     final Predicate<ExecutionPluginNode> datasetIdCheck = node ->
         DATASET_ID_TO_DELETE.equals(node.getExecution().getDatasetId());
-    return forest.getOrphanLeafSubtrees(datasetIdCheck);
+    return forest.getLeafSubtrees(datasetIdCheck);
   }
 }

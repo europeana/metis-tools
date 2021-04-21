@@ -256,8 +256,8 @@ class ExecutionPluginForest {
    * satisfy (see {@link ExecutionPluginNode#findSubtrees(Predicate, Consumer)}).
    * @return The list of non-overlapping subtrees of leafs that satisfy the given test.
    */
-  List<ExecutionPluginNode> getOrphanLeafSubtrees(Predicate<ExecutionPluginNode> subtreeTest) {
-    return getOrphanLeafSubtrees(node -> true, subtreeTest);
+  List<ExecutionPluginNode> getLeafSubtrees(Predicate<ExecutionPluginNode> subtreeTest) {
+    return getLeafSubtrees(node -> true, subtreeTest);
   }
 
   /**
@@ -270,7 +270,7 @@ class ExecutionPluginForest {
    * satisfy (see {@link ExecutionPluginNode#findSubtrees(Predicate, Consumer)}).
    * @return The list of non-overlapping subtrees of leafs that satisfy the given tests.
    */
-  List<ExecutionPluginNode> getOrphanLeafSubtrees(Predicate<ExecutionPluginNode> leafTest,
+  List<ExecutionPluginNode> getLeafSubtrees(Predicate<ExecutionPluginNode> leafTest,
       Predicate<ExecutionPluginNode> subtreeTest) {
     final List<ExecutionPluginNode> result = new ArrayList<>();
     leafNodeIds.stream().map(nodesById::get).filter(leafTest)

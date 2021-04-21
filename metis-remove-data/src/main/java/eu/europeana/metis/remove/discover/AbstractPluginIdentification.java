@@ -23,13 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class acts as an engine for discovering orphans. Individual cleanup actions can extend this
- * class and provide the functionality to identify the orphans given an instance of {@link
+ * This class acts as an engine for discovering plugins. Individual cleanup actions can extend this
+ * class and provide the functionality to identify the plugins given an instance of {@link
  * ExecutionPluginForest}.
  */
-abstract class AbstractOrphanIdentification {
+abstract class AbstractPluginIdentification {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOrphanIdentification.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPluginIdentification.class);
 
   private final MorphiaDatastoreProvider morphiaDatastoreProvider;
 
@@ -38,28 +38,28 @@ abstract class AbstractOrphanIdentification {
   enum DiscoveryMode {
 
     /**
-     * This mode discovers only identified orphans or their descendants that have no children. The
-     * deleted status of the orphan or its children is not taken into account. Note: in case that
-     * we're removing orphans, we should only use this mode if we intend to completely remove
-     * orphans from the history (rather than mark them as deleted).
+     * This mode discovers only identified plugins or their descendants that have no children. The
+     * deleted status of the plugin or its children is not taken into account. Note: in case that
+     * we're removing plugins, we should only use this mode if we intend to completely remove
+     * plugins from the history (rather than mark them as deleted).
      */
-    ORPHANS_WITHOUT_DESCENDANTS(node -> node.getChildren().isEmpty(), false),
+    PLUGINS_WITHOUT_DESCENDANTS(node -> node.getChildren().isEmpty(), false),
 
     /**
-     * This mode discovers only identified orphans or their descendants that have no children or
+     * This mode discovers only identified plugins or their descendants that have no children or
      * only children that are marked as deleted (through {@link eu.europeana.metis.core.workflow.plugins.DataStatus#DELETED}).
-     * The node itself is not allowed to be deleted. Note: in case that we're removing orphans, we
-     * should only use this mode if we intend to mark orphans as deleted (rather than actually
+     * The node itself is not allowed to be deleted. Note: in case that we're removing plugins, we
+     * should only use this mode if we intend to mark plugins as deleted (rather than actually
      * delete the history).
      */
-    ORPHANS_WITH_ONLY_DELETED_DESCENDANTS(node -> node.getChildren().isEmpty(), true);
+    PLUGINS_WITH_ONLY_DELETED_DESCENDANTS(node -> node.getChildren().isEmpty(), true);
 
-    private final Predicate<ExecutionPluginNode> orphanTest;
+    private final Predicate<ExecutionPluginNode> pluginTest;
     private final boolean attemptToIgnoreDeletedPlugins;
 
-    DiscoveryMode(Predicate<ExecutionPluginNode> orphanTest,
+    DiscoveryMode(Predicate<ExecutionPluginNode> pluginTest,
             boolean attemptToIgnoreDeletedPlugins) {
-      this.orphanTest = orphanTest;
+      this.pluginTest = pluginTest;
       this.attemptToIgnoreDeletedPlugins = attemptToIgnoreDeletedPlugins;
     }
   }
@@ -70,7 +70,7 @@ abstract class AbstractOrphanIdentification {
    * @param morphiaDatastoreProvider Access to the database.
    * @param discoveryMode The discoveryMode in which to operate.
    */
-  AbstractOrphanIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider,
+  AbstractPluginIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider,
       DiscoveryMode discoveryMode) {
     this.morphiaDatastoreProvider = morphiaDatastoreProvider;
     this.discoveryMode = discoveryMode;
@@ -84,7 +84,7 @@ abstract class AbstractOrphanIdentification {
    *
    * @return The nodes that can currently be removed.
    */
-  final List<ExecutionPluginNode> discoverOrphans() {
+  final List<ExecutionPluginNode> discoverPlugins() {
 
     // Compute all iterations
     final List<List<ExecutionPluginNode>> iterations = new ArrayList<>();
@@ -102,16 +102,16 @@ abstract class AbstractOrphanIdentification {
           continue;
         }
 
-        // Obtain the orphans for this dataset, in the right order for removal.
-        final List<ExecutionPluginNode> orphans = discoverOrphans(datasetId, nodeIdsToSkip).stream()
+        // Obtain the plugins for this dataset, in the right order for removal.
+        final List<ExecutionPluginNode> plugins = discoverPlugins(datasetId, nodeIdsToSkip).stream()
                 .map(ExecutionPluginNode::getAllInOrderOfRemoval).flatMap(List::stream)
-                .filter(discoveryMode.orphanTest).collect(Collectors.toList());
+                .filter(discoveryMode.pluginTest).collect(Collectors.toList());
 
-        // If we find no orphans, we mark this dataset to skip. Otherwise, add them for removal.
-        if (orphans.isEmpty()) {
+        // If we find no plugins, we mark this dataset to skip. Otherwise, add them for removal.
+        if (plugins.isEmpty()) {
           datasetIdsToSkip.add(datasetId);
         } else {
-          nodesToRemove.addAll(orphans);
+          nodesToRemove.addAll(plugins);
         }
       }
 
@@ -129,7 +129,7 @@ abstract class AbstractOrphanIdentification {
 
     // If there is nothing to do we print a message and we are done.
     if (iterations.isEmpty()) {
-      LOGGER.info("Nothing to do: no orphans/leaf nodes found.");
+      LOGGER.info("Nothing to do: no plugins/leaf nodes found.");
       return Collections.emptyList();
     }
 
@@ -159,7 +159,7 @@ abstract class AbstractOrphanIdentification {
     return iterations.get(0);
   }
 
-  private List<ExecutionPluginNode> discoverOrphans(String datasetId, Set<String> idsToSkip) {
+  private List<ExecutionPluginNode> discoverPlugins(String datasetId, Set<String> idsToSkip) {
 
     // Creating the forest
     final ExecutionPluginForest forest;
@@ -171,11 +171,11 @@ abstract class AbstractOrphanIdentification {
       return Collections.emptyList();
     }
 
-    // Identify the orphans
-    return identifyOrphans(forest);
+    // Identify the plugins
+    return identifyPlugins(forest);
   }
 
-  abstract List<ExecutionPluginNode> identifyOrphans(ExecutionPluginForest forest);
+  abstract List<ExecutionPluginNode> identifyPlugins(ExecutionPluginForest forest);
 
   private Set<String> getDatasetIds() {
     final MongoCollection<WorkflowExecution> collection = morphiaDatastoreProvider.getDatastore()

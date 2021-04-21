@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  * effect, this finds any failed or canceled plugins for data that was later successfully
  * published.
  */
-public class CanceledOrFailedIdentification extends AbstractOrphanIdentification {
+public class CanceledOrFailedIdentification extends AbstractPluginIdentification {
 
   /**
    * Constructor.
@@ -23,11 +23,11 @@ public class CanceledOrFailedIdentification extends AbstractOrphanIdentification
    * @param morphiaDatastoreProvider Access to the database.
    */
   CanceledOrFailedIdentification(MorphiaDatastoreProvider morphiaDatastoreProvider) {
-    super(morphiaDatastoreProvider, DiscoveryMode.ORPHANS_WITH_ONLY_DELETED_DESCENDANTS);
+    super(morphiaDatastoreProvider, DiscoveryMode.PLUGINS_WITH_ONLY_DELETED_DESCENDANTS);
   }
 
   @Override
-  List<ExecutionPluginNode> identifyOrphans(ExecutionPluginForest forest) {
+  List<ExecutionPluginNode> identifyPlugins(ExecutionPluginForest forest) {
 
     // Find the most recent successful index to publish start date (or the min date if none available).
     // Note: we'll look at the execution start date, to make sure that our comparison below holds.
@@ -39,7 +39,7 @@ public class CanceledOrFailedIdentification extends AbstractOrphanIdentification
             .map(WorkflowExecution::getStartedDate).map(Date::toInstant)
             .reduce(Instant.MIN, (i1, i2) -> i1.isAfter(i2) ? i1 : i2);
 
-    // Get the canceled and failed orphans that occurred before the latest successful index.
+    // Get the canceled and failed plugins that occurred before the latest successful index.
     // Note: we check the time of the workflow because the time of the plugin may not be set
     // if the plugin was canceled before it started.
     final Predicate<ExecutionPluginNode> isBeforeLatestPluginCheck = node ->
@@ -49,6 +49,6 @@ public class CanceledOrFailedIdentification extends AbstractOrphanIdentification
     final Predicate<ExecutionPluginNode> failedOrCancelledCheck = node ->
             node.getPlugin().getPluginStatus() == PluginStatus.FAILED
                     || node.getPlugin().getPluginStatus() == PluginStatus.CANCELLED;
-    return forest.getOrphanLeafSubtrees(failedOrCancelledCheck.and(isBeforeLatestPluginCheck));
+    return forest.getLeafSubtrees(failedOrCancelledCheck.and(isBeforeLatestPluginCheck));
   }
 }

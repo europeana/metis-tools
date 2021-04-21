@@ -7,14 +7,14 @@ import java.io.IOException;
 /**
  * @see DatasetSpecificIdentification for the details.
  */
-public class DatasetSpecificIdentificationMain extends AbstractOrphanIdentificationEngine {
+public class DatasetSpecificIdentificationMain extends AbstractPluginIdentificationEngine {
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
-    new DatasetSpecificIdentificationMain().discoverOrphans();
+    new DatasetSpecificIdentificationMain().discoverPlugins();
   }
 
   @Override
-  AbstractOrphanIdentification createOrphansDiscoverer(Application application) {
+  AbstractPluginIdentification createPluginDiscoverer(Application application) {
     return new DatasetSpecificIdentification(application.getDatastoreProvider());
   }
 }

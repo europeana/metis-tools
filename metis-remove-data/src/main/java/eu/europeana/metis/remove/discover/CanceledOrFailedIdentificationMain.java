@@ -7,14 +7,14 @@ import java.io.IOException;
 /**
  * @see CanceledOrFailedIdentification for the details.
  */
-public class CanceledOrFailedIdentificationMain extends AbstractOrphanIdentificationEngine {
+public class CanceledOrFailedIdentificationMain extends AbstractPluginIdentificationEngine {
 
   public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
-    new CanceledOrFailedIdentificationMain().discoverOrphans();
+    new CanceledOrFailedIdentificationMain().discoverPlugins();
   }
 
   @Override
-  AbstractOrphanIdentification createOrphansDiscoverer(Application application) {
+  AbstractPluginIdentification createPluginDiscoverer(Application application) {
     return new CanceledOrFailedIdentification(application.getDatastoreProvider());
   }
 }
