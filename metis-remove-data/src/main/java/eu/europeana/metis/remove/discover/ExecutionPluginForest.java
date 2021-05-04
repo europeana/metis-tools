@@ -212,7 +212,7 @@ class ExecutionPluginForest {
     final Set<PluginType> predecessorTypes;
     if (node.getPlugin() instanceof ExecutablePlugin) {
       // Find the latest one of the right type before the plugin we're processing.
-      final ExecutablePluginType pluginType = ((ExecutablePlugin<?>) node.getPlugin())
+      final ExecutablePluginType pluginType = ((ExecutablePlugin) node.getPlugin())
               .getPluginMetadata().getExecutablePluginType();
       predecessorTypes = DataEvolutionUtils.getPredecessorTypes(pluginType).stream()
               .map(ExecutablePluginType::toPluginType).collect(Collectors.toSet());

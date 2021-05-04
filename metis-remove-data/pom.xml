@@ -41,7 +41,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.metis>4-SNAPSHOT</version.metis>
+    <version.metis>5-SNAPSHOT</version.metis>
     <version.javax.xml.bind>2.3.1</version.javax.xml.bind>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.25</version.slf4j>

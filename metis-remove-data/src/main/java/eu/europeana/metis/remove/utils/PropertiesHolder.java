@@ -34,6 +34,7 @@ public class PropertiesHolder {
   private final String mongoCorePassword;
   private final boolean mongoCoreEnablessl;
   final String mongoCoreDb;
+  private final String mongoCoreApplicationName;
 
   // eCloud
   public final String ecloudMcsBaseUrl;
@@ -81,6 +82,7 @@ public class PropertiesHolder {
     mongoCorePassword = properties.getProperty("mongo.core.password");
     mongoCoreEnablessl = Boolean.parseBoolean(properties.getProperty("mongo.core.enableSSL"));
     mongoCoreDb = properties.getProperty("mongo.core.db");
+    mongoCoreApplicationName = properties.getProperty("mongo.core.application.name");
 
     // eCloud
     ecloudMcsBaseUrl = properties.getProperty("ecloud.mcs.baseUrl");
@@ -120,7 +122,8 @@ public class PropertiesHolder {
     final MongoProperties<IllegalArgumentException> properties = new MongoProperties<>(
             IllegalArgumentException::new);
     properties.setAllProperties(mongoCoreHosts, mongoCorePorts, mongoCoreAuthenticationDb,
-            mongoCoreUsername, mongoCorePassword, mongoCoreEnablessl, ReadPreferenceValue.PRIMARY);
+            mongoCoreUsername, mongoCorePassword, mongoCoreEnablessl, ReadPreferenceValue.PRIMARY,
+            mongoCoreApplicationName);
     return properties;
   }
 
@@ -138,7 +141,8 @@ public class PropertiesHolder {
     indexingSettings.getMongoProperties().setAllProperties(publishMongoHosts,
             publishMongoPorts, publishMongoAuthenticationDb, publishMongoUsername,
             publishMongoPassword, publishMongoEnablessl,
-            eu.europeana.metis.mongo.connection.MongoProperties.ReadPreferenceValue.PRIMARY);
+            eu.europeana.metis.mongo.connection.MongoProperties.ReadPreferenceValue.PRIMARY,
+            mongoCoreApplicationName);
     indexingSettings.setMongoDatabaseName(publishMongoDb);
   }
 
