@@ -94,7 +94,7 @@ final class OutputUtils {
       // Write records
       nodesToRemove.stream().map(ExecutionPluginNode::getPlugin)
           .filter(plugin -> plugin instanceof AbstractExecutablePlugin)
-          .map(plugin -> (AbstractExecutablePlugin) plugin)
+          .map(AbstractExecutablePlugin.class::cast)
           .filter(plugin -> plugin.getDataStatus() != DataStatus.DELETED)
           .map(AbstractExecutablePlugin::getExternalTaskId).filter(StringUtils::isNotBlank)
           .forEach(taskId -> writer.writeNext(new String[]{taskId}, false));

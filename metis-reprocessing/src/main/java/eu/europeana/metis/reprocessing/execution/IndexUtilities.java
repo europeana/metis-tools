@@ -2,6 +2,7 @@ package eu.europeana.metis.reprocessing.execution;
 
 import com.mongodb.MongoWriteException;
 import eu.europeana.indexing.IndexerPool;
+import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.metis.network.ExternalRequestUtil;
@@ -49,7 +50,8 @@ public class IndexUtilities {
       // try-with-resources block
       final IndexerPool indexerPool = basicConfiguration.getDestinationIndexerPool();
       ExternalRequestUtil.retryableExternalRequest(() -> {
-        indexerPool.indexRdf(rdf, null, preserveTimestamps, null, false);
+        indexerPool
+                .indexRdf(rdf, new IndexingProperties(null, preserveTimestamps, null, false, true));
         return null;
       }, retryExceptions);
     } catch (Exception e) {
