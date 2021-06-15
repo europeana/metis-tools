@@ -6,7 +6,7 @@ import static eu.europeana.metis.core.common.DaoFieldNames.ID;
 import dev.morphia.aggregation.experimental.Aggregation;
 import dev.morphia.aggregation.experimental.expressions.Expressions;
 import dev.morphia.aggregation.experimental.stages.Projection;
-import dev.morphia.annotations.Embedded;
+import dev.morphia.annotations.Entity;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProvider;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
@@ -39,7 +39,7 @@ public class MongoCoreDao {
       final String datasetIdField = "datasetId";
 
       // Project the dataset ID to the right field name.
-      pipeline.project(Projection.of().exclude(ID.getFieldName())
+      pipeline.project(Projection.project().exclude(ID.getFieldName())
               .include(datasetIdField, Expressions.field(DATASET_ID.getFieldName())));
 
       // Perform the aggregation and add the IDs in the result set.
@@ -49,7 +49,7 @@ public class MongoCoreDao {
     });
   }
 
-  @Embedded
+  @Entity
   private static class DatasetIdWrapper {
 
     // Name depends on the mongo aggregations in which it is used.
