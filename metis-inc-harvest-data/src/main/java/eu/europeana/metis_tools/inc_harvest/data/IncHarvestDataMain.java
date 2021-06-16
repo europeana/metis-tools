@@ -169,7 +169,7 @@ public class IncHarvestDataMain {
     LOGGER.info("... Reading records from preview.");
     final AtomicInteger previewCounter = new AtomicInteger(0);
     mongoPreviewRecordDao.getAllRecordIds(datasetId).forEach(recordId -> {
-      if (previewCounter.incrementAndGet() % 1000 == 0) {
+      if (previewCounter.incrementAndGet() % 10000 == 0) {
         LOGGER.info("... ... {} records found.", previewCounter.get());
       }
       result.put(recordId, RecordPresence.PREVIEW);
@@ -179,7 +179,7 @@ public class IncHarvestDataMain {
     LOGGER.info("... Reading records from publish.");
     final AtomicInteger publishCounter = new AtomicInteger(0);
     mongoPublishRecordDao.getAllRecordIds(datasetId).forEach(recordId -> {
-      if (publishCounter.incrementAndGet() % 1000 == 0) {
+      if (publishCounter.incrementAndGet() % 10000 == 0) {
         LOGGER.info("... ... {} records found.", publishCounter.get());
       }
       result.merge(recordId, RecordPresence.PUBLISH, (v1, v2) -> RecordPresence.BOTH);
@@ -206,7 +206,7 @@ public class IncHarvestDataMain {
     records.forEach((recordId, presence) -> {
 
       // Counter
-      if (counter.incrementAndGet() % 1000 == 0) {
+      if (counter.incrementAndGet() % 100000 == 0) {
         LOGGER.info("... ... {} records written.", counter.get());
       }
 
