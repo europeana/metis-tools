@@ -1,0 +1,33 @@
+#Mongo metis-core
+mongo.core.hosts=
+mongo.core.port=
+mongo.core.authentication.db=
+mongo.core.username=
+mongo.core.password=
+mongo.core.enableSSL=
+mongo.core.db=
+mongo.core.application.name=
+
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo preview records
+mongo.preview.hosts=
+mongo.preview.port=
+mongo.preview.authentication.db=
+mongo.preview.username=
+mongo.preview.password=
+mongo.preview.enableSSL=false
+mongo.preview.db=
+mongo.preview.application.name=
+
+#Mongo published records
+mongo.publish.hosts=
+mongo.publish.port=
+mongo.publish.authentication.db=
+mongo.publish.username=
+mongo.publish.password=
+mongo.publish.enableSSL=false
+mongo.publish.db=
+mongo.publish.application.name=
