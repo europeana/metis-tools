@@ -42,7 +42,8 @@ public class RemovePluginsMain {
     REMOVE_FROM_DB, MARK_AS_DELETED
   }
 
-  private static final String FILE_FOR_PLUGIN_REMOVAL = "/home/jochen/Desktop/plugins_to_remove.csv";
+  private static final String FILE_FOR_PLUGIN_REMOVAL =
+          "/home/jochen/Desktop/cleanup/iterationX/plugins_to_remove.csv";
 
   /** NOTE: this mode should be set before running. */
   private static final Mode MODE = Mode.MARK_AS_DELETED;
@@ -173,10 +174,13 @@ public class RemovePluginsMain {
     // Test that if the plugin is not the last one, the next plugin has another source set (meaning
     // that it is not implicitly a successor of the plugin to be removed). Note: it is ok for there
     // to be an implicit successor if that successor is also marked as deleted.
+    // TODO this method does not take into account Link checking and the jumps that can happen. I.E.
+    // a plugin can be successor of two plugins earlier if the one in between is link checking.
     final int pluginIndex = IntStream.range(0, execution.getMetisPlugins().size())
         .filter(index -> execution.getMetisPlugins().get(index).getId().equals(plugin.getId()))
         .findFirst().orElseThrow(IllegalStateException::new);
-    if (pluginIndex != execution.getMetisPlugins().size() - 1) {
+    if (plugin.getPluginType() != PluginType.LINK_CHECKING
+            && pluginIndex != execution.getMetisPlugins().size() - 1) {
       final AbstractMetisPlugin nextPlugin = execution.getMetisPlugins().get(pluginIndex + 1);
       final boolean previousTimestampIsSetAndDifferent = nextPlugin.getPluginMetadata() != null
           && nextPlugin.getPluginMetadata().getRevisionTimestampPreviousPlugin() != null

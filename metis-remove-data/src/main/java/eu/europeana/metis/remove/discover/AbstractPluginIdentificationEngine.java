@@ -7,9 +7,10 @@ import java.util.List;
 
 public abstract class AbstractPluginIdentificationEngine {
 
-  private static final String FILE_FOR_PLUGIN_REMOVAL = "/home/jochen/Desktop/plugins_to_remove.csv";
-  private static final String FILE_FOR_REVISION_REMOVAL = "/home/jochen/Desktop/revisions_to_remove.csv";
-  private static final String FILE_FOR_TASK_REMOVAL = "/home/jochen/Desktop/tasks_to_remove.csv";
+  private static final String FOLDER_FOR_OUTPUT = "/home/jochen/Desktop/cleanup/iteration2/";
+  private static final String FILE_FOR_PLUGIN_REMOVAL = FOLDER_FOR_OUTPUT + "plugins_to_remove.csv";
+  private static final String FILE_FOR_REVISION_REMOVAL = FOLDER_FOR_OUTPUT + "revisions_to_remove.csv";
+  private static final String FILE_FOR_TASK_REMOVAL = FOLDER_FOR_OUTPUT + "tasks_to_remove.csv";
 
   protected void discoverPlugins() throws IOException, TrustStoreConfigurationException {
     try (final Application application = Application.initialize()) {
