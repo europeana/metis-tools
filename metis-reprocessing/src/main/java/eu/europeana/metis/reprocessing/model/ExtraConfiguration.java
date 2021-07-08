@@ -98,6 +98,7 @@ public class ExtraConfiguration extends BasicConfiguration {
     //Modify this method accordingly
     RDF computedRDF = rdf;
     try {
+      enrichmentWorker.cleanupPreviousEnrichmentEntities(rdf);
       computedRDF = enrichmentWorker.process(rdf, enrichmentWorker.getSupportedModes());
     } catch (EnrichmentException | DereferenceException e) {
       LOGGER.warn("Something went wrong during enrichment/dereference", e);

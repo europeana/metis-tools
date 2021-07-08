@@ -46,8 +46,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <version.metis>4-SNAPSHOT</version.metis>
-    <version.corelib>2.12.2-SNAPSHOT</version.corelib>
+    <version.metis>5-SNAPSHOT</version.metis>
+    <version.corelib>2.14.1-SNAPSHOT</version.corelib>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.30</version.slf4j>
     <version.log4j>2.13.3</version.log4j>

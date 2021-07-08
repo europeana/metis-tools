@@ -14,6 +14,7 @@ import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.EuropeanaAggregationImpl;
+import eu.europeana.corelib.solr.entity.OrganizationImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
@@ -131,6 +132,7 @@ public class MongoDestinationMongoDao {
     mapper.map(ProvidedCHOImpl.class);
     mapper.map(AgentImpl.class);
     mapper.map(AggregationImpl.class);
+    mapper.map(OrganizationImpl.class);
     mapper.map(ConceptImpl.class);
     mapper.map(ProxyImpl.class);
     mapper.map(PlaceImpl.class);
