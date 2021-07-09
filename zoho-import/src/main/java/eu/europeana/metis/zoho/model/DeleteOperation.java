@@ -1,21 +1,22 @@
 package eu.europeana.metis.zoho.model;
 
 import java.util.Date;
-import eu.europeana.corelib.solr.entity.Organization;
-import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
-import eu.europeana.enrichment.service.zoho.ZohoAccessService;
+
+import com.zoho.crm.api.record.Record;
+import eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity;
+import eu.europeana.metis.utils.Constants;
 
 public class DeleteOperation extends BaseOperation{
 
    String zohoId;
-   String edmOrganizationId;
+   String organizationId;
    Date modified;
   
   public DeleteOperation(String zohoId, Date modified){
     this.zohoId=zohoId;
     this.modified = modified;
-    this.edmOrganizationId = ZohoAccessService.URL_ORGANIZATION_PREFFIX + zohoId;
-    setAction(ACTION_DELETE);
+    this.organizationId = zohoId;
+    setAction(Constants.ACTION_DELETE);
   }
 
   public String getZohoId() {
@@ -23,8 +24,8 @@ public class DeleteOperation extends BaseOperation{
   }
 
   @Override
-  public String getEdmOrganizationId() {
-    return edmOrganizationId;
+  public String getOrganizationId() {
+    return organizationId;
   }
 
   @Override
@@ -33,19 +34,19 @@ public class DeleteOperation extends BaseOperation{
   }
 
   @Override
-  public ZohoOrganization getZohoOrganization() {
+  public OrganizationEnrichmentEntity getOrganisationEnrichmentEntity() {
     // Not used in delete operations
     return null;
   }
 
   @Override
-  public Organization getEdmOrganization() {
-    // Not used in delete operations
-    return null;
+  public void setOrganisationEnrichmentEntity(OrganizationEnrichmentEntity organizationEnrichmentEntity) {
+    // Not used in delete operation
   }
 
   @Override
-  public void setEdmOrganization(Organization edmOrganization) {
-    // Not used in delete operations   
+  public Record getZohoOrganization() {
+    // Not used in delete operations
+    return null;
   }
 }
