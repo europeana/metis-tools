@@ -1,39 +1,54 @@
 package eu.europeana.metis.zoho.model;
 
 import java.util.Date;
-import eu.europeana.corelib.solr.entity.Organization;
-import eu.europeana.enrichment.api.external.model.zoho.ZohoOrganization;
+
+import com.zoho.crm.api.record.Record;
+import eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity;
+import eu.europeana.metis.utils.Constants;
+import eu.europeana.metis.zoho.ZohoConstants;
+import eu.europeana.metis.zoho.ZohoUtils;
 
 public class UpdateOperation extends BaseOperation implements  Operation {
 
-  private ZohoOrganization zohoOrganization;
-  private Organization edmOrganization;
+  private Record zohoOrganization;
+  private OrganizationEnrichmentEntity organizationEnrichmentEntity;
 
   @Override
   public Date getModified() {
-    return getZohoOrganization().getModified();
+    return new Date(getZohoOrganization().getModifiedTime().toEpochSecond());
   }
 
-  public UpdateOperation(ZohoOrganization org) {
+  @Override
+  public OrganizationEnrichmentEntity getOrganisationEnrichmentEntity() {
+    return organizationEnrichmentEntity;
+  }
+
+  @Override
+  public void setOrganisationEnrichmentEntity(OrganizationEnrichmentEntity organizationEnrichmentEntity) {
+    this.organizationEnrichmentEntity = organizationEnrichmentEntity;
+  }
+
+  public UpdateOperation(Record org) {
     this.zohoOrganization = org;
-    setAction(ACTION_UPDATE); 
+    setAction(Constants.ACTION_UPDATE);
   }
 
   @Override
   public String getZohoId() {
-    return getZohoOrganization().getZohoId();
+    return Long.toString(getZohoOrganization().getId());
   }
 
   @Override
-  public String getEdmOrganizationId() {
-    return getEdmOrganization().getAbout();
+  public String getOrganizationId() {
+    return getOrganisationEnrichmentEntity().getAbout();
   }
-  
-  public ZohoOrganization getZohoOrganization() {
+
+  @Override
+  public Record getZohoOrganization() {
     return zohoOrganization;
   }
 
-  public void setZohoOrganization(ZohoOrganization zohoOrganization) {
+  public void setZohoOrganization(Record zohoOrganization) {
     this.zohoOrganization = zohoOrganization;
   }
 
@@ -48,16 +63,7 @@ public class UpdateOperation extends BaseOperation implements  Operation {
   }
 
   @Override
-  public Organization getEdmOrganization() {
-    return edmOrganization;
-  }
-
-  public void setEdmOrganization(Organization edmOrganization) {
-    this.edmOrganization = edmOrganization;
-  }
-  
-  @Override
   public String toString() {
-    return super.toString() + "; Acronym: " + getZohoOrganization().getAcronym();
+    return super.toString() + "; Acronym: " + ZohoUtils.stringFieldSupplier(getZohoOrganization().getKeyValue(ZohoConstants.ACRONYM_FIELD));
   }
 }

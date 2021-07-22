@@ -29,8 +29,8 @@ public abstract class BaseOperation implements Operation{
   @Override
   public String toString() {
     String serialization = "Action :" + getAction() + "; Zoho id: " + getZohoId();
-    if(getEdmOrganization() != null){
-      serialization+= "; EdmOrganizationId: " + getEdmOrganizationId();
+    if(getOrganisationEnrichmentEntity() != null){
+      serialization+= "; EdmOrganizationId: " + getOrganizationId();
     }
     return serialization;
   }
