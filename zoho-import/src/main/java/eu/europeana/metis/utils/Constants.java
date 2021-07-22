@@ -16,7 +16,9 @@ public final class Constants {
 
     // Converter Utils
     public static final String UNDEFINED_LANGUAGE_KEY = "def";
-    public static final int LANGUAGE_CODE_LENGTH = 2;
+    public static final int LANGUAGE_CODE_LENGTH = 5;
+    public static final int SAME_AS_CODE_LENGTH = 2;
+
 
     // TODO move to eu.europeana.metis.zoho.ZohoConstants
     public static final String URL_ORGANIZATION_PREFFIX = "http://data.europeana.eu/organization/";

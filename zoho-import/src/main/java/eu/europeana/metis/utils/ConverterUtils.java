@@ -51,7 +51,7 @@ public class ConverterUtils {
      * @return
      */
     public Map<String, String> createMap(String key, String value) {
-        return value == null ? null : Collections.singletonMap(key, value);
+        return (value == null || !value.isEmpty()) ? null : Collections.singletonMap(key, value);
     }
 
     /**

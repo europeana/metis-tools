@@ -7,8 +7,7 @@ import eu.europeana.metis.zoho.ZohoConstants;
 import eu.europeana.metis.zoho.ZohoUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static eu.europeana.metis.utils.ConverterUtils.toIsoLanguage;
 
@@ -37,8 +36,8 @@ public class OrganisationConverter {
         org.setDcIdentifier(this.getConverterUtils().createMapWithLists(Constants.UNDEFINED_LANGUAGE_KEY, Long.toString(record.getId())));
         String isoLanguage = toIsoLanguage(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.LANG_ORGANIZATION_NAME_FIELD)));
         org.setPrefLabel(this.getConverterUtils().createMapWithLists(isoLanguage, ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.ACCOUNT_NAME_FIELD))));
-        String isoLanguage1 = toIsoLanguage(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.LANG_ALTERNATIVE_FIELD)));
-        org.setAltLabel(this.getConverterUtils().createMapWithLists(isoLanguage1, ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.ALTERNATIVE_FIELD))));
+        // get all the alternatives labels
+        org.setAltLabel(getAllAltLabel(record));
 
         String acronym = ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.ACRONYM_FIELD));
         String langAcronym = ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.LANG_ACRONYM_FIELD));
@@ -55,10 +54,10 @@ public class OrganisationConverter {
         org.setEdmGeorgraphicLevel(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.GEOGRAPHIC_LEVEL_FIELD))));
         String organizationCountry = this.toEdmCountry(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.ORGANIZATION_COUNTRY_FIELD)));
         org.setEdmCountry(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), organizationCountry));
-        List<String> sameAs = ZohoUtils.stringListSupplier(record.getKeyValue(ZohoConstants.SAME_AS_FIELD));
+        // get all the same As values
+        List<String> sameAs = getAllSameAs(record);
         if (!sameAs.isEmpty()) {
             org.setOwlSameAs(sameAs);
-
         }
         Address address = new Address();
         address.setAbout(org.getAbout() + Constants.ADDRESS_ABOUT);
@@ -72,6 +71,43 @@ public class OrganisationConverter {
         return org;
     }
 
+    /**
+     * Collects all the sameAs values
+     * Fields : SameAs_1, SameAs_2
+     *
+     * @param record
+     * @return
+     */
+    private List<String> getAllSameAs(Record record) {
+        List<String> sameAsList = new ArrayList<>();
+        for(int i = 0; i < Constants.SAME_AS_CODE_LENGTH; i++) {
+            String sameAs = ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.SAME_AS_FIELD + "_" + i));
+            if (sameAs != null) {
+                sameAsList.add(sameAs);
+            }
+        }
+        return sameAsList;
+    }
+    /**
+     * Collects all the alternate labels values.
+     * Value of Fields: "Alternative_1", "Alternative_2", ... , "Alternative_5".
+     * lang value Fields: "Lang_Alternative_1", "Lang_Alternative_2", ... , "Lang_Alternative_5"
+     *
+     * @param record
+     * @return
+     */
+    private Map<String, List<String>> getAllAltLabel(Record record) {
+        Map<String, List<String>> altLabelMap = new HashMap<>();
+        for(int i = 0; i < Constants.LANGUAGE_CODE_LENGTH; i++) {
+            String label = ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.ALTERNATIVE_FIELD+ "_" + i));
+            if (label != null) {
+                String lang = ZohoConstants.LANG_ALTERNATIVE_FIELD + "_" + i;
+                String isoLanguage = toIsoLanguage(ZohoUtils.stringFieldSupplier(record.getKeyValue(lang)));
+                 altLabelMap.put(isoLanguage, Collections.singletonList(label));
+            }
+        }
+        return altLabelMap;
+    }
     /**
      * Returns the isoCode for the organizationCountry
      * @param organizationCountry
