@@ -229,7 +229,6 @@ public class ConverterUtils {
             }
 
             if (StringUtils.isEmpty(baseAddress.getVcardHasGeo())) {
-                System.out.println("here empty");
                 baseAddress.setVcardHasGeo(addAddress.getVcardHasGeo());
             }
 
