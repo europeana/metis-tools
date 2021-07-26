@@ -19,16 +19,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import eu.europeana.metis.utils.Constants;
 import eu.europeana.metis.zoho.exception.WikidataAccessException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CharSequenceReader;
 import org.apache.commons.io.output.StringBuilderWriter;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
-import org.apache.jena.vocabulary.OWL;
-import org.apache.jena.vocabulary.RDFS;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 /**
  * Wikidata Dao class
@@ -104,8 +104,50 @@ public class WikidataAccessDao {
     public StringBuilder getEntity(String uri) throws WikidataAccessException {
         StringBuilder res = new StringBuilder();
         StreamResult wikidataRes = new StreamResult(new StringBuilderWriter(res));
-        this.translate(uri, wikidataRes);
+        String entityResponse = getEntityFromURL(uri);
+        // transform the response
+        if(entityResponse != null) {
+            try (InputStream stream = new ByteArrayInputStream(entityResponse.getBytes(StandardCharsets.UTF_8))) {
+                this.transformer.setParameter("rdf_about", uri);
+                this.transformer.transform(new StreamSource(stream), wikidataRes);
+
+            } catch (TransformerException | IOException e) {
+                throw new WikidataAccessException("Error by transforming of Wikidata in RDF/XML.", e);
+            }
+        }
         return res;
+
+    }
+
+    /**
+     * Method to get the RDF/xml response from wikidata using entityId
+     * GET : <http://www.wikidata.org/entity/xyztesting>
+     *
+     * @param urlToRead
+     * @return
+     * @throws WikidataAccessException
+     */
+    public String getEntityFromURL(String urlToRead) throws WikidataAccessException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()){
+            HttpGet request = new HttpGet(urlToRead);
+            request.addHeader("Accept", "application/xml");
+            CloseableHttpResponse response = httpClient.execute(request);
+            try {
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    return null;
+                }
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    return EntityUtils.toString(entity);
+                }
+            } finally {
+                response.close();
+            }
+        } catch (IOException e) {
+            throw new WikidataAccessException("Error executing the request for uri "+urlToRead, e);
+        }
+        return null;
+
     }
 
     public WikidataOrganization parse(File xmlFile) throws JAXBException, IOException {
@@ -127,77 +169,10 @@ public class WikidataAccessDao {
         return (WikidataOrganization)unmarshaller.unmarshal(stream);
     }
 
-    private Resource getModelFromSPARQL(String uri) throws WikidataAccessException {
-        Resource resource = this.fetchFromSPARQL(uri);
-        if (!this.isDuplicate(resource)) {
-            return resource;
-        } else {
-            StmtIterator iter = resource.listProperties(OWL.sameAs);
-
-            try {
-                while(iter.hasNext()) {
-                    String sameAs = ((Statement)iter.next()).getResource().getURI();
-                    Resource r2 = this.fetchFromSPARQL(sameAs);
-                    if (!this.isDuplicate(r2)) {
-                        resource = r2;
-                        break;
-                    }
-                }
-            } finally {
-                iter.close();
-            }
-
-            return resource;
-        }
-    }
-
-    private boolean isDuplicate(Resource resource) {
-        return resource != null && resource.hasProperty(OWL.sameAs) && !resource.hasProperty(RDFS.label);
-    }
-
-    private Resource fetchFromSPARQL(String uri) throws WikidataAccessException {
-        String sDescribe = "DESCRIBE <" + uri + ">";
-        Model m = ModelFactory.createDefaultModel();
-        Resource var5;
-        try (QueryEngineHTTP endpoint = new QueryEngineHTTP(Constants.SPARQL, sDescribe)) {
-            var5 = endpoint.execDescribe(m).getResource(uri);
-        } catch (Exception var9) {
-            throw new WikidataAccessException("Cannot access wikidata resource: " + uri, var9);
-        }
-        return var5;
-    }
-
-    private synchronized void transform(Resource resource, StreamResult res) throws WikidataAccessException {
-        this.transformer.setParameter(Constants.RDF_ABOUT, resource.getURI());
-        StringBuilder sb = new StringBuilder(Constants.SIZE);
-        try (StringBuilderWriter sbw = new StringBuilderWriter(sb)){
-            Model model = ModelFactory.createDefaultModel();
-            RDFWriter writer = model.getWriter("RDF/XML");
-            writer.setProperty("tab", "0");
-            writer.setProperty("allowBadURIs", "true");
-            writer.setProperty("relativeURIs", "");
-            writer.write(model, sbw, "RDF/XML");
-            this.transformer.transform(new StreamSource(new CharSequenceReader(sb)), res);
-        } catch (TransformerException var26) {
-            throw new WikidataAccessException("Error by transforming of Wikidata in RDF/XML.", var26);
-        } finally {
-            sb.setLength(0);
-        }
-    }
-
     public WikidataOrganization parseWikidataOrganization(File inputFile) throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(new Class[]{WikidataOrganization.class});
         Unmarshaller unmarshaller = jc.createUnmarshaller();
         return (WikidataOrganization)unmarshaller.unmarshal(inputFile);
-    }
-
-    public void translate(String uri, StreamResult res) throws WikidataAccessException {
-        Resource wikidataResource = this.getModelFromSPARQL(uri);
-        if (wikidataResource != null && wikidataResource.getURI() != null) {
-            this.transform(wikidataResource, res);
-        } else {
-            throw new WikidataAccessException("Cannot access wikidata resource: " + uri, null);
-        }
     }
 
     @FunctionalInterface

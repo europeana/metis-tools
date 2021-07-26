@@ -44,7 +44,7 @@ public class OrganisationConverter {
         org.setEdmAcronym(this.getConverterUtils().createLanguageMapOfStringList(langAcronym, acronym));
         org.setFoafLogo(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.LOGO_LINK_TO_WIKIMEDIACOMMONS_FIELD)));
         org.setFoafHomepage(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.WEBSITE_FIELD)));
-        List<String> organizationRoleStringList = ZohoUtils.stringListSupplier(record.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
+        List<String> organizationRoleStringList = getZohoOrganisations(record);
         if (!organizationRoleStringList.isEmpty()) {
             org.setEdmEuropeanaRole(this.getConverterUtils().createLanguageMapOfStringList(Locale.ENGLISH.getLanguage(), organizationRoleStringList));
         }
@@ -128,5 +128,30 @@ public class OrganisationConverter {
 
             return isoCode;
         }
+    }
+
+    /**
+     * The method is to process the ORGANIZATION_ROLE_FIELD values
+     *
+     * ZOHO Bug: ORGANIZATION_ROLE_FIELD value is comma separated string but not List of strings.
+     * Hence ZohoUtils.stringFieldSupplier is used instead of ZohoUtils.stringListSupplier (as this return empty list all the time)
+     * Also the value is wrapped around [] brackets.
+     *
+     * @param recordOrganization
+     * @return
+     */
+    public List<String> getZohoOrganisations(Record recordOrganization) {
+        List<String> organisationRolesList = new ArrayList<>();
+        String zohoOrganizationRole = ZohoUtils.stringFieldSupplier(
+                recordOrganization.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
+        if (zohoOrganizationRole != null) {
+            // clean the string
+            zohoOrganizationRole = zohoOrganizationRole.replace("[", "").replace("]", "");
+            String [] orgRoles = zohoOrganizationRole.split(ZohoConstants.DELIMITER_COMMA);
+            for (int i = 0; i < orgRoles.length; i++) {
+                organisationRolesList.add(orgRoles[i].trim());
+            }
+        }
+        return organisationRolesList;
     }
 }

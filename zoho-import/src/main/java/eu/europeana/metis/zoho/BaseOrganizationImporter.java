@@ -63,6 +63,10 @@ public class BaseOrganizationImporter {
     return zohoAccessClient;
   }
 
+  public WikidataAccessService getWikidataAccessService() {
+    return wikidataAccessService;
+  }
+
   public ImportStatus getStatus() {
     return status;
   }
@@ -104,14 +108,13 @@ public class BaseOrganizationImporter {
     boolean res = false;
     if (searchCriteria == null || searchCriteria.isEmpty())
       return true;
-    // need to fix Zoho Bugg in API
     if (!searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD))
       return true;
-    List<String> organizationRoles = ZohoUtils.stringListSupplier(
-            recordOrganization.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
+    List<String> organizationRoles = getOrganisationConverter().getZohoOrganisations(recordOrganization);
     if (!organizationRoles.isEmpty()) {
       for (String organizationRole : organizationRoles) {
-        if (allowedRoles.contains(organizationRole)) {
+        if (allowedRoles.contains(organizationRole.trim())) {
+          LOGGER.info("Organisation has the required role : {}", organizationRole);
           res = true;
           break;
         }
@@ -125,6 +128,7 @@ public class BaseOrganizationImporter {
     String wikidataUri = getWikidataUri(operation.getOrganisationEnrichmentEntity());
     try {
       if (wikidataUri != null) {
+        LOGGER.info("Enriching with wikidata uri: {}", wikidataUri);
         wikidataOrg = wikidataAccessService.dereference(wikidataUri);
         wikidataAccessService.mergePropsFromWikidata(operation.getOrganisationEnrichmentEntity(), wikidataOrg);
       }
@@ -133,7 +137,7 @@ public class BaseOrganizationImporter {
     }
   }
 
-  private String getWikidataUri(OrganizationEnrichmentEntity organizationEnrichmentEntity) {
+  public String getWikidataUri(OrganizationEnrichmentEntity organizationEnrichmentEntity) {
     if (organizationEnrichmentEntity.getOwlSameAs() == null)
       return null;
 

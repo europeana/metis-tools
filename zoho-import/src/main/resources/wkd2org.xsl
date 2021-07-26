@@ -3,7 +3,7 @@
   Document   : wkd2org.xsl
   Author     : hmanguinhas
   Created on : March 17, 2018
-  Updated on : Jan 25, 2019
+  Updated on : March 17, 2018
 -->
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -33,28 +33,46 @@
     <xsl:param name="rdf_about"/>
     <xsl:param name="deref"    />
     <xsl:param name="address"  select="true()"/>
-    <xsl:param name="dbpedia"  />
 
-    <xsl:variable name="langs">bg,ca,cs,da,de,el,en,es,et,eu,fi,fr,ga,gd,he,hr,hu,ie,is,it,ka,lt,lv,mk,mt,mul,nl,no,pl,pt,ro,ru,sk,sl,sr,sv,tr,uk,yi,cy,sq,hy,az,be,bs,gl,ja,ar,ko,zh,hi</xsl:variable>
+    <xsl:variable name="namespace" select="'http://www.wikidata.org/prop/direct/'"/>
+    <xsl:variable name="wiki"      select="'https://en.wikipedia.org/wiki/'"/>
+    <xsl:variable name="dbp"       select="'http://dbpedia.org/resource/'"/>
+
+    <!-- Portal languages (27) -->
+    <xsl:variable name="langs">en,pl,de,nl,fr,it,da,sv,el,fi,hu,cs,sl,et,pt,es,lt,lv,bg,ro,sk,hr,ga,mt,no,ca,ru</xsl:variable>
+    <!--
+        <xsl:variable name="langs">bg,ca,cs,da,de,el,en,es,et,eu,fi,fr,ga,gd,he,hr,hu,ie,is,it,ka,lt,lv,mk,mt,mul,nl,no,pl,pt,ro,ru,sk,sl,sr,sv,tr,uk,yi,cy,sq,hy,az,be,bs,gl,ja,ar,ko,zh,hi</xsl:variable>
+     -->
+
+    <xsl:variable name="articles"
+                  select="/rdf:RDF/rdf:Description[rdf:type/@rdf:resource='http://schema.org/Article']"/>
 
     <xsl:template match="/">
         <xsl:apply-templates select="rdf:RDF"/>
     </xsl:template>
 
     <xsl:template match="rdf:RDF">
-        <rdf:RDF>
-            <xsl:choose>
-                <xsl:when test="$rdf_about">
-                    <xsl:apply-templates select="rdf:Description[@rdf:about=$rdf_about and rdfs:label]"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:apply-templates select="rdf:Description"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </rdf:RDF>
+
+        <xsl:variable name="props" select="rdf:Description[@rdf:about=$rdf_about]/*"/>
+
+        <xsl:if test="$props">
+            <xsl:variable name="entity">
+                <rdf:Description>
+                    <xsl:attribute name="rdf:about" select="$rdf_about"/>
+                    <xsl:copy-of select="$props"/>
+                </rdf:Description>
+            </xsl:variable>
+
+            <rdf:RDF>
+                <xsl:for-each select="$entity/rdf:Description">
+                    <xsl:call-template name="Entity"/>
+                </xsl:for-each>
+            </rdf:RDF>
+        </xsl:if>
+
     </xsl:template>
 
-    <xsl:template match="rdf:Description">
+    <xsl:template name="Entity">
         <xsl:variable name="wkdURI" select="string(@rdf:about)"/>
 
         <foaf:Organization>
@@ -67,17 +85,24 @@
                 </xsl:element>
             </xsl:for-each>
 
-            <xsl:for-each select="rdfs:label">
-                <xsl:call-template name="label">
-                    <xsl:with-param name="property" select="'skos:prefLabel'"/>
-                </xsl:call-template>
-            </xsl:for-each>
+            <!-- labels -->
+            <xsl:call-template name="labels">
+                <xsl:with-param name="alt" select="skos:altLabel"/>
+            </xsl:call-template>
 
-            <xsl:for-each select="skos:altLabel">
-                <xsl:call-template name="label">
-                    <xsl:with-param name="property" select="'skos:altLabel'"/>
-                </xsl:call-template>
-            </xsl:for-each>
+            <!--
+                        <xsl:for-each select="rdfs:label">
+                            <xsl:call-template name="label">
+                                <xsl:with-param name="property" select="'skos:prefLabel'"/>
+                            </xsl:call-template>
+                        </xsl:for-each>
+
+                        <xsl:for-each select="skos:altLabel">
+                            <xsl:call-template name="label">
+                                <xsl:with-param name="property" select="'skos:altLabel'"/>
+                            </xsl:call-template>
+                        </xsl:for-each>
+             -->
 
             <xsl:for-each select="schema:description">
                 <xsl:if test="contains($langs,@xml:lang)">
@@ -191,6 +216,10 @@
 
             <!-- Co-referencing -->
 
+            <xsl:call-template name="DBpedia">
+                <xsl:with-param name="uri" select="@rdf:about"/>
+            </xsl:call-template>
+
             <!-- ISNI -->
             <xsl:for-each select="wdt:P213">
                 <xsl:element name="owl:sameAs">
@@ -271,44 +300,31 @@
                 </xsl:element>
             </xsl:for-each>
 
-            <!-- DBpedia Language Editions -->
-
-            <xsl:if test="$dbpedia">
-                <xsl:for-each select="/rdf:RDF/rdf:Description[schema:about/@rdf:resource=$wkdURI]">
-                    <xsl:if test="fn:matches(@rdf:about, 'https:[/][/]([a-z-]+).wikipedia.org[/]wiki[/](.*)')">
-                        <xsl:variable name="suffix" select="substring-after(@rdf:about,'.wikipedia.org/wiki/')"/>
-                        <xsl:variable name="prefix" select="replace(replace(substring-before(@rdf:about,'wikipedia.org/wiki/'),'en.',''),'https','http')"/>
-                        <xsl:variable name="iri"    select="concat($prefix,'dbpedia.org/resource/',replace($suffix,'%20+','_'))"/>
-                        <xsl:element name="owl:sameAs">
-                            <xsl:attribute name="rdf:resource"><xsl:value-of select="$iri"/></xsl:attribute>
-                        </xsl:element>
-                    </xsl:if>
-                </xsl:for-each>
-            </xsl:if>
-
         </foaf:Organization>
 
     </xsl:template>
 
-    <xsl:template name="label">
-        <xsl:param name="property"/>
+    <!--
+        <xsl:template name="label">
+            <xsl:param name="property"/>
 
-        <xsl:choose>
-            <xsl:when test="not(contains($langs,@xml:lang))"/>
-            <xsl:when test="fn:matches(string(.),'^\s*([A-Z]+[.]*)+\s*$')">
-                <xsl:element name="edm:acronym">
-                    <xsl:copy-of select="@xml:lang"/>
-                    <xsl:value-of select="."/>
-                </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:element name="{$property}">
-                    <xsl:copy-of select="@xml:lang"/>
-                    <xsl:value-of select="."/>
-                </xsl:element>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
+            <xsl:choose>
+                <xsl:when test="not(contains($langs,@xml:lang))"/>
+                <xsl:when test="fn:matches(string(.),'^\s*([A-Z]+[.]*)+\s*$')">
+                    <xsl:element name="edm:acronym">
+                        <xsl:copy-of select="@xml:lang"/>
+                        <xsl:value-of select="."/>
+                    </xsl:element>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:element name="{$property}">
+                        <xsl:copy-of select="@xml:lang"/>
+                        <xsl:value-of select="."/>
+                    </xsl:element>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:template>
+     -->
 
     <!-- Geo Coordinates -->
 
@@ -339,8 +355,84 @@
         </xsl:choose>
     </xsl:function>
 
+    <!-- Labels -->
+
+    <xsl:template name="labels">
+        <xsl:param name="alt"/>
+
+        <xsl:variable name="labels"
+                      select="rdfs:label[lib:isAcceptableLang(@xml:lang)
+                                     and lib:isAcceptableLabel(text())]"/>
+
+        <xsl:for-each select="$labels">
+            <xsl:element name="skos:prefLabel">
+                <xsl:copy-of select="@xml:lang"/>
+                <xsl:value-of select="."/>
+            </xsl:element>
+        </xsl:for-each>
+
+        <xsl:for-each select="$alt">
+            <xsl:variable name="literal" select="text()"/>
+            <xsl:variable name="lang"    select="@xml:lang"/>
+            <xsl:if test="lib:isAcceptableLang($lang)
+                   and lib:isAcceptableLabel($literal)
+                   and not($labels[text()=$literal and @xml:lang=$lang])">
+                <xsl:call-template name="altLabel">
+                    <xsl:with-param name="lang"   select="@xml:lang"/>
+                    <xsl:with-param name="string" select="$literal"/>
+                </xsl:call-template>
+            </xsl:if>
+        </xsl:for-each>
+
+    </xsl:template>
+
+    <xsl:template name="altLabel">
+        <xsl:param name="string"/>
+        <xsl:param name="lang"/>
+
+        <xsl:choose>
+            <xsl:when test="fn:matches($string,'^\s*([A-Z]+[.]*)+\s*$')">
+                <xsl:element name="edm:acronym">
+                    <xsl:attribute name="xml:lang" select="$lang"/>
+                    <xsl:value-of select="$string"/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:element name="skos:altLabel">
+                    <xsl:attribute name="xml:lang" select="$lang"/>
+                    <xsl:value-of select="$string"/>
+                </xsl:element>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:function name="lib:isAcceptableLang" as="xs:boolean">
+        <xsl:param name="string"/>
+
+        <xsl:sequence select="$string!='' and contains($langs,lower-case($string))"/>
+    </xsl:function>
+
+    <xsl:function name="lib:isAcceptableLabel" as="xs:boolean">
+        <xsl:param name="string"/>
+
+        <xsl:sequence select="matches($string,'[\p{L}\p{N}]')"/>
+    </xsl:function>
 
     <!-- Utilities -->
+
+    <xsl:template name="DBpedia">
+        <xsl:param name="uri"/>
+
+        <xsl:for-each select="$articles[schema:about/@rdf:resource=$uri
+                                    and contains(@rdf:about,$wiki)]">
+            <xsl:element name="owl:sameAs">
+                <xsl:attribute name="rdf:resource">
+                    <xsl:value-of select="replace(@rdf:about,$wiki,$dbp)"/>
+                </xsl:attribute>
+            </xsl:element>
+        </xsl:for-each>
+
+    </xsl:template>
 
     <xsl:function name="lib:getLabel" as="xs:string">
         <xsl:param name="uri"/>

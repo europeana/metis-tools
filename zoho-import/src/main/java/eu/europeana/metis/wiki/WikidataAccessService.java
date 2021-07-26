@@ -54,7 +54,6 @@ public class WikidataAccessService {
     public Organization dereference(String wikidataUri) throws WikidataAccessException {
         StringBuilder wikidataXml = null;
         WikidataOrganization wikidataOrganization = null;
-
         try {
             wikidataXml = this.getWikidataAccessDao().getEntity(wikidataUri);
             wikidataOrganization = this.getWikidataAccessDao().parse(wikidataXml.toString());
@@ -157,13 +156,20 @@ public class WikidataAccessService {
 
     public void mergePropsFromWikidata(OrganizationEnrichmentEntity organizationEnrichmentEntity, Organization wikidataOrganization) {
         Map<String, List<String>> addToAltLabelMap = new HashMap();
-        Map<String, List<String>> newPrefLabelMap = this.getConverterUtils().mergeMapsWithSingletonLists(organizationEnrichmentEntity.getPrefLabel(), wikidataOrganization.getPrefLabel(), addToAltLabelMap);
-        organizationEnrichmentEntity.setPrefLabel(newPrefLabelMap);
-        Map<String, List<String>> allWikidataAltLabels = this.getConverterUtils().mergeMapsWithLists(wikidataOrganization.getAltLabel(), addToAltLabelMap);
-        Map<String, List<String>> mergedAltLabelMap = this.getConverterUtils().mergeMapsWithLists(allWikidataAltLabels, organizationEnrichmentEntity.getAltLabel());
-        organizationEnrichmentEntity.setAltLabel(mergedAltLabelMap);
-        Map<String, List<String>> acronyms = this.getConverterUtils().mergeMapsWithLists(organizationEnrichmentEntity.getEdmAcronym(), wikidataOrganization.getEdmAcronym());
-        organizationEnrichmentEntity.setEdmAcronym(acronyms);
+        if (wikidataOrganization.getPrefLabel() != null) {
+            Map<String, List<String>> newPrefLabelMap = this.getConverterUtils().mergeMapsWithSingletonLists(organizationEnrichmentEntity.getPrefLabel(), wikidataOrganization.getPrefLabel(), addToAltLabelMap);
+            organizationEnrichmentEntity.setPrefLabel(newPrefLabelMap);
+        }
+        if (wikidataOrganization.getAltLabel() != null) {
+            Map<String, List<String>> allWikidataAltLabels = this.getConverterUtils().mergeMapsWithLists(wikidataOrganization.getAltLabel(), addToAltLabelMap);
+            Map<String, List<String>> mergedAltLabelMap = this.getConverterUtils().mergeMapsWithLists(allWikidataAltLabels, organizationEnrichmentEntity.getAltLabel());
+            organizationEnrichmentEntity.setAltLabel(mergedAltLabelMap);
+        }
+
+        if (wikidataOrganization.getEdmAcronym() != null) {
+            Map<String, List<String>> acronyms = this.getConverterUtils().mergeMapsWithLists(organizationEnrichmentEntity.getEdmAcronym(), wikidataOrganization.getEdmAcronym());
+            organizationEnrichmentEntity.setEdmAcronym(acronyms);
+        }
         if (StringUtils.isEmpty(organizationEnrichmentEntity.getFoafLogo())) {
             organizationEnrichmentEntity.setFoafLogo(wikidataOrganization.getFoafLogo());
         }
