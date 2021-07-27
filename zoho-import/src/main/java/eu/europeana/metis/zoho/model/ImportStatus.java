@@ -6,6 +6,7 @@ public class ImportStatus {
   int deletedMetis = 0;
   int importedEntityApi = 0;
   int deletedEntityApi = 0;
+  int notAvailable = 0;
   UpdateOperation failedOperation;
 
   public int getImportedMetis() {
@@ -20,6 +21,10 @@ public class ImportStatus {
     return importedEntityApi;
   }
 
+	public int getNotAvailableInMetis() {
+		return notAvailable;
+	}
+  
   public int getDeletedEntityApi() {
     return deletedEntityApi;
   }
@@ -44,6 +49,10 @@ public class ImportStatus {
     deletedEntityApi++;
   }
 
+  public void incrementNotAvailableInMetis() {
+	  notAvailable++;
+  }
+  
   public UpdateOperation getFailedOperation() {
     return failedOperation;
   }
@@ -58,7 +67,7 @@ public class ImportStatus {
     builder.append("Imported in Metis: ").append(getImportedMetis())
         .append("; Imported in Entity Api: ").append(getImportedEntityApi())
         .append("; Deleted in Metis: ").append(getDeletedMetis())
-        .append("; Deleted in Entity Api: ").append(getDeletedEntityApi());
+        .append("; Not available in Metis (for deletion): ").append(getNotAvailableInMetis());
     if (getFailedOperation() != null)
       builder.append("\nFailed operation: ").append(getFailedOperation().toString());
     

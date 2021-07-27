@@ -178,6 +178,8 @@ public class BaseOrganizationImporter {
     Optional<OrganizationEnrichmentEntity> storedOrg = enrichmentService.getOrganizationByUri(Constants.URL_ORGANIZATION_PREFFIX + entityId);
     if (storedOrg.isEmpty()) {
       LOGGER.info("Cannot delete Organization, it was not found in Metis :{}", entityId);
+      // update import status
+      getStatus().incrementNotAvailableInMetis();
     } else {
       enrichmentService.deleteOrganization(entityId);
       LOGGER.info("Deleted Organization in Metis :{}", entityId);
