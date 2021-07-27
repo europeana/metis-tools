@@ -18,6 +18,8 @@ import eu.europeana.metis.utils.Constants;
 import eu.europeana.metis.utils.OrganisationConverter;
 import eu.europeana.metis.wiki.WikidataAccessDao;
 import eu.europeana.metis.wiki.WikidataAccessService;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -106,21 +108,23 @@ public class BaseOrganizationImporter {
    */
   public boolean hasRequiredRole(Record recordOrganization) {
     boolean res = false;
-    if (searchCriteria == null || searchCriteria.isEmpty())
-      return true;
-    if (!searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD))
-      return true;
     List<String> organizationRoles = getOrganisationConverter().getZohoOrganisations(recordOrganization);
-    if (!organizationRoles.isEmpty()) {
-      for (String organizationRole : organizationRoles) {
-        if (allowedRoles.contains(organizationRole.trim())) {
-          LOGGER.info("Organisation has the required role : {}", organizationRole);
-          res = true;
-          break;
-        }
-      }
-    }
-    return res;
+    
+	if (searchCriteria == null || searchCriteria.isEmpty()
+			|| !searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD)) {
+		// EA-2623 consider only collections that have a europeana role assigned
+		return CollectionUtils.isNotEmpty(organizationRoles);
+	} else if (!organizationRoles.isEmpty()) {
+		// check organization roles when a filter is used
+		for (String organizationRole : organizationRoles) {
+			if (allowedRoles.contains(organizationRole.trim())) {
+				LOGGER.info("Organisation has the required role : {}", organizationRole);
+				res = true;
+				break;
+			}
+		}
+	}
+	return res;
   }
 
   protected void enrichWithWikidata(Operation operation) {

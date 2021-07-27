@@ -141,17 +141,7 @@ public class OrganisationConverter {
      * @return
      */
     public List<String> getZohoOrganisations(Record recordOrganization) {
-        List<String> organisationRolesList = new ArrayList<>();
-        String zohoOrganizationRole = ZohoUtils.stringFieldSupplier(
+        return ZohoUtils.stringListSupplier(
                 recordOrganization.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
-        if (zohoOrganizationRole != null) {
-            // clean the string
-            zohoOrganizationRole = zohoOrganizationRole.replace("[", "").replace("]", "");
-            String [] orgRoles = zohoOrganizationRole.split(ZohoConstants.DELIMITER_COMMA);
-            for (int i = 0; i < orgRoles.length; i++) {
-                organisationRolesList.add(orgRoles[i].trim());
-            }
-        }
-        return organisationRolesList;
     }
 }

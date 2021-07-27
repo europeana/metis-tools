@@ -127,8 +127,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     List<Record> orgList ;
     SortedSet<Operation> operations;
 
-    int start = 1;
-    final int rows = 100;
+    int page = 1;
+    final int pageSize = 100;
     boolean hasNext = true;
     // Zoho doesn't return the number of organizations in get response.
     while (hasNext) {
@@ -139,21 +139,23 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       } else {
         OffsetDateTime offsetDateTime = modifiedSince.toInstant()
                 .atOffset(ZoneOffset.UTC);
-        orgList = zohoAccessClient.getZcrmRecordOrganizations(start, rows, offsetDateTime, searchCriteria, null);
-        LOGGER.info("Processing organizations set: {} - {}", start, (start+orgList.size()));
+        orgList = zohoAccessClient.getZcrmRecordOrganizations(page, pageSize, offsetDateTime, searchCriteria, null);
+        int start = (page-1)*pageSize;
+		int end = start+orgList.size();
+		LOGGER.info("Processing organizations set: {} - {}", start, end);
       }
       // collect operations to be run on Metis and Entity API
       operations = fillOperationsSet(orgList);
       // perform operations on all systems
       performOperations(operations);
 
-      if (orgList.size() < rows) {
+      if (orgList.size() < pageSize) {
         // last page: if no more organizations exist in Zoho
         // TODO: there is the "more_records":false flag in the zoho response, we should use it
         hasNext = false;
       } else {
         // go to next page
-        start += rows;
+        page++;
       }
     }
     // log status
