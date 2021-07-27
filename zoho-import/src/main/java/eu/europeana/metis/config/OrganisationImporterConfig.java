@@ -135,9 +135,9 @@ public class OrganisationImporterConfig {
 
     public String getSearchFilter() {
         String searchFilter = getProperty(PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE);
-        if(searchFilter.isEmpty()) {
-            throw new IllegalArgumentException(PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE + " can not be empty. Please provide a valid value.");
-        }
+//        if(searchFilter.isEmpty()) {
+//            throw new IllegalArgumentException(PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE + " can not be empty. Please provide a valid value.");
+//        }
         return searchFilter;
     }
 
