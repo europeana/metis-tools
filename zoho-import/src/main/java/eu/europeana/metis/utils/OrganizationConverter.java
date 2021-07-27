@@ -17,7 +17,7 @@ import static eu.europeana.metis.utils.ConverterUtils.toIsoLanguage;
  * @author Srishti Singh (srishti.singh@europeana.eu)
  * @since 2021-07-06
  */
-public class OrganisationConverter {
+public class OrganizationConverter {
 
     private ConverterUtils converterUtils = new ConverterUtils();
 
@@ -44,7 +44,7 @@ public class OrganisationConverter {
         org.setEdmAcronym(this.getConverterUtils().createLanguageMapOfStringList(langAcronym, acronym));
         org.setFoafLogo(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.LOGO_LINK_TO_WIKIMEDIACOMMONS_FIELD)));
         org.setFoafHomepage(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.WEBSITE_FIELD)));
-        List<String> organizationRoleStringList = getZohoOrganisations(record);
+        List<String> organizationRoleStringList = getOrganizationRole(record);
         if (!organizationRoleStringList.isEmpty()) {
             org.setEdmEuropeanaRole(this.getConverterUtils().createLanguageMapOfStringList(Locale.ENGLISH.getLanguage(), organizationRoleStringList));
         }
@@ -140,7 +140,7 @@ public class OrganisationConverter {
      * @param recordOrganization
      * @return
      */
-    public List<String> getZohoOrganisations(Record recordOrganization) {
+    public List<String> getOrganizationRole(Record recordOrganization) {
         return ZohoUtils.stringListSupplier(
                 recordOrganization.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
     }

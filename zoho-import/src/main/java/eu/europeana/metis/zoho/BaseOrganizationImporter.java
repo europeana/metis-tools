@@ -15,7 +15,7 @@ import eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity;
 import eu.europeana.enrichment.service.EnrichmentService;
 import eu.europeana.metis.config.OrganisationImporterConfig;
 import eu.europeana.metis.utils.Constants;
-import eu.europeana.metis.utils.OrganisationConverter;
+import eu.europeana.metis.utils.OrganizationConverter;
 import eu.europeana.metis.wiki.WikidataAccessDao;
 import eu.europeana.metis.wiki.WikidataAccessService;
 
@@ -44,12 +44,12 @@ public class BaseOrganizationImporter {
   WikidataAccessService wikidataAccessService;
   ImportStatus status = new ImportStatus();
   OrganisationImporterConfig organisationImporterConfig = new OrganisationImporterConfig();
-  private final OrganisationConverter organisationConverter = new OrganisationConverter();
+  private final OrganizationConverter organisationConverter = new OrganizationConverter();
   String searchFilter;
   Map<String, String> searchCriteria = new HashMap<>();
   Set<String> allowedRoles = new HashSet<>();
 
-  public OrganisationConverter getOrganisationConverter() {
+  public OrganizationConverter getOrganisationConverter() {
     return organisationConverter;
   }
 
@@ -108,7 +108,7 @@ public class BaseOrganizationImporter {
    */
   public boolean hasRequiredRole(Record recordOrganization) {
     boolean res = false;
-    List<String> organizationRoles = getOrganisationConverter().getZohoOrganisations(recordOrganization);
+    List<String> organizationRoles = getOrganisationConverter().getOrganizationRole(recordOrganization);
     
 	if (searchCriteria == null || searchCriteria.isEmpty()
 			|| !searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD)) {
