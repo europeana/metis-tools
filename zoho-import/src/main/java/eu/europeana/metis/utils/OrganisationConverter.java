@@ -44,7 +44,8 @@ public class OrganisationConverter {
         org.setEdmAcronym(this.getConverterUtils().createLanguageMapOfStringList(langAcronym, acronym));
         org.setFoafLogo(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.LOGO_LINK_TO_WIKIMEDIACOMMONS_FIELD)));
         org.setFoafHomepage(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.WEBSITE_FIELD)));
-        List<String> organizationRoleStringList = getZohoOrganisations(record);
+        List<String> organizationRoleStringList = ZohoUtils.stringListSupplier(record.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
+
         if (!organizationRoleStringList.isEmpty()) {
             org.setEdmEuropeanaRole(this.getConverterUtils().createLanguageMapOfStringList(Locale.ENGLISH.getLanguage(), organizationRoleStringList));
         }
