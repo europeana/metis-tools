@@ -110,7 +110,8 @@ public class BaseOrganizationImporter {
       return true;
     if (!searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD))
       return true;
-    List<String> organizationRoles = getOrganisationConverter().getZohoOrganisations(recordOrganization);
+    List<String> organizationRoles = ZohoUtils.stringListSupplier(
+            recordOrganization.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
     if (!organizationRoles.isEmpty()) {
       for (String organizationRole : organizationRoles) {
         if (allowedRoles.contains(organizationRole.trim())) {
