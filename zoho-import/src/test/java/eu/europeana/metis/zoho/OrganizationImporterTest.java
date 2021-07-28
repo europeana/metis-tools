@@ -24,30 +24,30 @@ public class OrganizationImporterTest extends BaseImporterTest {
 
   @Test
   public void testUpdateInMetis() throws Exception{
-    List<Record> org = importer.getOneOrganizationAsList(BNF_ENTITY_ID_URI_1);
+    List<Record> org = importer.getOneOrganizationAsList(BNF_ENTITY_URI);
     UpdateOperation operation = new UpdateOperation(org.get(0));
     importer.convertToEnrichmentOrganization(operation);
     importer.enrichWithWikidata(operation);
     importer.updateInMetis(operation);
-    Optional<OrganizationEnrichmentEntity> organisation = importer.getEnrichmentService().getOrganizationByUri(BNF_ENTITY_ID_URI_1);
+    Optional<OrganizationEnrichmentEntity> organisation = importer.getEnrichmentService().getOrganizationByUri(BNF_ENTITY_URI);
     assertTrue(organisation.isPresent());
 
     // delete the organisation
-    importer.getEnrichmentService().deleteOrganization(BNF_ENTITY_ID_URI_1);
+    importer.getEnrichmentService().deleteOrganization(BNF_ENTITY_URI);
   }
 
   @Test
   public void testRunIndividualReimport() throws Exception {
     // will run the importer for criteria roles
-    OrganizationImporter.main(new String[]{"individual", BNF_ENTITY_ID_URI_2});
-    Optional<OrganizationEnrichmentEntity> org = importer.getEnrichmentService().getOrganizationByUri(BNF_ENTITY_ID_URI_2);
+    OrganizationImporter.main(new String[]{"individual", SAS_ENTITY_URI});
+    Optional<OrganizationEnrichmentEntity> org = importer.getEnrichmentService().getOrganizationByUri(SAS_ENTITY_URI);
 
     assertTrue(org.isPresent());
-    assertEquals(BNF_ENTITY_ID_URI_2, org.get().getAbout());
-    assertEquals(BNF_ENTITY_ID_2, org.get().getDcIdentifier().get(Constants.UNDEFINED_LANGUAGE_KEY).get(0));
+    assertEquals(SAS_ENTITY_URI, org.get().getAbout());
+    assertEquals(SSA_ENTITY_ID, org.get().getDcIdentifier().get(Constants.UNDEFINED_LANGUAGE_KEY).get(0));
 
     // delete the organisation
-    importer.getEnrichmentService().deleteOrganization(BNF_ENTITY_ID_URI_2);
+    importer.getEnrichmentService().deleteOrganization(SAS_ENTITY_URI);
   }
 
 }
