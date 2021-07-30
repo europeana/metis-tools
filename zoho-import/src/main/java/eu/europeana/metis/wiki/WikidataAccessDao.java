@@ -138,7 +138,9 @@ public class WikidataAccessDao {
                 }
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
-                    return EntityUtils.toString(entity);
+                	//just for debugging purposes
+//                	System.out.println(EntityUtils.toString(entity));
+                	return EntityUtils.toString(entity);
                 }
             } finally {
                 response.close();
@@ -159,6 +161,7 @@ public class WikidataAccessDao {
         StringWriter writer = new StringWriter();
         IOUtils.copy(xmlStream, writer, StandardCharsets.UTF_8);
         String wikidataXml = writer.toString();
+        System.out.println(wikidataXml);
         return this.parse(wikidataXml);
     }
 

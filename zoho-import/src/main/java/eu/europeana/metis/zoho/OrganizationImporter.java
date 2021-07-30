@@ -2,16 +2,24 @@ package eu.europeana.metis.zoho;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.gson.Gson;
 import com.zoho.crm.api.record.DeletedRecord;
 import com.zoho.crm.api.record.Record;
-import org.apache.commons.lang3.StringUtils;
+
+import eu.europeana.metis.utils.Constants;
 import eu.europeana.metis.zoho.exception.OrganizationImportException;
 import eu.europeana.metis.zoho.model.DeleteOperation;
 import eu.europeana.metis.zoho.model.Operation;
 import eu.europeana.metis.zoho.model.UpdateOperation;
-import eu.europeana.metis.utils.Constants;
 
 /**
  * This class performs the import of organizations from Zoho to Metis. The import type is mandatory
@@ -127,8 +135,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     List<Record> orgList ;
     SortedSet<Operation> operations;
 
-    int start = 1;
-    final int rows = 100;
+    int page = 1;
+    final int pageSize = 100;
     boolean hasNext = true;
     // Zoho doesn't return the number of organizations in get response.
     while (hasNext) {
@@ -139,21 +147,23 @@ public class OrganizationImporter extends BaseOrganizationImporter {
       } else {
         OffsetDateTime offsetDateTime = modifiedSince.toInstant()
                 .atOffset(ZoneOffset.UTC);
-        orgList = zohoAccessClient.getZcrmRecordOrganizations(start, rows, offsetDateTime, searchCriteria, null);
-        LOGGER.info("Processing organizations set: {} - {}", start, (start+orgList.size()));
+        orgList = zohoAccessClient.getZcrmRecordOrganizations(page, pageSize, offsetDateTime, searchCriteria, null);
+        int start = (page-1)*pageSize;
+		int end = start+orgList.size();
+		LOGGER.info("Processing organizations set: {} - {}", start, end);
       }
       // collect operations to be run on Metis and Entity API
       operations = fillOperationsSet(orgList);
       // perform operations on all systems
       performOperations(operations);
 
-      if (orgList.size() < rows) {
+      if (orgList.size() < pageSize) {
         // last page: if no more organizations exist in Zoho
         // TODO: there is the "more_records":false flag in the zoho response, we should use it
         hasNext = false;
       } else {
         // go to next page
-        start += rows;
+        page++;
       }
     }
     // log status
@@ -178,6 +188,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     if (organisation.isEmpty()) {
       throw new ZohoException("There is no zoho Organisation with id "+ zohoId);
     }
+    //use for debugging purposes
+//    System.out.println((new Gson()).toJson(organisation));
     res.add(organisation.get());
     return res;
   }

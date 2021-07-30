@@ -72,47 +72,47 @@ public class WikidataAccessService {
     public Organization toOrganizationImpl(WikidataOrganization wikidataOrganization) {
         OrganizationImpl org = new OrganizationImpl();
         eu.europeana.enrichment.api.external.model.Organization edmOrganization = wikidataOrganization.getOrganization();
-        String logo;
+        String propValue;
         if (edmOrganization.getAbout() != null) {
-            logo = edmOrganization.getAbout();
-            if (StringUtils.isNotEmpty(logo)) {
-                org.setAbout(logo);
+            propValue = edmOrganization.getAbout();
+            if (StringUtils.isNotEmpty(propValue)) {
+                org.setAbout(propValue);
             }
         }
 
         if (edmOrganization.getCountry() != null) {
-            logo = edmOrganization.getCountry();
-            org.setEdmCountry(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), logo));
+            propValue = edmOrganization.getCountry();
+            org.setEdmCountry(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), propValue));
         }
 
         if (edmOrganization.getHomepage() != null) {
-            logo = edmOrganization.getHomepage().getResource();
-            org.setFoafHomepage(logo);
+            propValue = edmOrganization.getHomepage().getResource();
+            org.setFoafHomepage(propValue);
         }
 
         if (edmOrganization.getLogo() != null) {
-            logo = edmOrganization.getLogo().getResource();
-            org.setFoafLogo(logo);
+            propValue = edmOrganization.getLogo().getResource();
+            org.setFoafLogo(propValue);
         }
 
         if (edmOrganization.getDepiction() != null) {
-            logo = edmOrganization.getDepiction().getResource();
-            org.setFoafDepiction(logo);
+            propValue = edmOrganization.getDepiction().getResource();
+            org.setFoafDepiction(propValue);
         }
 
         if (edmOrganization.getMbox() != null) {
-            logo = edmOrganization.getMbox();
-            org.setFoafMbox(this.getConverterUtils().createList(logo));
+            propValue = edmOrganization.getMbox();
+            org.setFoafMbox(this.getConverterUtils().createList(propValue));
         }
 
         if (edmOrganization.getPhone() != null) {
-            logo = edmOrganization.getPhone();
-            org.setFoafPhone(this.getConverterUtils().createList(logo));
+            propValue = edmOrganization.getPhone();
+            org.setFoafPhone(this.getConverterUtils().createList(propValue));
         }
 
         if (edmOrganization.getLogo() != null) {
-            logo = edmOrganization.getLogo().getResource();
-            org.setFoafLogo(logo);
+            propValue = edmOrganization.getLogo().getResource();
+            org.setFoafLogo(propValue);
         }
 
         List<Label> acronymLabel = edmOrganization.getAcronyms();

@@ -15,9 +15,11 @@ import eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity;
 import eu.europeana.enrichment.service.EnrichmentService;
 import eu.europeana.metis.config.OrganisationImporterConfig;
 import eu.europeana.metis.utils.Constants;
-import eu.europeana.metis.utils.OrganisationConverter;
+import eu.europeana.metis.utils.OrganizationConverter;
 import eu.europeana.metis.wiki.WikidataAccessDao;
 import eu.europeana.metis.wiki.WikidataAccessService;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,12 +44,12 @@ public class BaseOrganizationImporter {
   WikidataAccessService wikidataAccessService;
   ImportStatus status = new ImportStatus();
   OrganisationImporterConfig organisationImporterConfig = new OrganisationImporterConfig();
-  private final OrganisationConverter organisationConverter = new OrganisationConverter();
+  private final OrganizationConverter organisationConverter = new OrganizationConverter();
   String searchFilter;
   Map<String, String> searchCriteria = new HashMap<>();
   Set<String> allowedRoles = new HashSet<>();
 
-  public OrganisationConverter getOrganisationConverter() {
+  public OrganizationConverter getOrganisationConverter() {
     return organisationConverter;
   }
 
@@ -106,22 +108,23 @@ public class BaseOrganizationImporter {
    */
   public boolean hasRequiredRole(Record recordOrganization) {
     boolean res = false;
-    if (searchCriteria == null || searchCriteria.isEmpty())
-      return true;
-    if (!searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD))
-      return true;
-    List<String> organizationRoles = ZohoUtils.stringListSupplier(
-            recordOrganization.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
-    if (!organizationRoles.isEmpty()) {
-      for (String organizationRole : organizationRoles) {
-        if (allowedRoles.contains(organizationRole.trim())) {
-          LOGGER.info("Organisation has the required role : {}", organizationRole);
-          res = true;
-          break;
-        }
-      }
-    }
-    return res;
+    List<String> organizationRoles = getOrganisationConverter().getOrganizationRole(recordOrganization);
+    
+	if (searchCriteria == null || searchCriteria.isEmpty()
+			|| !searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD)) {
+		// EA-2623 consider only collections that have a europeana role assigned
+		return CollectionUtils.isNotEmpty(organizationRoles);
+	} else if (!organizationRoles.isEmpty()) {
+		// check organization roles when a filter is used
+		for (String organizationRole : organizationRoles) {
+			if (allowedRoles.contains(organizationRole.trim())) {
+				LOGGER.info("Organisation has the required role : {}", organizationRole);
+				res = true;
+				break;
+			}
+		}
+	}
+	return res;
   }
 
   protected void enrichWithWikidata(Operation operation) {
@@ -175,6 +178,8 @@ public class BaseOrganizationImporter {
     Optional<OrganizationEnrichmentEntity> storedOrg = enrichmentService.getOrganizationByUri(Constants.URL_ORGANIZATION_PREFFIX + entityId);
     if (storedOrg.isEmpty()) {
       LOGGER.info("Cannot delete Organization, it was not found in Metis :{}", entityId);
+      // update import status
+      getStatus().incrementNotAvailableInMetis();
     } else {
       enrichmentService.deleteOrganization(entityId);
       LOGGER.info("Deleted Organization in Metis :{}", entityId);
@@ -198,7 +203,8 @@ public class BaseOrganizationImporter {
    */
   protected void updateInMetis(Operation operation) {
     enrichmentService.saveOrganization(operation.getOrganisationEnrichmentEntity(),
-        new Date(operation.getZohoOrganization().getCreatedTime().toEpochSecond()), operation.getModified());
+        new Date(operation.getZohoOrganization().getCreatedTime().toInstant().toEpochMilli()),
+        new Date(operation.getZohoOrganization().getModifiedTime().toInstant().toEpochMilli()));
     LOGGER.info("Organization saved in Metis :{}", operation.getOrganisationEnrichmentEntity().getAbout());
 
     //NOTE: at this point we could differentiate between create and update if needed

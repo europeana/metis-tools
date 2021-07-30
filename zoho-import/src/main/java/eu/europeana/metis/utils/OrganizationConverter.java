@@ -17,7 +17,7 @@ import static eu.europeana.metis.utils.ConverterUtils.toIsoLanguage;
  * @author Srishti Singh (srishti.singh@europeana.eu)
  * @since 2021-07-06
  */
-public class OrganisationConverter {
+public class OrganizationConverter {
 
     private ConverterUtils converterUtils = new ConverterUtils();
 
@@ -44,15 +44,19 @@ public class OrganisationConverter {
         org.setEdmAcronym(this.getConverterUtils().createLanguageMapOfStringList(langAcronym, acronym));
         org.setFoafLogo(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.LOGO_LINK_TO_WIKIMEDIACOMMONS_FIELD)));
         org.setFoafHomepage(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.WEBSITE_FIELD)));
-        List<String> organizationRoleStringList = ZohoUtils.stringListSupplier(record.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
-
+        List<String> organizationRoleStringList = getOrganizationRole(record);
         if (!organizationRoleStringList.isEmpty()) {
             org.setEdmEuropeanaRole(this.getConverterUtils().createLanguageMapOfStringList(Locale.ENGLISH.getLanguage(), organizationRoleStringList));
         }
-        org.setEdmOrganizationDomain(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.DOMAIN_FIELD))));
-        org.setEdmOrganizationSector(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.SECTOR_FIELD))));
+        String domain = ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.DOMAIN_FIELD));
+		org.setEdmOrganizationDomain(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), domain));
+        String sector = ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.SECTOR_FIELD));
+		org.setEdmOrganizationSector(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), sector));
         org.setEdmOrganizationScope(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.SCOPE_FIELD))));
-        org.setEdmGeorgraphicLevel(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.GEOGRAPHIC_LEVEL_FIELD))));
+        List<String> geographicLevel = ZohoUtils.stringListSupplier(record.getKeyValue(ZohoConstants.GEOGRAPHIC_LEVEL_FIELD));
+        if(!geographicLevel.isEmpty()) {
+        	org.setEdmGeorgraphicLevel(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), geographicLevel.get(0)));
+        }
         String organizationCountry = this.toEdmCountry(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.ORGANIZATION_COUNTRY_FIELD)));
         org.setEdmCountry(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), organizationCountry));
         // get all the same As values
@@ -141,18 +145,8 @@ public class OrganisationConverter {
      * @param recordOrganization
      * @return
      */
-    public List<String> getZohoOrganisations(Record recordOrganization) {
-        List<String> organisationRolesList = new ArrayList<>();
-        String zohoOrganizationRole = ZohoUtils.stringFieldSupplier(
+    public List<String> getOrganizationRole(Record recordOrganization) {
+        return ZohoUtils.stringListSupplier(
                 recordOrganization.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
-        if (zohoOrganizationRole != null) {
-            // clean the string
-            zohoOrganizationRole = zohoOrganizationRole.replace("[", "").replace("]", "");
-            String [] orgRoles = zohoOrganizationRole.split(ZohoConstants.DELIMITER_COMMA);
-            for (int i = 0; i < orgRoles.length; i++) {
-                organisationRolesList.add(orgRoles[i].trim());
-            }
-        }
-        return organisationRolesList;
     }
 }

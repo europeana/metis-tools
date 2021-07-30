@@ -1,0 +1,276 @@
+/* 1 */
+{
+    "_id" : ObjectId("61003fec5a75961d9c99182b"),
+    "className" : "eu.europeana.enrichment.internal.model.EnrichmentTerm",
+    "created" : ISODate("2016-12-22T13:24:44.000Z"),
+    "updated" : ISODate("2021-03-24T20:05:57.000Z"),
+    "entityType" : "ORGANIZATION",
+    "enrichmentEntity" : {
+        "className" : "eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity",
+        "dcIdentifier" : {
+            "def" : [ 
+                "1482250000002112001"
+            ]
+        },
+        "dcDescription" : {
+            "cs" : "knihovna ve Francii",
+            "de" : "französische Nationalbibliothek in Paris",
+            "sv" : "Frankrikes nationalbibliotek",
+            "fi" : "Ranskan keskuskirjasto",
+            "en" : "National Library of France",
+            "lv" : "bibliotēka Francijā, Parīzē",
+            "it" : "biblioteca francese",
+            "fr" : "bibliothèque nationale",
+            "pl" : "francuska biblioteka narodowa (siedziba: Paryż)",
+            "nl" : "nationale bibliotheek in Parijs",
+            "es" : "biblioteca nacional",
+            "ca" : "Biblioteca de París, França"
+        },
+        "edmAcronym" : {
+            "fr" : [ 
+                "BnF", 
+                "BNF"
+            ],
+            "en" : [ 
+                "BNF"
+            ],
+            "it" : [ 
+                "BNF"
+            ]
+        },
+        "foafLogo" : "http://commons.wikimedia.org/wiki/Special:FilePath/Logo_BnF.svg",
+        "foafHomepage" : "http://www.bnf.fr",
+        "edmEuropeanaRole" : {
+            "en" : [ 
+                "Data Provider", 
+                "Provider"
+            ]
+        },
+        "edmOrganizationSector" : {
+            "en" : "Cultural Heritage"
+        },
+        "edmGeographicLevel" : {
+            "en" : "National"
+        },
+        "edmCountry" : {
+            "en" : "FR"
+        },
+        "address" : {
+            "className" : "eu.europeana.enrichment.internal.model.Address",
+            "about" : "http://data.europeana.eu/organization/1482250000002112001#address",
+            "vcardStreetAddress" : "Quai François Mauriac",
+            "vcardLocality" : "Paris",
+            "vcardPostalCode" : "75706",
+            "vcardCountryName" : "France",
+            "vcardPostOfficeBox" : "Paris Cedex 13",
+            "vcardHasGeo" : "geo:48.833611111111,2.3758333333333"
+        },
+        "about" : "http://data.europeana.eu/organization/1482250000002112001",
+        "prefLabel" : {
+            "de" : [ 
+                "Bibliothèque nationale de France"
+            ],
+            "sv" : [ 
+                "Bibliothèque nationale de France"
+            ],
+            "ru" : [ 
+                "Национальная библиотека Франции"
+            ],
+            "fi" : [ 
+                "Ranskan kansalliskirjasto"
+            ],
+            "pt" : [ 
+                "Biblioteca Nacional da França"
+            ],
+            "bg" : [ 
+                "Национална библиотека на Франция"
+            ],
+            "el" : [ 
+                "Εθνική Βιβλιοθήκη της Γαλλίας"
+            ],
+            "en" : [ 
+                "National Library of France"
+            ],
+            "hr" : [ 
+                "Nacionalna knjižnica Francuske"
+            ],
+            "lv" : [ 
+                "Francijas Nacionālā bibliotēka"
+            ],
+            "it" : [ 
+                "Bibliothèque nationale de France"
+            ],
+            "fr" : [ 
+                "Bibliothèque nationale de France"
+            ],
+            "hu" : [ 
+                "Francia Nemzeti Könyvtár"
+            ],
+            "es" : [ 
+                "Biblioteca Nacional de Francia"
+            ],
+            "cs" : [ 
+                "Francouzská národní knihovna"
+            ],
+            "sk" : [ 
+                "Bibliothèque nationale de France"
+            ],
+            "sl" : [ 
+                "Francoska narodna knjižnica"
+            ],
+            "ga" : [ 
+                "Leabharlann Náisiúnta na Fraince"
+            ],
+            "pl" : [ 
+                "Francuska Biblioteka Narodowa"
+            ],
+            "da" : [ 
+                "Bibliothèque nationale de France"
+            ],
+            "ro" : [ 
+                "Bibliothèque nationale de France"
+            ],
+            "nl" : [ 
+                "Bibliothèque nationale de France"
+            ],
+            "ca" : [ 
+                "Biblioteca Nacional de França"
+            ]
+        },
+        "altLabel" : {
+            "de" : [ 
+                "Bibliothèque de l'Arsenal", 
+                "BnF", 
+                "Französische Nationalbibliothek"
+            ],
+            "sv" : [ 
+                "Bibliothèque nationale", 
+                "Nationalbiblioteket", 
+                "Frankrikes nationalbibliotek", 
+                "BnF"
+            ],
+            "ru" : [ 
+                "Королевская библиотека Франции", 
+                "Библиотека Парижа", 
+                "Французская национальная библиотека", 
+                "Парижская библиотека", 
+                "Парижская национальная библиотека"
+            ],
+            "fi" : [ 
+                "BnF", 
+                "Bibliothèque nationale de France"
+            ],
+            "pt" : [ 
+                "Gallica", 
+                "BnF", 
+                "Bibliothèque Nationale de France", 
+                "Biblioteca Nacional de França", 
+                "Bibliothèque Nationale", 
+                "Biblioteca Nacional de Paris"
+            ],
+            "bg" : [ 
+                "Национална библиотека „Франсоа Митеран“"
+            ],
+            "en" : [ 
+                "National library of France", 
+                "National Library of France", 
+                "Bibliotheque nationale de France", 
+                "BnF", 
+                "Bibliothèque nationale de France"
+            ],
+            "hr" : [ 
+                "BnF"
+            ],
+            "lv" : [ 
+                "Francijas nacionālā bibliotēka", 
+                "Bibliothèque nationale de France", 
+                "BnF"
+            ],
+            "it" : [ 
+                "Biblioteca Nazionale di Francia", 
+                "Bibliothèque National", 
+                "Bibliothèque nationale", 
+                "Biblioteca nazionale di Parigi", 
+                "Bibliothèque Nationale di Parigi", 
+                "Biblioteca nazionale francese"
+            ],
+            "fr" : [ 
+                "Très Grande Bibliothèque", 
+                "Bibliothèque Nationale de Paris", 
+                "BnF", 
+                "Bibliothèque nationale de France", 
+                "Bibliothèque de France", 
+                "Bibliothèque royale"
+            ],
+            "hu" : [ 
+                "BnF"
+            ],
+            "es" : [ 
+                "Bibliotheque Nationale", 
+                "BnF", 
+                "Bibliotheque Nationale de France", 
+                "Bibliothèque Nationale de France", 
+                "Biblioteca Nacional de París", 
+                "Bibliothèque nationale", 
+                "Biblioteca Nacional de Paris"
+            ],
+            "cs" : [ 
+                "Bibliotheque François Mitterrand", 
+                "Bibliothèque nationale de France", 
+                "Bibliotheque nationale de France", 
+                "Bibliothéque nationale de France"
+            ],
+            "sk" : [ 
+                "Francúzska národná knižnica", 
+                "BnF"
+            ],
+            "sl" : [ 
+                "BnF"
+            ],
+            "ga" : [ 
+                "BnF"
+            ],
+            "pl" : [ 
+                "BnF", 
+                "Bibliothèque nationale de France"
+            ],
+            "ro" : [ 
+                "BnF"
+            ],
+            "da" : [ 
+                "BnF"
+            ],
+            "nl" : [ 
+                "Bibliothèque François Mitterrand", 
+                "Bibliotheque Francois Mitterrand", 
+                "Bibliotheque Nationale", 
+                "Bibliotheque nationale de France", 
+                "Bibliothèque nationale", 
+                "Nationale Bibliotheek van Frankrijk", 
+                "BnF"
+            ],
+            "ca" : [ 
+                "Bibliothèque Nationale de France", 
+                "Biblioteca Nacional de París", 
+                "Biblioteca Nacional de Paris"
+            ]
+        },
+        "owlSameAs" : [ 
+            "http://www.wikidata.org/entity/Q193563", 
+            "http://dbpedia.org/resource/Biblioth%C3%A8que_nationale_de_France", 
+            "http://isni.org/isni/0000000123531945", 
+            "http://isni.org/isni/0000000123532569", 
+            "http://viaf.org/viaf/137156173", 
+            "https://www.freebase.com/m/01cb6r", 
+            "https://g.co/kg/m/01cb6r", 
+            "http://d-nb.info/gnd/5156217-0", 
+            "http://data.bnf.fr/ark:/12148/cb12381002j", 
+            "http://id.loc.gov/authorities/names/no95028191", 
+            "http://vocab.getty.edu/ulan/500309981", 
+            "http://sws.geonames.org/6452876/", 
+            "http://babelnet.org/rdf/s01268347n", 
+            "http://datos.bne.es/resource/XX179415"
+        ],
+        "foafDepiction" : "http://commons.wikimedia.org/wiki/Special:FilePath/Biblioth%C3%A8que%20nationale%20de%20France%20%28site%20Richelieu%29%2C%20Paris%20-%20Salle%20Ovale.jpg"
+    }
+}

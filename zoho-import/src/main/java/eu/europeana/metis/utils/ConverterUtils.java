@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import eu.europeana.enrichment.internal.model.Address;
 import eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity;
+import io.github.classgraph.AnnotationParameterValueList;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -51,7 +53,7 @@ public class ConverterUtils {
      * @return
      */
     public Map<String, String> createMap(String key, String value) {
-        return (value == null || !value.isEmpty()) ? null : Collections.singletonMap(key, value);
+        return StringUtils.isBlank(value) ? null : Collections.singletonMap(key, value);
     }
 
     /**
@@ -71,8 +73,16 @@ public class ConverterUtils {
     public Map<String, List<String>> createMapWithListsFromLabelList(List<Label> labels) {
         if (labels != null && !labels.isEmpty()) {
             Map<String, List<String>> resMap = new HashMap();
+            String lang;
             for(Label label : labels) {
-                resMap.put(toIsoLanguage(label.getLang()), this.createList(label.getValue()));
+            	lang = toIsoLanguage(label.getLang());
+            	if(resMap.containsKey(lang)) {
+            		resMap.get(lang).add(label.getValue());
+            	} else {
+            		ArrayList<String> valueList = new ArrayList<String>();
+            		valueList.add(label.getValue());
+					resMap.put(lang, valueList);
+            	}
             }
             return resMap;
         }
@@ -173,10 +183,10 @@ public class ConverterUtils {
      */
     public Map<String, List<String>> mergeMapsWithSingletonLists(Map<String, List<String>> baseMap, Map<String, List<String>> addMap, Map<String, List<String>> notMergedMap) {
         Map<String, List<String>> result = new HashMap(baseMap);
-        Iterator var5 = addMap.entrySet().iterator();
+        Iterator iterator = addMap.entrySet().iterator();
 
-        while(var5.hasNext()) {
-            Entry<String, List<String>> entry = (Entry)var5.next();
+        while(iterator.hasNext()) {
+            Entry<String, List<String>> entry = (Entry)iterator.next();
             String key = entry.getKey();
             if (result.containsKey(key)) {
                 List<String> unmergedValues = (List)((List)entry.getValue()).stream().distinct().filter(value -> {

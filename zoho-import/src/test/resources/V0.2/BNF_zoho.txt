@@ -1,0 +1,116 @@
+{
+   "value":{
+      "keyValues":{
+         "Owner":{
+         	"DELETED":"VALUE"
+            },
+            "keyModified":{
+               
+            }
+         },
+         "PO_box":"Paris Cedex 13",
+         "$currency_symbol":"EUR",
+         "Last_Activity_Time":{
+            "dateTime":{
+               "date":{
+                  "year":2021,
+                  "month":6,
+                  "day":18
+               },
+               "time":{
+                  "hour":12,
+                  "minute":34,
+                  "second":11,
+                  "nano":0
+               }
+            },
+            "offset":{
+               "totalSeconds":7200
+            }
+         },
+         "Industry":{
+            "value":"Library"
+         },
+         "Lang_Acronym":{
+            "value":"FR(French)"
+         },
+         "Street":"Quai François Mauriac",
+         "id":1482250000002112001,
+         "Created_Time":{
+            "dateTime":{
+               "date":{
+                  "year":2016,
+                  "month":12,
+                  "day":22
+               },
+               "time":{
+                  "hour":14,
+                  "minute":24,
+                  "second":44,
+                  "nano":0
+               }
+            },
+            "offset":{
+               "totalSeconds":3600
+            }
+         },
+         "Lang_Alternative_1":{
+            "value":"FR(French)"
+         },
+         "City":"Paris",
+         "Country":"France",
+         "Description":"The Bibliothèque nationale de France (BnF; French: [bi.bli.jɔ.tɛk na.sjɔ.nal də fʁɑ̃s]) is the National Library of France, located in Paris. It is the national repository of all that is published in France and also holds extensive historical collections.",
+         "Logo_link_to_WikimediaCommons":"http://commons.wikimedia.org/wiki/Special:FilePath/Logo_BnF.svg",
+         "Geographic_Level":[
+            {
+               "value":"National"
+            }
+         ],
+         "Alternative_1":"Bibliothèque nationale de France",
+         "Website":"http://www.bnf.fr",
+         "Lang_Organisation_Name":{
+            "value":"EN(English)"
+         },
+         "Country1":{
+            "value":"France, FR"
+         },
+         "ZIP_code":"75706",
+         "Account_Name":"National Library of France",
+         "Modified_Time":{
+            "dateTime":{
+               "date":{
+                  "year":2021,
+                  "month":3,
+                  "day":24
+               },
+               "time":{
+                  "hour":21,
+                  "minute":5,
+                  "second":57,
+                  "nano":0
+               }
+            },
+            "offset":{
+               "totalSeconds":3600
+            }
+         },
+         "Sector":{
+            "value":"Cultural Heritage"
+         },
+         "SameAs_1":"http://www.wikidata.org/entity/Q193563",
+         "SameAs_2":"http://isni.org/isni/0000000123531945",
+         "Organisation_Role2":[
+            {
+               "value":"Data Provider"
+            },
+            {
+               "value":"Provider"
+            }
+         ],
+         "Tag":[
+            
+         ],
+         "Acronym":"BnF",
+      },
+   }
+}
