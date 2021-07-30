@@ -2,16 +2,24 @@ package eu.europeana.metis.zoho;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.gson.Gson;
 import com.zoho.crm.api.record.DeletedRecord;
 import com.zoho.crm.api.record.Record;
-import org.apache.commons.lang3.StringUtils;
+
+import eu.europeana.metis.utils.Constants;
 import eu.europeana.metis.zoho.exception.OrganizationImportException;
 import eu.europeana.metis.zoho.model.DeleteOperation;
 import eu.europeana.metis.zoho.model.Operation;
 import eu.europeana.metis.zoho.model.UpdateOperation;
-import eu.europeana.metis.utils.Constants;
 
 /**
  * This class performs the import of organizations from Zoho to Metis. The import type is mandatory
@@ -180,6 +188,8 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     if (organisation.isEmpty()) {
       throw new ZohoException("There is no zoho Organisation with id "+ zohoId);
     }
+    //use for debugging purposes
+//    System.out.println((new Gson()).toJson(organisation));
     res.add(organisation.get());
     return res;
   }
