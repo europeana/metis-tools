@@ -48,10 +48,15 @@ public class OrganizationConverter {
         if (!organizationRoleStringList.isEmpty()) {
             org.setEdmEuropeanaRole(this.getConverterUtils().createLanguageMapOfStringList(Locale.ENGLISH.getLanguage(), organizationRoleStringList));
         }
-        org.setEdmOrganizationDomain(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.DOMAIN_FIELD))));
-        org.setEdmOrganizationSector(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.SECTOR_FIELD))));
+        String domain = ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.DOMAIN_FIELD));
+		org.setEdmOrganizationDomain(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), domain));
+        String sector = ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.SECTOR_FIELD));
+		org.setEdmOrganizationSector(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), sector));
         org.setEdmOrganizationScope(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.SCOPE_FIELD))));
-        org.setEdmGeorgraphicLevel(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.GEOGRAPHIC_LEVEL_FIELD))));
+        List<String> geographicLevel = ZohoUtils.stringListSupplier(record.getKeyValue(ZohoConstants.GEOGRAPHIC_LEVEL_FIELD));
+        if(!geographicLevel.isEmpty()) {
+        	org.setEdmGeorgraphicLevel(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), geographicLevel.get(0)));
+        }
         String organizationCountry = this.toEdmCountry(ZohoUtils.stringFieldSupplier(record.getKeyValue(ZohoConstants.ORGANIZATION_COUNTRY_FIELD)));
         org.setEdmCountry(this.getConverterUtils().createMap(Locale.ENGLISH.getLanguage(), organizationCountry));
         // get all the same As values

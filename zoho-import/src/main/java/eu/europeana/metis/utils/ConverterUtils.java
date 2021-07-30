@@ -53,7 +53,7 @@ public class ConverterUtils {
      * @return
      */
     public Map<String, String> createMap(String key, String value) {
-        return (value == null || !value.isEmpty()) ? null : Collections.singletonMap(key, value);
+        return StringUtils.isBlank(value) ? null : Collections.singletonMap(key, value);
     }
 
     /**

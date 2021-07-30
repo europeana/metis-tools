@@ -2,8 +2,8 @@
 {
     "_id" : ObjectId("61003fec5a75961d9c99182b"),
     "className" : "eu.europeana.enrichment.internal.model.EnrichmentTerm",
-    "created" : ISODate("1970-01-18T03:46:53.084Z"),
-    "updated" : ISODate("1970-01-19T17:03:36.357Z"),
+    "created" : ISODate("2016-12-22T13:24:44.000Z"),
+    "updated" : ISODate("2021-03-24T20:05:57.000Z"),
     "entityType" : "ORGANIZATION",
     "enrichmentEntity" : {
         "className" : "eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity",
@@ -31,6 +31,9 @@
                 "BnF", 
                 "BNF"
             ],
+            "en" : [ 
+                "BNF"
+            ],
             "it" : [ 
                 "BNF"
             ]
@@ -42,6 +45,15 @@
                 "Data Provider", 
                 "Provider"
             ]
+        },
+        "edmOrganizationSector" : {
+            "en" : "Cultural Heritage"
+        },
+        "edmGeographicLevel" : {
+            "en" : "National"
+        },
+        "edmCountry" : {
+            "en" : "FR"
         },
         "address" : {
             "className" : "eu.europeana.enrichment.internal.model.Address",
@@ -127,50 +139,89 @@
         },
         "altLabel" : {
             "de" : [ 
+                "Bibliothèque de l'Arsenal", 
+                "BnF", 
                 "Französische Nationalbibliothek"
             ],
             "sv" : [ 
+                "Bibliothèque nationale", 
+                "Nationalbiblioteket", 
+                "Frankrikes nationalbibliotek", 
                 "BnF"
             ],
             "ru" : [ 
+                "Королевская библиотека Франции", 
+                "Библиотека Парижа", 
+                "Французская национальная библиотека", 
+                "Парижская библиотека", 
                 "Парижская национальная библиотека"
             ],
             "fi" : [ 
+                "BnF", 
                 "Bibliothèque nationale de France"
             ],
             "pt" : [ 
+                "Gallica", 
+                "BnF", 
+                "Bibliothèque Nationale de France", 
+                "Biblioteca Nacional de França", 
+                "Bibliothèque Nationale", 
                 "Biblioteca Nacional de Paris"
             ],
             "bg" : [ 
                 "Национална библиотека „Франсоа Митеран“"
             ],
             "en" : [ 
+                "National library of France", 
                 "National Library of France", 
+                "Bibliotheque nationale de France", 
+                "BnF", 
                 "Bibliothèque nationale de France"
             ],
             "hr" : [ 
                 "BnF"
             ],
             "lv" : [ 
+                "Francijas nacionālā bibliotēka", 
+                "Bibliothèque nationale de France", 
                 "BnF"
             ],
             "it" : [ 
+                "Biblioteca Nazionale di Francia", 
+                "Bibliothèque National", 
+                "Bibliothèque nationale", 
+                "Biblioteca nazionale di Parigi", 
+                "Bibliothèque Nationale di Parigi", 
                 "Biblioteca nazionale francese"
             ],
             "fr" : [ 
+                "Très Grande Bibliothèque", 
+                "Bibliothèque Nationale de Paris", 
+                "BnF", 
                 "Bibliothèque nationale de France", 
-                "Bibliothèque de France"
+                "Bibliothèque de France", 
+                "Bibliothèque royale"
             ],
             "hu" : [ 
                 "BnF"
             ],
             "es" : [ 
+                "Bibliotheque Nationale", 
+                "BnF", 
+                "Bibliotheque Nationale de France", 
+                "Bibliothèque Nationale de France", 
+                "Biblioteca Nacional de París", 
+                "Bibliothèque nationale", 
                 "Biblioteca Nacional de Paris"
             ],
             "cs" : [ 
+                "Bibliotheque François Mitterrand", 
+                "Bibliothèque nationale de France", 
+                "Bibliotheque nationale de France", 
                 "Bibliothéque nationale de France"
             ],
             "sk" : [ 
+                "Francúzska národná knižnica", 
                 "BnF"
             ],
             "sl" : [ 
@@ -180,6 +231,7 @@
                 "BnF"
             ],
             "pl" : [ 
+                "BnF", 
                 "Bibliothèque nationale de France"
             ],
             "ro" : [ 
@@ -189,9 +241,17 @@
                 "BnF"
             ],
             "nl" : [ 
+                "Bibliothèque François Mitterrand", 
+                "Bibliotheque Francois Mitterrand", 
+                "Bibliotheque Nationale", 
+                "Bibliotheque nationale de France", 
+                "Bibliothèque nationale", 
+                "Nationale Bibliotheek van Frankrijk", 
                 "BnF"
             ],
             "ca" : [ 
+                "Bibliothèque Nationale de France", 
+                "Biblioteca Nacional de París", 
                 "Biblioteca Nacional de Paris"
             ]
         },

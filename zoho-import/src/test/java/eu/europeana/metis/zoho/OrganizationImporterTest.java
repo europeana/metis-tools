@@ -31,7 +31,7 @@ public class OrganizationImporterTest extends BaseImporterTest {
     importer.updateInMetis(operation);
     Optional<OrganizationEnrichmentEntity> organisation = importer.getEnrichmentService().getOrganizationByUri(BNF_ENTITY_URI);
     assertTrue(organisation.isPresent());
-
+    System.out.println("");
     // delete the organization when needed (individual update will always update the organization)
 //    importer.getEnrichmentService().deleteOrganization(BNF_ENTITY_URI);
   }
