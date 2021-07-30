@@ -17,6 +17,6 @@
         </Root>
         <Logger name="org.apache.jena.riot" level="ERROR" />
         <Logger name="com.zoho.api.logger.SDKLogger" level="ERROR" />
-
+        <Logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR" />
     </Loggers>
 </Configuration>
