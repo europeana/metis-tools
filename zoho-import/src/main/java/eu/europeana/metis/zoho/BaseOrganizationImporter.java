@@ -203,7 +203,8 @@ public class BaseOrganizationImporter {
    */
   protected void updateInMetis(Operation operation) {
     enrichmentService.saveOrganization(operation.getOrganisationEnrichmentEntity(),
-        new Date(operation.getZohoOrganization().getCreatedTime().toEpochSecond()), operation.getModified());
+        new Date(operation.getZohoOrganization().getCreatedTime().toInstant().toEpochMilli()),
+        new Date(operation.getZohoOrganization().getModifiedTime().toInstant().toEpochMilli()));
     LOGGER.info("Organization saved in Metis :{}", operation.getOrganisationEnrichmentEntity().getAbout());
 
     //NOTE: at this point we could differentiate between create and update if needed

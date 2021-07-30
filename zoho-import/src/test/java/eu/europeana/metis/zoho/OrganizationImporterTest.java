@@ -32,8 +32,8 @@ public class OrganizationImporterTest extends BaseImporterTest {
     Optional<OrganizationEnrichmentEntity> organisation = importer.getEnrichmentService().getOrganizationByUri(BNF_ENTITY_URI);
     assertTrue(organisation.isPresent());
 
-    // delete the organisation
-    importer.getEnrichmentService().deleteOrganization(BNF_ENTITY_URI);
+    // delete the organization when needed (individual update will always update the organization)
+//    importer.getEnrichmentService().deleteOrganization(BNF_ENTITY_URI);
   }
 
   @Test
@@ -46,8 +46,8 @@ public class OrganizationImporterTest extends BaseImporterTest {
     assertEquals(SAS_ENTITY_URI, org.get().getAbout());
     assertEquals(SSA_ENTITY_ID, org.get().getDcIdentifier().get(Constants.UNDEFINED_LANGUAGE_KEY).get(0));
 
-    // delete the organisation
-    importer.getEnrichmentService().deleteOrganization(SAS_ENTITY_URI);
+    // delete the organization when needed (individual update will always update the organization)
+//    importer.getEnrichmentService().deleteOrganization(SAS_ENTITY_URI);
   }
 
 }
