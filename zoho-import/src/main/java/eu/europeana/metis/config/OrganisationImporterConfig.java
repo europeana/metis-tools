@@ -28,6 +28,7 @@ public class OrganisationImporterConfig {
     public static final String PROP_MONGO_ENRICHMENT_CONNECTION_URL = "mongo.enrichment.connectionUrl";
 
     public static final String PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE = "zoho.organization.search.criteria.role";
+    public static final String PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_OWNER = "zoho.organization.search.criteria.owner";
 
     public static final String PROP_ZOHO_EMAIL = "zoho.email";
     public static final String PROP_ZOHO_CLIENT_ID = "zoho.client.id";
@@ -133,12 +134,12 @@ public class OrganisationImporterConfig {
         return new EnrichmentService(getPersistentEntityResolver());
     }
 
-    public String getSearchFilter() {
-        String searchFilter = getProperty(PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE);
-//        if(searchFilter.isEmpty()) {
-//            throw new IllegalArgumentException(PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE + " can not be empty. Please provide a valid value.");
-//        }
-        return searchFilter;
+    public String getRoleFilter() {
+        return getProperty(PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_ROLE);
+    }
+
+    public String getOwnerFilter() {
+        return getProperty(PROP_ZOHO_ORGANIZATION_SEARCH_CRITERIA_OWNER);
     }
 
     private String getProperty(String propertyName) {

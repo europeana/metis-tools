@@ -45,7 +45,8 @@ public class BaseOrganizationImporter {
   ImportStatus status = new ImportStatus();
   OrganisationImporterConfig organisationImporterConfig = new OrganisationImporterConfig();
   private final OrganizationConverter organisationConverter = new OrganizationConverter();
-  String searchFilter;
+  String roleFilter;
+  String ownerFilter;
   Map<String, String> searchCriteria = new HashMap<>();
   Set<String> allowedRoles = new HashSet<>();
 
@@ -74,7 +75,9 @@ public class BaseOrganizationImporter {
   }
 
   public void init() throws Exception {
-    searchFilter = getOrganisationImporterConfig().getSearchFilter();
+    // Only owner filter is applied now
+    //roleFilter = getOrganisationImporterConfig().getRoleFilter();
+    ownerFilter = getOrganisationImporterConfig().getOwnerFilter();
     initSearchCriteria();
     zohoAccessClient = getOrganisationImporterConfig().getZohoAccessClient();
     enrichmentService = getOrganisationImporterConfig().getEnrichmentService();
@@ -82,22 +85,48 @@ public class BaseOrganizationImporter {
   }
 
   /**
-   * Builds allowed roles
-   * Also init allowed roles, due to the Zoho bug on not using filtering (e.g. Provider, includes Data Provider)
+   * Builds a search criteria Map :
+   *  [Organisation_Role2: <roleFilter>, Owner.name:<ownerFilter>]
    */
   private void initSearchCriteria() {
-    if (StringUtils.isNotEmpty(searchFilter)) {
-      LOGGER.info("apply filter for Zoho search criteria role: {}", searchFilter);
-      searchCriteria.put(ZohoConstants.ORGANIZATION_ROLE_FIELD, searchFilter);
+    if (StringUtils.isNotEmpty(roleFilter)) {
+      LOGGER.info("apply filter for Zoho search criteria role: {}", roleFilter);
+      searchCriteria.put(ZohoConstants.ORGANIZATION_ROLE_FIELD, roleFilter);
       initAllowedRoles();
+    }
+    if (StringUtils.isNotEmpty(ownerFilter)) {
+      LOGGER.info("apply filter for Zoho search criteria owner : {}", ownerFilter);
+      searchCriteria.put(Constants.ZOHO_OWNER_CRITERIA, ownerFilter);
     }
   }
 
   private void initAllowedRoles() {
-    String[] roles = searchFilter.split(ZohoConstants.DELIMITER_COMMA);
+    String[] roles = roleFilter.split(ZohoConstants.DELIMITER_COMMA);
     for (int i = 0; i < roles.length; i++) {
       allowedRoles.add(roles[i].trim());
     }
+  }
+
+  /**
+   * This method validates that organization ownership match to the filter criteria.
+   *
+   * @param recordOrganization
+   * @return
+   */
+  public boolean hasRequiredOwnership(Record recordOrganization) {
+    boolean res = false;
+    String ownerName = getOrganisationConverter().getOwnerName(recordOrganization);
+
+    if (searchCriteria == null || searchCriteria.isEmpty()
+           || !searchCriteria.containsKey(Constants.ZOHO_OWNER_CRITERIA)) {
+      // if the owner criteria is empty, check if owner name is not empty in the zoho record
+      return StringUtils.isNotEmpty(ownerName);
+    } // check if owner name matches when filter is used
+      else if(!ownerName.isEmpty() && searchCriteria.get(Constants.ZOHO_OWNER_CRITERIA).equals(ownerName.trim())) {
+        LOGGER.info("Organisation has the required ownership : {}", ownerName);
+        return true;
+   }
+    return res;
   }
 
   /**
@@ -106,11 +135,11 @@ public class BaseOrganizationImporter {
    * @param recordOrganization
    * @return filtered and validated orgnization list
    */
+  @Deprecated
   public boolean hasRequiredRole(Record recordOrganization) {
     boolean res = false;
     List<String> organizationRoles = getOrganisationConverter().getOrganizationRole(recordOrganization);
-    
-	if (searchCriteria == null || searchCriteria.isEmpty()
+    if (searchCriteria == null || searchCriteria.isEmpty()
 			|| !searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD)) {
 		// EA-2623 consider only collections that have a europeana role assigned
 		return CollectionUtils.isNotEmpty(organizationRoles);

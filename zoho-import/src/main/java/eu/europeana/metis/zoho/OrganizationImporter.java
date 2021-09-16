@@ -2,16 +2,9 @@ package eu.europeana.metis.zoho;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.gson.Gson;
 import com.zoho.crm.api.record.DeletedRecord;
 import com.zoho.crm.api.record.Record;
 
@@ -288,8 +281,14 @@ public class OrganizationImporter extends BaseOrganizationImporter {
 
   /**
    * This method performs synchronization of organizations between Zoho and Entity API database
-   * addressing deleted and unwanted (defined by search criteria) organizations. We separate to
+   * addressing deleted and unwanted (defined by owner criteria) organizations. We separate to
    * update from to delete types
+   *
+   * If full import -> only update/create
+   * else Update operation -> 1) search criteria is empty, check if the owner is present in the zoho record
+   *             2) search criteria present, then zoho record owner should match with
+   *               the search filter ZOHO_OWNER_CRITERIA
+   * Delete the record if none of the above matches.
    * 
    * @param orgList The list of retrieved Zoho objects
    */
@@ -297,20 +296,23 @@ public class OrganizationImporter extends BaseOrganizationImporter {
     SortedSet<Operation> ret = new TreeSet<>();
     Operation operation;
     for (Record org : orgList) {
-      // validate Zoho organization roles (workaround for Zoho API bug on role filtering)
-      if (hasRequiredRole(org)) {
+      // if full import then always update no deletion required
+      if (fullImport){
+        operation = new UpdateOperation(org);
+      }
+      // validate Zoho organization ownership
+      else if (hasRequiredOwnership(org)) {
         // create or update organization
         operation = new UpdateOperation(org);
       } else {
         // add organization to the delete
         operation = new DeleteOperation(Long.toString(org.getId()), new Date(org.getModifiedTime().toEpochSecond()));
         // the organization doesn't have the
-        LOGGER.info("The organization {} will be deleted as it doesn't have the required roles anymore. organization role: {}", org.getId(),
-                ZohoUtils.stringFieldSupplier(org.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD)));
+        LOGGER.info("The organization {} will be deleted as it doesn't have the required ownership anymore. organization owner: {}", org.getId(),
+                getOrganisationConverter().getOwnerName(org));
       }
       ret.add(operation);
     }
-
     return ret;
   }
 

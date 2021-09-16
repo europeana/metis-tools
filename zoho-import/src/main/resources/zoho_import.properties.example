@@ -1,6 +1,8 @@
 #Filter settings for Zoho query
 #for multiple values e.g. roles - comma separated strings
 zoho.organization.search.criteria.role=
+#for owner criteria
+zoho.organization.search.criteria.owner=
 
 # Zoho Access properties
 zoho.email=
