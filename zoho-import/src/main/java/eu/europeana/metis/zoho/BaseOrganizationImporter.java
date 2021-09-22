@@ -13,7 +13,7 @@ import java.util.*;
 import com.zoho.crm.api.record.Record;
 import eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity;
 import eu.europeana.enrichment.service.EnrichmentService;
-import eu.europeana.metis.config.OrganisationImporterConfig;
+import eu.europeana.metis.config.OrganizationImporterConfig;
 import eu.europeana.metis.utils.Constants;
 import eu.europeana.metis.utils.OrganizationConverter;
 import eu.europeana.metis.wiki.WikidataAccessDao;
@@ -43,7 +43,7 @@ public class BaseOrganizationImporter {
   EnrichmentService enrichmentService ;
   WikidataAccessService wikidataAccessService;
   ImportStatus status = new ImportStatus();
-  OrganisationImporterConfig organisationImporterConfig = new OrganisationImporterConfig();
+  OrganizationImporterConfig organisationImporterConfig = new OrganizationImporterConfig();
   private final OrganizationConverter organisationConverter = new OrganizationConverter();
   String roleFilter;
   String ownerFilter;
@@ -54,7 +54,7 @@ public class BaseOrganizationImporter {
     return organisationConverter;
   }
 
-  public OrganisationImporterConfig getOrganisationImporterConfig() {
+  public OrganizationImporterConfig getOrganisationImporterConfig() {
     return organisationImporterConfig;
   }
 
@@ -98,9 +98,15 @@ public class BaseOrganizationImporter {
       LOGGER.info("apply filter for Zoho search criteria owner : {}", ownerFilter);
       searchCriteria.put(Constants.ZOHO_OWNER_CRITERIA, ownerFilter);
     }
+    if(searchCriteria.isEmpty()) {
+    	LOGGER.info("There is no search criteria configured. Fetching all organization from Zoho! (in case of full import)");
+    }
   }
 
   private void initAllowedRoles() {
+	if(roleFilter == null) {
+		return;
+	}  
     String[] roles = roleFilter.split(ZohoConstants.DELIMITER_COMMA);
     for (int i = 0; i < roles.length; i++) {
       allowedRoles.add(roles[i].trim());
@@ -117,12 +123,11 @@ public class BaseOrganizationImporter {
     boolean res = false;
     String ownerName = getOrganisationConverter().getOwnerName(recordOrganization);
 
-    if (searchCriteria == null || searchCriteria.isEmpty()
-           || !searchCriteria.containsKey(Constants.ZOHO_OWNER_CRITERIA)) {
+    if (!searchCriteria.containsKey(Constants.ZOHO_OWNER_CRITERIA)) {
       // if the owner criteria is empty, check if owner name is not empty in the zoho record
       return StringUtils.isNotEmpty(ownerName);
-    } // check if owner name matches when filter is used
-      else if(!ownerName.isEmpty() && searchCriteria.get(Constants.ZOHO_OWNER_CRITERIA).equals(ownerName.trim())) {
+    } else if(!ownerName.isEmpty() && searchCriteria.get(Constants.ZOHO_OWNER_CRITERIA).equals(ownerName.trim())) {
+    	// ensure owner name matches when filter is used
         LOGGER.info("Organisation has the required ownership : {}", ownerName);
         return true;
    }
@@ -139,8 +144,7 @@ public class BaseOrganizationImporter {
   public boolean hasRequiredRole(Record recordOrganization) {
     boolean res = false;
     List<String> organizationRoles = getOrganisationConverter().getOrganizationRole(recordOrganization);
-    if (searchCriteria == null || searchCriteria.isEmpty()
-			|| !searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD)) {
+    if (!searchCriteria.containsKey(ZohoConstants.ORGANIZATION_ROLE_FIELD)) {
 		// EA-2623 consider only collections that have a europeana role assigned
 		return CollectionUtils.isNotEmpty(organizationRoles);
 	} else if (!organizationRoles.isEmpty()) {

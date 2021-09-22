@@ -9,17 +9,18 @@ zoho.email=
 zoho.client.id=
 zoho.client.secret=
 zoho.grant.token=
+zoho.refresh.token=
 zoho.redirect.url=
 
 # metis Enrichment DB
 mongo.enrichment.connectionUrl = mongodb://localhost:27017
 mongo.enrichment.database = enrichment
 
-#Token Store DB persistence
-zohooauth.host=localhost
-zohooauth.user=
-zohooauth.password=
-zohooauth.port=3306
-zohooauth.dbname=zohoouth
+#Token Store DB persistence - not used
+#zohooauth.host=localhost
+#zohooauth.user=
+#zohooauth.password=
+#zohooauth.port=3306
+#zohooauth.dbname=zohoouth
 
 token.store.file.path=

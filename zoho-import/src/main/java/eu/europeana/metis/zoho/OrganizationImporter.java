@@ -294,24 +294,22 @@ public class OrganizationImporter extends BaseOrganizationImporter {
    */
   protected SortedSet<Operation> fillOperationsSet(final List<Record> orgList) {
     SortedSet<Operation> ret = new TreeSet<>();
-    Operation operation;
+    Operation operation = null;
     for (Record org : orgList) {
       // if full import then always update no deletion required
-      if (fullImport){
-        operation = new UpdateOperation(org);
-      }
-      // validate Zoho organization ownership
-      else if (hasRequiredOwnership(org)) {
+      if (hasRequiredOwnership(org)) {
         // create or update organization
         operation = new UpdateOperation(org);
-      } else {
-        // add organization to the delete
+      } else if (!fullImport){
+    	 // add organization to the delete, but not for full import for which the database should be empty (manually deleted)
         operation = new DeleteOperation(Long.toString(org.getId()), new Date(org.getModifiedTime().toEpochSecond()));
-        // the organization doesn't have the
+        // the organization doesn't have the (required) owner
         LOGGER.info("The organization {} will be deleted as it doesn't have the required ownership anymore. organization owner: {}", org.getId(),
                 getOrganisationConverter().getOwnerName(org));
       }
-      ret.add(operation);
+      if(operation != null) {
+    	  ret.add(operation);
+      }
     }
     return ret;
   }

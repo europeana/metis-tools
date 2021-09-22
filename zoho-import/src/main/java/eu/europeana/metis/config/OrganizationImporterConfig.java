@@ -20,9 +20,9 @@ import java.util.Properties;
  * @author Srishti Singh (srishti.singh@europeana.eu)
  * @since 2021-07-06
  */
-public class OrganisationImporterConfig {
+public class OrganizationImporterConfig {
 
-    private static final Logger LOGGER = LogManager.getLogger(OrganisationImporterConfig.class);
+    private static final Logger LOGGER = LogManager.getLogger(OrganizationImporterConfig.class);
 
     public static final String PROP_MONGO_ENRICHMENT_DB_NAME = "mongo.enrichment.database";
     public static final String PROP_MONGO_ENRICHMENT_CONNECTION_URL = "mongo.enrichment.connectionUrl";
@@ -48,7 +48,7 @@ public class OrganisationImporterConfig {
 
     Properties appProps;
 
-    public OrganisationImporterConfig() {
+    public OrganizationImporterConfig() {
         loadProperties(PROPERTIES_FILE);
     }
 
@@ -61,18 +61,18 @@ public class OrganisationImporterConfig {
         return appProps;
     }
 
-    /**
-     * returns the token store instance of DB persistence
-     * @return TokenStore
-     */
-    public TokenStore getDBTokenStore() {
-        return new DBStore(
-                getProperty(PROP_ZOHO_AUTH_HOST),
-                getProperty(PROP_ZOHO_AUTH_DBNAME),
-                getProperty(PROP_ZOHO_AUTH_USER),
-                getProperty(PROP_ZOHO_AUTH_PASSWORD),
-                getProperty(PROP_ZOHO_AUTH_PORT));
-    }
+//    /**
+//     * returns the token store instance of DB persistence
+//     * @return TokenStore
+//     */
+//    public TokenStore getDBTokenStore() {
+//        return new DBStore(
+//                getProperty(PROP_ZOHO_AUTH_HOST),
+//                getProperty(PROP_ZOHO_AUTH_DBNAME),
+//                getProperty(PROP_ZOHO_AUTH_USER),
+//                getProperty(PROP_ZOHO_AUTH_PASSWORD),
+//                getProperty(PROP_ZOHO_AUTH_PORT));
+//    }
 
     /**
      * returns the token store instance of DB persistence
@@ -109,9 +109,10 @@ public class OrganisationImporterConfig {
      * @throws Exception
      */
     private TokenStore getTokenStore() throws Exception {
-        TokenStore tokenStore = getProperty(PROP_TOKEN_FILE).isEmpty() ? getDBTokenStore() : getFileTokenStore();
+//        TokenStore tokenStore = getProperty(PROP_TOKEN_FILE).isEmpty() ? getDBTokenStore() : getFileTokenStore();
+    	TokenStore tokenStore = getFileTokenStore();
         if(tokenStore.getTokens().isEmpty()) {
-            throw new IllegalArgumentException("Something went wrong with token store. Please verify the properties for db or file token store");
+            throw new IllegalArgumentException("Something went wrong with token store. Please verify the properties for file token store");
         }
         return tokenStore;
     }
