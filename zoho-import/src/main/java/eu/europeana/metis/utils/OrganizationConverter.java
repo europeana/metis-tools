@@ -1,6 +1,7 @@
 package eu.europeana.metis.utils;
 
 import com.zoho.crm.api.record.Record;
+import com.zoho.crm.api.users.User;
 import eu.europeana.enrichment.internal.model.Address;
 import eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity;
 import eu.europeana.metis.zoho.ZohoConstants;
@@ -138,15 +139,21 @@ public class OrganizationConverter {
     /**
      * The method is to process the ORGANIZATION_ROLE_FIELD values
      *
-     * ZOHO Bug: ORGANIZATION_ROLE_FIELD value is comma separated string but not List of strings.
-     * Hence ZohoUtils.stringFieldSupplier is used instead of ZohoUtils.stringListSupplier (as this return empty list all the time)
-     * Also the value is wrapped around [] brackets.
-     *
      * @param recordOrganization
      * @return
      */
     public List<String> getOrganizationRole(Record recordOrganization) {
         return ZohoUtils.stringListSupplier(
                 recordOrganization.getKeyValue(ZohoConstants.ORGANIZATION_ROLE_FIELD));
+    }
+
+    /**
+     * The method is to process the ZOHO_OWNER_FIELD name value
+     *
+     * @param recordOrganization
+     * @return
+     */
+    public String getOwnerName(Record recordOrganization) {
+       return ((User) recordOrganization.getKeyValue(Constants.ZOHO_OWNER_FIELD)).getName();
     }
 }

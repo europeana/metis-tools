@@ -1,9 +1,5 @@
 package eu.europeana.metis.utils;
 
-import eu.europeana.corelib.definitions.edm.entity.Organization;
-
-import eu.europeana.enrichment.api.external.model.Label;
-import eu.europeana.enrichment.api.external.model.WebResource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,15 +10,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import eu.europeana.corelib.definitions.edm.entity.Organization;
+import eu.europeana.enrichment.api.external.model.Label;
+import eu.europeana.enrichment.api.external.model.WebResource;
 import eu.europeana.enrichment.internal.model.Address;
 import eu.europeana.enrichment.internal.model.OrganizationEnrichmentEntity;
-import io.github.classgraph.AnnotationParameterValueList;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class for Organisation Importer

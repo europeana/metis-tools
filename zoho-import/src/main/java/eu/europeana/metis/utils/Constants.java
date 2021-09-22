@@ -23,6 +23,8 @@ public final class Constants {
     // TODO move to eu.europeana.metis.zoho.ZohoConstants
     public static final String URL_ORGANIZATION_PREFFIX = "http://data.europeana.eu/organization/";
     public static final String ZOHO_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String ZOHO_OWNER_CRITERIA = "Owner.name";
+    public static final String ZOHO_OWNER_FIELD = "Owner";
 
     // wikidata
     public static final String WIKIDATA_ORGANIZATION_XSL_FILE = "/wkd2org.xsl";

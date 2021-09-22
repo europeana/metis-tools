@@ -50,4 +50,17 @@ public class OrganizationImporterTest extends BaseImporterTest {
 //    importer.getEnrichmentService().deleteOrganization(SAS_ENTITY_URI);
   }
 
+  @Test
+  public void testRunIndividualReimportAlbertina() throws Exception {
+    // will run the importer for criteria roles
+    OrganizationImporter.main(new String[]{"individual", ALBERTINA_ENTITY_URI});
+    Optional<OrganizationEnrichmentEntity> org = importer.getEnrichmentService().getOrganizationByUri(ALBERTINA_ENTITY_URI);
+
+    assertTrue(org.isPresent());
+    assertEquals(ALBERTINA_ENTITY_URI, org.get().getAbout());
+    assertEquals(ALBERTINA_ENTITY_ID, org.get().getDcIdentifier().get(Constants.UNDEFINED_LANGUAGE_KEY).get(0));
+
+    // delete the organization when needed (individual update will always update the organization)
+//    importer.getEnrichmentService().deleteOrganization(SAS_ENTITY_URI);
+  }
 }
