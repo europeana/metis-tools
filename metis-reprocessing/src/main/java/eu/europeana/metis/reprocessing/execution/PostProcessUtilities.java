@@ -55,7 +55,8 @@ public class PostProcessUtilities {
   public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,
       Date endDate, BasicConfiguration basicConfiguration) {
     createReindexWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
-//    setInvalidFlagToPlugins(datasetId, basicConfiguration);
+    // TODO: 28/10/2021 Set a flag for invalidating or not?
+    setInvalidFlagToPlugins(datasetId, basicConfiguration);
   }
 
   private static void createReindexWorkflowExecutions(String datasetId, Date startDate,
