@@ -22,7 +22,7 @@
     <version.corelib>2.12.2-SNAPSHOT</version.corelib>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.25</version.slf4j>
-    <version.log4j>2.9.1</version.log4j>
+    <version.log4j>2.13.2</version.log4j>
   </properties>
 
   <build>
