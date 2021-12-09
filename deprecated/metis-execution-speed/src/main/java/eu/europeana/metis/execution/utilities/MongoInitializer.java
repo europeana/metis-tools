@@ -3,6 +3,7 @@ package eu.europeana.metis.execution.utilities;
 import com.mongodb.client.MongoClient;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.mongo.connection.MongoProperties;
+import eu.europeana.metis.mongo.connection.MongoProperties.ReadPreferenceValue;
 
 /**
  * Initialize MongoClient
@@ -18,10 +19,11 @@ public class MongoInitializer {
   private final String mongoUsername;
   private final String mongoPassword;
   private final boolean mongoEnablessl;
+  private final String mongoApplicationName;
   private MongoClient mongoClient;
 
   public MongoInitializer(String[] mongoHosts, int[] mongoPorts, String mongoAuthenticationDb,
-      String mongoUsername, String mongoPassword, boolean mongoEnablessl) {
+      String mongoUsername, String mongoPassword, boolean mongoEnablessl, String mongoApplicationName) {
     this.mongoHosts = mongoHosts;
     this.mongoPorts = mongoPorts;
     this.mongoAuthenticationDb = mongoAuthenticationDb;
@@ -29,6 +31,7 @@ public class MongoInitializer {
     this.mongoPassword = mongoPassword;
 
     this.mongoEnablessl = mongoEnablessl;
+    this.mongoApplicationName = mongoApplicationName;
   }
 
   public void initializeMongoClient() {
@@ -39,7 +42,7 @@ public class MongoInitializer {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
         IllegalArgumentException::new);
     mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
-        mongoPassword, mongoEnablessl, null);
+        mongoPassword, mongoEnablessl, ReadPreferenceValue.SECONDARY, mongoApplicationName);
     return mongoProperties;
   }
 

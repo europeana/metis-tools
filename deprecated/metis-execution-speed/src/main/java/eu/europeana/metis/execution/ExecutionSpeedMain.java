@@ -54,7 +54,7 @@ public class ExecutionSpeedMain {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.mongoHosts,
         propertiesHolder.mongoPorts, propertiesHolder.mongoAuthenticationDb,
         propertiesHolder.mongoUsername, propertiesHolder.mongoPassword,
-        propertiesHolder.mongoEnablessl);
+        propertiesHolder.mongoEnablessl, propertiesHolder.mongoApplicationName);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

@@ -8,6 +8,19 @@
   <artifactId>metis-execution-speed</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <distributionManagement>
+    <repository>
+      <id>artifactory.eanadev.org</id>
+      <name>artifactory.eanadev.org-releases</name>
+      <url>http://artifactory.eanadev.org/artifactory/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>artifactory.eanadev.org</id>
+      <name>artifactory.eanadev.org-snapshots</name>
+      <url>http://artifactory.eanadev.org/artifactory/libs-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <build>
     <plugins>
       <plugin>
@@ -46,7 +59,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <version.metis>4-SNAPSHOT</version.metis>
+    <version.metis>5</version.metis>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.30</version.slf4j>
     <version.log4j>2.13.2</version.log4j>

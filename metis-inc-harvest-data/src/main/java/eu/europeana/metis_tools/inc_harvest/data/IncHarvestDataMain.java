@@ -35,7 +35,7 @@ public class IncHarvestDataMain {
   private static final Set<ExecutablePluginType> HARVEST_PLUGIN_TYPES = Collections.unmodifiableSet(
           EnumSet.of(ExecutablePluginType.OAIPMH_HARVEST, ExecutablePluginType.HTTP_HARVEST));
 
-  private static final String OUTPUT_FILE = "/home/jochen/Desktop/test_migration/output.csv";
+  private static final String OUTPUT_FILE = "/home/zmon/Desktop/output.csv";
 
   private enum RecordPresence{PREVIEW, PUBLISH, BOTH}
 
