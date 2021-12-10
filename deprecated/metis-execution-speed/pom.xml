@@ -8,19 +8,6 @@
   <artifactId>metis-execution-speed</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <distributionManagement>
-    <repository>
-      <id>artifactory.eanadev.org</id>
-      <name>artifactory.eanadev.org-releases</name>
-      <url>http://artifactory.eanadev.org/artifactory/libs-release-local</url>
-    </repository>
-    <snapshotRepository>
-      <id>artifactory.eanadev.org</id>
-      <name>artifactory.eanadev.org-snapshots</name>
-      <url>http://artifactory.eanadev.org/artifactory/libs-snapshot-local</url>
-    </snapshotRepository>
-  </distributionManagement>
-
   <build>
     <plugins>
       <plugin>
@@ -62,7 +49,7 @@
     <version.metis>5</version.metis>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.30</version.slf4j>
-    <version.log4j>2.13.2</version.log4j>
+    <version.log4j>2.15.0</version.log4j>
   </properties>
 
   <dependencies>
@@ -107,4 +94,30 @@
       <version>${version.log4j}</version>
     </dependency>
   </dependencies>
+
+  <repositories>
+    <!--Release repositories-->
+    <repository>
+      <id>libs-release</id>
+      <name>libs-release</name>
+      <url>http://artifactory.eanadev.org/artifactory/libs-release</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>libs-snapshot</id>
+      <name>libs-snapshot</name>
+      <url>http://artifactory.eanadev.org/artifactory/libs-snapshot</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>
