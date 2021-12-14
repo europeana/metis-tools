@@ -49,7 +49,7 @@
     <version.metis>5</version.metis>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.30</version.slf4j>
-    <version.log4j>2.15.0</version.log4j>
+    <version.log4j>2.16.0</version.log4j>
   </properties>
 
   <dependencies>
