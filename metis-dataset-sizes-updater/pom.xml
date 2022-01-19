@@ -18,8 +18,8 @@
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
     <version.metis>6-SNAPSHOT</version.metis>
 <!--    &lt;!&ndash; These two versions are interdependent. &ndash;&gt;-->
-    <version.slf4j>1.7.25</version.slf4j>
-    <version.log4j>2.17.0</version.log4j>
+    <version.slf4j>1.7.30</version.slf4j>
+    <version.log4j>2.17.1</version.log4j>
   </properties>
 
   <build>

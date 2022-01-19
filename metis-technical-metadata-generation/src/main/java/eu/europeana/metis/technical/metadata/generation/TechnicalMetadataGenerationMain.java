@@ -10,8 +10,8 @@ import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManage
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.slf4j.Logger;
@@ -44,8 +44,7 @@ public class TechnicalMetadataGenerationMain {
 
   }
 
-  static MongoInitializer prepareConfiguration(PropertiesHolder propertiesHolder)
-      throws TrustStoreConfigurationException {
+  static MongoInitializer prepareConfiguration(PropertiesHolder propertiesHolder) throws TrustStoreConfigurationException {
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
         .isNotEmpty(propertiesHolder.truststorePassword)) {
       LOGGER.info(EXECUTION_LOGS_MARKER,

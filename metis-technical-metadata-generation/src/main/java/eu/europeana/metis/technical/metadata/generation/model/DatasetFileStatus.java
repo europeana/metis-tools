@@ -1,6 +1,6 @@
 package eu.europeana.metis.technical.metadata.generation.model;
 
-import eu.europeana.metis.core.workflow.HasMongoObjectId;
+import eu.europeana.metis.mongo.model.HasMongoObjectId;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)

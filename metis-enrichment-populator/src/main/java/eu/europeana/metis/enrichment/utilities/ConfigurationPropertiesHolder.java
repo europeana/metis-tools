@@ -17,6 +17,8 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:application.properties")
 public class ConfigurationPropertiesHolder {
 
+  private static final String ENRICHMENT_APP_NAME = "Enrichment-util-app";
+
   @Value("${truststore.path}")
   public  String truststorePath;
   @Value("${truststore.password}")
@@ -50,7 +52,7 @@ public class ConfigurationPropertiesHolder {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
         IllegalArgumentException::new);
     mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
-        mongoPassword, mongoEnableSSL, null);
+        mongoPassword, mongoEnableSSL, null, ENRICHMENT_APP_NAME);
     return mongoProperties;
   }
 

@@ -5,9 +5,9 @@ import eu.europeana.metis.technical.metadata.generation.model.ThumbnailFileStatu
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoDao;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
+import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.mongodb.morphia.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

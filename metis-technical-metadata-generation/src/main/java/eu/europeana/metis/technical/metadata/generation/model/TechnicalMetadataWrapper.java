@@ -1,8 +1,8 @@
 package eu.europeana.metis.technical.metadata.generation.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import eu.europeana.metis.core.workflow.HasMongoObjectId;
-import eu.europeana.metis.json.ObjectIdSerializer;
+import eu.europeana.metis.mongo.model.HasMongoObjectId;
+import eu.europeana.metis.mongo.utils.ObjectIdSerializer;
 import eu.europeana.metis.mediaprocessing.model.ResourceMetadata;
 import java.util.List;
 import org.bson.types.ObjectId;

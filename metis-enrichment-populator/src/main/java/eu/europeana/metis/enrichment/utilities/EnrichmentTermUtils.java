@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -78,7 +79,7 @@ public class EnrichmentTermUtils {
     //isPartOf
     final List<Element> isPartOfElements = XmlUtil
         .getAsElementList(timeSpan.getElementsByTagNameNS(Namespace.DCTERMS.getUri(), "isPartOf"));
-    timespanEnrichmentEntity.setIsPartOf(getMapFromElementsWithResource(isPartOfElements));
+    timespanEnrichmentEntity.setIsPartOf(getMapFromElementsWithResource(isPartOfElements).get("def").get(0));
 
     //isNextInSequence
     final List<Element> isNextInSequenceList = XmlUtil.getAsElementList(
@@ -96,7 +97,7 @@ public class EnrichmentTermUtils {
 
     final EnrichmentTerm enrichmentTerm = new EnrichmentTerm();
     enrichmentTerm.setEntityType(EntityType.TIMESPAN);
-    enrichmentTerm.setParent(timespanEnrichmentEntity.getIsPartOf().get("def").get(0));
+    enrichmentTerm.setParent(timespanEnrichmentEntity.getIsPartOf());
     enrichmentTerm.setEnrichmentEntity(timespanEnrichmentEntity);
     enrichmentTerm.setLabelInfos(createLabelInfoList(timespanEnrichmentEntity));
 
