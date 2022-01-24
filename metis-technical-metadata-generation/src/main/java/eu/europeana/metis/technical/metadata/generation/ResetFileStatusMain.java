@@ -5,9 +5,9 @@ import eu.europeana.metis.technical.metadata.generation.utilities.ExecutorManage
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoDao;
 import eu.europeana.metis.technical.metadata.generation.utilities.MongoInitializer;
 import eu.europeana.metis.technical.metadata.generation.utilities.PropertiesHolder;
+import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import org.apache.logging.log4j.core.net.ssl.TrustStoreConfigurationException;
 import org.mongodb.morphia.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class ResetFileStatusMain {
 
   private static final String CONFIGURATION_FILE = "application.properties";
 
-  public static void main(String[] args) throws TrustStoreConfigurationException, IOException {
+  public static void main(String[] args) throws IOException, TrustStoreConfigurationException {
 
     // Initialize.
     LOGGER.info("Starting script - initializing connections.");

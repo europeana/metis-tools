@@ -1,7 +1,7 @@
 package eu.europeana.metis.technical.metadata.generation.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import eu.europeana.metis.json.ObjectIdSerializer;
+import eu.europeana.metis.mongo.utils.ObjectIdSerializer;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.IndexOptions;

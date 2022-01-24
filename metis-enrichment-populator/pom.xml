@@ -18,11 +18,12 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <version.metis>3-SNAPSHOT</version.metis>
-    <version.corelib>2.11.0</version.corelib>
+    <version.metis>6-SNAPSHOT</version.metis>
+    <version.corelib>2.14.1-SNAPSHOT</version.corelib>
     <!-- These two versions are interdependent. -->
-    <version.slf4j>1.7.25</version.slf4j>
-    <version.log4j>2.17.0</version.log4j>
+    <version.slf4j>1.7.30</version.slf4j>
+    <version.log4j>2.17.1</version.log4j>
+    <version.apache.commons>2.6</version.apache.commons>
   </properties>
 
   <build>
@@ -109,6 +110,11 @@
       <artifactId>log4j-core</artifactId>
       <version>${version.log4j}</version>
     </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>${version.apache.commons}</version>
+    </dependency>
   </dependencies>
 
   <repositories>
@@ -116,7 +122,7 @@
     <repository>
       <id>libs-release</id>
       <name>libs-release</name>
-      <url>http://artifactory.eanadev.org/artifactory/libs-release</url>
+      <url>https://artifactory.eanadev.org/artifactory/libs-release</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -127,7 +133,7 @@
     <repository>
       <id>libs-snapshot</id>
       <name>libs-snapshot</name>
-      <url>http://artifactory.eanadev.org/artifactory/libs-snapshot</url>
+      <url>https://artifactory.eanadev.org/artifactory/libs-snapshot</url>
       <releases>
         <enabled>false</enabled>
       </releases>

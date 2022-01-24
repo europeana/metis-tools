@@ -15,10 +15,10 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${version.maven.compiler.plugin}</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <testSource>1.8</testSource>
-          <testTarget>1.8</testTarget>
+          <source>11</source>
+          <target>11</target>
+          <testSource>11</testSource>
+          <testTarget>11</testTarget>
         </configuration>
       </plugin>
       <plugin>
@@ -48,12 +48,13 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.maven.compiler.plugin>3.6.1</version.maven.compiler.plugin>
-    <version.metis>1.4.0-SNAPSHOT</version.metis>
+    <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
+    <version.metis>6-SNAPSHOT</version.metis>
     <!-- These two versions are interdependent. -->
-    <version.slf4j>1.7.25</version.slf4j>
-    <version.log4j>2.17.0</version.log4j>
+    <version.slf4j>1.7.30</version.slf4j>
+    <version.log4j>2.17.1</version.log4j>
     <version.aws-java-sdk-s3>1.11.64</version.aws-java-sdk-s3>
+    <version.morphia>1.3.2</version.morphia>
   </properties>
 
   <dependencies>
@@ -104,5 +105,12 @@
       <version>${version.aws-java-sdk-s3}</version>
       <scope>compile</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.mongodb.morphia/morphia -->
+    <dependency>
+      <groupId>org.mongodb.morphia</groupId>
+      <artifactId>morphia</artifactId>
+      <version>${version.morphia}</version>
+    </dependency>
+
   </dependencies>
 </project>
