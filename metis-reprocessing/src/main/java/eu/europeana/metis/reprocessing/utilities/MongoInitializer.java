@@ -18,10 +18,11 @@ public class MongoInitializer {
   private final String mongoUsername;
   private final String mongoPassword;
   private final boolean mongoEnablessl;
+  private final int metisCoreConnectionPoolSize;
   private MongoClient mongoClient;
 
   public MongoInitializer(String[] mongoHosts, int[] mongoPorts, String mongoAuthenticationDb,
-      String mongoUsername, String mongoPassword, boolean mongoEnablessl) {
+      String mongoUsername, String mongoPassword, boolean mongoEnablessl, int metisCoreConnectionPoolSize) {
     this.mongoHosts = mongoHosts;
     this.mongoPorts = mongoPorts;
     this.mongoAuthenticationDb = mongoAuthenticationDb;
@@ -29,6 +30,7 @@ public class MongoInitializer {
     this.mongoPassword = mongoPassword;
 
     this.mongoEnablessl = mongoEnablessl;
+    this.metisCoreConnectionPoolSize = metisCoreConnectionPoolSize;
   }
 
   public void initializeMongoClient() {
@@ -40,6 +42,7 @@ public class MongoInitializer {
         IllegalArgumentException::new);
     mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
         mongoPassword, mongoEnablessl, null, "Metis Reprocessing");
+    mongoProperties.setMaxConnectionPoolSize(metisCoreConnectionPoolSize);
     return mongoProperties;
   }
 

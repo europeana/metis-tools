@@ -2,6 +2,7 @@ package eu.europeana.metis.reprocessing.utilities;
 
 import eu.europeana.enrichment.service.dao.EnrichmentDao;
 import java.util.Arrays;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * Extra properties class that is part of {@link PropertiesHolder}.
@@ -22,6 +23,7 @@ public class PropertiesHolderExtension extends PropertiesHolder {
   public final String metisEnrichmentMongoPassword;
   public final boolean metisEnrichmentMongoEnableSSL;
   public final String metisEnrichmentMongoDb;
+  public final int metisEnrichmentConnectionPoolSize;
   public final EnrichmentDao enrichmentDao;
 
   public PropertiesHolderExtension(String configurationFileName) {
@@ -41,6 +43,7 @@ public class PropertiesHolderExtension extends PropertiesHolder {
     metisEnrichmentMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.enrichment.enableSSL"));
     metisEnrichmentMongoDb = properties.getProperty("mongo.enrichment.db");
+    metisEnrichmentConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.enrichment.connection.pool.size"), 500);
 
     enrichmentDao = new EnrichmentDao(
         prepareMongoEnrichmentConfiguration().getMongoClient(), metisEnrichmentMongoDb);
@@ -49,7 +52,8 @@ public class PropertiesHolderExtension extends PropertiesHolder {
   private MongoInitializer prepareMongoEnrichmentConfiguration() {
     MongoInitializer mongoInitializer = new MongoInitializer(metisEnrichmentMongoHosts,
         metisEnrichmentMongoPorts, metisEnrichmentMongoAuthenticationDb,
-        metisEnrichmentMongoUsername, metisEnrichmentMongoPassword, metisEnrichmentMongoEnableSSL);
+        metisEnrichmentMongoUsername, metisEnrichmentMongoPassword, metisEnrichmentMongoEnableSSL,
+        metisEnrichmentConnectionPoolSize);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

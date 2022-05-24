@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -54,6 +55,7 @@ public class PropertiesHolder {
   public final String metisCoreMongoPassword;
   public final boolean metisCoreMongoEnableSSL;
   public final String metisCoreMongoDb;
+  public final int metisCoreConnectionPoolSize;
   //Mongo Source
   public final String[] sourceMongoHosts;
   public final int[] sourceMongoPorts;
@@ -62,6 +64,7 @@ public class PropertiesHolder {
   public final String sourceMongoPassword;
   public final boolean sourceMongoEnableSSL;
   public final String sourceMongoDb;
+  public final int sourceMongoConnectionPoolSize;
   //Mongo Destination
   public final String[] destinationMongoHosts;
   public final int[] destinationMongoPorts;
@@ -70,6 +73,7 @@ public class PropertiesHolder {
   public final String destinationMongoPassword;
   public final boolean destinationMongoEnableSSL;
   public final String destinationMongoDb;
+  public final int destinationMongoConnectionPoolSize;
   //Solr/Zookeeper Destination
   public final String[] destinationSolrHosts;
   public final String[] destinationZookeeperHosts;
@@ -149,6 +153,7 @@ public class PropertiesHolder {
     metisCoreMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
     metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
+    metisCoreConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.metis.core.connection.pool.size"), 50);
 
     //Mongo Source
     sourceMongoHosts = properties.getProperty("mongo.source.hosts").split(",");
@@ -159,6 +164,7 @@ public class PropertiesHolder {
     sourceMongoPassword = properties.getProperty("mongo.source.password");
     sourceMongoEnableSSL = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
     sourceMongoDb = properties.getProperty("mongo.source.db");
+    sourceMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.source.connection.pool.size"), 500);
 
     //Mongo Destination
     destinationMongoHosts = properties.getProperty("mongo.destination.hosts").split(",");
@@ -172,6 +178,7 @@ public class PropertiesHolder {
     destinationMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
+    destinationMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.destination.connection.pool.size"), 500);
 
     //Solr/Zookeeper Destination
     destinationSolrHosts = properties.getProperty("solr.destination.hosts").split(",");

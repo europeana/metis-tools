@@ -116,7 +116,7 @@ public class MongoDestinationMongoDao {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.destinationMongoHosts,
         propertiesHolder.destinationMongoPorts, propertiesHolder.destinationMongoAuthenticationDb,
         propertiesHolder.destinationMongoUsername, propertiesHolder.destinationMongoPassword,
-        propertiesHolder.destinationMongoEnableSSL);
+        propertiesHolder.destinationMongoEnableSSL, propertiesHolder.destinationMongoConnectionPoolSize);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

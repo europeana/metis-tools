@@ -35,6 +35,8 @@ mongo.metis.core.username=
 mongo.metis.core.password=
 mongo.metis.core.enableSSL=false
 mongo.metis.core.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
 
 #Mongo Source
 mongo.source.hosts=
@@ -44,6 +46,8 @@ mongo.source.username=
 mongo.source.password=
 mongo.source.enableSSL=false
 mongo.source.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
 
 #Mongo Destination
 mongo.destination.hosts=
@@ -53,6 +57,8 @@ mongo.destination.username=
 mongo.destination.password=
 mongo.destination.enableSSL=false
 mongo.destination.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
 
 #Solr/Zookeeper Destination
 solr.destination.hosts=
@@ -73,3 +79,5 @@ mongo.enrichment.username=
 mongo.enrichment.password=
 mongo.enrichment.enableSSL=false
 mongo.enrichment.db=
+#Not setting this will results to default
+mongo.enrichment.connection.pool.size=
