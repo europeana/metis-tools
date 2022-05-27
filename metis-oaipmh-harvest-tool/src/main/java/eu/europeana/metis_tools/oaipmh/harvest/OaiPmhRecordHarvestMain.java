@@ -37,9 +37,9 @@ import org.xml.sax.SAXException;
 /**
  * Looks at a OAI-PMH endpoint and harvest the one record that we need.
  */
-public class OaiPmhHarvestMain {
+public class OaiPmhRecordHarvestMain {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OaiPmhHarvestMain.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OaiPmhRecordHarvestMain.class);
 
   private static final String OAI_PMH_NAME_SPACE = "http://www.openarchives.org/OAI/2.0/";
 
