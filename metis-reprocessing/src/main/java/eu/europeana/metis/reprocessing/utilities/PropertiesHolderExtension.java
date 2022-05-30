@@ -1,7 +1,14 @@
 package eu.europeana.metis.reprocessing.utilities;
 
 import eu.europeana.enrichment.service.dao.EnrichmentDao;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.math.NumberUtils;
 
 /**
@@ -26,6 +33,9 @@ public class PropertiesHolderExtension extends PropertiesHolder {
   public final int metisEnrichmentConnectionPoolSize;
   public final EnrichmentDao enrichmentDao;
 
+  //Set of ids to relabel
+  public final Set<String> idsToRelabel;
+
   public PropertiesHolderExtension(String configurationFileName) {
     super(configurationFileName);
     enrichmentUrl = properties.getProperty("enrichment.url");
@@ -47,6 +57,14 @@ public class PropertiesHolderExtension extends PropertiesHolder {
 
     enrichmentDao = new EnrichmentDao(
         prepareMongoEnrichmentConfiguration().getMongoClient(), metisEnrichmentMongoDb);
+
+    //Set of ids to relabel from a file with an id per line
+    try (InputStream inputStream = getClass().getResourceAsStream("/ids_to_relabel.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
+      idsToRelabel = reader.lines().collect(Collectors.toSet());
+    } catch (IOException e) {
+      throw new ExceptionInInitializerError(e);
+    }
   }
 
   private MongoInitializer prepareMongoEnrichmentConfiguration() {

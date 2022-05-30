@@ -1,5 +1,7 @@
 package eu.europeana.metis.reprocessing.model;
 
+import static java.util.Objects.nonNull;
+
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.enrichment.rest.client.EnrichmentWorker;
 import eu.europeana.enrichment.rest.client.EnrichmentWorkerImpl;
@@ -15,10 +17,15 @@ import eu.europeana.metis.reprocessing.execution.IndexUtilities;
 import eu.europeana.metis.reprocessing.execution.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.execution.ProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.schema.jibx.EdmType;
+import eu.europeana.metis.schema.jibx.ProvidedCHOType;
 import eu.europeana.metis.schema.jibx.RDF;
+import eu.europeana.metis.schema.jibx.Type2;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +33,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Extra configuration class that is part of {@link BasicConfiguration}.
  * <p>This class is meant to be modifiable and different per re-processing operation.
- * It contains 3 functional interfaces that should be initialized properly and they are triggered
- * internally during the re-processing.</p>
+ * It contains 3 functional interfaces that should be initialized properly and they are triggered internally during the
+ * re-processing.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
@@ -39,6 +46,7 @@ public class ExtraConfiguration extends BasicConfiguration {
   private final ThrowingBiFunction<FullBeanImpl, BasicConfiguration, RDF> fullBeanProcessor;
   private final ThrowingTriConsumer<RDF, Boolean, BasicConfiguration> rdfIndexer;
   private final ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> afterReprocessProcessor;
+  private final Set<String> idsToRelabel;
 
   private EnrichmentWorker enrichmentWorker;
 
@@ -51,6 +59,9 @@ public class ExtraConfiguration extends BasicConfiguration {
     this.afterReprocessProcessor = PostProcessUtilities::postProcess;
 
     initializeAdditionalElements(propertiesHolderExtension);
+
+    //Ids to relabel
+    idsToRelabel = propertiesHolderExtension.idsToRelabel;
   }
 
   private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension)
@@ -96,6 +107,25 @@ public class ExtraConfiguration extends BasicConfiguration {
   @Override
   public RDF processRDF(RDF rdf) {
     //Modify this method accordingly
+    RDF enrichedRdf = reEnrichment(rdf);
+    return reLabel3DTypeToImage(enrichedRdf);
+  }
+
+  private RDF reLabel3DTypeToImage(RDF rdf) {
+    final String about = rdf.getProvidedCHOList().stream().findFirst().map(ProvidedCHOType::getAbout).orElse(null);
+    if (idsToRelabel.contains(about)) {
+      rdf.getProxyList().stream().filter(Objects::nonNull).filter(
+             proxy -> nonNull(proxy.getType()) && nonNull(proxy.getType().getType()) && proxy.getType().getType() == EdmType._3_D)
+         .forEach(proxy -> {
+           Type2 type = new Type2();
+           type.setType(EdmType.IMAGE);
+           proxy.setType(type);
+         });
+    }
+    return rdf;
+  }
+
+  private RDF reEnrichment(RDF rdf) {
     RDF computedRDF = rdf;
     try {
       enrichmentWorker.cleanupPreviousEnrichmentEntities(rdf);
