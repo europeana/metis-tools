@@ -89,32 +89,32 @@
 	<repositories>
 		<repository>
 		     <id>europeana-ext-release-local</id>
-             <url>http://artifactory.eanadev.org/artifactory/ext-release-local</url>
+             <url>https://artifactory.eanadev.org/artifactory/ext-release-local</url>
 		</repository>
 		<repository>
 			<id>releases</id>
-			<url>http://artifactory.eanadev.org/artifactory/libs-release-local</url>
+			<url>https://artifactory.eanadev.org/artifactory/libs-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 		<repository>
 			<id>ext-releases</id>
-			<url>http://artifactory.eanadev.org/artifactory/ext-release-local</url>
+			<url>https://artifactory.eanadev.org/artifactory/ext-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 		<repository>
 			<id>snapshots</id>
-			<url>http://artifactory.eanadev.org/artifactory/libs-snapshot-local</url>
+			<url>https://artifactory.eanadev.org/artifactory/libs-snapshot-local</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
 		</repository>
 		<repository>
 			<id>ext-snapshots</id>
-			<url>http://artifactory.eanadev.org/artifactory/ext-snapshot-local</url>
+			<url>https://artifactory.eanadev.org/artifactory/ext-snapshot-local</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>

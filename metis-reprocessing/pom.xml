@@ -50,7 +50,7 @@
     <version.corelib>2.15.3</version.corelib>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.30</version.slf4j>
-    <version.log4j>2.17.1</version.log4j>
+    <version.log4j>2.17.2</version.log4j>
   </properties>
 
   <dependencies>
@@ -142,7 +142,7 @@
     <repository>
       <id>libs-release</id>
       <name>libs-release</name>
-      <url>http://artifactory.eanadev.org/artifactory/libs-release</url>
+      <url>https://artifactory.eanadev.org/artifactory/libs-release</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -153,7 +153,7 @@
     <repository>
       <id>libs-snapshot</id>
       <name>libs-snapshot</name>
-      <url>http://artifactory.eanadev.org/artifactory/libs-snapshot</url>
+      <url>https://artifactory.eanadev.org/artifactory/libs-snapshot</url>
       <releases>
         <enabled>false</enabled>
       </releases>
