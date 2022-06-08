@@ -51,6 +51,7 @@ public abstract class BasicConfiguration {
   private final Mode mode;
   private final boolean identityProcess;
   private final boolean clearDatabasesBeforeProcess;
+  private final boolean tierRecalculation;
   private final List<String> datasetIdsToProcess;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private final List<ExecutablePluginType> invalidatePluginTypes;
@@ -82,6 +83,7 @@ public abstract class BasicConfiguration {
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
     clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
+    tierRecalculation = propertiesHolder.tierRecalculation;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
@@ -180,6 +182,10 @@ public abstract class BasicConfiguration {
 
   public boolean isClearDatabasesBeforeProcess() {
     return clearDatabasesBeforeProcess;
+  }
+
+  public boolean isTierRecalculation() {
+    return tierRecalculation;
   }
 
   public ExecutablePluginType getReprocessBasedOnPluginType() {

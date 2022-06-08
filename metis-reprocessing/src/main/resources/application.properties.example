@@ -18,6 +18,7 @@ dataset.ids.to.process=
 identity.process=
 #Set to true if we want to clear the database before we start a new process. Only applicable for DEFAULT Mode
 clean.databases.before.process=
+tier.recalculation=
 #The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon. For example ENRICHMENT. MUST not be empty if mode is POST_PROCESS
 reprocess.based.on.plugin.type=
 #The plugins in metis core to invalidate during POST_PROCESS. For example if the base plugin type was ENRICHMENT then the plugins that have to be invalidated would be the ones following ENRICHMENT. MUST not be empty if mode is POST_PROCESS
@@ -81,3 +82,9 @@ mongo.enrichment.enableSSL=false
 mongo.enrichment.db=
 #Not setting this will results to default
 mongo.enrichment.connection.pool.size=
+
+#Entity Management Base Url for Entity Retrieval
+entity.management.url=https://entity-management-acceptance.eanadev.org/entity
+#Entity Api V2 url for search and suggest
+entity.api.url= https://entity-api-v2-new-acceptance.eanadev.org/entity
+entity.api.key=api2demo

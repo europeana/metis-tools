@@ -21,8 +21,8 @@ import org.springframework.util.CollectionUtils;
 /**
  * Contains all properties that are required for execution.
  * <p>During construction will read properties from the specified file from the classpath.
- * Internally it holds {@link PropertiesHolder#propertiesHolderExtension} that should contain the
- * extra required properties per re-process operation.</p>
+ * Internally it holds {@link PropertiesHolder#propertiesHolderExtension} that should contain the extra required properties per
+ * re-process operation.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-16
@@ -42,6 +42,8 @@ public class PropertiesHolder {
   public final List<String> datasetIdsToProcess;
   public final boolean identityProcess;
   public final boolean cleanDatabasesBeforeProcess;
+  public final boolean tierRecalculation;
+
   public final ExecutablePluginType reprocessBasedOnPluginType;
   public final List<ExecutablePluginType> invalidatePluginTypes;
 
@@ -117,10 +119,11 @@ public class PropertiesHolder {
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
 
     datasetIdsToProcess = Arrays.stream(properties.getProperty("dataset.ids.to.process").split(","))
-        .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+                                .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
+    tierRecalculation = Boolean.parseBoolean(properties.getProperty("tier.recalculation"));
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
     invalidatePluginTypes = Arrays
@@ -158,7 +161,7 @@ public class PropertiesHolder {
     //Mongo Source
     sourceMongoHosts = properties.getProperty("mongo.source.hosts").split(",");
     sourceMongoPorts = Arrays.stream(properties.getProperty("mongo.source.port").split(","))
-        .mapToInt(Integer::parseInt).toArray();
+                             .mapToInt(Integer::parseInt).toArray();
     sourceMongoAuthenticationDb = properties.getProperty("mongo.source.authentication.db");
     sourceMongoUsername = properties.getProperty("mongo.source.username");
     sourceMongoPassword = properties.getProperty("mongo.source.password");

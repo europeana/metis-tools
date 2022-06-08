@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.utilities;
 
+import eu.europeana.enrichment.api.external.impl.EntityResolverType;
 import eu.europeana.enrichment.service.dao.EnrichmentDao;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Extra properties class that is part of {@link PropertiesHolder}.
@@ -31,6 +33,21 @@ public class PropertiesHolderExtension extends PropertiesHolder {
   public final boolean metisEnrichmentMongoEnableSSL;
   public final String metisEnrichmentMongoDb;
   public final int metisEnrichmentConnectionPoolSize;
+
+  public final int enrichmentBatchSize;
+
+  @Value("${enrichment.entity.resolver.type:PERSISTENT}")
+  public final EntityResolverType entityResolverType;
+
+  @Value("${entity.management.url}")
+  public final String entityManagementUrl;
+
+  @Value("${entity.api.url}")
+  public final String entityApiUrl;
+
+  @Value("${entity.api.key}")
+  public final String entityApiKey;
+
   public final EnrichmentDao enrichmentDao;
 
   //Set of ids to relabel
@@ -54,6 +71,13 @@ public class PropertiesHolderExtension extends PropertiesHolder {
         .parseBoolean(properties.getProperty("mongo.enrichment.enableSSL"));
     metisEnrichmentMongoDb = properties.getProperty("mongo.enrichment.db");
     metisEnrichmentConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.enrichment.connection.pool.size"), 500);
+
+    enrichmentBatchSize = Integer
+        .parseInt(properties.getProperty("enrichment.batch.size"));
+    entityResolverType = EntityResolverType.valueOf(properties.getProperty("enrichment.entity.resolver.type"));
+    entityManagementUrl = properties.getProperty("entity.management.url");
+    entityApiUrl = properties.getProperty("entity.api.url");
+    entityApiKey = properties.getProperty("entity.api.key");
 
     enrichmentDao = new EnrichmentDao(
         prepareMongoEnrichmentConfiguration().getMongoClient(), metisEnrichmentMongoDb);

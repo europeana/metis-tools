@@ -1,8 +1,12 @@
 package eu.europeana.metis.reprocessing.model;
 
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.enrichment.api.external.impl.ClientEntityResolver;
+import eu.europeana.enrichment.api.external.impl.EntityResolverType;
+import eu.europeana.enrichment.api.internal.EntityResolver;
 import eu.europeana.enrichment.rest.client.EnrichmentWorker;
 import eu.europeana.enrichment.rest.client.EnrichmentWorkerImpl;
 import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
@@ -12,6 +16,8 @@ import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.enrichment.service.PersistentEntityResolver;
+import eu.europeana.entity.client.config.EntityClientConfiguration;
+import eu.europeana.entity.client.web.EntityClientApiImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.execution.IndexUtilities;
 import eu.europeana.metis.reprocessing.execution.PostProcessUtilities;
@@ -25,6 +31,7 @@ import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfiguration
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -66,27 +73,52 @@ public class ExtraConfiguration extends BasicConfiguration {
 
   private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension)
       throws DereferenceException, EnrichmentException {
+    enrichmentWorker = new EnrichmentWorkerImpl(getDereferencer(propertiesHolderExtension),
+        getEnricher(propertiesHolderExtension));
+  }
 
-    Enricher enricher = null;
-    Dereferencer dereferencer = null;
+  private Enricher getEnricher(PropertiesHolderExtension propertiesHolderExtension) throws EnrichmentException {
     final EnricherProvider enricherProvider = new EnricherProvider();
-    if (propertiesHolderExtension.enrichmentDao != null) {
-      enricherProvider
-          .setEntityResolver(new PersistentEntityResolver(propertiesHolderExtension.enrichmentDao));
-      enricher = enricherProvider.create();
+    if (propertiesHolderExtension.entityResolverType == EntityResolverType.ENTITY_CLIENT) {
+      enricherProvider.setEntityResolver(prepareClientEntityResolver(propertiesHolderExtension));
+    } else if (propertiesHolderExtension.entityResolverType == EntityResolverType.PERSISTENT) {
+      enricherProvider.setEntityResolver(new PersistentEntityResolver(propertiesHolderExtension.enrichmentDao));
     } else {
       if (StringUtils.isNotBlank(propertiesHolderExtension.enrichmentUrl)) {
         enricherProvider.setEnrichmentUrl(propertiesHolderExtension.enrichmentUrl);
-        enricher = enricherProvider.create();
-        if (StringUtils.isNotBlank(propertiesHolderExtension.dereferenceUrl)) {
-          final DereferencerProvider dereferencerProvider = new DereferencerProvider();
-          dereferencerProvider.setEnrichmentUrl(propertiesHolderExtension.enrichmentUrl);
-          dereferencerProvider.setDereferenceUrl(propertiesHolderExtension.dereferenceUrl);
-          dereferencer = dereferencerProvider.create();
-        }
       }
     }
-    enrichmentWorker = new EnrichmentWorkerImpl(dereferencer, enricher);
+    return enricherProvider.create();
+  }
+
+  private EntityResolver prepareClientEntityResolver(PropertiesHolderExtension propertiesHolderExtension) {
+    final EntityResolver entityResolver;
+    //Sanity check
+    if (StringUtils.isAnyBlank(propertiesHolderExtension.entityManagementUrl, propertiesHolderExtension.entityApiUrl,
+        propertiesHolderExtension.entityApiKey)) {
+      throw new IllegalArgumentException(
+          format("Requested %s resolver but configuration is missing", EntityResolverType.ENTITY_CLIENT));
+    }
+    final Properties properties = new Properties();
+    properties.put("entity.management.url", propertiesHolderExtension.entityManagementUrl);
+    properties.put("entity.api.url", propertiesHolderExtension.entityApiUrl);
+    properties.put("entity.api.key", propertiesHolderExtension.entityApiKey);
+    entityResolver = new ClientEntityResolver(new EntityClientApiImpl(new EntityClientConfiguration(properties)),
+        propertiesHolderExtension.enrichmentBatchSize);
+    return entityResolver;
+  }
+
+  private Dereferencer getDereferencer(PropertiesHolderExtension propertiesHolderExtension) throws DereferenceException {
+    final Dereferencer dereferencer;
+    if (StringUtils.isNotBlank(propertiesHolderExtension.dereferenceUrl)) {
+      final DereferencerProvider dereferencerProvider = new DereferencerProvider();
+      dereferencerProvider.setEnrichmentUrl(propertiesHolderExtension.enrichmentUrl);
+      dereferencerProvider.setDereferenceUrl(propertiesHolderExtension.dereferenceUrl);
+      dereferencer = dereferencerProvider.create();
+    } else {
+      dereferencer = null;
+    }
+    return dereferencer;
   }
 
   @Override
