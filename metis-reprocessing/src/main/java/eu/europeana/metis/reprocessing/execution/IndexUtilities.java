@@ -52,7 +52,7 @@ public class IndexUtilities {
       ExternalRequestUtil.retryableExternalRequest(() -> {
         // TODO: 28/10/2021 Add configuration property for the flags?
         //Timestamps should be preserved, Tier calculation is disabled(preserved), Redirects calculation disabled
-        final IndexingProperties indexingProperties = new IndexingProperties(null, preserveTimestamps, null, false, false);
+        final IndexingProperties indexingProperties = new IndexingProperties(null, preserveTimestamps, null, false, true);
         indexerPool.indexRdf(rdf, indexingProperties);
         return null;
       }, retryExceptions);

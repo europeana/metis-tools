@@ -107,8 +107,30 @@ public class ExtraConfiguration extends BasicConfiguration {
   @Override
   public RDF processRDF(RDF rdf) {
     //Modify this method accordingly
-    RDF enrichedRdf = reEnrichment(rdf);
-    return reLabel3DTypeToImage(enrichedRdf);
+    final RDF enrichedRdf = reEnrichment(rdf);
+    final RDF reLabel3DTypeToImage = reLabel3DTypeToImage(enrichedRdf);
+    return rightsFix(reLabel3DTypeToImage);
+  }
+
+  private RDF rightsFix(RDF rdf) {
+    final String about = rdf.getProvidedCHOList().stream().findFirst().map(ProvidedCHOType::getAbout).orElse(null);
+    if (nonNull(about)) {
+      if (about.startsWith("/2020702")) {
+        rdf.getAggregationList().stream().filter(
+            aggregation -> nonNull(aggregation.getRights()) && nonNull(aggregation.getRights().getResource()) &&
+                aggregation.getRights().getResource().equals(
+                    "http://creativecommons.org/publicdomain/mark/1.0")).forEach(aggregation ->
+            aggregation.getRights().setResource("http://creativecommons.org/publicdomain/mark/1.0/"));
+
+      } else if (about.startsWith("/364")) {
+        rdf.getAggregationList().stream().filter(
+            aggregation -> nonNull(aggregation.getRights()) && nonNull(aggregation.getRights().getResource()) &&
+                aggregation.getRights().getResource().equals(
+                    "http://rightsstatements.org/page/InC/1.0/?language=en")).forEach(aggregation ->
+            aggregation.getRights().setResource("http://rightsstatements.org/page/InC/1.0/"));
+      }
+    }
+    return rdf;
   }
 
   private RDF reLabel3DTypeToImage(RDF rdf) {
