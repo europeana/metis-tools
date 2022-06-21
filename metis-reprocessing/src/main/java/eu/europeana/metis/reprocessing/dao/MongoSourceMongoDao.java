@@ -38,7 +38,6 @@ import java.util.List;
  */
 public class MongoSourceMongoDao {
 
-  private static final String ID = "_id";
   private static final int DEFAULT_PAGE_SIZE = 200;
   public static final String ABOUT = "about";
   public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;

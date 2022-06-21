@@ -147,9 +147,9 @@ public class ProcessDataset implements Callable<Void> {
   private void failedRecordsOperation() {
     //For an execution of processing only previously failed records the starting page index is
     // always 0(zero). And since we update individual records nextPage remains at 0 on each iteration.
-    int nextPage = 0;
+    int failedNextPage = 0;
     final long totalFailedRecords = datasetStatus.getTotalFailedRecords();
-    List<FailedRecord> failedRecords = getFailedRecords(nextPage);
+    List<FailedRecord> failedRecords = getFailedRecords(failedNextPage);
     List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(failedRecords);
     long counterFailedRecordsProcessed = 0;
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
@@ -166,10 +166,9 @@ public class ProcessDataset implements Callable<Void> {
       counterFailedRecordsProcessed += nextPageOfRecords.size();
       LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
           prefixDatasetIdLog, counterFailedRecordsProcessed, totalFailedRecords);
-      failedRecords = getFailedRecords(nextPage);
+      failedRecords = getFailedRecords(failedNextPage);
       nextPageOfRecords = getFailedFullBeans(failedRecords);
     }
-    //    basicConfiguration.getMongoDestinationMongoDao().deleteAllSuccessfulReprocessedFailedRecords();
   }
 
   /**

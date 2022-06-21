@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Contains functionality for indexing.
@@ -28,7 +26,6 @@ import org.slf4j.LoggerFactory;
  */
 public class IndexUtilities {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IndexUtilities.class);
   private static final Map<Class<?>, String> retryExceptions;
 
   static {
