@@ -1,7 +1,8 @@
-package eu.europeana.metis.reprocessing.utilities;
+package eu.europeana.metis.reprocessing.config;
 
 import eu.europeana.enrichment.api.external.impl.EntityResolverType;
 import eu.europeana.enrichment.service.dao.EnrichmentDao;
+import eu.europeana.metis.reprocessing.dao.MongoInitializer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,15 +1,15 @@
 package eu.europeana.metis.reprocessing.execution;
 
-import static eu.europeana.metis.reprocessing.utilities.PropertiesHolder.STATISTICS_LOGS_MARKER;
+import static eu.europeana.metis.reprocessing.config.PropertiesHolder.STATISTICS_LOGS_MARKER;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
-import eu.europeana.metis.reprocessing.model.BasicConfiguration;
+import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
-import eu.europeana.metis.reprocessing.model.Mode;
+import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * This class is a {@link Callable} class that would be initialized with a {@link #datasetId}.
  * <p>It is responsible of re-processing a dataset as a whole, by paging records from the
  * database, while keeping track of it's dataset status. This class should not require modification
- * and only provided functionality in the {@link BasicConfiguration} should be modifiable.</p>
+ * and only provided functionality in the {@link Configuration} should be modifiable.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-14
@@ -44,17 +44,17 @@ public class ProcessDataset implements Callable<Void> {
   private final String prefixDatasetIdLog;
   private final String datasetId;
   private final DatasetStatus datasetStatus;
-  private final BasicConfiguration basicConfiguration;
+  private final Configuration configuration;
   private final int maxParallelPageThreads;
   private int nextPage;
 
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Integer> completionService;
 
-  ProcessDataset(DatasetStatus datasetStatus, BasicConfiguration basicConfiguration,
+  ProcessDataset(DatasetStatus datasetStatus, Configuration configuration,
       int maxParallelPageThreads) {
     this.datasetId = datasetStatus.getDatasetId();
-    this.basicConfiguration = basicConfiguration;
+    this.configuration = configuration;
     this.prefixDatasetIdLog = String.format("DatasetId: %s", this.datasetId);
     this.datasetStatus = datasetStatus;
 
@@ -72,7 +72,7 @@ public class ProcessDataset implements Callable<Void> {
   private void processDataset() throws ExecutionException, InterruptedException {
     LOGGER.info("{} - Processing start", prefixDatasetIdLog);
     final long startProcessTime = System.nanoTime();
-    if (basicConfiguration.getMode() == Mode.DEFAULT) {
+    if (configuration.getMode() == Mode.DEFAULT) {
       if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
         LOGGER.info(
             "{} - Reprocessing not started because it was already completely processed with totalRecords: {} - totalProcessed: {}",
@@ -82,13 +82,13 @@ public class ProcessDataset implements Callable<Void> {
       //Process normally if not completely processed
       loopOverAllRecordsAndProcess();
       finalizeDatasetStatus(startProcessTime);
-    } else if (basicConfiguration.getMode() == Mode.REPROCESS_ALL_FAILED) {
+    } else if (configuration.getMode() == Mode.REPROCESS_ALL_FAILED) {
       if (datasetStatus.getTotalFailedRecords() <= 0) {
         //Do not process dataset further cause we only process failed ones
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(
               "{} - Reprocessing not started because mode is: {} and there are no failed records",
-              prefixDatasetIdLog, basicConfiguration.getMode().name());
+              prefixDatasetIdLog, configuration.getMode().name());
         }
         return;
       }
@@ -98,7 +98,7 @@ public class ProcessDataset implements Callable<Void> {
       //Process only failed records no matter if the dataset has already been completed
       loopOverAllFailedRecordsAndProcess();
       finalizeDatasetStatus(startProcessTime);
-    } else if (basicConfiguration.getMode() == Mode.POST_PROCESS) {
+    } else if (configuration.getMode() == Mode.POST_PROCESS) {
       postProcess();
       LOGGER.info("{} - Applied post processing function", prefixDatasetIdLog);
     }
@@ -110,7 +110,7 @@ public class ProcessDataset implements Callable<Void> {
     final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startProcess);
     datasetStatus
         .setActualTimeProcessAndIndex(datasetStatus.getActualTimeProcessAndIndex() + elapsedTime);
-    basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+    configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     LOGGER.info("{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
     LOGGER
         .info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
@@ -136,7 +136,7 @@ public class ProcessDataset implements Callable<Void> {
   private void loopOverAllRecordsAndProcess() throws ExecutionException, InterruptedException {
     nextPage = getStartingNextPage();
     datasetStatus.setStartDate(new Date());
-    basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+    configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     defaultOperation();
   }
 
@@ -205,7 +205,7 @@ public class ProcessDataset implements Callable<Void> {
 
     //Set End Date
     datasetStatus.setEndDate(new Date());
-    basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+    configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
   }
 
   void processRecords(List<FullBeanImpl> nextPageOfRecords) {
@@ -220,7 +220,7 @@ public class ProcessDataset implements Callable<Void> {
       final Set<Integer> pagesProcessed = datasetStatus.getPagesProcessed();
       pagesProcessed.add(pageProcessed);
       datasetStatus.updateAverages();
-      basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+      configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     }
   }
 
@@ -249,12 +249,12 @@ public class ProcessDataset implements Callable<Void> {
   private List<FullBeanImpl> getFailedFullBeans(List<FailedRecord> failedRecords) {
     final List<String> failedRecordsUrls = failedRecords.stream().map(FailedRecord::getFailedUrl)
         .collect(Collectors.toList());
-    return basicConfiguration.getMongoSourceMongoDao().getRecordsFromList(failedRecordsUrls);
+    return configuration.getMongoSourceMongoDao().getRecordsFromList(failedRecordsUrls);
   }
 
   private List<FailedRecord> getFailedRecords(int nextPage) {
-    return basicConfiguration.getMongoDestinationMongoDao()
-        .getNextPageOfFailedRecords(datasetId, nextPage);
+    return configuration.getMongoDestinationMongoDao()
+                        .getNextPageOfFailedRecords(datasetId, nextPage);
   }
 
   /**
@@ -264,7 +264,7 @@ public class ProcessDataset implements Callable<Void> {
    * @return the list of records
    */
   List<FullBeanImpl> getFullBeans(int nextPage) {
-    return basicConfiguration.getMongoSourceMongoDao().getNextPageOfRecords(datasetId, nextPage);
+    return configuration.getMongoSourceMongoDao().getNextPageOfRecords(datasetId, nextPage);
   }
 
   private String processAndIndex(FullBeanImpl fullBean) {
@@ -306,10 +306,10 @@ public class ProcessDataset implements Callable<Void> {
       if (StringUtils.isNotBlank(resourceId)) {
         if (StringUtils.isBlank(exceptionStackTrace)) {
           if (processFailedOnly) {
-            basicConfiguration.getMongoDestinationMongoDao()
-                .deleteFailedRecordFromDb(foundFailedRecord);
+            configuration.getMongoDestinationMongoDao()
+                         .deleteFailedRecordFromDb(foundFailedRecord);
             datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() - 1);
-            basicConfiguration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
+            configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
           } else {
             datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
           }
@@ -318,7 +318,7 @@ public class ProcessDataset implements Callable<Void> {
           if (foundFailedRecord != null) {
             failedRecord.setId(foundFailedRecord.getId());
           }
-          basicConfiguration.getMongoDestinationMongoDao().storeFailedRecordToDb(failedRecord);
+          configuration.getMongoDestinationMongoDao().storeFailedRecordToDb(failedRecord);
           if (!processFailedOnly) {
             datasetStatus.setTotalProcessed(datasetStatus.getTotalProcessed() + 1);
             datasetStatus.setTotalFailedRecords(datasetStatus.getTotalFailedRecords() + 1);
@@ -331,7 +331,7 @@ public class ProcessDataset implements Callable<Void> {
   private RDF processRecord(FullBeanImpl fullBean) throws ProcessingException {
     final long startTimeProcess = System.nanoTime();
     try {
-      return basicConfiguration.getFullBeanProcessor().apply(fullBean, basicConfiguration);
+      return configuration.getFullBeanProcessor().apply(fullBean, configuration);
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeProcess);
       synchronized (this) {
@@ -344,7 +344,7 @@ public class ProcessDataset implements Callable<Void> {
   private void indexRecord(RDF rdf) throws IndexingException {
     final long startTimeIndex = System.nanoTime();
     try {
-      basicConfiguration.getRdfIndexer().accept(rdf, true, basicConfiguration);
+      configuration.getRdfIndexer().accept(rdf, true, configuration);
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeIndex);
       synchronized (this) {
@@ -356,9 +356,9 @@ public class ProcessDataset implements Callable<Void> {
 
   private void postProcess() {
     try {
-      basicConfiguration.getAfterReprocessProcessor()
-          .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),
-              basicConfiguration);
+      configuration.getAfterReprocessProcessor()
+                   .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),
+                       configuration);
     } catch (ProcessingException e) {
       LOGGER.error("{} - After reprocessing operation failed!", prefixDatasetIdLog, e);
     }

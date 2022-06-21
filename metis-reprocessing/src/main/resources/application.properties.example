@@ -83,8 +83,11 @@ mongo.enrichment.db=
 #Not setting this will results to default
 mongo.enrichment.connection.pool.size=
 
+enrichment.batch.size=
+enrichment.entity.resolver.type=
+
 #Entity Management Base Url for Entity Retrieval
-entity.management.url=https://entity-management-acceptance.eanadev.org/entity
+entity.management.url=
 #Entity Api V2 url for search and suggest
-entity.api.url= https://entity-api-v2-new-acceptance.eanadev.org/entity
-entity.api.key=api2demo
+entity.api.url=
+entity.api.key=

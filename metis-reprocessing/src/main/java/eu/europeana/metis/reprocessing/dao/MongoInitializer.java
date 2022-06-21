@@ -1,4 +1,4 @@
-package eu.europeana.metis.reprocessing.utilities;
+package eu.europeana.metis.reprocessing.dao;
 
 import com.mongodb.client.MongoClient;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;

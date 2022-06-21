@@ -1,4 +1,4 @@
-package eu.europeana.metis.reprocessing.execution;
+package eu.europeana.metis.reprocessing.utilities;
 
 import eu.europeana.corelib.definitions.edm.beans.FullBean;
 import eu.europeana.corelib.definitions.edm.entity.Aggregation;
@@ -9,7 +9,7 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
-import eu.europeana.metis.reprocessing.model.BasicConfiguration;
+import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -42,11 +42,11 @@ public class ProcessUtilities {
   private ProcessUtilities() {
   }
 
-  public static RDF processFullBean(FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {
-    if (basicConfiguration.isIdentityProcess()) {
-      return identityProcess(fullBean, basicConfiguration.getMongoSourceMongoDao());
+  public static RDF processFullBean(FullBeanImpl fullBean, Configuration configuration) {
+    if (configuration.isIdentityProcess()) {
+      return identityProcess(fullBean, configuration.getMongoSourceMongoDao());
     } else {
-      return process(fullBean, basicConfiguration);
+      return process(fullBean, configuration);
     }
   }
 
@@ -56,14 +56,14 @@ public class ProcessUtilities {
     return EdmUtils.toRDF(fullBean, true);
   }
 
-  private static RDF process(FullBeanImpl fullBean, BasicConfiguration basicConfiguration) {
-    RDF rdf = identityProcess(fullBean, basicConfiguration.getMongoSourceMongoDao());
-    rdf = compute(basicConfiguration, rdf);
+  private static RDF process(FullBeanImpl fullBean, Configuration configuration) {
+    RDF rdf = identityProcess(fullBean, configuration.getMongoSourceMongoDao());
+    rdf = compute(configuration, rdf);
     return rdf;
   }
 
-  private static RDF compute(BasicConfiguration basicConfiguration, RDF rdf) {
-    return basicConfiguration.processRDF(rdf);
+  private static RDF compute(Configuration configuration, RDF rdf) {
+    return configuration.processRDF(rdf);
   }
 
   private static void injectWebResourceMetaInfo(final FullBean fullBean,

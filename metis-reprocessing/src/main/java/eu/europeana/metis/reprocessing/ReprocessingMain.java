@@ -4,9 +4,9 @@ import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.execution.ExecutorManager;
-import eu.europeana.metis.reprocessing.model.BasicConfiguration;
-import eu.europeana.metis.reprocessing.model.ExtraConfiguration;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
+import eu.europeana.metis.reprocessing.config.PropertiesHolderExtension;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,10 +30,10 @@ public class ReprocessingMain {
       throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException, DereferenceException, EnrichmentException {
     LOGGER.info("Starting script");
 
-    final BasicConfiguration basicConfiguration = new ExtraConfiguration(propertiesHolder);
+    final Configuration configuration = new DefaultConfiguration(propertiesHolder);
 
     boolean startExecution = true;
-    if (basicConfiguration.isClearDatabasesBeforeProcess()) {
+    if (configuration.isClearDatabasesBeforeProcess()) {
       System.out.println(
           "Script parameter to clear databases before start is set to true, " + "continue? y/n");
       try (Scanner input = new Scanner(System.in)) {
@@ -45,12 +45,12 @@ public class ReprocessingMain {
     }
 
     if (startExecution) {
-      final ExecutorManager executorManager = new ExecutorManager(basicConfiguration,
+      final ExecutorManager executorManager = new ExecutorManager(configuration,
           propertiesHolder);
       executorManager.startReprocessing();
       executorManager.close();
     }
-    basicConfiguration.close();
+    configuration.close();
     LOGGER.info("End script");
   }
 }

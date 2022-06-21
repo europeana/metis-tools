@@ -1,7 +1,6 @@
-package eu.europeana.metis.reprocessing.utilities;
+package eu.europeana.metis.reprocessing.config;
 
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
-import eu.europeana.metis.reprocessing.model.Mode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

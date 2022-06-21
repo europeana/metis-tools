@@ -46,6 +46,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
+    <version.metis-schema>7</version.metis-schema>
     <version.metis>7-SNAPSHOT</version.metis>
     <version.corelib>2.15.3</version.corelib>
     <!-- These two versions are interdependent. -->
@@ -54,6 +55,11 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>eu.europeana.metis</groupId>
+      <artifactId>metis-schema</artifactId>
+      <version>${version.metis-schema}</version>
+    </dependency>
     <dependency>
       <artifactId>metis-core-common</artifactId>
       <groupId>eu.europeana.metis</groupId>

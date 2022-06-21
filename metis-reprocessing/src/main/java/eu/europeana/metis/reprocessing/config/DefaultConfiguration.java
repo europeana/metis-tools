@@ -1,4 +1,4 @@
-package eu.europeana.metis.reprocessing.model;
+package eu.europeana.metis.reprocessing.config;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -19,10 +19,9 @@ import eu.europeana.enrichment.service.PersistentEntityResolver;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.web.EntityClientApiImpl;
 import eu.europeana.indexing.exception.IndexingException;
-import eu.europeana.metis.reprocessing.execution.IndexUtilities;
-import eu.europeana.metis.reprocessing.execution.PostProcessUtilities;
-import eu.europeana.metis.reprocessing.execution.ProcessUtilities;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
+import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
+import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
 import eu.europeana.metis.schema.jibx.EdmType;
 import eu.europeana.metis.schema.jibx.ProvidedCHOType;
 import eu.europeana.metis.schema.jibx.RDF;
@@ -38,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extra configuration class that is part of {@link BasicConfiguration}.
+ * Extra configuration class that is part of {@link Configuration}.
  * <p>This class is meant to be modifiable and different per re-processing operation.
  * It contains 3 functional interfaces that should be initialized properly and they are triggered internally during the
  * re-processing.</p>
@@ -46,18 +45,18 @@ import org.slf4j.LoggerFactory;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */
-public class ExtraConfiguration extends BasicConfiguration {
+public class DefaultConfiguration extends Configuration {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ExtraConfiguration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConfiguration.class);
 
-  private final ThrowingBiFunction<FullBeanImpl, BasicConfiguration, RDF> fullBeanProcessor;
-  private final ThrowingTriConsumer<RDF, Boolean, BasicConfiguration> rdfIndexer;
-  private final ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> afterReprocessProcessor;
-  private final Set<String> idsToRelabel;
+  private final ThrowingBiFunction<FullBeanImpl, Configuration, RDF> fullBeanProcessor;
+  private final ThrowingTriConsumer<RDF, Boolean, Configuration> rdfIndexer;
+  private final ThrowingQuadConsumer<String, Date, Date, Configuration> afterReprocessProcessor;
+  private Set<String> idsToRelabel;
 
   private EnrichmentWorker enrichmentWorker;
 
-  public ExtraConfiguration(PropertiesHolderExtension propertiesHolderExtension)
+  public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
       throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException {
     super(propertiesHolderExtension);
 
@@ -66,15 +65,13 @@ public class ExtraConfiguration extends BasicConfiguration {
     this.afterReprocessProcessor = PostProcessUtilities::postProcess;
 
     initializeAdditionalElements(propertiesHolderExtension);
-
-    //Ids to relabel
-    idsToRelabel = propertiesHolderExtension.idsToRelabel;
   }
 
   private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension)
       throws DereferenceException, EnrichmentException {
     enrichmentWorker = new EnrichmentWorkerImpl(getDereferencer(propertiesHolderExtension),
         getEnricher(propertiesHolderExtension));
+    idsToRelabel = propertiesHolderExtension.idsToRelabel;
   }
 
   private Enricher getEnricher(PropertiesHolderExtension propertiesHolderExtension) throws EnrichmentException {
@@ -122,17 +119,17 @@ public class ExtraConfiguration extends BasicConfiguration {
   }
 
   @Override
-  public ThrowingBiFunction<FullBeanImpl, BasicConfiguration, RDF> getFullBeanProcessor() {
+  public ThrowingBiFunction<FullBeanImpl, Configuration, RDF> getFullBeanProcessor() {
     return fullBeanProcessor;
   }
 
   @Override
-  public ThrowingTriConsumer<RDF, Boolean, BasicConfiguration> getRdfIndexer() {
+  public ThrowingTriConsumer<RDF, Boolean, Configuration> getRdfIndexer() {
     return rdfIndexer;
   }
 
   @Override
-  public ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> getAfterReprocessProcessor() {
+  public ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor() {
     return afterReprocessProcessor;
   }
 

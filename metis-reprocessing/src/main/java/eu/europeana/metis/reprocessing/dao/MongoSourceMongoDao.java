@@ -25,8 +25,7 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
-import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.reprocessing.config.PropertiesHolder;
 import java.util.ArrayList;
 import java.util.List;
 
