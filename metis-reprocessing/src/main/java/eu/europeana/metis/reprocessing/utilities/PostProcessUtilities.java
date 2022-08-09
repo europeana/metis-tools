@@ -112,8 +112,7 @@ public class PostProcessUtilities {
 
   private static void setInvalidFlagToPlugins(String datasetId,
       Configuration configuration) {
-    final List<ExecutablePluginType> invalidatePluginTypes = configuration
-        .getInvalidatePluginTypes();
+    final List<ExecutablePluginType> invalidatePluginTypes = configuration.getInvalidatePluginTypes();
     final WorkflowExecutionDao workflowExecutionDao = configuration.getMetisCoreMongoDao()
                                                                    .getWorkflowExecutionDao();
     final List<PluginWithExecutionId<ExecutablePlugin>> deprecatedPlugins = invalidatePluginTypes

@@ -181,7 +181,7 @@ public class DefaultConfiguration extends Configuration {
     try {
       enrichmentWorker.cleanupPreviousEnrichmentEntities(rdf);
       computedRDF = enrichmentWorker.process(rdf, enrichmentWorker.getSupportedModes());
-    } catch (EnrichmentException | DereferenceException e) {
+    } catch (EnrichmentException | DereferenceException | RuntimeException e) {
       LOGGER.warn("Something went wrong during enrichment/dereference", e);
     }
     return computedRDF;

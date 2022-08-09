@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is a {@link Callable} class that would be initialized with a {@link #datasetId}.
  * <p>It is responsible of re-processing a dataset as a whole, by paging records from the
- * database, while keeping track of it's dataset status. This class should not require modification
- * and only provided functionality in the {@link Configuration} should be modifiable.</p>
+ * database, while keeping track of it's dataset status. This class should not require modification and only provided
+ * functionality in the {@link Configuration} should be modifiable.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-14
@@ -128,7 +128,7 @@ public class ProcessDataset implements Callable<Void> {
       startingPage = 0;
     } else {
       startingPage = IntStream.range(0, pagesProcessed.size())
-          .filter(idx -> !pagesProcessed.contains(idx)).findFirst().orElse(pagesProcessed.size());
+                              .filter(idx -> !pagesProcessed.contains(idx)).findFirst().orElse(pagesProcessed.size());
     }
     return startingPage;
   }
@@ -158,10 +158,10 @@ public class ProcessDataset implements Callable<Void> {
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final String exceptionStackTrace = processAndIndex(fullBean);
         failedRecords.stream()
-            .filter(failedRecord -> failedRecord.getFailedUrl().equals(fullBean.getAbout()))
-            .findFirst().ifPresent(
-            foundFailedRecord -> updateProcessFailedOnlyCounts(exceptionStackTrace,
-                fullBean.getAbout(), foundFailedRecord));
+                     .filter(failedRecord -> failedRecord.getFailedUrl().equals(fullBean.getAbout()))
+                     .findFirst().ifPresent(
+                         foundFailedRecord -> updateProcessFailedOnlyCounts(exceptionStackTrace,
+                             fullBean.getAbout(), foundFailedRecord));
       }
       counterFailedRecordsProcessed += nextPageOfRecords.size();
       LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
@@ -174,9 +174,8 @@ public class ProcessDataset implements Callable<Void> {
   /**
    * Default processing operation.
    * <p>It calculates all sorts of statistics provided in the {@link DatasetStatus} in the
-   * datastore. Creates new {@link PageProcess} classes and starts them under the thread pool, while
-   * finalizing the operation by running {@link #postProcess()} when all records have been
-   * processed.
+   * datastore. Creates new {@link PageProcess} classes and starts them under the thread pool, while finalizing the operation by
+   * running {@link #postProcess()} when all records have been processed.
    */
   private void defaultOperation() throws InterruptedException, ExecutionException {
     LOGGER
@@ -232,7 +231,7 @@ public class ProcessDataset implements Callable<Void> {
         nextPage++;
       } else {
         nextPageToReturn = IntStream.range(nextPage, pagesProcessed.size())
-            .filter(idx -> !pagesProcessed.contains(idx)).findFirst().orElse(pagesProcessed.size());
+                                    .filter(idx -> !pagesProcessed.contains(idx)).findFirst().orElse(pagesProcessed.size());
         nextPage = nextPageToReturn + 1;
       }
       return nextPageToReturn;
@@ -247,7 +246,7 @@ public class ProcessDataset implements Callable<Void> {
    */
   private List<FullBeanImpl> getFailedFullBeans(List<FailedRecord> failedRecords) {
     final List<String> failedRecordsUrls = failedRecords.stream().map(FailedRecord::getFailedUrl)
-        .collect(Collectors.toList());
+                                                        .collect(Collectors.toList());
     return configuration.getMongoSourceMongoDao().getRecordsFromList(failedRecordsUrls);
   }
 
@@ -276,6 +275,9 @@ public class ProcessDataset implements Callable<Void> {
     } catch (IndexingException e) {
       LOGGER.error("{} - Could not index record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
+    } catch (RuntimeException e) {
+      LOGGER.error("{} - Could not process or index(RuntimeException) record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
+      return exceptionStacktraceToString(e);
     }
     return "";
   }
@@ -292,8 +294,8 @@ public class ProcessDataset implements Callable<Void> {
   /**
    * Update the record counts based on the execution.
    * <p>For a failed record it will create a new {@link FailedRecord}.
-   * For a success record if the {@code processFailedOnly} is true then the {@link FailedRecord} is
-   * removed and the {@link DatasetStatus#getTotalFailedRecords()} is updated.</p>
+   * For a success record if the {@code processFailedOnly} is true then the {@link FailedRecord} is removed and the
+   * {@link DatasetStatus#getTotalFailedRecords()} is updated.</p>
    *
    * @param exceptionStackTrace the exception stack trace if any
    * @param processFailedOnly trigger for execution of processing only previously failed records
