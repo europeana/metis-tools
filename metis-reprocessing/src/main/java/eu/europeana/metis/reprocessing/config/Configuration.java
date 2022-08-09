@@ -1,4 +1,4 @@
-package eu.europeana.metis.reprocessing.model;
+package eu.europeana.metis.reprocessing.config;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.Indexer;
@@ -12,7 +12,6 @@ import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolderExtension;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.solr.client.CompoundSolrClient;
 import eu.europeana.metis.solr.connection.SolrClientProvider;
@@ -37,9 +36,9 @@ import org.springframework.util.CollectionUtils;
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
  */
-public abstract class BasicConfiguration {
+public abstract class Configuration {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(BasicConfiguration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
 
   private final PropertiesHolderExtension propertiesHolder;
   private final MetisCoreMongoDao metisCoreMongoDao;
@@ -51,11 +50,12 @@ public abstract class BasicConfiguration {
   private final Mode mode;
   private final boolean identityProcess;
   private final boolean clearDatabasesBeforeProcess;
+  private final boolean tierRecalculation;
   private final List<String> datasetIdsToProcess;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private final List<ExecutablePluginType> invalidatePluginTypes;
 
-  protected BasicConfiguration(PropertiesHolderExtension propertiesHolder)
+  protected Configuration(PropertiesHolderExtension propertiesHolder)
       throws IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException {
     this.propertiesHolder = propertiesHolder;
     //Create metis core dao only if there aren't any specific datasets to process and mode not
@@ -82,6 +82,7 @@ public abstract class BasicConfiguration {
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
     clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
+    tierRecalculation = propertiesHolder.tierRecalculation;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
@@ -182,6 +183,10 @@ public abstract class BasicConfiguration {
     return clearDatabasesBeforeProcess;
   }
 
+  public boolean isTierRecalculation() {
+    return tierRecalculation;
+  }
+
   public ExecutablePluginType getReprocessBasedOnPluginType() {
     return reprocessBasedOnPluginType;
   }
@@ -190,11 +195,11 @@ public abstract class BasicConfiguration {
     return invalidatePluginTypes;
   }
 
-  public abstract ThrowingBiFunction<FullBeanImpl, BasicConfiguration, RDF> getFullBeanProcessor();
+  public abstract ThrowingBiFunction<FullBeanImpl, Configuration, RDF> getFullBeanProcessor();
 
-  public abstract ThrowingTriConsumer<RDF, Boolean, BasicConfiguration> getRdfIndexer();
+  public abstract ThrowingTriConsumer<RDF, Boolean, Configuration> getRdfIndexer();
 
-  public abstract ThrowingQuadConsumer<String, Date, Date, BasicConfiguration> getAfterReprocessProcessor();
+  public abstract ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor();
 
   public abstract RDF processRDF(RDF rdf);
 

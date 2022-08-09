@@ -25,8 +25,7 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
-import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.reprocessing.config.PropertiesHolder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,6 @@ import java.util.List;
  */
 public class MongoSourceMongoDao {
 
-  private static final String ID = "_id";
   private static final int DEFAULT_PAGE_SIZE = 200;
   public static final String ABOUT = "about";
   public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
@@ -91,7 +89,7 @@ public class MongoSourceMongoDao {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.sourceMongoHosts,
         propertiesHolder.sourceMongoPorts, propertiesHolder.sourceMongoAuthenticationDb,
         propertiesHolder.sourceMongoUsername, propertiesHolder.sourceMongoPassword,
-        propertiesHolder.sourceMongoEnableSSL);
+        propertiesHolder.sourceMongoEnableSSL, propertiesHolder.sourceMongoConnectionPoolSize);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

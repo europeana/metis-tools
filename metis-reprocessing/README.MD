@@ -47,8 +47,8 @@ Example command:
 **Modifying implementation for a future reprocess operation**
 The changes on the implementation, per reprocessing operation should be limited in the following files:  
 - `PropertysHolderExtension` For the extra required properties from the properties file
-- `ExtraConfiguration` For any extra fields that need to be initialized and the initialization of the required 
-functional interfaces
+- `DefaultConfiguration` For any extra fields that need to be initialized and the initialization of the required 
+functional interfaces. The processRDF method is used in turn in the ProcessUtilities and it's functionality can be modified from this file.
 - `ProcessUtilities` That contains all functionality for processing records and datasets
 - `IndexUtilities` That contains all functionality for indexing records
 - `PostProcessingUtilities` That contains all functionality for after reprocessing of all records, once per dataset  
@@ -69,3 +69,21 @@ so that morphia would not throw an error during reading
 <u>*Version 2*</u>
 - `enrichment.url` The url for enrichment
 - `dereference.url` The url for dereference
+
+<u>*Version 3(October 2021)*</u>
+- change in Solr to add docValues (this is to support the A-Z Newspaper Titles)
+- change in Solr to support the indexing of provider and data provider's URIs 
+- enrich metadata with Organizations
+
+<u>*Version 4(June 2022)*</u>
+- Addition of properties
+  - `tier.recalculation` (dis)enabling tier calculation
+  - `enrichment.batch.size` the enrichment batch size(not applicable for the entity api at this point in time)
+  - `enrichment.entity.resolver.type` the enrichment resolver type(PERSISTENT, ENTITY_CLIENT)
+  - `entity.management.url` the entity api management url
+  - `entity.api.url` the entity api url
+  - `entity.api.key` the entity api key
+- 3D relabeling to image for specific list of identifiers
+- Rights statements fixes for 2020702, 364
+- Tier re-calculation only for 3D
+- Re-enrichment with entity-api

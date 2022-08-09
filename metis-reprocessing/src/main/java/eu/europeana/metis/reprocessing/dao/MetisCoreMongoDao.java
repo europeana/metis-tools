@@ -15,8 +15,7 @@ import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
-import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.reprocessing.config.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,7 +73,7 @@ public class MetisCoreMongoDao {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.metisCoreMongoHosts,
         propertiesHolder.metisCoreMongoPorts, propertiesHolder.metisCoreMongoAuthenticationDb,
         propertiesHolder.metisCoreMongoUsername, propertiesHolder.metisCoreMongoPassword,
-        propertiesHolder.metisCoreMongoEnableSSL);
+        propertiesHolder.metisCoreMongoEnableSSL, propertiesHolder.metisCoreConnectionPoolSize);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }

@@ -46,14 +46,20 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <version.metis>5-SNAPSHOT</version.metis>
-    <version.corelib>2.14.1-SNAPSHOT</version.corelib>
+    <version.metis-schema>7</version.metis-schema>
+    <version.metis>7-SNAPSHOT</version.metis>
+    <version.corelib>2.15.3</version.corelib>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.30</version.slf4j>
-    <version.log4j>2.17.1</version.log4j>
+    <version.log4j>2.17.2</version.log4j>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>eu.europeana.metis</groupId>
+      <artifactId>metis-schema</artifactId>
+      <version>${version.metis-schema}</version>
+    </dependency>
     <dependency>
       <artifactId>metis-core-common</artifactId>
       <groupId>eu.europeana.metis</groupId>
@@ -64,6 +70,13 @@
       <artifactId>metis-core-service</artifactId>
       <groupId>eu.europeana.metis</groupId>
       <version>${version.metis}</version>
+      <exclusions>
+      <!--Exclude those because of eu.europeana.api:entity-api-client:jar:0.0.1-SNAPSHOT transitive of metis-enrichment-client-->
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -76,6 +89,13 @@
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-indexing</artifactId>
       <version>${version.metis}</version>
+      <exclusions>
+      <!--Exclude those because of eu.europeana.api:entity-api-client:jar:0.0.1-SNAPSHOT transitive of metis-enrichment-client-->
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -142,7 +162,7 @@
     <repository>
       <id>libs-release</id>
       <name>libs-release</name>
-      <url>http://artifactory.eanadev.org/artifactory/libs-release</url>
+      <url>https://artifactory.eanadev.org/artifactory/libs-release</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -153,7 +173,7 @@
     <repository>
       <id>libs-snapshot</id>
       <name>libs-snapshot</name>
-      <url>http://artifactory.eanadev.org/artifactory/libs-snapshot</url>
+      <url>https://artifactory.eanadev.org/artifactory/libs-snapshot</url>
       <releases>
         <enabled>false</enabled>
       </releases>

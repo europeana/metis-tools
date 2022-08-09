@@ -1,4 +1,4 @@
-package eu.europeana.metis.reprocessing.model;
+package eu.europeana.metis.reprocessing.config;
 
 /**
  * Mode of execution of the script.

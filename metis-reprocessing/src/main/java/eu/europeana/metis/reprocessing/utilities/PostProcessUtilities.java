@@ -1,4 +1,4 @@
-package eu.europeana.metis.reprocessing.execution;
+package eu.europeana.metis.reprocessing.utilities;
 
 import eu.europeana.metis.core.dao.PluginWithExecutionId;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
@@ -14,7 +14,7 @@ import eu.europeana.metis.core.workflow.plugins.ReindexToPreviewPlugin;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPreviewPluginMetadata;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPlugin;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPluginMetadata;
-import eu.europeana.metis.reprocessing.model.BasicConfiguration;
+import eu.europeana.metis.reprocessing.config.Configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -45,26 +45,26 @@ public class PostProcessUtilities {
    * @param datasetId the dataset id of the finished dataset re-processing
    * @param startDate the start date of the re-processing
    * @param endDate the end date of the re-processing
-   * @param basicConfiguration the configuration class that contains required properties
+   * @param configuration the configuration class that contains required properties
    */
   public static void postProcess(String datasetId, Date startDate, Date endDate,
-      BasicConfiguration basicConfiguration) {
-    updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
+      Configuration configuration) {
+    updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, configuration);
   }
 
   public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,
-      Date endDate, BasicConfiguration basicConfiguration) {
-    createReindexWorkflowExecutions(datasetId, startDate, endDate, basicConfiguration);
+      Date endDate, Configuration configuration) {
+    createReindexWorkflowExecutions(datasetId, startDate, endDate, configuration);
     // TODO: 28/10/2021 Set a flag for invalidating or not?
-    setInvalidFlagToPlugins(datasetId, basicConfiguration);
+    setInvalidFlagToPlugins(datasetId, configuration);
   }
 
   private static void createReindexWorkflowExecutions(String datasetId, Date startDate,
-      Date endDate, BasicConfiguration basicConfiguration) {
-    final PluginWithExecutionId<ExecutablePlugin> lastExecutionToBeBasedOn = basicConfiguration
+      Date endDate, Configuration configuration) {
+    final PluginWithExecutionId<ExecutablePlugin> lastExecutionToBeBasedOn = configuration
         .getMetisCoreMongoDao().getWorkflowExecutionDao()
         .getLatestSuccessfulExecutablePlugin(datasetId,
-            Collections.singleton(basicConfiguration.getReprocessBasedOnPluginType()), false);
+            Collections.singleton(configuration.getReprocessBasedOnPluginType()), false);
 
     //Preview Plugin
     final ReindexToPreviewPluginMetadata reindexToPreviewPluginMetadata = new ReindexToPreviewPluginMetadata();
@@ -96,7 +96,7 @@ public class PostProcessUtilities {
     reindexToPublishPlugin.setFinishedDate(endDate);
     reindexToPublishPlugin.setPluginStatus(PluginStatus.FINISHED);
 
-    final Dataset dataset = basicConfiguration.getMetisCoreMongoDao().getDataset(datasetId);
+    final Dataset dataset = configuration.getMetisCoreMongoDao().getDataset(datasetId);
     final ArrayList<AbstractMetisPlugin> abstractMetisPlugins = new ArrayList<>();
     abstractMetisPlugins.add(reindexToPreviewPlugin);
     abstractMetisPlugins.add(reindexToPublishPlugin);
@@ -107,15 +107,14 @@ public class PostProcessUtilities {
     workflowExecution.setStartedDate(startDate);
     workflowExecution.setUpdatedDate(endDate);
     workflowExecution.setFinishedDate(endDate);
-    basicConfiguration.getMetisCoreMongoDao().getWorkflowExecutionDao().create(workflowExecution);
+    configuration.getMetisCoreMongoDao().getWorkflowExecutionDao().create(workflowExecution);
   }
 
   private static void setInvalidFlagToPlugins(String datasetId,
-      BasicConfiguration basicConfiguration) {
-    final List<ExecutablePluginType> invalidatePluginTypes = basicConfiguration
-        .getInvalidatePluginTypes();
-    final WorkflowExecutionDao workflowExecutionDao = basicConfiguration.getMetisCoreMongoDao()
-        .getWorkflowExecutionDao();
+      Configuration configuration) {
+    final List<ExecutablePluginType> invalidatePluginTypes = configuration.getInvalidatePluginTypes();
+    final WorkflowExecutionDao workflowExecutionDao = configuration.getMetisCoreMongoDao()
+                                                                   .getWorkflowExecutionDao();
     final List<PluginWithExecutionId<ExecutablePlugin>> deprecatedPlugins = invalidatePluginTypes
         .stream().map(executablePluginType -> workflowExecutionDao
             .getLatestSuccessfulExecutablePlugin(datasetId,

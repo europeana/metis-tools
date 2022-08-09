@@ -1,7 +1,6 @@
-package eu.europeana.metis.reprocessing.utilities;
+package eu.europeana.metis.reprocessing.config;
 
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
-import eu.europeana.metis.reprocessing.model.Mode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -20,8 +20,8 @@ import org.springframework.util.CollectionUtils;
 /**
  * Contains all properties that are required for execution.
  * <p>During construction will read properties from the specified file from the classpath.
- * Internally it holds {@link PropertiesHolder#propertiesHolderExtension} that should contain the
- * extra required properties per re-process operation.</p>
+ * Internally it holds {@link PropertiesHolder#propertiesHolderExtension} that should contain the extra required properties per
+ * re-process operation.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-16
@@ -41,6 +41,8 @@ public class PropertiesHolder {
   public final List<String> datasetIdsToProcess;
   public final boolean identityProcess;
   public final boolean cleanDatabasesBeforeProcess;
+  public final boolean tierRecalculation;
+
   public final ExecutablePluginType reprocessBasedOnPluginType;
   public final List<ExecutablePluginType> invalidatePluginTypes;
 
@@ -54,6 +56,7 @@ public class PropertiesHolder {
   public final String metisCoreMongoPassword;
   public final boolean metisCoreMongoEnableSSL;
   public final String metisCoreMongoDb;
+  public final int metisCoreConnectionPoolSize;
   //Mongo Source
   public final String[] sourceMongoHosts;
   public final int[] sourceMongoPorts;
@@ -62,6 +65,7 @@ public class PropertiesHolder {
   public final String sourceMongoPassword;
   public final boolean sourceMongoEnableSSL;
   public final String sourceMongoDb;
+  public final int sourceMongoConnectionPoolSize;
   //Mongo Destination
   public final String[] destinationMongoHosts;
   public final int[] destinationMongoPorts;
@@ -70,6 +74,7 @@ public class PropertiesHolder {
   public final String destinationMongoPassword;
   public final boolean destinationMongoEnableSSL;
   public final String destinationMongoDb;
+  public final int destinationMongoConnectionPoolSize;
   //Solr/Zookeeper Destination
   public final String[] destinationSolrHosts;
   public final String[] destinationZookeeperHosts;
@@ -113,10 +118,11 @@ public class PropertiesHolder {
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
 
     datasetIdsToProcess = Arrays.stream(properties.getProperty("dataset.ids.to.process").split(","))
-        .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+                                .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
+    tierRecalculation = Boolean.parseBoolean(properties.getProperty("tier.recalculation"));
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
     invalidatePluginTypes = Arrays
@@ -149,16 +155,18 @@ public class PropertiesHolder {
     metisCoreMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.metis.core.enableSSL"));
     metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
+    metisCoreConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.metis.core.connection.pool.size"), 50);
 
     //Mongo Source
     sourceMongoHosts = properties.getProperty("mongo.source.hosts").split(",");
     sourceMongoPorts = Arrays.stream(properties.getProperty("mongo.source.port").split(","))
-        .mapToInt(Integer::parseInt).toArray();
+                             .mapToInt(Integer::parseInt).toArray();
     sourceMongoAuthenticationDb = properties.getProperty("mongo.source.authentication.db");
     sourceMongoUsername = properties.getProperty("mongo.source.username");
     sourceMongoPassword = properties.getProperty("mongo.source.password");
     sourceMongoEnableSSL = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
     sourceMongoDb = properties.getProperty("mongo.source.db");
+    sourceMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.source.connection.pool.size"), 500);
 
     //Mongo Destination
     destinationMongoHosts = properties.getProperty("mongo.destination.hosts").split(",");
@@ -172,6 +180,7 @@ public class PropertiesHolder {
     destinationMongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
+    destinationMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.destination.connection.pool.size"), 500);
 
     //Solr/Zookeeper Destination
     destinationSolrHosts = properties.getProperty("solr.destination.hosts").split(",");

@@ -18,6 +18,7 @@ dataset.ids.to.process=
 identity.process=
 #Set to true if we want to clear the database before we start a new process. Only applicable for DEFAULT Mode
 clean.databases.before.process=
+tier.recalculation=
 #The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon. For example ENRICHMENT. MUST not be empty if mode is POST_PROCESS
 reprocess.based.on.plugin.type=
 #The plugins in metis core to invalidate during POST_PROCESS. For example if the base plugin type was ENRICHMENT then the plugins that have to be invalidated would be the ones following ENRICHMENT. MUST not be empty if mode is POST_PROCESS
@@ -35,6 +36,8 @@ mongo.metis.core.username=
 mongo.metis.core.password=
 mongo.metis.core.enableSSL=false
 mongo.metis.core.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
 
 #Mongo Source
 mongo.source.hosts=
@@ -44,6 +47,8 @@ mongo.source.username=
 mongo.source.password=
 mongo.source.enableSSL=false
 mongo.source.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
 
 #Mongo Destination
 mongo.destination.hosts=
@@ -53,6 +58,8 @@ mongo.destination.username=
 mongo.destination.password=
 mongo.destination.enableSSL=false
 mongo.destination.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
 
 #Solr/Zookeeper Destination
 solr.destination.hosts=
@@ -73,3 +80,14 @@ mongo.enrichment.username=
 mongo.enrichment.password=
 mongo.enrichment.enableSSL=false
 mongo.enrichment.db=
+#Not setting this will results to default
+mongo.enrichment.connection.pool.size=
+
+enrichment.batch.size=
+enrichment.entity.resolver.type=
+
+#Entity Management Base Url for Entity Retrieval
+entity.management.url=
+#Entity Api V2 url for search and suggest
+entity.api.url=
+entity.api.key=

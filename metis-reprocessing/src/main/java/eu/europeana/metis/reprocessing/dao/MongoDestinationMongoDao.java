@@ -24,8 +24,7 @@ import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
-import eu.europeana.metis.reprocessing.utilities.MongoInitializer;
-import eu.europeana.metis.reprocessing.utilities.PropertiesHolder;
+import eu.europeana.metis.reprocessing.config.PropertiesHolder;
 import java.util.List;
 
 /**
@@ -116,7 +115,7 @@ public class MongoDestinationMongoDao {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.destinationMongoHosts,
         propertiesHolder.destinationMongoPorts, propertiesHolder.destinationMongoAuthenticationDb,
         propertiesHolder.destinationMongoUsername, propertiesHolder.destinationMongoPassword,
-        propertiesHolder.destinationMongoEnableSSL);
+        propertiesHolder.destinationMongoEnableSSL, propertiesHolder.destinationMongoConnectionPoolSize);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
   }
