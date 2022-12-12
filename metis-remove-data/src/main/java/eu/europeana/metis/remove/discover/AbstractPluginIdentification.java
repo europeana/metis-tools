@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -28,6 +29,13 @@ import org.slf4j.LoggerFactory;
  * ExecutionPluginForest}.
  */
 abstract class AbstractPluginIdentification {
+
+  private final ToIntFunction<ExecutionPluginNode> RECORD_COUNTER = node -> Optional
+      .ofNullable(node.getPlugin()).filter(plugin -> plugin instanceof AbstractExecutablePlugin)
+      .map(plugin -> (AbstractExecutablePlugin) plugin)
+      .map(AbstractExecutablePlugin::getExecutionProgress)
+      .map(ExecutionProgress::getProcessedRecords).orElse(0);
+
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPluginIdentification.class);
 
@@ -88,6 +96,8 @@ abstract class AbstractPluginIdentification {
 
     // Compute all iterations
     final List<List<ExecutionPluginNode>> iterations = new ArrayList<>();
+    final AtomicInteger totalNodeCount = new AtomicInteger(0);
+    final AtomicInteger totalRecordCount = new AtomicInteger(0);
     final Set<String> datasetIds = getDatasetIds();
     final Set<String> datasetIdsToSkip = new HashSet<>();
     final Set<String> nodeIdsToSkip = new HashSet<>();
@@ -102,10 +112,19 @@ abstract class AbstractPluginIdentification {
           continue;
         }
 
+        // Get the forest for this dataset, and log if needed.
+        final ExecutionPluginForest forest = getForest(datasetId, nodeIdsToSkip);
+        if (iterations.isEmpty() && forest!=null){
+          final List<ExecutionPluginNode> allNodes = forest.getNodes(node->true);
+          totalNodeCount.addAndGet(allNodes.size());
+          totalRecordCount.addAndGet(allNodes.stream().mapToInt(RECORD_COUNTER).sum());
+        }
+
         // Obtain the plugins for this dataset, in the right order for removal.
-        final List<ExecutionPluginNode> plugins = discoverPlugins(datasetId, nodeIdsToSkip).stream()
-                .map(ExecutionPluginNode::getAllInOrderOfRemoval).flatMap(List::stream)
-                .filter(discoveryMode.pluginTest).collect(Collectors.toList());
+        final List<ExecutionPluginNode> plugins = Optional.ofNullable(forest)
+            .map(this::identifyPlugins).orElse(Collections.emptyList()).stream()
+            .map(ExecutionPluginNode::getAllInOrderOfRemoval).flatMap(List::stream)
+            .filter(discoveryMode.pluginTest).collect(Collectors.toList());
 
         // If we find no plugins, we mark this dataset to skip. Otherwise, add them for removal.
         if (plugins.isEmpty()) {
@@ -125,6 +144,9 @@ abstract class AbstractPluginIdentification {
 
       // Add all nodes to remove to the node skip list: we can ignore them in the next iteration.
       nodesToRemove.stream().map(ExecutionPluginNode::getId).forEach(nodeIdsToSkip::add);
+
+      // Log
+      LOGGER.info("Iteration {} identified.", iterations.size());
     }
 
     // If there is nothing to do we print a message and we are done.
@@ -134,45 +156,38 @@ abstract class AbstractPluginIdentification {
     }
 
     // Print all iterations to the log.
-    final ToIntFunction<ExecutionPluginNode> recordCounter = node -> Optional
-        .ofNullable(node.getPlugin()).filter(plugin -> plugin instanceof AbstractExecutablePlugin)
-        .map(plugin -> (AbstractExecutablePlugin) plugin)
-        .map(AbstractExecutablePlugin::getExecutionProgress)
-        .map(ExecutionProgress::getProcessedRecords).orElse(0);
+    LOGGER.info("Total database size: {} records in {} nodes.", totalRecordCount.get(),
+        totalNodeCount.get());
     LOGGER.info("{} iterations are needed:", iterations.size());
     int totalRecords = 0;
+    int totalNodes = 0;
     for (int i = 0; i < iterations.size(); i++) {
       final List<ExecutionPluginNode> nodesToRemove = iterations.get(i);
       final long linkCheckingExecutions = nodesToRemove.stream().map(ExecutionPluginNode::getType)
           .filter(type -> type == PluginType.LINK_CHECKING).count();
       final long nonExecutablePlugins = nodesToRemove.stream().map(ExecutionPluginNode::getPlugin)
           .filter(plugin -> !(plugin instanceof AbstractExecutablePlugin)).count();
-      final int recordCount = nodesToRemove.stream().mapToInt(recordCounter).sum();
+      final int recordCount = nodesToRemove.stream().mapToInt(RECORD_COUNTER).sum();
       LOGGER.info(
           " ... Iteration {}: remove {} nodes ({} records). This includes {} link checking plugins and {} non-executable plugins.",
           i, nodesToRemove.size(), recordCount, linkCheckingExecutions, nonExecutablePlugins);
       totalRecords += recordCount;
+      totalNodes += nodesToRemove.size();
     }
-    LOGGER.info("{} records will be removed.", totalRecords);
+    LOGGER.info("{} records will be removed in {} nodes.", totalRecords, totalNodes);
 
     // Return just the first iteration.
     return iterations.get(0);
   }
 
-  private List<ExecutionPluginNode> discoverPlugins(String datasetId, Set<String> idsToSkip) {
-
-    // Creating the forest
-    final ExecutionPluginForest forest;
+  private ExecutionPluginForest getForest(String datasetId, Set<String> idsToSkip) {
     try {
-      forest = new ExecutionPluginForest(getWorkflowExecutions(datasetId),
+      return new ExecutionPluginForest(getWorkflowExecutions(datasetId),
               discoveryMode.attemptToIgnoreDeletedPlugins, idsToSkip);
     } catch (RuntimeException e) {
       LOGGER.warn("Problem with dataset {}.", datasetId, e);
-      return Collections.emptyList();
+      return null;
     }
-
-    // Identify the plugins
-    return identifyPlugins(forest);
   }
 
   abstract List<ExecutionPluginNode> identifyPlugins(ExecutionPluginForest forest);
