@@ -1,14 +1,6 @@
 package eu.europeana.metis.reprocessing.config;
 
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -17,11 +9,18 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
 /**
  * Contains all properties that are required for execution.
- * <p>During construction will read properties from the specified file from the classpath.
- * Internally it holds {@link PropertiesHolder#propertiesHolderExtension} that should contain the extra required properties per
- * re-process operation.</p>
+ * <p>During construction will read properties from the specified file from the classpath.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-04-16

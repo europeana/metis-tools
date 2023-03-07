@@ -46,9 +46,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <version.metis-schema>7</version.metis-schema>
-    <version.metis>7-SNAPSHOT</version.metis>
-    <version.corelib>2.15.3</version.corelib>
+    <version.metis-schema>8-SNAPSHOT</version.metis-schema>
+    <version.metis>10-SNAPSHOT</version.metis>
+    <version.corelib>2.16.2</version.corelib>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.30</version.slf4j>
     <version.log4j>2.17.2</version.log4j>
@@ -101,12 +101,6 @@
     <dependency>
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-enrichment-client</artifactId>
-      <version>${version.metis}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>eu.europeana.metis</groupId>
-      <artifactId>metis-enrichment-service</artifactId>
       <version>${version.metis}</version>
     </dependency>
 

@@ -69,23 +69,9 @@ zookeeper.destination.chroot=
 zookeeper.destination.defaultCollection=
 
 #EXTRA CONFIGURATION
-enrichment.url=
 dereference.url=
-
-#Mongo Enrichment
-mongo.enrichment.hosts=
-mongo.enrichment.port=
-mongo.enrichment.authentication.db=
-mongo.enrichment.username=
-mongo.enrichment.password=
-mongo.enrichment.enableSSL=false
-mongo.enrichment.db=
-#Not setting this will results to default
-mongo.enrichment.connection.pool.size=
-
+#Enrichment
 enrichment.batch.size=
-enrichment.entity.resolver.type=
-
 #Entity Management Base Url for Entity Retrieval
 entity.management.url=
 #Entity Api V2 url for search and suggest
