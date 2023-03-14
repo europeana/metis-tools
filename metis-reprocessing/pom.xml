@@ -20,6 +20,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.5.0</version>
         <configuration>
           <archive>
             <manifest>
@@ -64,6 +65,16 @@
       <artifactId>metis-core-common</artifactId>
       <groupId>eu.europeana.metis</groupId>
       <version>${version.metis}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-autoconfigure</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -74,6 +85,18 @@
       <!--Exclude those because of eu.europeana.api:entity-api-client:jar:0.0.1-SNAPSHOT transitive of metis-enrichment-client-->
         <exclusion>
           <groupId>io.netty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.logging</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
@@ -102,6 +125,12 @@
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-enrichment-client</artifactId>
       <version>${version.metis}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -116,6 +145,10 @@
         <exclusion>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
