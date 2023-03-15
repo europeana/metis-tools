@@ -18,13 +18,22 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
+import eu.europeana.metis.schema.convert.RdfConversionUtils;
+import eu.europeana.metis.schema.convert.SerializationException;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
+import eu.europeana.normalization.Normalizer;
+import eu.europeana.normalization.NormalizerFactory;
+import eu.europeana.normalization.NormalizerStep;
+import eu.europeana.normalization.model.NormalizationBatchResult;
+import eu.europeana.normalization.util.NormalizationConfigurationException;
+import eu.europeana.normalization.util.NormalizationException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Properties;
 
@@ -46,9 +55,11 @@ public class DefaultConfiguration extends Configuration {
     private final ThrowingQuadConsumer<String, Date, Date, Configuration> afterReprocessProcessor;
 
     private EnrichmentWorker enrichmentWorker;
+    private RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
+    private Normalizer normalizer = new NormalizerFactory().getNormalizer(NormalizerStep.DATES_NORMALIZER);
 
     public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
-            throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException {
+            throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException, NormalizationConfigurationException {
         super(propertiesHolderExtension);
 
         this.fullBeanProcessor = ProcessUtilities::processFullBean;
@@ -117,9 +128,25 @@ public class DefaultConfiguration extends Configuration {
     @Override
     public RDF processRDF(RDF rdf) {
         //Modify this method accordingly
-        return reEnrichment(rdf);
+        rdf = dateNormalization(rdf);
+        return rdf;
     }
 
+    private RDF dateNormalization(RDF rdf) {
+
+        RDF computedRDF = rdf;
+        try {
+            LOGGER.info("Date normalization");
+            final String rdfString = rdfConversionUtils.convertRdfToString(rdf);
+            final NormalizationBatchResult result = normalizer.normalize(Collections.singletonList(rdfString));
+            computedRDF = rdfConversionUtils.convertStringToRdf(result.getNormalizedRecordsInEdmXml().get(0));
+        } catch (RuntimeException | SerializationException | NormalizationException e) {
+            LOGGER.warn("Something went wrong during enrichment/dereference", e);
+        }
+        return computedRDF;
+    }
+
+    // TODO: 15/03/2023 Needs to be updated to accomodate the approach for the coming reprocessing
     private RDF reEnrichment(RDF rdf) {
         RDF computedRDF = rdf;
         try {
