@@ -138,20 +138,21 @@ public class DefaultConfiguration extends Configuration {
     @Override
     public RDF processRDF(RDF rdf) {
         //Modify this method accordingly
-        rdf = dateNormalization(rdf);
+//        rdf = dateNormalization(rdf);
+        RDF normalizedRdf = dateNormalization(rdf);
+        rdf = selectiveReEnrichment(normalizedRdf);
+
+        LOGGER.debug("DONE");
         return rdf;
     }
 
     private RDF dateNormalization(RDF rdf) {
-
         RDF computedRDF = rdf;
         try {
-            LOGGER.info("Date normalization");
+            LOGGER.debug("Date normalization");
             final String rdfString = rdfConversionUtils.convertRdfToString(rdf);
             final NormalizationBatchResult result = normalizer.normalize(Collections.singletonList(rdfString));
-            RDF normalizedRDF = rdfConversionUtils.convertStringToRdf(result.getNormalizedRecordsInEdmXml().get(0));
-
-            computedRDF = selectiveReEnrichment(normalizedRDF);
+            computedRDF = rdfConversionUtils.convertStringToRdf(result.getNormalizedRecordsInEdmXml().get(0));
         } catch (RuntimeException | SerializationException | NormalizationException e) {
             LOGGER.warn("Something went wrong during enrichment/dereference", e);
         }
@@ -159,6 +160,7 @@ public class DefaultConfiguration extends Configuration {
     }
 
     private RDF selectiveReEnrichment(RDF rdf) {
+        LOGGER.debug("Selective re-enrichment");
         //Find europeana id organizations that are linked in provider aggregation supported fields
         List<Aggregation> aggregationList = rdf.getAggregationList();
         Set<String> aggregationEuropeanaLinks = new HashSet<>();
@@ -188,11 +190,8 @@ public class DefaultConfiguration extends Configuration {
 
         //Request new entities
         HashMap<Class<? extends AboutType>, DereferencedEntities> dereferencedEntities = dereferenceEntities(entitiesToUpdate);
-
-        //At this point the dereference values should contain 0 or 1 but not more results per reference
         replaceEntities(rdf, dereferencedEntities);
-        // TODO: 06/04/2023 How about returned entities that contain more than one entity e.g. a hierarchy?
-        // Think about it in the meantime.
+
         return rdf;
     }
 
@@ -219,6 +218,7 @@ public class DefaultConfiguration extends Configuration {
     }
 
     private static void findAndReplaceUpdatedEntity(RDF rdf, Map<ReferenceTerm, List<EnrichmentBase>> referenceTermListMap, List<? extends AboutType> entitiesList) {
+        //At this point the dereference values should contain 0 or 1 but not more results per reference
         for (Map.Entry<ReferenceTerm, List<EnrichmentBase>> referenceTermListEntry : referenceTermListMap.entrySet()) {
             if (CollectionUtils.isNotEmpty(referenceTermListEntry.getValue()) && referenceTermListEntry.getValue().get(0) != null) {
                 EnrichmentBase enrichmentBase = referenceTermListEntry.getValue().get(0);
