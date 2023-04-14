@@ -1,0 +1,14 @@
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo Metis Core
+mongo.metis.core.hosts=
+mongo.metis.core.port=
+mongo.metis.core.authentication.db=
+mongo.metis.core.username=
+mongo.metis.core.password=
+mongo.metis.core.enableSSL=true
+mongo.metis.core.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
