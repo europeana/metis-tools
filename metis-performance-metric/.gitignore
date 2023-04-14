@@ -37,3 +37,4 @@ build/
 ### Mac OS ###
 .DS_Store
 /src/main/resources/application.properties
+/src/main/java/eu/europeana/metis/performance/metric/output/*.csv
