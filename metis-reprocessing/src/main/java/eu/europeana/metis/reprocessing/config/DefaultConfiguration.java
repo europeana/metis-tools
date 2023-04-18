@@ -201,15 +201,15 @@ public class DefaultConfiguration extends Configuration {
             Map<ReferenceTerm, List<EnrichmentBase>> referenceTermListMap = dereferencedEntities.getReferenceTermListMap();
 
             List<? extends AboutType> entitiesList = new ArrayList<>();
-            if (entry.getKey().isInstance(AgentType.class)) {
+            if (entry.getKey().isNestmateOf(AgentType.class)) {
                 entitiesList = rdf.getAgentList();
-            } else if (entry.getKey().isInstance(Concept.class)) {
+            } else if (entry.getKey().isNestmateOf(Concept.class)) {
                 entitiesList = rdf.getConceptList();
-            } else if (entry.getKey().isInstance(PlaceType.class)) {
+            } else if (entry.getKey().isNestmateOf(PlaceType.class)) {
                 entitiesList = rdf.getPlaceList();
-            } else if (entry.getKey().isInstance(TimeSpanType.class)) {
+            } else if (entry.getKey().isNestmateOf(TimeSpanType.class)) {
                 entitiesList = rdf.getTimeSpanList();
-            } else if (entry.getKey().isInstance(Organization.class)) {
+            } else if (entry.getKey().isNestmateOf(Organization.class)) {
                 entitiesList = rdf.getOrganizationList();
             }
 
