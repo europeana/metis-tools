@@ -32,10 +32,12 @@ public class CSVUtilities {
     public void writeIntoCsvFile(String filePath, Date startDate, Date endDate) throws FileNotFoundException {
         File resultFile = new File(filePath);
         List<Dataset> datasetsToProcess = mongoMetisCoreDao.getAllDatasetsWithinDateInterval(startDate, endDate);
-        String firstRow = "DatasetId, Time of last Successful harvest, Date of Indexing to Publish, Number of Records Published";
+        String firstRow = "DatasetId Date Publish Indexing, Time of last successful harvest, Number of Records Published";
 
         try (PrintWriter printWriter = new PrintWriter(resultFile)) {
-            List<String> contentToPrint = datasetsToProcess.stream().map(this::turnDatasetIntoCSVRow).collect(Collectors.toList());
+            List<String> contentToPrint = datasetsToProcess.stream()
+                    .map(content -> turnDatasetIntoCSVRow(content, startDate, endDate))
+                    .collect(Collectors.toList());
             printWriter.println(firstRow);
             contentToPrint.forEach(content -> {
                 if(StringUtils.isNotEmpty(content)){
@@ -46,11 +48,12 @@ public class CSVUtilities {
 
     }
 
-    private String turnDatasetIntoCSVRow(Dataset dataset){
+    private String turnDatasetIntoCSVRow(Dataset dataset, Date startDate, Date endDate){
         LOGGER.info("Processing dataset with id " + dataset.getDatasetId());
-        WorkflowExecution lastSuccessfulWorkflow = mongoMetisCoreDao.getLatestSuccessfulWorkflowWithDatasetId(dataset.getDatasetId());
+        WorkflowExecution lastSuccessfulWorkflow = mongoMetisCoreDao.getLatestSuccessfulWorkflowWithDatasetId(dataset.getDatasetId(), startDate, endDate);
 
         if(lastSuccessfulWorkflow == null){
+            LOGGER.info("No workflows found for dataset " + dataset.getDatasetId());
             return "";
         }
 
@@ -68,6 +71,7 @@ public class CSVUtilities {
             stringBuilderCSVRow.append(", ");
             stringBuilderCSVRow.append(publishPlugin.getExecutionProgress().getProcessedRecords());
         } else {
+            LOGGER.info("No publish plugin found for dataset " + dataset.getDatasetId());
             stringBuilderCSVRow.append("null, null");
         }
 

@@ -9,6 +9,7 @@ import dev.morphia.mapping.MapperOptions;
 import dev.morphia.mapping.NamingStrategy;
 import dev.morphia.query.Query;
 import dev.morphia.query.experimental.filters.Filters;
+import eu.europeana.metis.core.dao.DataEvolutionUtils;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
@@ -32,11 +33,11 @@ import java.util.stream.Collectors;
 public class MongoMetisCoreDao {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoMetisCoreDao.class);
-    private static final String DATASET_ID = "datasetId";
     private final MongoInitializer metisCoreMongoInitializer;
     private final Datastore metisCoreDatastore;
     private final PropertiesHolder propertiesHolder;
     private final WorkflowExecutionDao workflowExecutionDao;
+    private final DataEvolutionUtils dataEvolutionUtils;
 
     public MongoMetisCoreDao(PropertiesHolder propertiesHolder)
             throws CustomTruststoreAppender.TrustStoreConfigurationException {
@@ -44,10 +45,10 @@ public class MongoMetisCoreDao {
         metisCoreMongoInitializer = prepareMetisCoreConfiguration();
         metisCoreDatastore = createMetisCoreDatastore(metisCoreMongoInitializer.getMongoClient(),
                 propertiesHolder.metisCoreMongoDb);
-
         final MorphiaDatastoreProviderImpl morphiaDatastoreProvider = new MorphiaDatastoreProviderImpl(
                 metisCoreMongoInitializer.getMongoClient(), propertiesHolder.metisCoreMongoDb);
         workflowExecutionDao = new WorkflowExecutionDao(morphiaDatastoreProvider);
+        dataEvolutionUtils = new DataEvolutionUtils(workflowExecutionDao);
     }
 
     public List<Dataset> getAllDatasetsWithinDateInterval(Date startDate, Date endDate) {
@@ -57,10 +58,12 @@ public class MongoMetisCoreDao {
         return MorphiaUtils.getListOfQueryRetryable(query);
     }
 
-    public WorkflowExecution getLatestSuccessfulWorkflowWithDatasetId(String datasetId){
+    public WorkflowExecution getLatestSuccessfulWorkflowWithDatasetId(String datasetId, Date startDate, Date endDate){
         Query<WorkflowExecution> query = metisCoreDatastore.find(WorkflowExecution.class)
                 .filter(Filters.eq("datasetId", datasetId))
-                .filter(Filters.eq("workflowStatus", WorkflowStatus.FINISHED));
+                .filter(Filters.eq("workflowStatus", WorkflowStatus.FINISHED))
+                .filter(Filters.gte("startedDate", startDate))
+                .filter(Filters.lte("startedDate", endDate));;
         List<WorkflowExecution> result = MorphiaUtils.getListOfQueryRetryable(query);
 
         if(result.isEmpty()){
