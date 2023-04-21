@@ -1,10 +1,13 @@
 package eu.europeana.metis.performance.metric.utilities;
 
 
+import eu.europeana.metis.core.dao.PluginWithExecutionId;
+import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
+import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.performance.metric.dao.MongoMetisCoreDao;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +20,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class CSVUtilities {
@@ -31,12 +34,14 @@ public class CSVUtilities {
 
     public void writeIntoCsvFile(String filePath, Date startDate, Date endDate) throws FileNotFoundException {
         File resultFile = new File(filePath);
-        List<Dataset> datasetsToProcess = mongoMetisCoreDao.getAllDatasetsWithinDateInterval(startDate, endDate);
-        String firstRow = "DatasetId Date Publish Indexing, Time of last successful harvest, Number of Records Published";
+        String firstRow = "DatasetId, Date Publish Indexing, Time of last successful harvest in hours, Number of Records Published";
 
         try (PrintWriter printWriter = new PrintWriter(resultFile)) {
-            List<String> contentToPrint = datasetsToProcess.stream()
-                    .map(content -> turnDatasetIntoCSVRow(content, startDate, endDate))
+            List<WorkflowExecutionDao.ExecutionDatasetPair> workflowExecutionsOverview =
+                    mongoMetisCoreDao.getAllWorkflowsExecutionsOverview(startDate, endDate).getResults();
+
+            List<String> contentToPrint = workflowExecutionsOverview.stream()
+                    .map(this::turnDatasetIntoCSVRow)
                     .collect(Collectors.toList());
             printWriter.println(firstRow);
             contentToPrint.forEach(content -> {
@@ -48,36 +53,29 @@ public class CSVUtilities {
 
     }
 
-    private String turnDatasetIntoCSVRow(Dataset dataset, Date startDate, Date endDate){
-        LOGGER.info("Processing dataset with id " + dataset.getDatasetId());
-        WorkflowExecution lastSuccessfulWorkflow = mongoMetisCoreDao.getLatestSuccessfulWorkflowWithDatasetId(dataset.getDatasetId(), startDate, endDate);
-
-        if(lastSuccessfulWorkflow == null){
-            LOGGER.info("No workflows found for dataset " + dataset.getDatasetId());
-            return "";
-        }
-
-        Optional<AbstractMetisPlugin> optionalPublishPlugin = lastSuccessfulWorkflow.getMetisPluginWithType(PluginType.PUBLISH);
+    private String turnDatasetIntoCSVRow(WorkflowExecutionDao.ExecutionDatasetPair executionDatasetPair){
+        Dataset dataset = executionDatasetPair.getDataset();
+        WorkflowExecution execution = executionDatasetPair.getExecution();
         SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        LOGGER.info("Processing dataset with id " + dataset.getDatasetId());
         StringBuilder stringBuilderCSVRow = new StringBuilder();
         stringBuilderCSVRow.append(dataset.getDatasetId());
         stringBuilderCSVRow.append(", ");
-        stringBuilderCSVRow.append(simpleDateFormatter.format(lastSuccessfulWorkflow.getStartedDate()));
+        AbstractMetisPlugin publishPlugin = execution.getMetisPluginWithType(PluginType.PUBLISH).get();
+        stringBuilderCSVRow.append(simpleDateFormatter.format(publishPlugin.getFinishedDate()));
         stringBuilderCSVRow.append(", ");
-
-        if(optionalPublishPlugin.isPresent()){
-            AbstractExecutablePlugin publishPlugin = (AbstractExecutablePlugin<?>) optionalPublishPlugin.get();
-            stringBuilderCSVRow.append(simpleDateFormatter.format(publishPlugin.getStartedDate()));
-            stringBuilderCSVRow.append(", ");
-            stringBuilderCSVRow.append(publishPlugin.getExecutionProgress().getProcessedRecords());
-        } else {
-            LOGGER.info("No publish plugin found for dataset " + dataset.getDatasetId());
-            stringBuilderCSVRow.append("null, null");
-        }
-
+        stringBuilderCSVRow.append(calculateTimeDifference(execution, (AbstractExecutablePlugin<?>)publishPlugin));
+        stringBuilderCSVRow.append(", ");
+        stringBuilderCSVRow.append(((AbstractExecutablePlugin<?>) publishPlugin).getExecutionProgress().getProcessedRecords());
         LOGGER.info("Finished processing dataset with id " + dataset.getDatasetId());
 
         return stringBuilderCSVRow.toString();
+    }
+
+    private long calculateTimeDifference(WorkflowExecution workflowExecution, AbstractExecutablePlugin<?> publishPlugin){
+        PluginWithExecutionId<? extends ExecutablePlugin> harvestPlugin =
+                mongoMetisCoreDao.getHarvesting(new PluginWithExecutionId<>(workflowExecution,publishPlugin));
+        return TimeUnit.MILLISECONDS.toHours(publishPlugin.getFinishedDate().getTime() - harvestPlugin.getPlugin().getStartedDate().getTime());
     }
 
 }

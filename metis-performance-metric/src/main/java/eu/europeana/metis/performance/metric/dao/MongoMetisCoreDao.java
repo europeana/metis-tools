@@ -8,13 +8,15 @@ import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.MapperOptions;
 import dev.morphia.mapping.NamingStrategy;
 import dev.morphia.query.Query;
-import dev.morphia.query.experimental.filters.Filters;
 import eu.europeana.metis.core.dao.DataEvolutionUtils;
+import eu.europeana.metis.core.dao.PluginWithExecutionId;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
-import eu.europeana.metis.core.workflow.WorkflowStatus;
+import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
+import eu.europeana.metis.core.workflow.plugins.PluginStatus;
+import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.performance.metric.config.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
@@ -22,9 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -51,27 +55,22 @@ public class MongoMetisCoreDao {
         dataEvolutionUtils = new DataEvolutionUtils(workflowExecutionDao);
     }
 
-    public List<Dataset> getAllDatasetsWithinDateInterval(Date startDate, Date endDate) {
-        Query<Dataset> query = metisCoreDatastore.find(Dataset.class)
-                .filter(Filters.gte("createdDate", startDate))
-                .filter(Filters.lte("createdDate", endDate));
-        return MorphiaUtils.getListOfQueryRetryable(query);
+    public List<String> getAllDatasetIds() {
+        Query<Dataset> query = metisCoreDatastore.find(Dataset.class);
+        final List<Dataset> datasets = MorphiaUtils.getListOfQueryRetryable(query);
+        return datasets.stream().map(Dataset::getDatasetId).collect(Collectors.toList());
     }
 
-    public WorkflowExecution getLatestSuccessfulWorkflowWithDatasetId(String datasetId, Date startDate, Date endDate){
-        Query<WorkflowExecution> query = metisCoreDatastore.find(WorkflowExecution.class)
-                .filter(Filters.eq("datasetId", datasetId))
-                .filter(Filters.eq("workflowStatus", WorkflowStatus.FINISHED))
-                .filter(Filters.gte("startedDate", startDate))
-                .filter(Filters.lte("startedDate", endDate));;
-        List<WorkflowExecution> result = MorphiaUtils.getListOfQueryRetryable(query);
+    public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflowsExecutionsOverview(Date startDate, Date endDate){
+        //Make start date two weeks earlier, so we can include more reports based on end date
+        LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.toInstant(), ZoneId.systemDefault());
+        startLocalDateTime = startLocalDateTime.minusWeeks(2L);
+        return workflowExecutionDao.getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
+                Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, 1, 2);
+    }
 
-        if(result.isEmpty()){
-            return null;
-        }
-        return result.stream().sorted(Comparator.comparing(WorkflowExecution::getCreatedDate))
-                .collect(Collectors.toList()).get(result.size() - 1);
-
+    public PluginWithExecutionId<? extends ExecutablePlugin> getHarvesting(PluginWithExecutionId<? extends ExecutablePlugin> pluginWithExecutionId){
+        return dataEvolutionUtils.getRootAncestor(pluginWithExecutionId);
     }
 
     private MongoInitializer prepareMetisCoreConfiguration()
