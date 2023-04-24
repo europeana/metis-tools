@@ -18,8 +18,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -42,7 +44,9 @@ public class CSVUtilities {
 
             List<String> contentToPrint = workflowExecutionsOverview.stream()
                     .map(this::turnDatasetIntoCSVRow)
+                    .filter(StringUtils::isNotEmpty)
                     .collect(Collectors.toList());
+            Collections.reverse(contentToPrint);
             printWriter.println(firstRow);
             contentToPrint.forEach(content -> {
                 if(StringUtils.isNotEmpty(content)){
@@ -61,12 +65,19 @@ public class CSVUtilities {
         StringBuilder stringBuilderCSVRow = new StringBuilder();
         stringBuilderCSVRow.append(dataset.getDatasetId());
         stringBuilderCSVRow.append(", ");
-        AbstractMetisPlugin publishPlugin = execution.getMetisPluginWithType(PluginType.PUBLISH).get();
-        stringBuilderCSVRow.append(simpleDateFormatter.format(publishPlugin.getFinishedDate()));
-        stringBuilderCSVRow.append(", ");
-        stringBuilderCSVRow.append(calculateTimeDifference(execution, (AbstractExecutablePlugin<?>)publishPlugin));
-        stringBuilderCSVRow.append(", ");
-        stringBuilderCSVRow.append(((AbstractExecutablePlugin<?>) publishPlugin).getExecutionProgress().getProcessedRecords());
+        Optional<AbstractMetisPlugin> optionalPublishPlugin = execution.getMetisPluginWithType(PluginType.PUBLISH);
+        if(optionalPublishPlugin.isPresent()){
+            AbstractMetisPlugin publishPlugin = optionalPublishPlugin.get();
+            stringBuilderCSVRow.append(simpleDateFormatter.format(publishPlugin.getFinishedDate()));
+            stringBuilderCSVRow.append(", ");
+            stringBuilderCSVRow.append(calculateTimeDifference(execution, (AbstractExecutablePlugin<?>)publishPlugin));
+            stringBuilderCSVRow.append(", ");
+            stringBuilderCSVRow.append(((AbstractExecutablePlugin<?>) publishPlugin).getExecutionProgress().getProcessedRecords());
+        } else {
+            LOGGER.error("Something went wrong when extracting data");
+            return "";
+        }
+
         LOGGER.info("Finished processing dataset with id " + dataset.getDatasetId());
 
         return stringBuilderCSVRow.toString();

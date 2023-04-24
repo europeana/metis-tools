@@ -41,8 +41,6 @@ public class PerformanceMetricMain {
         //Start printing
         csvUtilities.writeIntoCsvFile(FILE_PATH + OUTPUT_FILE_NAME + NOW_DATE.format(ISO_FORMATTER) + ".csv", startDate, endDate);
 
-
-
         mongoMetisCoreDao.close();
         LOGGER.info("End script");
     }
