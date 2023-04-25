@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+/**
+ * Main script to run the performance metrics
+ */
 public class PerformanceMetricMain {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceMetricMain.class);
@@ -32,11 +35,11 @@ public class PerformanceMetricMain {
         final CSVUtilities csvUtilities = new CSVUtilities(mongoMetisCoreDao);
 
         //Prepare input values
-        String startDateAsString = "2022-02-15 00:00:00";
-        String endDateAsString = "2023-04-01 23:59:59";
-        SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date startDate = simpleDateFormatter.parse(startDateAsString);
-        Date endDate = simpleDateFormatter.parse(endDateAsString);
+        final String startDateAsString = "2022-01-01 00:00:00";
+        final String endDateAsString = "2022-12-31 23:59:59";
+        final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        final Date startDate = simpleDateFormatter.parse(startDateAsString);
+        final Date endDate = simpleDateFormatter.parse(endDateAsString);
 
         //Start printing
         csvUtilities.writeIntoCsvFile(FILE_PATH + OUTPUT_FILE_NAME + NOW_DATE.format(ISO_FORMATTER) + ".csv", startDate, endDate);

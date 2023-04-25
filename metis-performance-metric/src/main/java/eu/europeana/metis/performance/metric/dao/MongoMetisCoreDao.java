@@ -41,8 +41,8 @@ public class MongoMetisCoreDao {
 
     public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflowsExecutionsOverview(Date startDate, Date endDate){
         //Make start date two weeks earlier, so we can include more reports based on end date
-        LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.toInstant(), ZoneId.systemDefault());
-        startLocalDateTime = startLocalDateTime.minusWeeks(2L);
+        final LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.toInstant(), ZoneId.systemDefault())
+                .minusWeeks(2L);
         return workflowExecutionDao.getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
                 Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, 1, 2);
     }

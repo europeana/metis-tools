@@ -14,19 +14,19 @@ public class MongoInitializer {
   private final String mongoAuthenticationDb;
   private final String mongoUsername;
   private final String mongoPassword;
-  private final boolean mongoEnablessl;
+  private final boolean mongoEnableSsl;
   private final int metisCoreConnectionPoolSize;
   private MongoClient mongoClient;
 
   public MongoInitializer(String[] mongoHosts, int[] mongoPorts, String mongoAuthenticationDb,
-                          String mongoUsername, String mongoPassword, boolean mongoEnablessl, int metisCoreConnectionPoolSize) {
+                          String mongoUsername, String mongoPassword, boolean mongoEnableSsl, int metisCoreConnectionPoolSize) {
     this.mongoHosts = mongoHosts;
     this.mongoPorts = mongoPorts;
     this.mongoAuthenticationDb = mongoAuthenticationDb;
     this.mongoUsername = mongoUsername;
     this.mongoPassword = mongoPassword;
 
-    this.mongoEnablessl = mongoEnablessl;
+    this.mongoEnableSsl = mongoEnableSsl;
     this.metisCoreConnectionPoolSize = metisCoreConnectionPoolSize;
   }
 
@@ -38,7 +38,7 @@ public class MongoInitializer {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
         IllegalArgumentException::new);
     mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
-        mongoPassword, mongoEnablessl, null, "Metis Performance Metric");
+        mongoPassword, mongoEnableSsl, null, "Metis Performance Metric");
     mongoProperties.setMaxConnectionPoolSize(metisCoreConnectionPoolSize);
     return mongoProperties;
   }
