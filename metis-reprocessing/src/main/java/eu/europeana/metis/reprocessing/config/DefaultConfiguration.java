@@ -11,9 +11,9 @@ import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
 import eu.europeana.enrichment.rest.client.dereference.DereferencerProvider;
 import eu.europeana.enrichment.rest.client.enrichment.Enricher;
 import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
+import eu.europeana.enrichment.rest.client.enrichment.MetisRecordParser;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
-import eu.europeana.enrichment.rest.client.report.ProcessedResult;
 import eu.europeana.enrichment.rest.client.report.Report;
 import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.enrichment.utils.RdfEntityUtils;
@@ -35,6 +35,7 @@ import eu.europeana.normalization.util.NormalizationConfigurationException;
 import eu.europeana.normalization.util.NormalizationException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +55,6 @@ import static eu.europeana.enrichment.api.internal.EntityResolver.europeanaLinkP
  * It contains 3 functional interfaces that should be initialized properly and they are triggered internally during the
  * re-processing.</p>
  *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-05-16
  */
 public class DefaultConfiguration extends Configuration {
 
@@ -69,6 +68,8 @@ public class DefaultConfiguration extends Configuration {
     private final RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
     private final Normalizer normalizer = new NormalizerFactory().getNormalizer(NormalizerStep.DATES_NORMALIZER);
     private Dereferencer dereferencer;
+    private Enricher enricher;
+    private EntityMergeEngine entityMergeEngine = new EntityMergeEngine();
 
     public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
             throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException, NormalizationConfigurationException {
@@ -84,7 +85,7 @@ public class DefaultConfiguration extends Configuration {
     private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension)
             throws DereferenceException, EnrichmentException {
         dereferencer = getDereferencer(propertiesHolderExtension);
-        Enricher enricher = getEnricher(propertiesHolderExtension);
+        enricher = getEnricher(propertiesHolderExtension);
         enrichmentWorker = new EnrichmentWorkerImpl(dereferencer, enricher);
     }
 
@@ -138,9 +139,10 @@ public class DefaultConfiguration extends Configuration {
     @Override
     public RDF processRDF(RDF rdf) {
         //Modify this method accordingly
-//        rdf = dateNormalization(rdf);
         RDF normalizedRdf = dateNormalization(rdf);
-        rdf = selectiveReEnrichment(normalizedRdf);
+        RDF europeanaLinksReDereferenced = europeanaLinksReDereference(normalizedRdf);
+        rdf = organizationEnrichment(europeanaLinksReDereferenced);
+//        rdf = europeanaLinksReDereferenced;
 
         LOGGER.debug("DONE");
         return rdf;
@@ -159,14 +161,18 @@ public class DefaultConfiguration extends Configuration {
         return computedRDF;
     }
 
-    private RDF selectiveReEnrichment(RDF rdf) {
-        LOGGER.debug("Selective re-enrichment");
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private RDF europeanaLinksReDereference(RDF rdf) {
+        LOGGER.debug("Europeana links re-dereference");
         //Find europeana id organizations that are linked in provider aggregation supported fields
         List<Aggregation> aggregationList = rdf.getAggregationList();
         Set<String> aggregationEuropeanaLinks = new HashSet<>();
         for (AggregationFieldType aggregationFieldType : AggregationFieldType.values()) {
             aggregationList.stream().flatMap(aggregationFieldType::extractFields)
-                    .map(ResourceOrLiteralType::getResource).map(ResourceOrLiteralType.Resource::getResource)
+                    .map(ResourceOrLiteralType::getResource)
+                    .filter(Objects::nonNull)
+                    .map(ResourceOrLiteralType.Resource::getResource)
                     .filter(europeanaLinkPattern.asPredicate())
                     .forEach(aggregationEuropeanaLinks::add);
         }
@@ -281,15 +287,30 @@ public class DefaultConfiguration extends Configuration {
                 .collect(Collectors.toSet());
     }
 
-    private RDF generalReEnrichment(RDF rdf) {
-        RDF computedRDF = rdf;
-        try {
-            enrichmentWorker.cleanupPreviousEnrichmentEntities(rdf);
-            ProcessedResult<RDF> rdfProcessedResult = enrichmentWorker.process(rdf, enrichmentWorker.getSupportedModes());
-            computedRDF = rdfProcessedResult.getProcessedRecord() == null ? rdf : rdfProcessedResult.getProcessedRecord();
-        } catch (RuntimeException e) {
-            LOGGER.warn("Something went wrong during enrichment/dereference", e);
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    private RDF organizationEnrichment(RDF rdf){
+        LOGGER.debug("Organization re-enrichment");
+        final Set<SearchTermContext> searchTerms = new MetisRecordParser().getAggregationSearchTerms(rdf);
+        final Pair<Map<SearchTermContext, List<EnrichmentBase>>, Set<Report>> enrichedValues = enricher.enrichValues(searchTerms);
+
+        LOGGER.debug("Merging Enrichment Information...");
+        if (enrichedValues.getLeft() != null) {
+            for (Map.Entry<SearchTermContext, List<EnrichmentBase>> entry : enrichedValues.getLeft().entrySet()) {
+                entityMergeEngine.mergeSearchEntities(rdf, entry.getValue(), entry.getKey());
+            }
         }
-        return computedRDF;
+        return rdf;
     }
+
+//    private RDF generalReEnrichment(RDF rdf) {
+//        RDF computedRDF = rdf;
+//        try {
+//            enrichmentWorker.cleanupPreviousEnrichmentEntities(rdf);
+//            ProcessedResult<RDF> rdfProcessedResult = enrichmentWorker.process(rdf, enrichmentWorker.getSupportedModes());
+//            computedRDF = rdfProcessedResult.getProcessedRecord() == null ? rdf : rdfProcessedResult.getProcessedRecord();
+//        } catch (RuntimeException e) {
+//            LOGGER.warn("Something went wrong during enrichment/dereference", e);
+//        }
+//        return computedRDF;
+//    }
 }
