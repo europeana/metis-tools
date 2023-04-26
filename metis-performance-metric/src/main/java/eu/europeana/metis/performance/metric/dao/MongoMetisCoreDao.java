@@ -9,6 +9,7 @@ import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.performance.metric.config.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,14 +50,14 @@ public class MongoMetisCoreDao {
         int nextPage = 0;
         WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> resultList = workflowExecutionDao
                 .getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
-                Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 10);
+                Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 1000);
 
-        while (!resultList.getResults().isEmpty()){
+        while (CollectionUtils.isNotEmpty(resultList.getResults())){
             pairsList.addAll(resultList.getResults());
             nextPage++;
             resultList = workflowExecutionDao
                     .getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
-                            Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 10);
+                            Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 1000);
         }
 
         return new WorkflowExecutionDao.ResultList<>(pairsList, true);
