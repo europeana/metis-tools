@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -40,11 +42,24 @@ public class MongoMetisCoreDao {
     }
 
     public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflowsExecutionsOverview(Date startDate, Date endDate){
+        List<WorkflowExecutionDao.ExecutionDatasetPair> pairsList = new ArrayList<>();
         //Make start date two weeks earlier, so we can include more reports based on end date
         final LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.toInstant(), ZoneId.systemDefault())
                 .minusWeeks(2L);
-        return workflowExecutionDao.getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
-                Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, 1, 2);
+        int nextPage = 0;
+        WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> resultList = workflowExecutionDao
+                .getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
+                Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 10);
+
+        while (!resultList.getResults().isEmpty()){
+            pairsList.addAll(resultList.getResults());
+            nextPage++;
+            resultList = workflowExecutionDao
+                    .getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
+                            Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 10);
+        }
+
+        return new WorkflowExecutionDao.ResultList<>(pairsList, true);
     }
 
     public PluginWithExecutionId<? extends ExecutablePlugin> getHarvesting(PluginWithExecutionId<? extends ExecutablePlugin> pluginWithExecutionId){

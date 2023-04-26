@@ -26,7 +26,7 @@ public class PerformanceMetricMain {
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
     private static final LocalDateTime NOW_DATE = LocalDateTime.now();
     private static final String FILE_PATH = "metis-performance-metric/src/main/java/eu/europeana/metis/performance/metric/output/";
-    private static final String OUTPUT_FILE_NAME = "performance-metric-";
+    private static final String OUTPUT_FILE_NAME = "performance-metric-2-";
 
     public static void main(String[] args) throws CustomTruststoreAppender.TrustStoreConfigurationException, FileNotFoundException, ParseException {
         LOGGER.info("Starting script");
@@ -35,8 +35,8 @@ public class PerformanceMetricMain {
         final CSVUtilities csvUtilities = new CSVUtilities(mongoMetisCoreDao);
 
         //Prepare input values
-        final String startDateAsString = "2022-01-01 00:00:00";
-        final String endDateAsString = "2022-12-31 23:59:59";
+        final String startDateAsString = "2023-01-01 00:00:00";
+        final String endDateAsString = "2023-04-26 23:59:59";
         final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         final Date startDate = simpleDateFormatter.parse(startDateAsString);
         final Date endDate = simpleDateFormatter.parse(endDateAsString);

@@ -42,7 +42,7 @@ public class CSVUtilities {
             List<WorkflowExecutionDao.ExecutionDatasetPair> workflowExecutionsOverview =
                     mongoMetisCoreDao.getAllWorkflowsExecutionsOverview(startDate, endDate).getResults();
             List<WorkflowExecution> cleanedWorkflowExecutionList = cleanUpWorkflowExecutionList(workflowExecutionsOverview);
-
+            cleanedWorkflowExecutionList.sort(Comparator.comparing(workflow -> Integer.parseInt(workflow.getDatasetId())));
             List<String> contentToPrint = cleanedWorkflowExecutionList.stream()
                     .map(this::turnDatasetIntoCSVRow)
                     .filter(StringUtils::isNotEmpty)
