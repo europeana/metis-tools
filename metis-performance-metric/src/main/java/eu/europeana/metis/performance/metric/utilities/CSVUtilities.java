@@ -71,7 +71,9 @@ public class CSVUtilities {
             stringBuilderCSVRow.append(", ");
             stringBuilderCSVRow.append(calculateTimeDifference(execution, (AbstractExecutablePlugin<?>)publishPlugin));
             stringBuilderCSVRow.append(", ");
-            stringBuilderCSVRow.append(((AbstractExecutablePlugin<?>) publishPlugin).getExecutionProgress().getProcessedRecords());
+            int numberOfPublishedRecords = ((AbstractExecutablePlugin<?>) publishPlugin).getExecutionProgress().getProcessedRecords() -
+                    ((AbstractExecutablePlugin<?>) publishPlugin).getExecutionProgress().getErrors();
+            stringBuilderCSVRow.append(numberOfPublishedRecords);
         } else {
             LOGGER.error("Something went wrong when extracting data");
             return "";

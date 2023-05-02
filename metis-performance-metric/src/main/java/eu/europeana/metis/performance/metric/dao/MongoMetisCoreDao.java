@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Mongo Dao for functionality related to metis-core
@@ -53,7 +54,11 @@ public class MongoMetisCoreDao {
                 Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 1000);
 
         while (CollectionUtils.isNotEmpty(resultList.getResults())){
-            pairsList.addAll(resultList.getResults());
+            List<WorkflowExecutionDao.ExecutionDatasetPair> filteredResult = resultList.getResults()
+                    .stream()
+                    .filter(pair -> isWithinInterval(pair.getExecution().getFinishedDate(), startDate, endDate))
+                    .collect(Collectors.toList());
+            pairsList.addAll(filteredResult);
             nextPage++;
             resultList = workflowExecutionDao
                     .getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
@@ -81,6 +86,10 @@ public class MongoMetisCoreDao {
                 propertiesHolder.metisCoreMongoEnableSSL, propertiesHolder.metisCoreConnectionPoolSize);
         mongoInitializer.initializeMongoClient();
         return mongoInitializer;
+    }
+
+    private boolean isWithinInterval(Date dateToCheck, Date startDate, Date endDate){
+        return dateToCheck.getTime() >= startDate.getTime() && dateToCheck.getTime() <= endDate.getTime();
     }
 
     public void close() {
