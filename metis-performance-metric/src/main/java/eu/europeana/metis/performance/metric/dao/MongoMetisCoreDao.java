@@ -44,7 +44,7 @@ public class MongoMetisCoreDao {
     }
 
     public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflowsExecutionsOverview(Date startDate, Date endDate){
-        List<WorkflowExecutionDao.ExecutionDatasetPair> pairsList = new ArrayList<>();
+        final List<WorkflowExecutionDao.ExecutionDatasetPair> pairsList = new ArrayList<>();
         //Make start date two weeks earlier, so we can include more reports based on end date
         final LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.toInstant(), ZoneId.systemDefault())
                 .minusWeeks(2L);
@@ -54,7 +54,7 @@ public class MongoMetisCoreDao {
                 Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 1000);
 
         while (CollectionUtils.isNotEmpty(resultList.getResults())){
-            List<WorkflowExecutionDao.ExecutionDatasetPair> filteredResult = resultList.getResults()
+            final List<WorkflowExecutionDao.ExecutionDatasetPair> filteredResult = resultList.getResults()
                     .stream()
                     .filter(pair -> isWithinInterval(pair.getExecution().getFinishedDate(), startDate, endDate))
                     .collect(Collectors.toList());
