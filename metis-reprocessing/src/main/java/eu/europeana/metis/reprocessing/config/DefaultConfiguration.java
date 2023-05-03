@@ -54,7 +54,6 @@ import static eu.europeana.enrichment.api.internal.EntityResolver.europeanaLinkP
  * <p>This class is meant to be modifiable and different per re-processing operation.
  * It contains 3 functional interfaces that should be initialized properly and they are triggered internally during the
  * re-processing.</p>
- *
  */
 public class DefaultConfiguration extends Configuration {
 
@@ -141,7 +140,8 @@ public class DefaultConfiguration extends Configuration {
         //Modify this method accordingly
         RDF normalizedRdf = dateNormalization(rdf);
         RDF europeanaLinksReDereferenced = europeanaLinksReDereference(normalizedRdf);
-        rdf = organizationEnrichment(europeanaLinksReDereferenced);
+        RDF organizationEnriched = organizationEnrichment(europeanaLinksReDereferenced);
+        rdf = rightsFix(organizationEnriched);
 //        rdf = europeanaLinksReDereferenced;
 
         LOGGER.debug("DONE");
@@ -288,7 +288,7 @@ public class DefaultConfiguration extends Configuration {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    private RDF organizationEnrichment(RDF rdf){
+    private RDF organizationEnrichment(RDF rdf) {
         LOGGER.debug("Organization re-enrichment");
         final Set<SearchTermContext> searchTerms = new MetisRecordParser().getAggregationSearchTerms(rdf);
         final Pair<Map<SearchTermContext, List<EnrichmentBase>>, Set<Report>> enrichedValues = enricher.enrichValues(searchTerms);
@@ -313,4 +313,56 @@ public class DefaultConfiguration extends Configuration {
 //        }
 //        return computedRDF;
 //    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private RDF rightsFix(RDF rdf) {
+        Optional<String> about = rdf.getProvidedCHOList()
+                .stream()
+                .findFirst()
+                .map(ProvidedCHOType::getAbout);
+
+        about.ifPresent(aboutString -> {
+            String datasetId = aboutString.substring(1, StringUtils.ordinalIndexOf(aboutString, "/", 2));
+            RightsStatmentsValues.RightsValues rightsValues = RightsStatmentsValues.aggregationRightsMap.get(datasetId);
+            if (rightsValues != null) {
+                updateAggregationRights(rdf, rightsValues);
+                updateWebResourceRights(rdf, datasetId, rightsValues);
+                clearWebResourceRights(rdf, datasetId);
+            }
+        });
+
+        return rdf;
+    }
+
+    private void updateAggregationRights(RDF rdf, RightsStatmentsValues.RightsValues rightsValues) {
+        rdf.getAggregationList()
+                .stream()
+                .filter(aggregation -> aggregation.getRights() != null
+                        && aggregation.getRights().getResource() != null
+                        && rightsValues.getOreAggregation().containsKey(aggregation.getRights().getResource()))
+                .forEach(aggregation -> {
+                    String newResource = rightsValues.getOreAggregation().get(aggregation.getRights().getResource());
+                    aggregation.getRights().setResource(newResource);
+                });
+    }
+
+    private void updateWebResourceRights(RDF rdf, String bypassDatasetId, RightsStatmentsValues.RightsValues rightsValues) {
+        if (rightsValues.isCheckEdmWebResource() && !bypassDatasetId.equals("2048604")) {
+            rdf.getWebResourceList()
+                    .stream()
+                    .filter(webResource -> webResource.getRights() != null
+                            && webResource.getRights().getResource() != null
+                            && rightsValues.getOreAggregation().containsKey(webResource.getRights().getResource()))
+                    .forEach(webResource -> {
+                        String newResource = rightsValues.getOreAggregation().get(webResource.getRights().getResource());
+                        webResource.getRights().setResource(newResource);
+                    });
+        }
+    }
+
+    private void clearWebResourceRights(RDF rdf, String datasetId) {
+        if (datasetId.equals("2048604")) {
+            rdf.getWebResourceList().forEach(webResource -> webResource.setRights(null));
+        }
+    }
 }
