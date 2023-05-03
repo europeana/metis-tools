@@ -14,10 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -74,28 +74,32 @@ public class PerformanceMetricsUtilities {
     }
 
     private String turnDatasetIntoCSVRowForMetric2(WorkflowExecution execution){
-        String datasetId = execution.getDatasetId();
-        SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        LOGGER.info("Processing dataset with id " + datasetId);
-        StringBuilder stringBuilderCSVRow = new StringBuilder();
+        final String datasetId = execution.getDatasetId();
+        final SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        LOGGER.info("Processing dataset with id {}", datasetId);
+        final StringBuilder stringBuilderCSVRow = new StringBuilder();
         stringBuilderCSVRow.append(datasetId);
         stringBuilderCSVRow.append(", ");
-        Optional<AbstractMetisPlugin> optionalPublishPlugin = execution.getMetisPluginWithType(PluginType.PUBLISH);
+        final Optional<AbstractMetisPlugin> optionalPublishPlugin = execution.getMetisPluginWithType(PluginType.PUBLISH);
         if(optionalPublishPlugin.isPresent()){
-            AbstractMetisPlugin publishPlugin = optionalPublishPlugin.get();
+            final AbstractMetisPlugin publishPlugin = optionalPublishPlugin.get();
             stringBuilderCSVRow.append(simpleDateFormatter.format(publishPlugin.getFinishedDate()));
             stringBuilderCSVRow.append(", ");
             stringBuilderCSVRow.append(calculateTimeDifference(execution, (AbstractExecutablePlugin<?>)publishPlugin));
             stringBuilderCSVRow.append(", ");
-            stringBuilderCSVRow.append(((AbstractExecutablePlugin<?>) publishPlugin).getExecutionProgress().getProcessedRecords());
+            stringBuilderCSVRow.append(calculatePublishRecords((AbstractExecutablePlugin<?>) publishPlugin));
         } else {
             LOGGER.error("Something went wrong when extracting data");
             return "";
         }
 
-        LOGGER.info("Finished processing dataset with id " + datasetId);
+        LOGGER.info("Finished processing dataset with id {}", datasetId);
 
         return stringBuilderCSVRow.toString();
+    }
+
+    private int calculatePublishRecords(AbstractExecutablePlugin<?> publishPlugin){
+        return publishPlugin.getExecutionProgress().getProcessedRecords() - publishPlugin.getExecutionProgress().getErrors();
     }
 
     private long calculateTimeDifference(WorkflowExecution workflowExecution, AbstractExecutablePlugin<?> publishPlugin){
