@@ -1,4 +1,4 @@
-DatasetId, Date Publish Indexing, Time of last successful harvest in hours, Number of Records Published
+DatasetId, Date of Index to Publish, Time since last successful harvest in hours, Number of Records Published
 1, 2022-03-25 15:04:35, 0, 6
 3, 2022-02-18 17:04:12, 6, 12118
 6, 2022-06-07 05:21:05, 8, 7360
