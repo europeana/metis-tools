@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
@@ -61,6 +60,7 @@ public class PerformanceMetricsUtilities {
         }
 
         return dataByDate.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
                 .map(entry -> {
                     Date date =  Date.from(entry.getKey().atZone(ZoneId.systemDefault()).toInstant());
                     stringBuilder.setLength(0);

@@ -9,11 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 /**
  * Main script to run the performance metrics
@@ -49,9 +46,9 @@ public class PerformanceMetricMain {
         csvUtilities.writeMetric1IntoCsvFile(FILE_PATH + PERFORMANCE_METRIC_1 + NOW_DATE.format(ISO_FORMATTER) + ".csv", startDate, endDate);
         LOGGER.info("Finished metrics 1 script");
 
-//        LOGGER.info("Running metrics 2 script");
-//        csvUtilities.writeMetric2IntoCsvFile(FILE_PATH + PERFORMANCE_METRIC_2 + NOW_DATE.format(ISO_FORMATTER) + ".csv", startDate, endDate);
-//        LOGGER.info("Finished metrics 2 script");
+        LOGGER.info("Running metrics 2 script");
+        csvUtilities.writeMetric2IntoCsvFile(FILE_PATH + PERFORMANCE_METRIC_2 + NOW_DATE.format(ISO_FORMATTER) + ".csv", startDate, endDate);
+        LOGGER.info("Finished metrics 2 script");
 
         mongoMetisCoreDao.close();
         LOGGER.info("End script");
