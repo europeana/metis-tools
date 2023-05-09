@@ -4,10 +4,7 @@ import eu.europeana.metis.core.dao.PluginWithExecutionId;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
-import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
-import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
-import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
-import eu.europeana.metis.core.workflow.plugins.PluginType;
+import eu.europeana.metis.core.workflow.plugins.*;
 import eu.europeana.metis.performance.metric.dao.MongoMetisCoreDao;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,14 +45,14 @@ public class PerformanceMetricsUtilities {
 
         while(currentDate.isBefore(endLocalDateTime)){
             List<String> values = prepareDataWithDate(currentDate);
-            if(CollectionUtils.isNotEmpty(values)) {
+            if(CollectionUtils.isNotEmpty(values) && allElementsAreNotZero(values)) {
                 dataByDate.put(currentDate, values);
             }
             currentDate = currentDate.plusDays(1L);
         }
 
         List<String> valuesForEndDate = prepareDataWithDate(endLocalDateTime);
-        if(CollectionUtils.isNotEmpty(valuesForEndDate)) {
+        if(CollectionUtils.isNotEmpty(valuesForEndDate) && allElementsAreNotZero(valuesForEndDate)) {
             dataByDate.put(currentDate, valuesForEndDate);
         }
 
@@ -72,42 +69,6 @@ public class PerformanceMetricsUtilities {
                 .collect(Collectors.toList());
     }
 
-    private List<String> prepareDataWithDate(LocalDateTime dateToGatherData){
-        Date startDate = Date.from(dateToGatherData.atZone(ZoneId.systemDefault()).toInstant());
-        Date endDate = Date.from(dateToGatherData.plusDays(1L).atZone(ZoneId.systemDefault()).toInstant());
-        LOGGER.info("Processing data for metric 1  date: {}", SIMPLE_DATE_FORMAT.format(startDate));
-        List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsWithinDateInterval(startDate, endDate).getResults()
-                .stream()
-                .map(WorkflowExecutionDao.ExecutionDatasetPair::getExecution)
-                .collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(result)) {
-            String oaiPmh = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.OAIPMH_HARVEST,result));
-            String httpHarvest = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.HTTP_HARVEST,result));
-            String validateEdmExternal = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.VALIDATION_EXTERNAL,result));
-            String transform = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.TRANSFORMATION,result));
-            String validateEdmInternal = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.VALIDATION_INTERNAL,result));
-            String normalise = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.NORMALIZATION,result));
-            String enrich = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.ENRICHMENT,result));
-            String processMedia = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.MEDIA_PROCESS,result));
-            String indexToPreview = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.PREVIEW,result));
-            String indexToPublish = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.PUBLISH,result));
-            LOGGER.info("Finished data for metric 1  date: {}", SIMPLE_DATE_FORMAT.format(startDate));
-            return List.of(oaiPmh, httpHarvest, validateEdmExternal, transform, validateEdmInternal, normalise, enrich, processMedia, indexToPreview, indexToPublish);
-        } else {
-            LOGGER.info("Finished data for metric 1  date: {}", SIMPLE_DATE_FORMAT.format(startDate));
-            return Collections.emptyList();
-        }
-    }
-
-    private int calculateNumberOfRecordsForPluginType(PluginType pluginType, List<WorkflowExecution> listToGetDataFrom){
-        return listToGetDataFrom.stream()
-                .map(workflowExecution -> workflowExecution.getMetisPluginWithType(pluginType))
-                .filter(Optional::isPresent)
-                .map(plugin -> ((AbstractExecutablePlugin<?>) plugin.get()).getExecutionProgress().getProcessedRecords())
-                .mapToInt(Integer::intValue)
-                .sum();
-    }
-
     public List<String> getDataForMetric2(LocalDateTime startLocalDateTime, LocalDateTime endLocalDateTime){
         Date startDate = Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
         Date endDate = Date.from(endLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
@@ -120,6 +81,96 @@ public class PerformanceMetricsUtilities {
                 .map(this::turnDatasetIntoCSVRowForMetric2)
                 .filter(StringUtils::isNotEmpty)
                 .collect(Collectors.toList());
+    }
+
+    private List<String> prepareDataWithDate(LocalDateTime dateToGatherData){
+        Date startDate = Date.from(dateToGatherData.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(dateToGatherData.plusDays(1L).atZone(ZoneId.systemDefault()).toInstant());
+        LOGGER.info("Processing data for metric 1  date: {}", SIMPLE_DATE_FORMAT.format(startDate));
+        List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsWithinDateInterval(startDate, endDate).getResults()
+                .stream()
+                .map(WorkflowExecutionDao.ExecutionDatasetPair::getExecution)
+                .collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(result)) {
+            String oaiPmh = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.OAIPMH_HARVEST,result, startDate, endDate));
+            String httpHarvest = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.HTTP_HARVEST,result, startDate, endDate));
+            String validateEdmExternal = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.VALIDATION_EXTERNAL,result, startDate, endDate));
+            String transform = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.TRANSFORMATION,result, startDate, endDate));
+            String validateEdmInternal = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.VALIDATION_INTERNAL,result, startDate, endDate));
+            String normalise = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.NORMALIZATION,result, startDate, endDate));
+            String enrich = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.ENRICHMENT,result, startDate, endDate));
+            String processMedia = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.MEDIA_PROCESS,result, startDate, endDate));
+            String indexToPreview = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.PREVIEW,result, startDate, endDate));
+            String indexToPublish = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.PUBLISH,result, startDate, endDate));
+            LOGGER.info("Finished data for metric 1  date: {}", SIMPLE_DATE_FORMAT.format(startDate));
+            return List.of(oaiPmh, httpHarvest, validateEdmExternal, transform, validateEdmInternal, normalise, enrich, processMedia, indexToPreview, indexToPublish);
+        } else {
+            LOGGER.info("Finished data for metric 1  date: {}", SIMPLE_DATE_FORMAT.format(startDate));
+            return Collections.emptyList();
+        }
+    }
+
+    private int calculateNumberOfRecordsForPluginType(PluginType pluginType, List<WorkflowExecution> listToGetDataFrom,
+                                                      Date startDate, Date endDate){
+        return listToGetDataFrom.stream()
+                .map(workflowExecution -> workflowExecution.getMetisPluginWithType(pluginType))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(plugin -> !plugin.getPluginStatus().equals(PluginStatus.CANCELLED) && plugin.getDataStatus().equals(DataStatus.VALID))
+                .map(plugin -> getNumberOfRecordInDate((AbstractExecutablePlugin<?>) plugin, startDate, endDate))
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
+
+    private int getNumberOfRecordInDate(AbstractExecutablePlugin<?> plugin, Date startDate, Date endDate) {
+        long pluginStartTime = plugin.getStartedDate().getTime();
+        long pluginEndTime = plugin.getFinishedDate() != null ? plugin.getFinishedDate().getTime() : plugin.getUpdatedDate().getTime();
+
+        if(pluginIsOutsideDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
+            return 0;
+        } else if(pluginStartsAndFinishedWithinInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
+            return plugin.getExecutionProgress().getProcessedRecords();
+
+        } else if(pluginStartedBeforeDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
+            long totalTime = pluginEndTime - pluginStartTime;
+            long actualTime = pluginEndTime - startDate.getTime();
+            return estimateNumberOfRecords(totalTime, actualTime, plugin.getExecutionProgress().getProcessedRecords());
+
+        } else if(pluginFinishesAfterDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
+            long totalTime = pluginEndTime - pluginStartTime;
+            long actualTime = pluginStartTime - endDate.getTime();
+            return estimateNumberOfRecords(totalTime, actualTime, plugin.getExecutionProgress().getProcessedRecords());
+        }
+
+        return 0;
+    }
+
+    private boolean pluginStartsAndFinishedWithinInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate){
+        return pluginStartTime >= startDate.getTime() &&
+                pluginEndTime < endDate.getTime();
+    }
+
+    private boolean pluginStartedBeforeDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate){
+        return pluginStartTime < startDate.getTime() &&
+                pluginEndTime < endDate.getTime();
+    }
+
+    private boolean pluginFinishesAfterDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate){
+        return pluginStartTime >= startDate.getTime() &&
+                pluginEndTime >= endDate.getTime();
+    }
+
+    private boolean pluginIsOutsideDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate){
+        return (pluginStartTime < startDate.getTime() && pluginEndTime < startDate.getTime()) ||
+                (pluginStartTime > endDate.getTime() && pluginEndTime > endDate.getTime());
+    }
+
+    private int estimateNumberOfRecords(long totalTime, long actualTime, int totalRecords){
+        return (int) Math.ceil((double) (totalRecords * actualTime) / totalTime);
+    }
+
+    private boolean allElementsAreNotZero(List<String> list){
+        return !list.stream().allMatch(value -> Integer.parseInt(value) == 0);
     }
 
     private List<WorkflowExecution> cleanUpWorkflowExecutionList(List<WorkflowExecutionDao.ExecutionDatasetPair> listToClean){

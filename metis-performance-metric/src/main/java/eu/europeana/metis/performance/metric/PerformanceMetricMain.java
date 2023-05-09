@@ -36,7 +36,7 @@ public class PerformanceMetricMain {
 
         //Prepare input values
         final String startDateAsString = "2023-01-01 00:00:00";
-        final String endDateAsString = "2023-04-01 23:59:59";
+        final String endDateAsString = "2023-05-01 23:59:59";
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         final LocalDateTime startDate = LocalDateTime.parse(startDateAsString, formatter);
         final LocalDateTime endDate = LocalDateTime.parse(endDateAsString, formatter);
