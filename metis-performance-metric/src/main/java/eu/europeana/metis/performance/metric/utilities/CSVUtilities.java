@@ -1,6 +1,5 @@
 package eu.europeana.metis.performance.metric.utilities;
 
-import eu.europeana.metis.core.workflow.WorkflowExecution;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,7 +27,7 @@ public class CSVUtilities {
         final String firstRow = "Date, Import OAI-PMH, Import HTTP, Validate EDM External, Transformation, Validate EDM Internal, " +
                 "Normalization, Enrichment, Media Processing, Index to Preview, Index to Publish";
 
-        List<String> output = performanceMetricsUtilities.getDateForMetric1(startDate, endDate);
+        final List<String> output = performanceMetricsUtilities.getDateForMetric1(startDate, endDate);
 
         printIntoFile(resultFile, firstRow, output);
 
@@ -37,7 +35,7 @@ public class CSVUtilities {
 
     public void writeMetric2IntoCsvFile(String filePath, LocalDateTime startDate, LocalDateTime endDate) {
         final File resultFile = new File(filePath);
-        List<String> contentToPrint = performanceMetricsUtilities.getDataForMetric2(startDate, endDate);
+        final List<String> contentToPrint = performanceMetricsUtilities.getDataForMetric2(startDate, endDate);
         final String firstRow = "DatasetId, Date of Index to Publish, Time since last successful harvest in hours, Number of Records Published";
         printIntoFile(resultFile, firstRow, contentToPrint);
 
