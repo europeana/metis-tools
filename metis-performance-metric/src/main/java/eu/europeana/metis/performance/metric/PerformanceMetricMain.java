@@ -27,7 +27,7 @@ public class PerformanceMetricMain {
     private static final String PERFORMANCE_METRIC_1 = "performance-metric-1-";
     private static final String PERFORMANCE_METRIC_2 = "performance-metric-2-";
 
-    public static void main(String[] args) throws CustomTruststoreAppender.TrustStoreConfigurationException, ParseException {
+    public static void main(String[] args) throws CustomTruststoreAppender.TrustStoreConfigurationException {
         LOGGER.info("Starting script");
 
         final MongoMetisCoreDao mongoMetisCoreDao = new MongoMetisCoreDao(propertiesHolder);
