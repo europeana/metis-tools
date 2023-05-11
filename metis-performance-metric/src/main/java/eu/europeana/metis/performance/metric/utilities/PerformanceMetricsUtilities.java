@@ -8,8 +8,6 @@ import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
-import eu.europeana.metis.core.workflow.plugins.DataStatus;
-import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.performance.metric.dao.MongoMetisCoreDao;
 import org.apache.commons.collections.CollectionUtils;
@@ -93,7 +91,7 @@ public class PerformanceMetricsUtilities {
         final Date startDate = Date.from(dateToGatherData.atZone(ZoneId.systemDefault()).toInstant());
         final Date endDate = Date.from(dateToGatherData.plusDays(1L).atZone(ZoneId.systemDefault()).toInstant());
         LOGGER.info("Processing data for metric 1  date: {}", SIMPLE_DATE_FORMAT.format(startDate));
-        final List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsWithinDateInterval(startDate, endDate).getResults()
+        final List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsExecutionsOverviewThatFinished(startDate, endDate).getResults()
                 .stream()
                 .map(WorkflowExecutionDao.ExecutionDatasetPair::getExecution)
                 .collect(Collectors.toList());
@@ -122,7 +120,6 @@ public class PerformanceMetricsUtilities {
                 .map(workflowExecution -> workflowExecution.getMetisPluginWithType(pluginType))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(plugin -> !plugin.getPluginStatus().equals(PluginStatus.CANCELLED) && plugin.getDataStatus().equals(DataStatus.VALID))
                 .map(plugin -> getNumberOfRecordInDate((AbstractExecutablePlugin<?>) plugin, startDate, endDate))
                 .mapToInt(Integer::intValue)
                 .sum();
@@ -135,17 +132,19 @@ public class PerformanceMetricsUtilities {
         if(pluginIsOutsideDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
             return 0;
         } else if(pluginStartsAndFinishedWithinInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
-            return plugin.getExecutionProgress().getProcessedRecords();
+            return plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
 
         } else if(pluginStartedBeforeDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
             final long totalTime = pluginEndTime - pluginStartTime;
             final long actualTime = pluginEndTime - startDate.getTime();
-            return estimateNumberOfRecords(totalTime, actualTime, plugin.getExecutionProgress().getProcessedRecords());
+            final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
+            return estimateNumberOfRecords(totalTime, actualTime, totalRecordNumber);
 
         } else if(pluginFinishesAfterDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
             final long totalTime = pluginEndTime - pluginStartTime;
             final long actualTime = pluginStartTime - endDate.getTime();
-            return estimateNumberOfRecords(totalTime, actualTime, plugin.getExecutionProgress().getProcessedRecords());
+            final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
+            return estimateNumberOfRecords(totalTime, actualTime, totalRecordNumber);
         }
 
         return 0;
