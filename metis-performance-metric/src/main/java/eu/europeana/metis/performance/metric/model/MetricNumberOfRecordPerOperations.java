@@ -14,22 +14,22 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * This class is responsible in calculating the number of records processed per task per day
  */
 
-public class MetricNumberOfRecordPerOperations extends Metric{
+public class MetricNumberOfRecordPerOperations extends Metric {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MetricNumberOfRecordPerOperations.class);
-    private final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private final MongoMetisCoreDao mongoMetisCoreDao;
     private List<String> metricContent;
@@ -45,25 +45,25 @@ public class MetricNumberOfRecordPerOperations extends Metric{
         LocalDateTime currentDate = startLocalDateTime;
         final Map<LocalDateTime, List<String>> dataByDate = new HashMap<>();
 
-        while(currentDate.isBefore(endLocalDateTime)){
+        while (currentDate.isBefore(endLocalDateTime)) {
             List<String> values = prepareDataWithDate(currentDate);
-            if(CollectionUtils.isNotEmpty(values) && allElementsAreNotZero(values)) {
+            if (CollectionUtils.isNotEmpty(values) && allElementsAreNotZero(values)) {
                 dataByDate.put(currentDate, values);
             }
             currentDate = currentDate.plusDays(1L);
         }
 
         List<String> valuesForEndDate = prepareDataWithDate(endLocalDateTime);
-        if(CollectionUtils.isNotEmpty(valuesForEndDate) && allElementsAreNotZero(valuesForEndDate)) {
+        if (CollectionUtils.isNotEmpty(valuesForEndDate) && allElementsAreNotZero(valuesForEndDate)) {
             dataByDate.put(currentDate, valuesForEndDate);
         }
 
         metricContent = dataByDate.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .map(entry -> {
-                    Date date =  Date.from(entry.getKey().atZone(ZoneId.systemDefault()).toInstant());
+                    Date date = Date.from(entry.getKey().atZone(ZoneId.systemDefault()).toInstant());
                     stringBuilder.setLength(0);
-                    stringBuilder.append(SIMPLE_DATE_FORMAT.format(date));
+                    stringBuilder.append(simpleDateFormat.format(date));
                     stringBuilder.append(", ");
                     stringBuilder.append(String.join(", ", entry.getValue()));
                     return stringBuilder.toString();
@@ -78,7 +78,7 @@ public class MetricNumberOfRecordPerOperations extends Metric{
         final String firstRow = "Date, Import OAI-PMH, Import HTTP, Validate EDM External, Transformation, Validate EDM Internal, " +
                 "Normalization, Enrichment, Media Processing, Index to Preview, Index to Publish";
 
-        if(metricContent.isEmpty()){
+        if (metricContent.isEmpty()) {
             LOGGER.error("There is no content to print");
         } else {
             CSVUtilities.printIntoFile(resultFile, firstRow, metricContent);
@@ -86,26 +86,26 @@ public class MetricNumberOfRecordPerOperations extends Metric{
 
     }
 
-    private List<String> prepareDataWithDate(LocalDateTime dateToGatherData){
+    private List<String> prepareDataWithDate(LocalDateTime dateToGatherData) {
         final Date startDate = Date.from(dateToGatherData.atZone(ZoneId.systemDefault()).toInstant());
         final Date endDate = Date.from(dateToGatherData.plusDays(1L).atZone(ZoneId.systemDefault()).toInstant());
-        final String formattedStartDate = SIMPLE_DATE_FORMAT.format(startDate);
+        final String formattedStartDate = simpleDateFormat.format(startDate);
         LOGGER.info("Processing data for metric 1  date: {}", formattedStartDate);
         final List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsExecutionsOverviewThatFinished(startDate, endDate).getResults()
                 .stream()
                 .map(WorkflowExecutionDao.ExecutionDatasetPair::getExecution)
                 .collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(result)) {
-            final String oaiPmh = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.OAIPMH_HARVEST,result, startDate, endDate));
-            final String httpHarvest = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.HTTP_HARVEST,result, startDate, endDate));
-            final String validateEdmExternal = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.VALIDATION_EXTERNAL,result, startDate, endDate));
-            final String transform = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.TRANSFORMATION,result, startDate, endDate));
-            final String validateEdmInternal = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.VALIDATION_INTERNAL,result, startDate, endDate));
-            final String normalise = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.NORMALIZATION,result, startDate, endDate));
-            final String enrich = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.ENRICHMENT,result, startDate, endDate));
-            final String processMedia = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.MEDIA_PROCESS,result, startDate, endDate));
-            final String indexToPreview = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.PREVIEW,result, startDate, endDate));
-            final String indexToPublish = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.PUBLISH,result, startDate, endDate));
+        if (CollectionUtils.isNotEmpty(result)) {
+            final String oaiPmh = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.OAIPMH_HARVEST, result, startDate, endDate));
+            final String httpHarvest = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.HTTP_HARVEST, result, startDate, endDate));
+            final String validateEdmExternal = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.VALIDATION_EXTERNAL, result, startDate, endDate));
+            final String transform = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.TRANSFORMATION, result, startDate, endDate));
+            final String validateEdmInternal = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.VALIDATION_INTERNAL, result, startDate, endDate));
+            final String normalise = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.NORMALIZATION, result, startDate, endDate));
+            final String enrich = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.ENRICHMENT, result, startDate, endDate));
+            final String processMedia = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.MEDIA_PROCESS, result, startDate, endDate));
+            final String indexToPreview = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.PREVIEW, result, startDate, endDate));
+            final String indexToPublish = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.PUBLISH, result, startDate, endDate));
             LOGGER.info("Finished data for metric 1  date: {}", formattedStartDate);
             return List.of(oaiPmh, httpHarvest, validateEdmExternal, transform, validateEdmInternal, normalise, enrich, processMedia, indexToPreview, indexToPublish);
         } else {
@@ -115,7 +115,7 @@ public class MetricNumberOfRecordPerOperations extends Metric{
     }
 
     private int calculateNumberOfRecordsForPluginType(PluginType pluginType, List<WorkflowExecution> listToGetDataFrom,
-                                                      Date startDate, Date endDate){
+                                                      Date startDate, Date endDate) {
         return listToGetDataFrom.stream()
                 .map(workflowExecution -> workflowExecution.getMetisPluginWithType(pluginType))
                 .filter(Optional::isPresent)
@@ -129,18 +129,18 @@ public class MetricNumberOfRecordPerOperations extends Metric{
         final long pluginStartTime = plugin.getStartedDate().getTime();
         final long pluginEndTime = plugin.getFinishedDate() != null ? plugin.getFinishedDate().getTime() : plugin.getUpdatedDate().getTime();
 
-        if(pluginIsOutsideDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
+        if (pluginIsOutsideDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             return 0;
-        } else if(pluginStartsAndFinishedWithinInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
+        } else if (pluginStartsAndFinishedWithinInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             return plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
 
-        } else if(pluginStartedBeforeDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
+        } else if (pluginStartedBeforeDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             final long totalTime = pluginEndTime - pluginStartTime;
             final long actualTime = pluginEndTime - startDate.getTime();
             final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
             return estimateNumberOfRecords(totalTime, actualTime, totalRecordNumber);
 
-        } else if(pluginFinishesAfterDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)){
+        } else if (pluginFinishesAfterDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             final long totalTime = pluginEndTime - pluginStartTime;
             final long actualTime = pluginStartTime - endDate.getTime();
             final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
@@ -150,31 +150,31 @@ public class MetricNumberOfRecordPerOperations extends Metric{
         return 0;
     }
 
-    private boolean pluginStartsAndFinishedWithinInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate){
+    private boolean pluginStartsAndFinishedWithinInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate) {
         return pluginStartTime >= startDate.getTime() &&
                 pluginEndTime < endDate.getTime();
     }
 
-    private boolean pluginStartedBeforeDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate){
+    private boolean pluginStartedBeforeDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate) {
         return pluginStartTime < startDate.getTime() &&
                 pluginEndTime < endDate.getTime();
     }
 
-    private boolean pluginFinishesAfterDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate){
+    private boolean pluginFinishesAfterDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate) {
         return pluginStartTime >= startDate.getTime() &&
                 pluginEndTime >= endDate.getTime();
     }
 
-    private boolean pluginIsOutsideDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate){
+    private boolean pluginIsOutsideDateInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate) {
         return (pluginStartTime < startDate.getTime() && pluginEndTime < startDate.getTime()) ||
                 (pluginStartTime > endDate.getTime() && pluginEndTime > endDate.getTime());
     }
 
-    private int estimateNumberOfRecords(long totalTime, long actualTime, int totalRecords){
+    private int estimateNumberOfRecords(long totalTime, long actualTime, int totalRecords) {
         return (int) Math.ceil((double) (totalRecords * actualTime) / totalTime);
     }
 
-    private boolean allElementsAreNotZero(List<String> list){
+    private boolean allElementsAreNotZero(List<String> list) {
         return !list.stream().allMatch(value -> Integer.parseInt(value) == 0);
     }
 }

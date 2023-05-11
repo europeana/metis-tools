@@ -16,15 +16,15 @@ public class CSVUtilities {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSVUtilities.class);
 
-    public static void printIntoFile(File fileToWrite, String firstRow, List<String> contentToPrint){
-        try(PrintWriter printWriter = new PrintWriter(fileToWrite)){
+    public static void printIntoFile(File fileToWrite, String firstRow, List<String> contentToPrint) {
+        try (PrintWriter printWriter = new PrintWriter(fileToWrite)) {
             printWriter.println(firstRow);
             contentToPrint.forEach(content -> {
-                if(StringUtils.isNotEmpty(content)){
+                if (StringUtils.isNotEmpty(content)) {
                     printWriter.println(content);
                 }
             });
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             LOGGER.error("File path {} does not exist", fileToWrite.getPath());
         }
     }
