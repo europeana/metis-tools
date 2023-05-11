@@ -4,6 +4,8 @@ import eu.europeana.metis.core.dao.DataEvolutionUtils;
 import eu.europeana.metis.core.dao.PluginWithExecutionId;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
+import eu.europeana.metis.core.workflow.WorkflowExecution;
+import eu.europeana.metis.core.workflow.WorkflowStatus;
 import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
@@ -43,32 +45,43 @@ public class MongoMetisCoreDao {
         dataEvolutionUtils = new DataEvolutionUtils(workflowExecutionDao);
     }
 
-    public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflowsExecutionsOverview(Date startDate, Date endDate){
+    public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflowsWithinDateInterval(
+            Date startDate, Date endDate) {
+        return getAllWorkflows(startDate, endDate, null, null, null);
+    }
+
+    public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflowsExecutionsOverviewThatFinished
+            (Date startDate, Date endDate) {
+        return getAllWorkflows(startDate, endDate, null, Set.of(PluginStatus.FINISHED), Set.of(PluginType.PUBLISH));
+    }
+
+    private WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflows(
+            Date startDate, Date endDate, Set<String> datasetIds, Set<PluginStatus> pluginStatuses, Set<PluginType> pluginTypes) {
         final List<WorkflowExecutionDao.ExecutionDatasetPair> pairsList = new ArrayList<>();
         //Make start date two weeks earlier, so we can include more reports based on end date
         final LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.toInstant(), ZoneId.systemDefault())
                 .minusWeeks(2L);
         int nextPage = 0;
         WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> resultList = workflowExecutionDao
-                .getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
-                Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 1000);
+                .getWorkflowExecutionsOverview(datasetIds, pluginStatuses, pluginTypes,
+                        Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 1000);
 
-        while (CollectionUtils.isNotEmpty(resultList.getResults())){
+        while (CollectionUtils.isNotEmpty(resultList.getResults())) {
             final List<WorkflowExecutionDao.ExecutionDatasetPair> filteredResult = resultList.getResults()
                     .stream()
-                    .filter(pair -> isWithinInterval(pair.getExecution().getFinishedDate(), startDate, endDate))
+                    .filter(pair -> isWithinInterval(pair.getExecution(), startDate, endDate))
                     .collect(Collectors.toList());
             pairsList.addAll(filteredResult);
             nextPage++;
             resultList = workflowExecutionDao
-                    .getWorkflowExecutionsOverview(null, Set.of(PluginStatus.FINISHED),
-                            Set.of(PluginType.PUBLISH), Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 1000);
+                    .getWorkflowExecutionsOverview(datasetIds, pluginStatuses, pluginTypes,
+                            Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant()), endDate, nextPage, 1000);
         }
 
         return new WorkflowExecutionDao.ResultList<>(pairsList, true);
     }
 
-    public PluginWithExecutionId<? extends ExecutablePlugin> getHarvesting(PluginWithExecutionId<? extends ExecutablePlugin> pluginWithExecutionId){
+    public PluginWithExecutionId<? extends ExecutablePlugin> getHarvesting(PluginWithExecutionId<? extends ExecutablePlugin> pluginWithExecutionId) {
         return dataEvolutionUtils.getRootAncestor(pluginWithExecutionId);
     }
 
@@ -88,7 +101,13 @@ public class MongoMetisCoreDao {
         return mongoInitializer;
     }
 
-    private boolean isWithinInterval(Date dateToCheck, Date startDate, Date endDate){
+    private boolean isWithinInterval(WorkflowExecution workflowToCheck, Date startDate, Date endDate) {
+        Date dateToCheck;
+        if (workflowToCheck.getWorkflowStatus().equals(WorkflowStatus.FINISHED)) {
+            dateToCheck = workflowToCheck.getFinishedDate();
+        } else {
+            dateToCheck = workflowToCheck.getUpdatedDate();
+        }
         return dateToCheck.getTime() >= startDate.getTime() && dateToCheck.getTime() <= endDate.getTime();
     }
 
