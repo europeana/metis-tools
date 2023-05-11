@@ -69,6 +69,7 @@ public class DefaultConfiguration extends Configuration {
     private Dereferencer dereferencer;
     private Enricher enricher;
     private EntityMergeEngine entityMergeEngine = new EntityMergeEngine();
+    public Map<String, RightsStatmentsValues.RightsValues> aggregationRightsMap = new RightsStatmentsValues().getAggregationRightsMap();
 
     public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
             throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException, NormalizationConfigurationException {
@@ -323,7 +324,7 @@ public class DefaultConfiguration extends Configuration {
 
         about.ifPresent(aboutString -> {
             String datasetId = aboutString.substring(1, StringUtils.ordinalIndexOf(aboutString, "/", 2));
-            RightsStatmentsValues.RightsValues rightsValues = RightsStatmentsValues.aggregationRightsMap.get(datasetId);
+            RightsStatmentsValues.RightsValues rightsValues = aggregationRightsMap.get(datasetId);
             if (rightsValues != null) {
                 updateAggregationRights(rdf, rightsValues);
                 updateWebResourceRights(rdf, datasetId, rightsValues);
@@ -351,8 +352,9 @@ public class DefaultConfiguration extends Configuration {
             rdf.getWebResourceList()
                     .stream()
                     .filter(webResource -> webResource.getRights() != null
-                            && webResource.getRights().getResource() != null
-                            && rightsValues.getOreAggregation().containsKey(webResource.getRights().getResource()))
+                                        && webResource.getRights().getResource() != null
+                                        && rightsValues.getOreAggregation().containsKey(webResource.getRights().getResource())
+                    )
                     .forEach(webResource -> {
                         String newResource = rightsValues.getOreAggregation().get(webResource.getRights().getResource());
                         webResource.getRights().setResource(newResource);

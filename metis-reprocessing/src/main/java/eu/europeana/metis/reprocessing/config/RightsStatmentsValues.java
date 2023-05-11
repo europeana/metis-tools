@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 public class RightsStatmentsValues {
-    public static Map<String, RightsValues> aggregationRightsMap = new HashMap<>();
+    private Map<String, RightsValues> aggregationRightsMap;
 
-    static {
+    public RightsStatmentsValues() {
+        aggregationRightsMap = new HashMap<>();
+        aggregationRightsMap.put("9200384", new RightsValues(List.of("http://rightsstatements.org/vocab/CNE/1.0/\u200B"), List.of("http://rightsstatements.org/vocab/CNE/1.0/"), true));
         aggregationRightsMap.put("9200385", new RightsValues(List.of("http://rightsstatements.org/vocab/CNE/1.0/\u200B"), List.of("http://rightsstatements.org/vocab/CNE/1.0/"), true));
         aggregationRightsMap.put("364", new RightsValues(List.of("http://rightsstatements.org/page/InC/1.0/?language=en"), List.of("http://rightsstatements.org/vocab/InC/1.0/"), true));
         aggregationRightsMap.put("2022712", new RightsValues(List.of("https://creativecommons.org/licenses/by-nc-nd/4.0/"), List.of("http://creativecommons.org/licenses/by-nc-nd/4.0/"), false));
@@ -97,8 +99,10 @@ public class RightsStatmentsValues {
         aggregationRightsMap.put("2058810", new RightsValues(List.of("http://creativecommons.org/licences/by-sa/3.0/"), List.of("http://creativecommons.org/licenses/by-sa/3.0/"), false));
         aggregationRightsMap.put("9200573", new RightsValues(List.of("http://creativecommons.org/licenses/by/4.0"), List.of("http://creativecommons.org/licenses/by/4.0/"), false));
         aggregationRightsMap.put("103", new RightsValues(List.of("http://rightsstatements.org/page/UND/1.0/"), List.of("http://rightsstatements.org/vocab/CNE/1.0/"), false));
+    }
 
-
+    public Map<String, RightsValues> getAggregationRightsMap() {
+        return aggregationRightsMap;
     }
 
     static class RightsValues {
