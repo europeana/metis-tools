@@ -26,15 +26,15 @@ import java.util.stream.Collectors;
  * This class is responsible in calculating the number of records processed per task per day
  */
 
-public class MetricNumberOfRecordOperations extends Metric{
+public class MetricNumberOfRecordPerOperations extends Metric{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetricNumberOfRecordOperations.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricNumberOfRecordPerOperations.class);
     private final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private final MongoMetisCoreDao mongoMetisCoreDao;
     private List<String> metricContent;
 
-    public MetricNumberOfRecordOperations(MongoMetisCoreDao mongoMetisCoreDao) {
+    public MetricNumberOfRecordPerOperations(MongoMetisCoreDao mongoMetisCoreDao) {
         this.mongoMetisCoreDao = mongoMetisCoreDao;
     }
 
