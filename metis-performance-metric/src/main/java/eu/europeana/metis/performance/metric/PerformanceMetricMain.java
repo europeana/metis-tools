@@ -2,8 +2,8 @@ package eu.europeana.metis.performance.metric;
 
 import eu.europeana.metis.performance.metric.config.PropertiesHolder;
 import eu.europeana.metis.performance.metric.dao.MongoMetisCoreDao;
+import eu.europeana.metis.performance.metric.model.MetricNumberOfDatasetsPublished;
 import eu.europeana.metis.performance.metric.model.MetricNumberOfRecordOperations;
-import eu.europeana.metis.performance.metric.model.MetricNumberOfRecordsDatasetsPublished;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class PerformanceMetricMain {
 
         final MongoMetisCoreDao mongoMetisCoreDao = new MongoMetisCoreDao(propertiesHolder);
         MetricNumberOfRecordOperations metric1 = new MetricNumberOfRecordOperations(mongoMetisCoreDao);
-        MetricNumberOfRecordsDatasetsPublished metric2 = new MetricNumberOfRecordsDatasetsPublished(mongoMetisCoreDao);
+        MetricNumberOfDatasetsPublished metric2 = new MetricNumberOfDatasetsPublished(mongoMetisCoreDao);
 
         //Prepare input values
         final String startDateAsString = "2023-01-01 00:00:00";

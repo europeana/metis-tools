@@ -32,15 +32,15 @@ import java.util.stream.Collectors;
  * and how long it took to process each dataset
  */
 
-public class MetricNumberOfRecordsDatasetsPublished extends Metric{
+public class MetricNumberOfDatasetsPublished extends Metric{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetricNumberOfRecordsDatasetsPublished.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricNumberOfDatasetsPublished.class);
     private final SimpleDateFormat SIMPLE_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final MongoMetisCoreDao mongoMetisCoreDao;
     private List<String> metricContent;
 
-    public MetricNumberOfRecordsDatasetsPublished(MongoMetisCoreDao mongoMetisCoreDao){
+    public MetricNumberOfDatasetsPublished(MongoMetisCoreDao mongoMetisCoreDao){
         this.mongoMetisCoreDao = mongoMetisCoreDao;
     }
 
