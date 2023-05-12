@@ -91,7 +91,7 @@ public class MetricNumberOfRecordPerOperations extends Metric {
         final Date endDate = Date.from(dateToGatherData.plusDays(1L).atZone(ZoneId.systemDefault()).toInstant());
         final String formattedStartDate = simpleDateFormat.format(startDate);
         LOGGER.info("Processing data for metric 1  date: {}", formattedStartDate);
-        final List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsExecutionsOverviewThatFinished(startDate, endDate).getResults()
+        final List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsWithinDateInterval(startDate, endDate).getResults()
                 .stream()
                 .map(WorkflowExecutionDao.ExecutionDatasetPair::getExecution)
                 .collect(Collectors.toList());
@@ -126,6 +126,13 @@ public class MetricNumberOfRecordPerOperations extends Metric {
     }
 
     private int getNumberOfRecordInDate(AbstractExecutablePlugin<?> plugin, Date startDate, Date endDate) {
+        if(plugin.getStartedDate() == null){
+            return 0;
+        } else if (plugin.getStartedDate() != null && plugin.getFinishedDate() == null
+                && plugin.getStartedDate().getTime() >=  startDate.getTime()){
+            return plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
+        }
+
         final long pluginStartTime = plugin.getStartedDate().getTime();
         final long pluginEndTime = plugin.getFinishedDate() != null ? plugin.getFinishedDate().getTime() : plugin.getUpdatedDate().getTime();
 
