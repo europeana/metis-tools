@@ -89,12 +89,31 @@
             <artifactId>log4j-core</artifactId>
             <version>${version.log4j}</version>
         </dependency>
-        <dependency>
-            <groupId>eu.europeana.metis</groupId>
-            <artifactId>metis-core-service</artifactId>
-            <version>10-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
+    <repositories>
+        <!--Release repositories-->
+        <repository>
+            <id>libs-release</id>
+            <name>libs-release</name>
+            <url>https://artifactory.eanadev.org/artifactory/libs-release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>libs-snapshot</id>
+            <name>libs-snapshot</name>
+            <url>https://artifactory.eanadev.org/artifactory/libs-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>

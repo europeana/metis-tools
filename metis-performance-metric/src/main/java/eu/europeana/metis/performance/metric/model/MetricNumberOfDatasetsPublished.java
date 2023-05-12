@@ -1,8 +1,7 @@
 package eu.europeana.metis.performance.metric.model;
 
-import eu.europeana.metis.core.dao.PluginWithExecutionId;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
-import eu.europeana.metis.core.dataset.Dataset;
+import eu.europeana.metis.core.dao.WorkflowExecutionDao.ExecutionDatasetPair;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
@@ -10,22 +9,27 @@ import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.performance.metric.dao.MongoMetisCoreDao;
 import eu.europeana.metis.performance.metric.utilities.CSVUtilities;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.TreeSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible in calculating the number of records and datasets published within a date interval
@@ -49,7 +53,7 @@ public class MetricNumberOfDatasetsPublished extends Metric {
         final Date startDate = Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
         final Date endDate = Date.from(endLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
         final List<WorkflowExecutionDao.ExecutionDatasetPair> workflowExecutionsOverview =
-                mongoMetisCoreDao.getAllWorkflowsExecutionsOverviewThatFinished(startDate, endDate).getResults();
+                mongoMetisCoreDao.getAllSuccessfulPublishWorkflows(startDate, endDate).getResults();
         List<WorkflowExecution> cleanedWorkflowExecutionList = cleanUpWorkflowExecutionList(workflowExecutionsOverview);
         cleanedWorkflowExecutionList.sort(Comparator.comparing(workflow -> Integer.parseInt(workflow.getDatasetId())));
 
@@ -57,14 +61,12 @@ public class MetricNumberOfDatasetsPublished extends Metric {
                 .map(this::turnDatasetIntoCSVRowForMetric2)
                 .filter(StringUtils::isNotEmpty)
                 .collect(Collectors.toList());
-
     }
 
     @Override
     public void toCsv(String filePath) {
         final File resultFile = new File(filePath);
-        final String firstRow = "DatasetId, Date of Index to Publish, Time since last successful harvest in hours, Number of Records Published";
-
+        final String firstRow = "DatasetId, Date of Index to Publish, Time since last successful harvest in hours, Total processing time in seconds, Number of Records Published";
 
         if (metricContent.isEmpty()) {
             LOGGER.error("There is no content to print");
@@ -73,37 +75,39 @@ public class MetricNumberOfDatasetsPublished extends Metric {
         }
     }
 
-    private List<WorkflowExecution> cleanUpWorkflowExecutionList(List<WorkflowExecutionDao.ExecutionDatasetPair> listToClean) {
-        List<WorkflowExecution> result = new ArrayList<>();
-        final List<Dataset> uniqueDatasets = listToClean.stream()
-                .map(WorkflowExecutionDao.ExecutionDatasetPair::getDataset)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing((Dataset::getDatasetId)))), ArrayList::new));
-
-        for (Dataset dateset : uniqueDatasets) {
-            result.add(listToClean.stream()
-                    .filter(pair -> pair.getDataset().getDatasetId().equals(dateset.getDatasetId()))
-                    .map(WorkflowExecutionDao.ExecutionDatasetPair::getExecution)
-                    .collect(Collectors.toList()).get(0));
-        }
-
-        return result;
-
+    private List<WorkflowExecution> cleanUpWorkflowExecutionList(List<ExecutionDatasetPair> listToClean) {
+       final Map<String, WorkflowExecution> lastExecutionPerDataset = new HashMap<>();
+        listToClean.forEach(pair -> {
+            final String datasetId = pair.getDataset().getDatasetId();
+            final WorkflowExecution oldValue = lastExecutionPerDataset.get(datasetId);
+            final Instant newStartedDate = pair.getExecution().getStartedDate().toInstant();
+            if (oldValue == null || oldValue.getStartedDate().toInstant().isBefore(newStartedDate)) {
+                lastExecutionPerDataset.put(datasetId, pair.getExecution());
+            }
+        });
+        return new ArrayList<>(lastExecutionPerDataset.values());
     }
 
     private String turnDatasetIntoCSVRowForMetric2(WorkflowExecution execution) {
         final String datasetId = execution.getDatasetId();
-
         LOGGER.info("Processing dataset with id {} for metric 2", datasetId);
         final StringBuilder stringBuilderCSVRow = new StringBuilder();
         stringBuilderCSVRow.append(datasetId);
         stringBuilderCSVRow.append(", ");
         final Optional<AbstractMetisPlugin> optionalPublishPlugin = execution.getMetisPluginWithType(PluginType.PUBLISH);
         if (optionalPublishPlugin.isPresent()) {
-            final AbstractMetisPlugin publishPlugin = optionalPublishPlugin.get();
+            final ExecutablePlugin publishPlugin = (ExecutablePlugin) optionalPublishPlugin.get();
+            final List<Pair<ExecutablePlugin, WorkflowExecution>> evolution = mongoMetisCoreDao.getEvolution(publishPlugin, execution);
+            if (!Set.of(PluginType.OAIPMH_HARVEST, PluginType.HTTP_HARVEST)
+                .contains(evolution.get(0).getLeft().getPluginType())) {
+                LOGGER.error("No harvest associated with this publish: Dataset {}", execution.getDatasetId());
+                return "";
+            }
             stringBuilderCSVRow.append(simpleDateTimeFormat.format(publishPlugin.getFinishedDate()));
             stringBuilderCSVRow.append(", ");
-            stringBuilderCSVRow.append(calculateTimeDifference(execution, (AbstractExecutablePlugin<?>) publishPlugin));
+            stringBuilderCSVRow.append(calculateTimeDifference(evolution.get(0).getLeft(), publishPlugin));
+            stringBuilderCSVRow.append(", ");
+            stringBuilderCSVRow.append(calculateRunningTime(evolution));
             stringBuilderCSVRow.append(", ");
             stringBuilderCSVRow.append(calculatePublishRecords((AbstractExecutablePlugin<?>) publishPlugin));
         } else {
@@ -120,9 +124,12 @@ public class MetricNumberOfDatasetsPublished extends Metric {
         return publishPlugin.getExecutionProgress().getProcessedRecords() - publishPlugin.getExecutionProgress().getErrors();
     }
 
-    private long calculateTimeDifference(WorkflowExecution workflowExecution, AbstractExecutablePlugin<?> publishPlugin) {
-        final PluginWithExecutionId<? extends ExecutablePlugin> harvestPlugin =
-                mongoMetisCoreDao.getHarvesting(new PluginWithExecutionId<>(workflowExecution, publishPlugin));
-        return TimeUnit.MILLISECONDS.toHours(publishPlugin.getFinishedDate().getTime() - harvestPlugin.getPlugin().getStartedDate().getTime());
+    private long calculateTimeDifference(ExecutablePlugin harvestPlugin, ExecutablePlugin publishPlugin) {
+        return TimeUnit.MILLISECONDS.toHours(publishPlugin.getFinishedDate().getTime() - harvestPlugin.getStartedDate().getTime());
+    }
+
+    private long calculateRunningTime(List<Pair<ExecutablePlugin, WorkflowExecution>> evolution) {
+        return evolution.stream().map(Pair::getLeft).mapToLong(plugin -> plugin.getStartedDate().toInstant()
+            .until(plugin.getFinishedDate().toInstant(), ChronoUnit.SECONDS)).sum();
     }
 }

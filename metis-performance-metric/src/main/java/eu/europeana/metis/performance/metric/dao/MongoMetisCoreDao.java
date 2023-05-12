@@ -7,12 +7,15 @@ import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.WorkflowStatus;
 import eu.europeana.metis.core.workflow.plugins.ExecutablePlugin;
+import eu.europeana.metis.core.workflow.plugins.MetisPlugin;
 import eu.europeana.metis.core.workflow.plugins.PluginStatus;
 import eu.europeana.metis.core.workflow.plugins.PluginType;
 import eu.europeana.metis.performance.metric.config.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,11 @@ public class MongoMetisCoreDao {
                 metisCoreMongoInitializer.getMongoClient(), propertiesHolder.metisCoreMongoDb);
         workflowExecutionDao = new WorkflowExecutionDao(morphiaDatastoreProvider);
         dataEvolutionUtils = new DataEvolutionUtils(workflowExecutionDao);
+    }
+
+    public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllSuccessfulPublishWorkflows
+        (Date startDate, Date endDate) {
+        return getAllWorkflows(startDate, endDate, null, Set.of(PluginStatus.FINISHED), Set.of(PluginType.PUBLISH));
     }
 
     public WorkflowExecutionDao.ResultList<WorkflowExecutionDao.ExecutionDatasetPair> getAllWorkflowsWithinDateInterval(
@@ -81,8 +89,12 @@ public class MongoMetisCoreDao {
         return new WorkflowExecutionDao.ResultList<>(pairsList, true);
     }
 
-    public PluginWithExecutionId<? extends ExecutablePlugin> getHarvesting(PluginWithExecutionId<? extends ExecutablePlugin> pluginWithExecutionId) {
-        return dataEvolutionUtils.getRootAncestor(pluginWithExecutionId);
+    public List<Pair<ExecutablePlugin, WorkflowExecution>> getEvolution(ExecutablePlugin targetPlugin,
+        WorkflowExecution targetPluginExecution) {
+        final List<Pair<ExecutablePlugin, WorkflowExecution>> result = dataEvolutionUtils
+            .compileVersionEvolution(targetPlugin, targetPluginExecution);
+        result.add(new ImmutablePair<>(targetPlugin, targetPluginExecution));
+        return result;
     }
 
     private MongoInitializer prepareMetisCoreConfiguration()
