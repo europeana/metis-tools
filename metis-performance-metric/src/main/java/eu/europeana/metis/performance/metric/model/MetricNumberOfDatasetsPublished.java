@@ -1,7 +1,6 @@
 package eu.europeana.metis.performance.metric.model;
 
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
-import eu.europeana.metis.core.dao.WorkflowExecutionDao.ExecutionDatasetPair;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
@@ -11,7 +10,6 @@ import eu.europeana.metis.performance.metric.dao.MongoMetisCoreDao;
 import eu.europeana.metis.performance.metric.utilities.CSVUtilities;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -21,10 +19,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -54,9 +52,10 @@ public class MetricNumberOfDatasetsPublished extends Metric {
         final Date endDate = Date.from(endLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
         final List<WorkflowExecutionDao.ExecutionDatasetPair> workflowExecutionsOverview =
                 mongoMetisCoreDao.getAllSuccessfulPublishWorkflows(startDate, endDate).getResults();
-        List<WorkflowExecution> cleanedWorkflowExecutionList = cleanUpWorkflowExecutionList(workflowExecutionsOverview);
-        cleanedWorkflowExecutionList.sort(Comparator.comparing(workflow -> Integer.parseInt(workflow.getDatasetId())));
-
+        final List<List<Pair<ExecutablePlugin, WorkflowExecution>>> allEvolutions = workflowExecutionsOverview
+            .stream().map(this::getEvolutionForPublishAction).filter(Objects::nonNull).collect(Collectors.toList());
+        List<List<Pair<ExecutablePlugin, WorkflowExecution>>> cleanedWorkflowExecutionList = cleanUpWorkflowExecutionList(allEvolutions);
+        cleanedWorkflowExecutionList.sort(Comparator.comparing(evolution -> evolution.get(0).getLeft().getStartedDate()));
         metricContent = cleanedWorkflowExecutionList.stream()
                 .map(this::turnDatasetIntoCSVRowForMetric2)
                 .filter(StringUtils::isNotEmpty)
@@ -66,7 +65,8 @@ public class MetricNumberOfDatasetsPublished extends Metric {
     @Override
     public void toCsv(String filePath) {
         final File resultFile = new File(filePath);
-        final String firstRow = "DatasetId, Date of Index to Publish, Time since last successful harvest in hours, Total processing time in seconds, Number of Records Published";
+        final String firstRow = "DatasetId, Date of Index to Publish, Time since last successful harvest in hours,"
+            + " Total processing time in seconds, Number of Records Published";
 
         if (metricContent.isEmpty()) {
             LOGGER.error("There is no content to print");
@@ -75,48 +75,60 @@ public class MetricNumberOfDatasetsPublished extends Metric {
         }
     }
 
-    private List<WorkflowExecution> cleanUpWorkflowExecutionList(List<ExecutionDatasetPair> listToClean) {
-       final Map<String, WorkflowExecution> lastExecutionPerDataset = new HashMap<>();
-        listToClean.forEach(pair -> {
-            final String datasetId = pair.getDataset().getDatasetId();
-            final WorkflowExecution oldValue = lastExecutionPerDataset.get(datasetId);
-            final Instant newStartedDate = pair.getExecution().getStartedDate().toInstant();
-            if (oldValue == null || oldValue.getStartedDate().toInstant().isBefore(newStartedDate)) {
-                lastExecutionPerDataset.put(datasetId, pair.getExecution());
-            }
-        });
-        return new ArrayList<>(lastExecutionPerDataset.values());
+    private List<Pair<ExecutablePlugin, WorkflowExecution>> getEvolutionForPublishAction(
+            WorkflowExecutionDao.ExecutionDatasetPair publishPair) {
+        final String datasetId = publishPair.getDataset().getDatasetId();
+        LOGGER.info("Processing evolution for dataset with id {} for metric 2", datasetId);
+        final Optional<AbstractMetisPlugin> optionalPublishPlugin = publishPair.getExecution()
+            .getMetisPluginWithType(PluginType.PUBLISH);
+        if (optionalPublishPlugin.isEmpty()) {
+            LOGGER.error("Something went wrong when extracting data: non-publish plugin found.");
+            return null;
+        }
+        final ExecutablePlugin publishPlugin = (ExecutablePlugin) optionalPublishPlugin.get();
+        final List<Pair<ExecutablePlugin, WorkflowExecution>> result = mongoMetisCoreDao
+            .getEvolution(publishPlugin, publishPair.getExecution());
+        LOGGER.info("Finished processing evolution for dataset with id {} for metric 2", datasetId);
+        return result;
     }
 
-    private String turnDatasetIntoCSVRowForMetric2(WorkflowExecution execution) {
-        final String datasetId = execution.getDatasetId();
-        LOGGER.info("Processing dataset with id {} for metric 2", datasetId);
+    private List<List<Pair<ExecutablePlugin, WorkflowExecution>>> cleanUpWorkflowExecutionList(
+            List<List<Pair<ExecutablePlugin, WorkflowExecution>>> listToClean) {
+        final Map<String, List<Pair<ExecutablePlugin, WorkflowExecution>>> lastEvolutionPerHarvest = new HashMap<>();
+        listToClean.forEach(evolution -> {
+            final String harvestId = evolution.get(0).getLeft().getId();
+            final var oldValue = lastEvolutionPerHarvest.get(harvestId);
+            if (oldValue != null) {
+                final var publishTimeOld = oldValue.get(oldValue.size() - 1).getLeft().getStartedDate();
+                final var publishTimeNew = evolution.get(oldValue.size() - 1).getLeft().getStartedDate();
+                if (publishTimeOld.toInstant().isBefore(publishTimeNew.toInstant())) {
+                    lastEvolutionPerHarvest.put(harvestId, evolution);
+                }
+            } else {
+                lastEvolutionPerHarvest.put(harvestId, evolution);
+            }
+        });
+        return new ArrayList<>(lastEvolutionPerHarvest.values());
+    }
+
+    private String turnDatasetIntoCSVRowForMetric2(List<Pair<ExecutablePlugin, WorkflowExecution>> evolution) {
+        final String datasetId = evolution.get(0).getRight().getDatasetId();
         final StringBuilder stringBuilderCSVRow = new StringBuilder();
         stringBuilderCSVRow.append(datasetId);
         stringBuilderCSVRow.append(", ");
-        final Optional<AbstractMetisPlugin> optionalPublishPlugin = execution.getMetisPluginWithType(PluginType.PUBLISH);
-        if (optionalPublishPlugin.isPresent()) {
-            final ExecutablePlugin publishPlugin = (ExecutablePlugin) optionalPublishPlugin.get();
-            final List<Pair<ExecutablePlugin, WorkflowExecution>> evolution = mongoMetisCoreDao.getEvolution(publishPlugin, execution);
-            if (!Set.of(PluginType.OAIPMH_HARVEST, PluginType.HTTP_HARVEST)
-                .contains(evolution.get(0).getLeft().getPluginType())) {
-                LOGGER.error("No harvest associated with this publish: Dataset {}", execution.getDatasetId());
-                return "";
-            }
-            stringBuilderCSVRow.append(simpleDateTimeFormat.format(publishPlugin.getFinishedDate()));
-            stringBuilderCSVRow.append(", ");
-            stringBuilderCSVRow.append(calculateTimeDifference(evolution.get(0).getLeft(), publishPlugin));
-            stringBuilderCSVRow.append(", ");
-            stringBuilderCSVRow.append(calculateRunningTime(evolution));
-            stringBuilderCSVRow.append(", ");
-            stringBuilderCSVRow.append(calculatePublishRecords((AbstractExecutablePlugin<?>) publishPlugin));
-        } else {
-            LOGGER.error("Something went wrong when extracting data");
+        if (!Set.of(PluginType.OAIPMH_HARVEST, PluginType.HTTP_HARVEST)
+            .contains(evolution.get(0).getLeft().getPluginType())) {
+            LOGGER.error("No harvest associated with this publish: Dataset {}", datasetId);
             return "";
         }
-
-        LOGGER.info("Finished processing dataset with id {} for metric 2", datasetId);
-
+        final ExecutablePlugin publishPlugin = evolution.get(evolution.size() - 1).getLeft();
+        stringBuilderCSVRow.append(simpleDateTimeFormat.format(publishPlugin.getFinishedDate()));
+        stringBuilderCSVRow.append(", ");
+        stringBuilderCSVRow.append(calculateTimeDifference(evolution.get(0).getLeft(), publishPlugin));
+        stringBuilderCSVRow.append(", ");
+        stringBuilderCSVRow.append(calculateRunningTime(evolution));
+        stringBuilderCSVRow.append(", ");
+        stringBuilderCSVRow.append(calculatePublishRecords((AbstractExecutablePlugin<?>) publishPlugin));
         return stringBuilderCSVRow.toString();
     }
 
