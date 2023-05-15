@@ -91,7 +91,7 @@ public class MetricNumberOfRecordPerOperations extends Metric {
         final Date endDate = Date.from(dateToGatherData.plusDays(1L).atZone(ZoneId.systemDefault()).toInstant());
         final String formattedStartDate = simpleDateFormat.format(startDate);
         LOGGER.info("Processing data for metric 1  date: {}", formattedStartDate);
-        final List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsExecutionsOverviewThatFinished(startDate, endDate).getResults()
+        final List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsWithinDateInterval(startDate, endDate).getResults()
                 .stream()
                 .map(WorkflowExecutionDao.ExecutionDatasetPair::getExecution)
                 .collect(Collectors.toList());
@@ -126,20 +126,36 @@ public class MetricNumberOfRecordPerOperations extends Metric {
     }
 
     private int getNumberOfRecordInDate(AbstractExecutablePlugin<?> plugin, Date startDate, Date endDate) {
+        //if task has not registered any starting time, don't count records
+        if(plugin.getStartedDate() == null){
+            return 0;
+
+        //if task started within date interval but has no finish time, count all processed records (processed successfully or not)
+        } else if (pluginPluginStartTimeWithNoFinishDate(plugin, startDate)){
+            return plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
+        }
+
         final long pluginStartTime = plugin.getStartedDate().getTime();
         final long pluginEndTime = plugin.getFinishedDate() != null ? plugin.getFinishedDate().getTime() : plugin.getUpdatedDate().getTime();
 
+        //if the task was not executed within the date interval, count all processed records (processed successfully or not)
         if (pluginIsOutsideDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             return 0;
+
+        //if the task started and finished within date interval, count all processed records (processed successfully or not)
         } else if (pluginStartsAndFinishedWithinInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             return plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
 
+        //if the task started before the date interval but finished within date interval, estimate the number of
+        //records processed within date interval (processed successfully or not)
         } else if (pluginStartedBeforeDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             final long totalTime = pluginEndTime - pluginStartTime;
             final long actualTime = pluginEndTime - startDate.getTime();
             final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
             return estimateNumberOfRecords(totalTime, actualTime, totalRecordNumber);
 
+        //if the task started within the date interval but finished after date interval, estimate the number of
+        //records processed within date  interval (processed successfully or not)
         } else if (pluginFinishesAfterDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             final long totalTime = pluginEndTime - pluginStartTime;
             final long actualTime = pluginStartTime - endDate.getTime();
@@ -148,6 +164,11 @@ public class MetricNumberOfRecordPerOperations extends Metric {
         }
 
         return 0;
+    }
+
+    private boolean pluginPluginStartTimeWithNoFinishDate(AbstractExecutablePlugin<?> plugin, Date startDate){
+        return plugin.getStartedDate() != null && plugin.getFinishedDate() == null
+                && plugin.getStartedDate().getTime() >=  startDate.getTime();
     }
 
     private boolean pluginStartsAndFinishedWithinInterval(long pluginStartTime, long pluginEndTime, Date startDate, Date endDate) {
