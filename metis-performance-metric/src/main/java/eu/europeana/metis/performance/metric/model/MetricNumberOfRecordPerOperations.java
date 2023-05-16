@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -88,13 +89,13 @@ public class MetricNumberOfRecordPerOperations extends Metric {
 
     private List<String> prepareDataWithDate(LocalDateTime dateToGatherData) {
         final Date startDate = Date.from(dateToGatherData.atZone(ZoneId.systemDefault()).toInstant());
-        final Date endDate = Date.from(dateToGatherData.plusDays(1L).atZone(ZoneId.systemDefault()).toInstant());
+        final Date endDate = Date.from(dateToGatherData.plusDays(1L).minusSeconds(1L).atZone(ZoneId.systemDefault()).toInstant());
         final String formattedStartDate = simpleDateFormat.format(startDate);
         LOGGER.info("Processing data for metric 1  date: {}", formattedStartDate);
-        final List<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsWithinDateInterval(startDate, endDate).getResults()
+        final Set<WorkflowExecution> result = mongoMetisCoreDao.getAllWorkflowsWithinDateInterval(startDate, endDate).getResults()
                 .stream()
                 .map(WorkflowExecutionDao.ExecutionDatasetPair::getExecution)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         if (CollectionUtils.isNotEmpty(result)) {
             final String oaiPmh = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.OAIPMH_HARVEST, result, startDate, endDate));
             final String httpHarvest = String.valueOf(calculateNumberOfRecordsForPluginType(PluginType.HTTP_HARVEST, result, startDate, endDate));
@@ -114,7 +115,7 @@ public class MetricNumberOfRecordPerOperations extends Metric {
         }
     }
 
-    private int calculateNumberOfRecordsForPluginType(PluginType pluginType, List<WorkflowExecution> listToGetDataFrom,
+    private int calculateNumberOfRecordsForPluginType(PluginType pluginType, Set<WorkflowExecution> listToGetDataFrom,
                                                       Date startDate, Date endDate) {
         return listToGetDataFrom.stream()
                 .map(workflowExecution -> workflowExecution.getMetisPluginWithType(pluginType))
@@ -132,7 +133,7 @@ public class MetricNumberOfRecordPerOperations extends Metric {
 
         //if task started within date interval but has no finish time, count all processed records (processed successfully or not)
         } else if (pluginPluginStartTimeWithNoFinishDate(plugin, startDate)){
-            return plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
+            return plugin.getExecutionProgress().getProcessedRecords();
         }
 
         final long pluginStartTime = plugin.getStartedDate().getTime();
@@ -144,14 +145,14 @@ public class MetricNumberOfRecordPerOperations extends Metric {
 
         //if the task started and finished within date interval, count all processed records (processed successfully or not)
         } else if (pluginStartsAndFinishedWithinInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
-            return plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
+            return plugin.getExecutionProgress().getProcessedRecords();
 
         //if the task started before the date interval but finished within date interval, estimate the number of
         //records processed within date interval (processed successfully or not)
         } else if (pluginStartedBeforeDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             final long totalTime = pluginEndTime - pluginStartTime;
             final long actualTime = pluginEndTime - startDate.getTime();
-            final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
+            final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords();
             return estimateNumberOfRecords(totalTime, actualTime, totalRecordNumber);
 
         //if the task started within the date interval but finished after date interval, estimate the number of
@@ -159,7 +160,7 @@ public class MetricNumberOfRecordPerOperations extends Metric {
         } else if (pluginFinishesAfterDateInterval(pluginStartTime, pluginEndTime, startDate, endDate)) {
             final long totalTime = pluginEndTime - pluginStartTime;
             final long actualTime = pluginStartTime - endDate.getTime();
-            final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords() + plugin.getExecutionProgress().getErrors();
+            final int totalRecordNumber = plugin.getExecutionProgress().getProcessedRecords();
             return estimateNumberOfRecords(totalTime, actualTime, totalRecordNumber);
         }
 
