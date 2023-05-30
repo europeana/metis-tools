@@ -65,6 +65,8 @@ public class PropertiesHolder {
   public final boolean sourceMongoEnableSSL;
   public final String sourceMongoDb;
   public final int sourceMongoConnectionPoolSize;
+  // TODO: 15/05/2023 Temporary field for translations
+  public final String sourceTranslationsMongoDb;
   //Mongo Destination
   public final String[] destinationMongoHosts;
   public final int[] destinationMongoPorts;
@@ -166,6 +168,7 @@ public class PropertiesHolder {
     sourceMongoEnableSSL = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
     sourceMongoDb = properties.getProperty("mongo.source.db");
     sourceMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.source.connection.pool.size"), 500);
+    sourceTranslationsMongoDb = properties.getProperty("mongo.source.translations.db");
 
     //Mongo Destination
     destinationMongoHosts = properties.getProperty("mongo.destination.hosts").split(",");

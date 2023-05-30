@@ -45,17 +45,18 @@ public class RightsStatmentsValues {
         aggregationRightsMap.put("71", new RightsValues(List.of("http://www.europeana.eu/rights/rr-f/"), List.of("http://rightsstatements.org/vocab/InC/1.0/"), false));
         aggregationRightsMap.put("90", new RightsValues(List.of("http://www.europeana.eu/rights/rr-f/"), List.of("http://rightsstatements.org/vocab/InC/1.0/"), false));
         aggregationRightsMap.put("2048427", new RightsValues(List.of("http://www.europeana.eu/rights/rr-f/"), List.of("http://rightsstatements.org/vocab/InC/1.0/"), true));
-        aggregationRightsMap.put("2022720", new RightsValues(
-                List.of(
-                        "http://creativecommons.org/licenses/by-nc-nd/4.0",
-                        "An error occurred getting the license - uri.",
-                        "Attribution-NonCommercial-NoDerivatives 4.0 Internacional",
-                        "https://creativecommons.org/licenses/by/4.0/"),
-                List.of(
-                        "http://creativecommons.org/licenses/by-nc-nd/4.0/",
-                        "http://rightsstatements.org/vocab/CNE/1.0/",
-                        "http://creativecommons.org/licenses/by-nc-nd/4.0/",
-                        "http://creativecommons.org/licenses/by/4.0/"), false));
+        //2022720 was removed from the list on 25/05/2023 because it was fixed in production
+//        aggregationRightsMap.put("2022720", new RightsValues(
+//                List.of(
+//                        "http://creativecommons.org/licenses/by-nc-nd/4.0",
+//                        "An error occurred getting the license - uri.",
+//                        "Attribution-NonCommercial-NoDerivatives 4.0 Internacional",
+//                        "https://creativecommons.org/licenses/by/4.0/"),
+//                List.of(
+//                        "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+//                        "http://rightsstatements.org/vocab/CNE/1.0/",
+//                        "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+//                        "http://creativecommons.org/licenses/by/4.0/"), false));
         aggregationRightsMap.put("91978", new RightsValues(List.of("http://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.ca"), List.of("http://creativecommons.org/licenses/by-nc-nd/3.0/es/"), false));
         aggregationRightsMap.put("91979", new RightsValues(List.of("http://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.ca"), List.of("http://creativecommons.org/licenses/by-nc-nd/3.0/es/"), false));
         aggregationRightsMap.put("91988", new RightsValues(List.of("http://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.ca"), List.of("http://creativecommons.org/licenses/by-nc-nd/3.0/es/"), false));

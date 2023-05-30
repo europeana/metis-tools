@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.config;
 
+import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.enrichment.api.external.impl.ClientEntityResolver;
 import eu.europeana.enrichment.api.external.model.EnrichmentBase;
@@ -42,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.*;
 import java.util.function.Supplier;
@@ -139,15 +142,46 @@ public class DefaultConfiguration extends Configuration {
     @Override
     public RDF processRDF(RDF rdf) {
         //Modify this method accordingly
-        RDF normalizedRdf = dateNormalization(rdf);
-        RDF europeanaLinksReDereferenced = europeanaLinksReDereference(normalizedRdf);
-        RDF organizationEnriched = organizationEnrichment(europeanaLinksReDereferenced);
-        rdf = rightsFix(organizationEnriched);
-//        rdf = europeanaLinksReDereferenced;
+        rdf = translations(rdf);
+        rdf = dateNormalization(rdf);
+        rdf = europeanaLinksReDereference(rdf);
+        rdf = organizationEnrichment(rdf);
+        rdf = rightsFix(rdf);
 
         LOGGER.debug("DONE");
         return rdf;
     }
+
+    RDF translations(RDF rdf) {
+        //Get the translation if exists
+        FullBeanImpl translationsFullbean = getMongoSourceMongoDao().getTranslationsRecord(rdf.getProvidedCHOList().get(0).getAbout());
+
+        if (translationsFullbean != null) {
+            RDF rdfTranslation = EdmUtils.toRDF(translationsFullbean, true);
+            Date currentUpdatedDate = rdfTranslation.getEuropeanaAggregationList().stream().findFirst().map(EuropeanaAggregationType::getModified).map(Modified::getString)
+                    .map(this::convertToDate).orElse(null);
+            Date translationUpdateDate = rdf.getEuropeanaAggregationList().stream().findFirst().map(EuropeanaAggregationType::getModified).map(Modified::getString)
+                    .map(this::convertToDate).orElse(null);
+
+            if (currentUpdatedDate != null && translationUpdateDate != null && currentUpdatedDate.compareTo(translationUpdateDate) == 0
+                    && rdf.getProxyList() != null) {
+                for (int i = 0; i < rdf.getProxyList().size(); i++) {
+                    ProxyType proxyType = rdf.getProxyList().get(i);
+                    if (proxyType != null && RdfEntityUtils.isEuropeanaProxy(proxyType)) {
+                        rdf.getProxyList().set(i, RdfEntityUtils.getEuropeanaProxy(rdfTranslation));
+                        break;
+                    }
+                }
+            }
+        }
+        return rdf;
+    }
+
+    Date convertToDate(String dateString) {
+        return Date.from(Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(dateString)));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private RDF dateNormalization(RDF rdf) {
         RDF computedRDF = rdf;
@@ -352,8 +386,8 @@ public class DefaultConfiguration extends Configuration {
             rdf.getWebResourceList()
                     .stream()
                     .filter(webResource -> webResource.getRights() != null
-                                        && webResource.getRights().getResource() != null
-                                        && rightsValues.getOreAggregation().containsKey(webResource.getRights().getResource())
+                            && webResource.getRights().getResource() != null
+                            && rightsValues.getOreAggregation().containsKey(webResource.getRights().getResource())
                     )
                     .forEach(webResource -> {
                         String newResource = rightsValues.getOreAggregation().get(webResource.getRights().getResource());
@@ -367,4 +401,6 @@ public class DefaultConfiguration extends Configuration {
             rdf.getWebResourceList().forEach(webResource -> webResource.setRights(null));
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
