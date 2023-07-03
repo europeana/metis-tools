@@ -158,12 +158,12 @@ public class DefaultConfiguration extends Configuration {
 
         if (translationsFullbean != null) {
             RDF rdfTranslation = EdmUtils.toRDF(translationsFullbean, true);
-            Date currentUpdatedDate = rdfTranslation.getEuropeanaAggregationList().stream().findFirst().map(EuropeanaAggregationType::getModified).map(Modified::getString)
+            Date currentUpdatedDate = rdf.getEuropeanaAggregationList().stream().findFirst().map(EuropeanaAggregationType::getModified).map(Modified::getString)
                     .map(this::convertToDate).orElse(null);
-            Date translationUpdateDate = rdf.getEuropeanaAggregationList().stream().findFirst().map(EuropeanaAggregationType::getModified).map(Modified::getString)
+            Date translationUpdateDate = rdfTranslation.getEuropeanaAggregationList().stream().findFirst().map(EuropeanaAggregationType::getModified).map(Modified::getString)
                     .map(this::convertToDate).orElse(null);
 
-            if (currentUpdatedDate != null && translationUpdateDate != null && currentUpdatedDate.compareTo(translationUpdateDate) == 0
+            if (currentUpdatedDate != null && translationUpdateDate != null && currentUpdatedDate.compareTo(translationUpdateDate) <= 0
                     && rdf.getProxyList() != null) {
                 for (int i = 0; i < rdf.getProxyList().size(); i++) {
                     ProxyType proxyType = rdf.getProxyList().get(i);
