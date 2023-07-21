@@ -3,16 +3,18 @@ package eu.europeana.metis.reprocessing;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.indexing.exception.IndexingException;
-import eu.europeana.metis.reprocessing.execution.ExecutorManager;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
 import eu.europeana.metis.reprocessing.config.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.execution.ExecutorManager;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import eu.europeana.normalization.util.NormalizationConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Entry class for the reprocessing script.
@@ -27,7 +29,7 @@ public class ReprocessingMain {
   private static final PropertiesHolderExtension propertiesHolder = new PropertiesHolderExtension(CONFIGURATION_FILE);
 
   public static void main(String[] args)
-      throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException, DereferenceException, EnrichmentException {
+          throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException, DereferenceException, EnrichmentException, NormalizationConfigurationException {
     LOGGER.info("Starting script");
 
     final Configuration configuration = new DefaultConfiguration(propertiesHolder);

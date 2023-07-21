@@ -7,7 +7,7 @@ import dev.morphia.Morphia;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
-import dev.morphia.query.experimental.filters.Filters;
+import dev.morphia.query.filters.Filters;
 import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
@@ -44,6 +44,8 @@ public class MongoSourceMongoDao {
 
   private final MongoInitializer sourceMongoInitializer;
   private final Datastore mongoSourceDatastore;
+  // TODO: 15/05/2023 Temporary Datastore for translations
+  private final Datastore mongoSourceTranslationsDatastore;
   private final PropertiesHolder propertiesHolder;
 
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
@@ -52,6 +54,15 @@ public class MongoSourceMongoDao {
     sourceMongoInitializer = prepareMongoSourceConfiguration();
     mongoSourceDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
         propertiesHolder.sourceMongoDb);
+    mongoSourceTranslationsDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
+            propertiesHolder.sourceTranslationsMongoDb);
+  }
+
+  // TODO: 15/05/2023 Temporary method for translations.
+  public FullBeanImpl getTranslationsRecord(String about){
+    Query<FullBeanImpl> query = mongoSourceTranslationsDatastore.find(FullBeanImpl.class);
+    query.filter(Filters.eq(ABOUT, about));
+    return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::first);
   }
 
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
