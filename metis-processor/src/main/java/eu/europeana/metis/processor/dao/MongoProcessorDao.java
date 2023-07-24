@@ -3,15 +3,21 @@ package eu.europeana.metis.processor.dao;
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
+import dev.morphia.aggregation.experimental.expressions.Expressions;
 import dev.morphia.mapping.Mapper;
+import dev.morphia.query.FindOptions;
+import dev.morphia.query.Query;
 import dev.morphia.query.experimental.filters.Filters;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.processor.config.DataAccessConfigException;
 import eu.europeana.metis.processor.config.mongo.MongoProcessorProperties;
+import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
 
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class MongoProcessorDao {
 
@@ -20,6 +26,8 @@ public class MongoProcessorDao {
     private final MongoProcessorProperties mongoProcessorProperties;
     private final MongoClient mongoClient;
     private final Datastore metisProcessorDatastore;
+
+    private int counter = 0;
 
     public MongoProcessorDao(MongoProcessorProperties mongoProcessorProperties) throws DataAccessConfigException {
         this.mongoProcessorProperties = mongoProcessorProperties;
@@ -50,4 +58,38 @@ public class MongoProcessorDao {
     public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
         ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> metisProcessorDatastore.save(datasetStatus));
     }
+
+    public DatasetPageBuilder getNextDatasetPageNumber(){
+        // TODO: 24/07/2023 Remove this. It is only for testing
+        if (counter >= 2) {
+            return new DatasetPageBuilder(null, -1);
+        }
+        counter++;
+
+        //fix this
+        int pageSize = 10;
+        Query<DatasetStatus> query = metisProcessorDatastore.find(DatasetStatus.class);
+        query.filter(Filters.expr(Expressions.value("{$lt: [\"$totalProcessed\", \"$totalRecords\"]}")));
+        final List<DatasetStatus> datasetStatuses = MorphiaUtils.getListOfQueryRetryable(query, new FindOptions().limit(1));
+
+        DatasetPageBuilder datasetPageBuilder = new DatasetPageBuilder(null, -1);
+        if (!datasetStatuses.isEmpty()){
+            DatasetStatus datasetStatus = datasetStatuses.get(0);
+            final SortedSet<Integer> pagesProcessed = new TreeSet<>(datasetStatus.getPagesProcessed());
+            if (pagesProcessed.isEmpty()) {
+                datasetPageBuilder = new DatasetPageBuilder(datasetStatus.getDatasetId(), 0);
+            }
+            else{
+                //Possible total pages Math.ceil((float)processedRecords/pageSize)
+                int totalPages = (int)Math.ceil((float)datasetStatus.getTotalRecords()/pageSize);
+                //Ensure that if a page failed in the meantime, we don't get stuck repeating the last page.
+                boolean isLastPageProcessed = pagesProcessed.contains(totalPages - 1);
+                if(pagesProcessed.size() < totalPages && !isLastPageProcessed){
+                    datasetPageBuilder = new DatasetPageBuilder(datasetStatus.getDatasetId(), pagesProcessed.last() + 1);
+                }
+            }
+        }
+        return datasetPageBuilder;
+    }
+
 }

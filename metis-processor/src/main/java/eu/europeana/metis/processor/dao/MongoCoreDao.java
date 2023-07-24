@@ -17,30 +17,30 @@ import java.util.stream.Collectors;
  * Data access object for the Metis core Mongo.
  */
 public class MongoCoreDao {
-  private final MongoCoreProperties mongoCoreProperties;
-  private final MongoClient mongoClient;
-  private final Datastore metisCoreDatastore;
+    private final MongoCoreProperties mongoCoreProperties;
+    private final MongoClient mongoClient;
+    private final Datastore metisCoreDatastore;
 
 
-  public MongoCoreDao(MongoCoreProperties mongoCoreProperties) throws DataAccessConfigException {
-    this.mongoCoreProperties = mongoCoreProperties;
-    this.mongoClient = initializeMongoClient();
-    this.metisCoreDatastore = initializeDatastore();
-  }
+    public MongoCoreDao(MongoCoreProperties mongoCoreProperties) throws DataAccessConfigException {
+        this.mongoCoreProperties = mongoCoreProperties;
+        this.mongoClient = initializeMongoClient();
+        this.metisCoreDatastore = initializeDatastore();
+    }
 
-  private MongoClient initializeMongoClient() throws DataAccessConfigException {
-    return new MongoClientProvider<>(mongoCoreProperties.getMongoCoreProperties()).createMongoClient();
-  }
+    private MongoClient initializeMongoClient() throws DataAccessConfigException {
+        return new MongoClientProvider<>(mongoCoreProperties.getMongoCoreProperties()).createMongoClient();
+    }
 
-  private Datastore initializeDatastore() {
-    return new MorphiaDatastoreProviderImpl(mongoClient, mongoCoreProperties.getMongoCoreDatabase()).getDatastore();
-  }
+    private Datastore initializeDatastore() {
+        return new MorphiaDatastoreProviderImpl(mongoClient, mongoCoreProperties.getMongoCoreDatabase()).getDatastore();
+    }
 
 
-  public List<String> getAllDatasetIds() {
-    Query<Dataset> query = metisCoreDatastore.find(Dataset.class);
-    final List<Dataset> datasets = MorphiaUtils.getListOfQueryRetryable(query);
-    return datasets.stream().map(Dataset::getDatasetId).collect(Collectors.toList());
-  }
+    public List<String> getAllDatasetIds() {
+        Query<Dataset> query = metisCoreDatastore.find(Dataset.class);
+        final List<Dataset> datasets = MorphiaUtils.getListOfQueryRetryable(query);
+        return datasets.stream().map(Dataset::getDatasetId).collect(Collectors.toList());
+    }
 
 }

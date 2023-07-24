@@ -16,12 +16,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.lang.invoke.MethodHandles;
+
 @Configuration
 public class ApplicationConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfiguration.class);
-
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     /**
      * Autowired constructor for Spring Configuration class.
      *
@@ -63,7 +63,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    MongoSourceDao getMongoSourceDao(MongoSourceProperties mongoSourceProperties) throws DataAccessConfigException {
+    public MongoSourceDao getMongoSourceDao(MongoSourceProperties mongoSourceProperties) throws DataAccessConfigException {
         return new MongoSourceDao(mongoSourceProperties);
     }
 
