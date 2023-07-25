@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Component
-public class ConfigurationProperties {
+public class TruststoreProperties {
 
   //Custom truststore
   @Value("${truststore.path}")

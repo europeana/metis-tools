@@ -20,7 +20,7 @@ public class RecordsProcessor {
         this.completionService = new ExecutorCompletionService<>(threadPool);
     }
 
-    public boolean process(List<FullBeanImpl> fullBeans) throws InterruptedException {
+    public void process(List<FullBeanImpl> fullBeans) throws InterruptedException {
 
         List<Future<Void>> futureList = new ArrayList<>(fullBeans.size());
         for (FullBeanImpl fullbean : fullBeans) {
@@ -40,13 +40,13 @@ public class RecordsProcessor {
             }
         }
 
+        LOGGER.info("Storing results.");
         for (FullBeanImpl fullbean : fullBeans) {
             //Store fullbeans in target database if necessary
             //This can also be done in the first loop instead
 
         }
 
-        return true;
     }
 
     public void close() {

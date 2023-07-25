@@ -3,6 +3,8 @@ package eu.europeana.metis.processor.utilities;
 import eu.europeana.corelib.definitions.edm.beans.FullBean;
 import eu.europeana.corelib.definitions.edm.entity.Aggregation;
 import eu.europeana.corelib.definitions.edm.entity.WebResource;
+import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
+import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.exception.GenericMetisException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,23 +21,15 @@ import java.util.*;
 public class FullbeanUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-//    private final MongoSourceDao mongoSourceDao;
-//
-//    public FullbeanUtil(MongoSourceDao mongoSourceDao) {
-//        this.mongoSourceDao = mongoSourceDao;
-//    }
 
     public FullbeanUtil() {
     }
 
-    public void injectWebResourceMetaInfo(final FullBean fullBean) {
-//        Map<String, WebResource> webResourceHashCodes = prepareWebResourceHashCodes(fullBean);
-//        final List<WebResourceMetaInfoImpl> webResourceMetaInfos = mongoSourceDao
-//                .getTechnicalMetadataForHashCodes(new ArrayList<>(webResourceHashCodes.keySet()));
-//        for (WebResourceMetaInfoImpl webResourceMetaInfo : webResourceMetaInfos) {
-//            WebResource webResource = webResourceHashCodes.get(webResourceMetaInfo.getId());
-//            ((WebResourceImpl) webResource).setWebResourceMetaInfo(webResourceMetaInfo);
-//        }
+    public void injectWebResourceMetaInfo(Map<String, WebResource> webResourceHashCodes, List<WebResourceMetaInfoImpl> webResourceMetaInfos) {
+        for (WebResourceMetaInfoImpl webResourceMetaInfo : webResourceMetaInfos) {
+            WebResource webResource = webResourceHashCodes.get(webResourceMetaInfo.getId());
+            ((WebResourceImpl) webResource).setWebResourceMetaInfo(webResourceMetaInfo);
+        }
     }
 
     public Map<String, WebResource> prepareWebResourceHashCodes(FullBean fullBean) {

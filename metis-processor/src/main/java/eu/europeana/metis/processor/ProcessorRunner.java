@@ -6,6 +6,8 @@ import eu.europeana.metis.processor.dao.MongoProcessorDao;
 import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.utilities.DatasetPage;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -21,20 +23,23 @@ import static java.util.stream.Collectors.toMap;
 
 // TODO: 24/07/2023 Implement reprocessing of failed pages
 // TODO: 24/07/2023 Amount of threads per app should be configurable
-// TODO: 24/07/2023 Implement locks
 public class ProcessorRunner implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final String DATASET_STATUS = "datasetStatus";
     private final MongoProcessorDao mongoProcessorDao;
     private final MongoCoreDao mongoCoreDao;
     private final MongoSourceDao mongoSourceDao;
+    private final RedissonClient redissonClient;
     private final RecordsProcessor recordsProcessor;
 
-    public ProcessorRunner(MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao) {
+
+    public ProcessorRunner(MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao, RedissonClient redissonClient) {
         this.mongoProcessorDao = mongoProcessorDao;
         this.mongoCoreDao = mongoCoreDao;
         this.mongoSourceDao = mongoSourceDao;
+        this.redissonClient = redissonClient;
         // TODO: 24/07/2023 Fix this parameter
-        recordsProcessor = new RecordsProcessor(1);
+        recordsProcessor = new RecordsProcessor(2);
     }
 
     @Override
@@ -57,33 +62,50 @@ public class ProcessorRunner implements CommandLineRunner {
     private void updateDatasetStatusLockWrapped(DatasetPage datasetPage) {
         if (datasetPage.getDatasetId() != null) {
             //Distributed LOCK for datasetStatuses update
-            DatasetStatus datasetStatus = mongoProcessorDao.getDatasetStatus(datasetPage.getDatasetId());
-            final Set<Integer> pagesProcessed = datasetStatus.getPagesProcessed();
-            pagesProcessed.add(datasetPage.getPage());
-            mongoProcessorDao.storeDatasetStatusToDb(datasetStatus);
+            RLock lock = redissonClient.getFairLock(DATASET_STATUS);
+            lock.lock();
+            try {
+                DatasetStatus datasetStatus = mongoProcessorDao.getDatasetStatus(datasetPage.getDatasetId());
+                final Set<Integer> pagesProcessed = datasetStatus.getPagesProcessed();
+                pagesProcessed.add(datasetPage.getPage());
+                mongoProcessorDao.storeDatasetStatusToDb(datasetStatus);
+            } finally {
+                lock.unlock();
+            }
             //Distributed UNLOCK for datasetStatuses update
         }
     }
 
     private void initializeLockWrapped() {
         //Distributed LOCK for datasetStatuses initialization
-        //Request configuration Mongo database for datasetStatuses
-        List<DatasetStatus> allDatasetStatuses = mongoProcessorDao.getAllDatasetStatuses();
+        RLock lock = redissonClient.getFairLock(DATASET_STATUS);
+        lock.lock();
+        try {
+            //Request configuration Mongo database for datasetStatuses
+            List<DatasetStatus> allDatasetStatuses = mongoProcessorDao.getAllDatasetStatuses();
 
-        //If datasetStatuses is already initialized, do nothing
-        //If datasetStatuses is NOT already initialized, initialize
-        if (allDatasetStatuses.isEmpty()) {
-            Map<String, Long> datasetsWithSize = getDatasetWithSize(10);
-            Optional<Map.Entry<String, Long>> entry = datasetsWithSize.entrySet().stream().findFirst();
-            entry.ifPresent(stringLongEntry -> LOGGER.info("{}: {}", stringLongEntry.getKey(), stringLongEntry.getValue()));
-            allDatasetStatuses = orderAndInitialDatasetStatuses(datasetsWithSize);
+            //If datasetStatuses is already initialized, do nothing
+            //If datasetStatuses is NOT already initialized, initialize
+            if (allDatasetStatuses.isEmpty()) {
+                LOGGER.info("DatasetStatuses: is empty.");
+                LOGGER.info("DatasetStatuses: Start initialization.");
+                Map<String, Long> datasetsWithSize = getDatasetWithSize(10);
+                //--Remove this block
+                Optional<Map.Entry<String, Long>> entry = datasetsWithSize.entrySet().stream().findFirst();
+                entry.ifPresent(stringLongEntry -> LOGGER.info("{}: {}", stringLongEntry.getKey(), stringLongEntry.getValue()));
+                //--Remove this block
+                allDatasetStatuses = orderAndInitialDatasetStatuses(datasetsWithSize);
+                LOGGER.info("DatasetStatuses: End initialization.");
+            }
+
+            //--Remove this block
+            Optional<DatasetStatus> datasetStatus = allDatasetStatuses.stream().findFirst();
+            datasetStatus.ifPresent(datasetStatusItem -> LOGGER.info("{}: {}", datasetStatusItem.getDatasetId(), datasetStatusItem.getTotalRecords()));
+            //--Remove this block
+        } finally {
+            lock.unlock();
         }
         //Distributed UNLOCK for datasetStatuses initialization
-
-        //--Remove this part
-        Optional<DatasetStatus> datasetStatus = allDatasetStatuses.stream().findFirst();
-        datasetStatus.ifPresent(datasetStatusItem -> LOGGER.info("{}: {}", datasetStatusItem.getDatasetId(), datasetStatusItem.getTotalRecords()));
-        //--Remove this part
     }
 
     private List<DatasetStatus> orderAndInitialDatasetStatuses(Map<String, Long> datasetsWithSize) {
@@ -128,13 +150,19 @@ public class ProcessorRunner implements CommandLineRunner {
 
     private DatasetPage getNextPageLockWrapped() {
         //Distributed LOCK for page processing
-        DatasetPageBuilder datasetPageNumber = mongoProcessorDao.getNextDatasetPageNumber();
-        if (datasetPageNumber.getDatasetId() == null) {
-            datasetPageNumber.setFullBeanList(Collections.emptyList());
-        } else {
-            datasetPageNumber.setFullBeanList(mongoSourceDao.getNextPageOfRecords(datasetPageNumber.getDatasetId(), datasetPageNumber.getPage()));
+        RLock lock = redissonClient.getFairLock(DATASET_STATUS);
+        lock.lock();
+        try {
+            DatasetPageBuilder datasetPageNumber = mongoProcessorDao.getNextDatasetPageNumber();
+            if (datasetPageNumber.getDatasetId() == null) {
+                datasetPageNumber.setFullBeanList(Collections.emptyList());
+            } else {
+                datasetPageNumber.setFullBeanList(mongoSourceDao.getNextPageOfRecords(datasetPageNumber.getDatasetId(), datasetPageNumber.getPage()));
+            }
+            return datasetPageNumber.build();
+        } finally {
+            lock.unlock();
         }
         //Distributed UNLOCK for page processing
-        return datasetPageNumber.build();
     }
 }

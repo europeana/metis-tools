@@ -6,11 +6,9 @@ import dev.morphia.Datastore;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.experimental.filters.Filters;
-import eu.europeana.corelib.definitions.edm.beans.FullBean;
 import eu.europeana.corelib.definitions.edm.entity.WebResource;
 import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.mongo.dao.RecordDao;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
@@ -63,19 +61,12 @@ public class MongoSourceDao {
                 new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE));
 
         for (FullBeanImpl fullBean : fullBeanList) {
-            injectWebResourceMetaInfo(fullBean);
+            Map<String, WebResource> webResourceHashCodes = fullbeanUtil.prepareWebResourceHashCodes(fullBean);
+            final List<WebResourceMetaInfoImpl> webResourceMetaInfos = getTechnicalMetadataForHashCodes(new ArrayList<>(webResourceHashCodes.keySet()));
+            fullbeanUtil.injectWebResourceMetaInfo(webResourceHashCodes, webResourceMetaInfos);
         }
         return fullBeanList;
 
-    }
-
-    public void injectWebResourceMetaInfo(final FullBean fullBean) {
-        Map<String, WebResource> webResourceHashCodes = fullbeanUtil.prepareWebResourceHashCodes(fullBean);
-        final List<WebResourceMetaInfoImpl> webResourceMetaInfos = getTechnicalMetadataForHashCodes(new ArrayList<>(webResourceHashCodes.keySet()));
-        for (WebResourceMetaInfoImpl webResourceMetaInfo : webResourceMetaInfos) {
-            WebResource webResource = webResourceHashCodes.get(webResourceMetaInfo.getId());
-            ((WebResourceImpl) webResource).setWebResourceMetaInfo(webResourceMetaInfo);
-        }
     }
 
     public List<WebResourceMetaInfoImpl> getTechnicalMetadataForHashCodes(List<String> hashCodes) {

@@ -20,9 +20,10 @@ public class RecordCallable implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
+        // TODO: 25/07/2023 Can we implement it with steps? 
         //Process RDF and exit
         RDF rdf = EdmUtils.toRDF(fullBean, true);
-        LOGGER.info("Processing RDF: {}", rdf.getProvidedCHOList().get(0).getAbout());
+        LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
         return null;
     }
 }
