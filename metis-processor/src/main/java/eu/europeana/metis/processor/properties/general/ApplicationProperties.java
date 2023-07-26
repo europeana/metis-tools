@@ -1,4 +1,4 @@
-package eu.europeana.metis.processor.config.general;
+package eu.europeana.metis.processor.properties.general;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

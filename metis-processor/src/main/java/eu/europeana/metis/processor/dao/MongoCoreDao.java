@@ -8,7 +8,7 @@ import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.processor.config.DataAccessConfigException;
-import eu.europeana.metis.processor.config.mongo.MongoCoreProperties;
+import eu.europeana.metis.processor.properties.mongo.MongoCoreProperties;
 
 import java.util.List;
 import java.util.stream.Collectors;

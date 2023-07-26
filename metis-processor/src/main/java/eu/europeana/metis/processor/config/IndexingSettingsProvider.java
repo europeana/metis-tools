@@ -1,9 +1,10 @@
-package eu.europeana.metis.processor.config.general;
+package eu.europeana.metis.processor.config;
 
 import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.SetupRelatedIndexingException;
-import eu.europeana.metis.processor.config.mongo.MongoTargetProperties;
+import eu.europeana.metis.processor.properties.general.SolrZookeeperTargetProperties;
+import eu.europeana.metis.processor.properties.mongo.MongoTargetProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

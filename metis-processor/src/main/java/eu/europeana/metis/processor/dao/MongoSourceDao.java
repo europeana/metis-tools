@@ -14,7 +14,7 @@ import eu.europeana.metis.mongo.dao.RecordDao;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.processor.config.DataAccessConfigException;
-import eu.europeana.metis.processor.config.mongo.MongoSourceProperties;
+import eu.europeana.metis.processor.properties.mongo.MongoSourceProperties;
 import eu.europeana.metis.processor.utilities.FullbeanUtil;
 
 import java.util.ArrayList;

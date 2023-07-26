@@ -12,7 +12,7 @@ import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.processor.config.DataAccessConfigException;
-import eu.europeana.metis.processor.config.mongo.MongoProcessorProperties;
+import eu.europeana.metis.processor.properties.mongo.MongoProcessorProperties;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class MongoProcessorDao {
         ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> metisProcessorDatastore.save(datasetStatus));
     }
 
-    public DatasetPageBuilder getNextDatasetPageNumber(){
+    public DatasetPageBuilder getNextDatasetPageNumber() {
         // TODO: 24/07/2023 Remove this. It is only for testing
         if (counter >= 2) {
             return new DatasetPageBuilder(null, -1);
@@ -73,21 +73,25 @@ public class MongoProcessorDao {
         final List<DatasetStatus> datasetStatuses = MorphiaUtils.getListOfQueryRetryable(query, new FindOptions().limit(1));
 
         DatasetPageBuilder datasetPageBuilder = new DatasetPageBuilder(null, -1);
-        if (!datasetStatuses.isEmpty()){
+        if (!datasetStatuses.isEmpty()) {
             DatasetStatus datasetStatus = datasetStatuses.get(0);
             final SortedSet<Integer> pagesProcessed = new TreeSet<>(datasetStatus.getPagesProcessed());
+            final SortedSet<Integer> currentPagesProcessing = new TreeSet<>(datasetStatus.getCurrentPagesProcessing());
             if (pagesProcessed.isEmpty()) {
+                datasetStatus.getCurrentPagesProcessing().add(0);
                 datasetPageBuilder = new DatasetPageBuilder(datasetStatus.getDatasetId(), 0);
-            }
-            else{
+            } else {
                 //Possible total pages Math.ceil((float)processedRecords/pageSize)
-                int totalPages = (int)Math.ceil((float)datasetStatus.getTotalRecords()/pageSize);
+                int totalPages = (int) Math.ceil((float) datasetStatus.getTotalRecords() / pageSize);
                 //Ensure that if a page failed in the meantime, we don't get stuck repeating the last page.
                 boolean isLastPageProcessed = pagesProcessed.contains(totalPages - 1);
-                if(pagesProcessed.size() < totalPages && !isLastPageProcessed){
-                    datasetPageBuilder = new DatasetPageBuilder(datasetStatus.getDatasetId(), pagesProcessed.last() + 1);
+                int nextPage = Math.max(pagesProcessed.last(), currentPagesProcessing.isEmpty() ? Integer.MIN_VALUE : currentPagesProcessing.last()) + 1;
+                if (nextPage < totalPages && !isLastPageProcessed) {
+                    datasetStatus.getCurrentPagesProcessing().add(nextPage);
+                    datasetPageBuilder = new DatasetPageBuilder(datasetStatus.getDatasetId(), nextPage);
                 }
             }
+            metisProcessorDatastore.save(datasetStatus);
         }
         return datasetPageBuilder;
     }

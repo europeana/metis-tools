@@ -1,4 +1,4 @@
-package eu.europeana.metis.processor.config.mongo;
+package eu.europeana.metis.processor.properties.mongo;
 
 import eu.europeana.metis.mongo.connection.MongoProperties;
 import eu.europeana.metis.processor.config.DataAccessConfigException;

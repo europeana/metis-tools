@@ -31,12 +31,14 @@ public class DatasetStatus implements HasMongoObjectId {
   private volatile long totalProcessed;
   private volatile long totalFailedRecords;
   private volatile Set<Integer> pagesProcessed = new HashSet<>();
+
+  private volatile Set<Integer> currentPagesProcessing = new HashSet<>();
+
   private volatile double actualTimeProcessAndIndex;
   private volatile double totalTimeProcessingInSecs;
   private volatile double totalTimeIndexingInSecs;
   private volatile double averageTimeRecordProcessingInSecs;
   private volatile double averageTimeRecordIndexingInSecs;
-
   public DatasetStatus() {
     //Default constructor
   }
@@ -109,6 +111,14 @@ public class DatasetStatus implements HasMongoObjectId {
 
   public Set<Integer> getPagesProcessed() {
     return pagesProcessed;
+  }
+
+  public Set<Integer> getCurrentPagesProcessing() {
+    return currentPagesProcessing;
+  }
+
+  public void setCurrentPagesProcessing(Set<Integer> currentPagesProcessing) {
+    this.currentPagesProcessing = currentPagesProcessing;
   }
 
   public double getActualTimeProcessAndIndex() {

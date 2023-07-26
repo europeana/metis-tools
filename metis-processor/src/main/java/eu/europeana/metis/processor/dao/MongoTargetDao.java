@@ -2,15 +2,11 @@ package eu.europeana.metis.processor.dao;
 
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
-import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.mongo.dao.RecordDao;
-import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.processor.config.DataAccessConfigException;
-import eu.europeana.metis.processor.config.mongo.MongoTargetProperties;
+import eu.europeana.metis.processor.properties.mongo.MongoTargetProperties;
 import eu.europeana.metis.processor.utilities.FullbeanUtil;
-
-import java.util.List;
 
 public class MongoTargetDao {
 
@@ -37,9 +33,5 @@ public class MongoTargetDao {
     private Datastore initializeDatastore() {
         RecordDao recordDao = new RecordDao(mongoClient, mongoTargetProperties.getMongoTargetDatabase());
         return recordDao.getDatastore();
-    }
-
-    public void storeFullbeans(List<FullBeanImpl> fullBeanList) {
-        ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> metisTargetDatastore.save(fullBeanList));
     }
 }

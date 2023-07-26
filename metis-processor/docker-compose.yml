@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  metis-processor-local:
+    image: europeana/metis-processor:feat_mets_processor_poc
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 2
+    volumes:
+      - /data/metis-configuration/metis-tools/metis-processor/k8s/overlays/local/components/properties/application.properties:/application.properties
+      - /data/metis-configuration/k8s/common-components/custom-truststore-jks/custom-truststore.jks:/data/certificates/custom-truststore.jks
+      - /data/metis-configuration/k8s/common-components/log4j2-xml/log4j2.xml:/data/logging/log4j2.xml

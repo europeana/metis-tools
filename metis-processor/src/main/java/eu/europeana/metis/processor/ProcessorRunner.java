@@ -5,7 +5,7 @@ import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.metis.network.ExternalRequestUtil;
-import eu.europeana.metis.processor.config.general.ApplicationProperties;
+import eu.europeana.metis.processor.properties.general.ApplicationProperties;
 import eu.europeana.metis.processor.dao.*;
 import eu.europeana.metis.processor.utilities.DatasetPage;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
@@ -145,6 +145,7 @@ public class ProcessorRunner implements CommandLineRunner {
                 DatasetStatus datasetStatus = mongoProcessorDao.getDatasetStatus(datasetPage.getDatasetId());
                 final Set<Integer> pagesProcessed = datasetStatus.getPagesProcessed();
                 pagesProcessed.add(datasetPage.getPage());
+                datasetStatus.getCurrentPagesProcessing().remove(datasetPage.getPage());
                 mongoProcessorDao.storeDatasetStatusToDb(datasetStatus);
             } finally {
                 lock.unlock();
