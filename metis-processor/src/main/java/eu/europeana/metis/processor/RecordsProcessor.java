@@ -1,6 +1,7 @@
 package eu.europeana.metis.processor;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.metis.schema.jibx.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,40 +14,34 @@ public class RecordsProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ExecutorService threadPool;
-    private final ExecutorCompletionService<Void> completionService;
+    private final ExecutorCompletionService<RDF> completionService;
 
     public RecordsProcessor(int maxThreads) {
         this.threadPool = Executors.newFixedThreadPool(maxThreads);
         this.completionService = new ExecutorCompletionService<>(threadPool);
     }
 
-    public void process(List<FullBeanImpl> fullBeans) throws InterruptedException {
+    public List<RDF> process(List<FullBeanImpl> fullBeans) throws InterruptedException, ExecutionException {
 
-        List<Future<Void>> futureList = new ArrayList<>(fullBeans.size());
+        List<Future<RDF>> futureList = new ArrayList<>(fullBeans.size());
         for (FullBeanImpl fullbean : fullBeans) {
             RecordCallable recordCallable = new RecordCallable(fullbean);
             futureList.add(completionService.submit(recordCallable));
         }
 
-        for (Future<Void> future : futureList){
+        List<RDF> rdfs = new ArrayList<>(fullBeans.size());
+        for (Future<RDF> future : futureList){
             try {
-                future.get();
+                rdfs.add(future.get());
             } catch (InterruptedException e) {
                 LOGGER.warn("Interrupted while waiting for Future", e);
-                throw e;
+                throw new InterruptedException();
             } catch (ExecutionException e) {
-                // TODO: 24/07/2023 Handle exceptions for records;
                 LOGGER.error("Exception while waiting for Future", e);
+                throw e;
             }
         }
-
-        LOGGER.info("Storing results.");
-        for (FullBeanImpl fullbean : fullBeans) {
-            //Store fullbeans in target database if necessary
-            //This can also be done in the first loop instead
-
-        }
-
+        return rdfs;
     }
 
     public void close() {

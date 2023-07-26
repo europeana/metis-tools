@@ -1,13 +1,21 @@
 package eu.europeana.metis.processor.config;
 
+import eu.europeana.indexing.IndexerFactory;
+import eu.europeana.indexing.IndexerPool;
+import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.processor.ProcessorRunner;
+import eu.europeana.metis.processor.config.general.IndexingSettingsProvider;
+import eu.europeana.metis.processor.config.general.RedisProperties;
+import eu.europeana.metis.processor.config.general.SolrZookeeperTargetProperties;
+import eu.europeana.metis.processor.config.general.TruststoreProperties;
 import eu.europeana.metis.processor.config.mongo.MongoCoreProperties;
 import eu.europeana.metis.processor.config.mongo.MongoProcessorProperties;
 import eu.europeana.metis.processor.config.mongo.MongoSourceProperties;
-import eu.europeana.metis.processor.config.mongo.RedisProperties;
+import eu.europeana.metis.processor.config.mongo.MongoTargetProperties;
 import eu.europeana.metis.processor.dao.MongoCoreDao;
 import eu.europeana.metis.processor.dao.MongoProcessorDao;
 import eu.europeana.metis.processor.dao.MongoSourceDao;
+import eu.europeana.metis.processor.dao.MongoTargetDao;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
@@ -23,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 public class ApplicationConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     /**
      * Autowired constructor for Spring Configuration class.
      *
@@ -76,8 +86,25 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner(MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao, RedissonClient redissonClient) {
-        return new ProcessorRunner(mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient);
+    public MongoTargetDao getMongoTargetDao(MongoTargetProperties mongoTargetProperties) throws DataAccessConfigException {
+        return new MongoTargetDao(mongoTargetProperties);
+    }
+
+    @Bean
+    public IndexingSettingsProvider getIndexingSettingsProvider(MongoTargetProperties mongoTargetProperties, SolrZookeeperTargetProperties solrZookeeperTargetProperties) {
+        return new IndexingSettingsProvider(mongoTargetProperties, solrZookeeperTargetProperties);
+    }
+
+    @Bean
+    public IndexerPool getIndexerPool(IndexingSettingsProvider indexingSettingsProvider) throws IndexingException, URISyntaxException {
+        IndexerFactory indexerFactory = new IndexerFactory(indexingSettingsProvider.getIndexingSettings());
+        return new IndexerPool(indexerFactory, 600, 60);
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunner(MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
+                                               MongoTargetDao mongoTargetDao, RedissonClient redissonClient, IndexerPool indexerPool) {
+        return new ProcessorRunner(mongoProcessorDao, mongoCoreDao, mongoSourceDao, mongoTargetDao, redissonClient, indexerPool);
     }
 
     @Bean

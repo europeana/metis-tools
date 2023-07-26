@@ -1,19 +1,26 @@
 package eu.europeana.metis.processor;
 
-import eu.europeana.metis.processor.dao.DatasetStatus;
-import eu.europeana.metis.processor.dao.MongoCoreDao;
-import eu.europeana.metis.processor.dao.MongoProcessorDao;
-import eu.europeana.metis.processor.dao.MongoSourceDao;
+import com.mongodb.MongoWriteException;
+import eu.europeana.indexing.IndexerPool;
+import eu.europeana.indexing.IndexingProperties;
+import eu.europeana.indexing.exception.RecordRelatedIndexingException;
+import eu.europeana.metis.network.ExternalRequestUtil;
+import eu.europeana.metis.processor.dao.*;
 import eu.europeana.metis.processor.utilities.DatasetPage;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
+import eu.europeana.metis.schema.jibx.EdmType;
+import eu.europeana.metis.schema.jibx.RDF;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,15 +36,27 @@ public class ProcessorRunner implements CommandLineRunner {
     private final MongoProcessorDao mongoProcessorDao;
     private final MongoCoreDao mongoCoreDao;
     private final MongoSourceDao mongoSourceDao;
+    private final MongoTargetDao mongoTargetDao;
     private final RedissonClient redissonClient;
+    private final IndexerPool indexerPool;
     private final RecordsProcessor recordsProcessor;
 
+    private static final Map<Class<?>, String> retryExceptions;
 
-    public ProcessorRunner(MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao, RedissonClient redissonClient) {
+    static {
+        retryExceptions = new HashMap<>(ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
+        retryExceptions.put(MongoWriteException.class, "E11000 duplicate key error collection");
+    }
+
+
+    public ProcessorRunner(MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
+                           MongoTargetDao mongoTargetDao, RedissonClient redissonClient, IndexerPool indexerPool) {
         this.mongoProcessorDao = mongoProcessorDao;
         this.mongoCoreDao = mongoCoreDao;
         this.mongoSourceDao = mongoSourceDao;
+        this.mongoTargetDao = mongoTargetDao;
         this.redissonClient = redissonClient;
+        this.indexerPool = indexerPool;
         // TODO: 24/07/2023 Fix this parameter
         recordsProcessor = new RecordsProcessor(2);
     }
@@ -50,13 +69,75 @@ public class ProcessorRunner implements CommandLineRunner {
         DatasetPage datasetPage = getNextPageLockWrapped();
         while (!datasetPage.getFullBeanList().isEmpty()) {
             LOGGER.info("Processing page {}", datasetPage.getPage());
-            recordsProcessor.process(datasetPage.getFullBeanList());
+            pageProcess(datasetPage);
             updateDatasetStatusLockWrapped(datasetPage);
             datasetPage = getNextPageLockWrapped();
         }
 
         recordsProcessor.close();
         LOGGER.info("END");
+    }
+
+    private void pageProcess(DatasetPage datasetPage) throws InterruptedException {
+        try {
+            List<RDF> rdfs = recordsProcessor.process(datasetPage.getFullBeanList());
+            // TODO: 26/07/2023 Handle error pages?
+        } catch (ExecutionException e) {
+            LOGGER.error("{} - Could not process page: {}", datasetPage.getDatasetId(), datasetPage.getPage(), e);
+            exceptionStacktraceToString(e);
+        } catch (RuntimeException e) {
+            LOGGER.error("{} - Could not process or index(RuntimeException) page: {}", datasetPage.getDatasetId(), datasetPage.getPage(), e);
+            exceptionStacktraceToString(e);
+        }
+    }
+
+    // TODO: 26/07/2023 With indexing example
+//    private void pageProcess(DatasetPage datasetPage) throws InterruptedException {
+//        try {
+//            List<RDF> rdfs = recordsProcessor.process(datasetPage.getFullBeanList());
+//            indexRdfs(rdfs);
+//            // TODO: 26/07/2023 Handle error pages?
+//        } catch (ExecutionException e) {
+//            LOGGER.error("{} - Could not process page: {}", datasetPage.getDatasetId(), datasetPage.getPage(), e);
+//            exceptionStacktraceToString(e);
+//        } catch (IndexingException e) {
+//            LOGGER.error("{} - Could not index page: {}", datasetPage.getDatasetId(), datasetPage.getPage(), e);
+//            exceptionStacktraceToString(e);
+//        } catch (RuntimeException e) {
+//            LOGGER.error("{} - Could not process or index(RuntimeException) page: {}", datasetPage.getDatasetId(), datasetPage.getPage(), e);
+//            exceptionStacktraceToString(e);
+//        }
+//    }
+
+    private static String exceptionStacktraceToString(Exception e) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        e.printStackTrace(ps);
+        ps.close();
+        return baos.toString();
+    }
+
+    private void indexRdfs(List<RDF> rdfs) throws RecordRelatedIndexingException {
+        //Timestamps should be preserved, Redirects calculation disabled
+        final Date recordDate = null;
+        final List<String> datasetIdsForRedirection = null;
+        final boolean performRedirects = false;
+        final boolean tierRecalculation = false;
+        final boolean preserveTimestamps = true;
+        final Set<EdmType> typesEnabledForTierCalculation = EnumSet.of(EdmType._3_D);
+        final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
+                datasetIdsForRedirection, performRedirects, tierRecalculation, typesEnabledForTierCalculation);
+
+        for (RDF rdf : rdfs) {
+            try {
+                ExternalRequestUtil.retryableExternalRequest(() -> {
+                    indexerPool.indexRdf(rdf, indexingProperties);
+                    return null;
+                }, retryExceptions);
+            } catch (Exception e) {
+                throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
+            }
+        }
     }
 
     private void updateDatasetStatusLockWrapped(DatasetPage datasetPage) {

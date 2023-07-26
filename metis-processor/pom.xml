@@ -20,6 +20,7 @@
     <version.metis-common-utils>9</version.metis-common-utils>
     <version.metis-common-mongo>9</version.metis-common-mongo>
     <version.metis-core-service>9</version.metis-core-service>
+    <version.metis-indexing>10</version.metis-indexing>
   </properties>
 
   <dependencies>
@@ -61,6 +62,18 @@
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-core-service</artifactId>
       <version>${version.metis-core-service}</version>
+    </dependency>
+    <dependency>
+      <groupId>eu.europeana.metis</groupId>
+      <artifactId>metis-indexing</artifactId>
+      <version>${version.metis-indexing}</version>
+      <exclusions>
+        <!--Exclude those because of eu.europeana.api:entity-api-client:jar:0.0.1-SNAPSHOT transitive of metis-enrichment-client-->
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

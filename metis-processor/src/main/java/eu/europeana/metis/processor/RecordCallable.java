@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.Callable;
 
-public class RecordCallable implements Callable<Void> {
+public class RecordCallable implements Callable<RDF> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final FullBeanImpl fullBean;
@@ -19,11 +19,11 @@ public class RecordCallable implements Callable<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public RDF call() throws Exception {
         // TODO: 25/07/2023 Can we implement it with steps? 
         //Process RDF and exit
         RDF rdf = EdmUtils.toRDF(fullBean, true);
         LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
-        return null;
+        return rdf;
     }
 }
