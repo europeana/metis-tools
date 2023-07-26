@@ -4,10 +4,7 @@ import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.processor.ProcessorRunner;
-import eu.europeana.metis.processor.config.general.IndexingSettingsProvider;
-import eu.europeana.metis.processor.config.general.RedisProperties;
-import eu.europeana.metis.processor.config.general.SolrZookeeperTargetProperties;
-import eu.europeana.metis.processor.config.general.TruststoreProperties;
+import eu.europeana.metis.processor.config.general.*;
 import eu.europeana.metis.processor.config.mongo.MongoCoreProperties;
 import eu.europeana.metis.processor.config.mongo.MongoProcessorProperties;
 import eu.europeana.metis.processor.config.mongo.MongoSourceProperties;
@@ -102,9 +99,9 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner(MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
-                                               MongoTargetDao mongoTargetDao, RedissonClient redissonClient, IndexerPool indexerPool) {
-        return new ProcessorRunner(mongoProcessorDao, mongoCoreDao, mongoSourceDao, mongoTargetDao, redissonClient, indexerPool);
+    public CommandLineRunner commandLineRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
+                                               RedissonClient redissonClient, IndexerPool indexerPool) {
+        return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient, indexerPool);
     }
 
     @Bean

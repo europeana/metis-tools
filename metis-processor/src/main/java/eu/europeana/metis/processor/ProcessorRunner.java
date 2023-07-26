@@ -5,6 +5,7 @@ import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.metis.network.ExternalRequestUtil;
+import eu.europeana.metis.processor.config.general.ApplicationProperties;
 import eu.europeana.metis.processor.dao.*;
 import eu.europeana.metis.processor.utilities.DatasetPage;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
@@ -29,14 +30,12 @@ import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toMap;
 
 // TODO: 24/07/2023 Implement reprocessing of failed pages
-// TODO: 24/07/2023 Amount of threads per app should be configurable
 public class ProcessorRunner implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String DATASET_STATUS = "datasetStatus";
     private final MongoProcessorDao mongoProcessorDao;
     private final MongoCoreDao mongoCoreDao;
     private final MongoSourceDao mongoSourceDao;
-    private final MongoTargetDao mongoTargetDao;
     private final RedissonClient redissonClient;
     private final IndexerPool indexerPool;
     private final RecordsProcessor recordsProcessor;
@@ -49,16 +48,13 @@ public class ProcessorRunner implements CommandLineRunner {
     }
 
 
-    public ProcessorRunner(MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
-                           MongoTargetDao mongoTargetDao, RedissonClient redissonClient, IndexerPool indexerPool) {
+    public ProcessorRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao, RedissonClient redissonClient, IndexerPool indexerPool) {
         this.mongoProcessorDao = mongoProcessorDao;
         this.mongoCoreDao = mongoCoreDao;
         this.mongoSourceDao = mongoSourceDao;
-        this.mongoTargetDao = mongoTargetDao;
         this.redissonClient = redissonClient;
         this.indexerPool = indexerPool;
-        // TODO: 24/07/2023 Fix this parameter
-        recordsProcessor = new RecordsProcessor(2);
+        this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads());
     }
 
     @Override
