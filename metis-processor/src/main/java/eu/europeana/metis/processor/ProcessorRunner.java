@@ -37,6 +37,7 @@ public class ProcessorRunner implements CommandLineRunner {
     private final MongoCoreDao mongoCoreDao;
     private final MongoSourceDao mongoSourceDao;
     private final RedissonClient redissonClient;
+    private final ApplicationProperties applicationProperties;
     private final IndexerPool indexerPool;
     private final RecordsProcessor recordsProcessor;
 
@@ -49,6 +50,7 @@ public class ProcessorRunner implements CommandLineRunner {
 
 
     public ProcessorRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao, RedissonClient redissonClient, IndexerPool indexerPool) {
+        this.applicationProperties = applicationProperties;
         this.mongoProcessorDao = mongoProcessorDao;
         this.mongoCoreDao = mongoCoreDao;
         this.mongoSourceDao = mongoSourceDao;
@@ -64,7 +66,7 @@ public class ProcessorRunner implements CommandLineRunner {
         initializeLockWrapped();
         DatasetPage datasetPage = getNextPageLockWrapped();
         while (!datasetPage.getFullBeanList().isEmpty()) {
-            LOGGER.info("Processing page {}", datasetPage.getPage());
+            LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
             pageProcess(datasetPage);
             updateDatasetStatusLockWrapped(datasetPage);
             datasetPage = getNextPageLockWrapped();
@@ -167,7 +169,8 @@ public class ProcessorRunner implements CommandLineRunner {
             if (allDatasetStatuses.isEmpty()) {
                 LOGGER.info("DatasetStatuses: is empty.");
                 LOGGER.info("DatasetStatuses: Start initialization.");
-                Map<String, Long> datasetsWithSize = getDatasetWithSize(10);
+//                Map<String, Long> datasetsWithSize = getDatasetWithSize(10);
+                Map<String, Long> datasetsWithSize = getDatasetWithSize();
                 //--Remove this block
                 Optional<Map.Entry<String, Long>> entry = datasetsWithSize.entrySet().stream().findFirst();
                 entry.ifPresent(stringLongEntry -> LOGGER.info("{}: {}", stringLongEntry.getKey(), stringLongEntry.getValue()));
@@ -180,7 +183,8 @@ public class ProcessorRunner implements CommandLineRunner {
             Optional<DatasetStatus> datasetStatus = allDatasetStatuses.stream().findFirst();
             datasetStatus.ifPresent(datasetStatusItem -> LOGGER.info("{}: {}", datasetStatusItem.getDatasetId(), datasetStatusItem.getTotalRecords()));
             //--Remove this block
-        } finally {
+        }
+        finally {
             lock.unlock();
         }
         //Distributed UNLOCK for datasetStatuses initialization
@@ -221,7 +225,6 @@ public class ProcessorRunner implements CommandLineRunner {
 
     private Map<String, Long> getDatasetWithSize(long limit) {
         //Request all datasetIds from metis core database(our source of truth)
-        // TODO: 24/07/2023 Get actual size per datasetId based on mongo query(can be any type of query, with the simplest being filtering by datasetId only)
         return mongoCoreDao.getAllDatasetIds().parallelStream().limit(limit).collect(
                 toMap(Function.identity(), mongoSourceDao::getTotalRecordsForDataset));
     }
@@ -235,7 +238,8 @@ public class ProcessorRunner implements CommandLineRunner {
             if (datasetPageNumber.getDatasetId() == null) {
                 datasetPageNumber.setFullBeanList(Collections.emptyList());
             } else {
-                datasetPageNumber.setFullBeanList(mongoSourceDao.getNextPageOfRecords(datasetPageNumber.getDatasetId(), datasetPageNumber.getPage()));
+                datasetPageNumber.setFullBeanList(
+                        mongoSourceDao.getNextPageOfRecords(datasetPageNumber.getDatasetId(), datasetPageNumber.getPage(), applicationProperties.getRecordPageSize()));
             }
             return datasetPageNumber.build();
         } finally {

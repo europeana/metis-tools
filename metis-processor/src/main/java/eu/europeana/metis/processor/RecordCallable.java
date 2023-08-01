@@ -2,6 +2,7 @@ package eu.europeana.metis.processor;
 
 import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.metis.processor.utilities.RdfUtil;
 import eu.europeana.metis.schema.jibx.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ public class RecordCallable implements Callable<RDF> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final FullBeanImpl fullBean;
+    private final RdfUtil rdfUtil = new RdfUtil();
 
     public RecordCallable(FullBeanImpl fullBean) {
         this.fullBean = fullBean;
@@ -23,7 +25,17 @@ public class RecordCallable implements Callable<RDF> {
         // TODO: 25/07/2023 Can we implement it with steps? 
         //Process RDF and exit
         RDF rdf = EdmUtils.toRDF(fullBean, true);
-        LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
+        if(rdfUtil.hasThumbnailsAndValidLicense(rdf)){
+            LOGGER.info("RDF HAS thumbnails and valid license");
+            LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
+        }
+//        else{
+//            LOGGER.info("RDF HAS NO thumbnails or valid license");
+//        }
+
+
+//        LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
         return rdf;
     }
+
 }

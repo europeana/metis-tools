@@ -17,10 +17,11 @@
     <version.spring.boot>2.7.14</version.spring.boot>
     <version.log4j>2.17.1</version.log4j>
     <version.commons.lang3>3.12.0</version.commons.lang3>
-    <version.metis-common-utils>9</version.metis-common-utils>
-    <version.metis-common-mongo>9</version.metis-common-mongo>
-    <version.metis-core-service>9</version.metis-core-service>
-    <version.metis-indexing>10</version.metis-indexing>
+    <version.morphia.core>2.3.0</version.morphia.core>
+    <version.metis-common-utils>11-SNAPSHOT</version.metis-common-utils>
+    <version.metis-common-mongo>11-SNAPSHOT</version.metis-common-mongo>
+    <version.metis-core-service>11-SNAPSHOT</version.metis-core-service>
+    <version.metis-indexing>11-SNAPSHOT</version.metis-indexing>
   </properties>
 
   <dependencies>
@@ -58,6 +59,11 @@
       <artifactId>metis-common-mongo</artifactId>
       <version>${version.metis-common-mongo}</version>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>dev.morphia.morphia</groupId>-->
+<!--      <artifactId>morphia-core</artifactId>-->
+<!--      <version>${version.morphia.core}</version>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-core-service</artifactId>

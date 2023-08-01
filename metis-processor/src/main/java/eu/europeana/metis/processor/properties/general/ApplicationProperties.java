@@ -9,7 +9,14 @@ public class ApplicationProperties {
     @Value("${record.parallel.threads}")
     private int recordParallelThreads;
 
+    @Value("${record.page.size}")
+    private int recordPageSize;
+
     public int getRecordParallelThreads() {
         return recordParallelThreads;
+    }
+
+    public int getRecordPageSize() {
+        return recordPageSize;
     }
 }

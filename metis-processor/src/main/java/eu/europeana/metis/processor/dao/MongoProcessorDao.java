@@ -3,11 +3,11 @@ package eu.europeana.metis.processor.dao;
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
-import dev.morphia.aggregation.experimental.expressions.Expressions;
+import dev.morphia.aggregation.expressions.Expressions;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
-import dev.morphia.query.experimental.filters.Filters;
+import dev.morphia.query.filters.Filters;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
@@ -61,9 +61,9 @@ public class MongoProcessorDao {
 
     public DatasetPageBuilder getNextDatasetPageNumber() {
         // TODO: 24/07/2023 Remove this. It is only for testing
-        if (counter >= 2) {
-            return new DatasetPageBuilder(null, -1);
-        }
+//        if (counter >= 2) {
+//            return new DatasetPageBuilder(null, -1);
+//        }
         counter++;
 
         //fix this
@@ -91,7 +91,7 @@ public class MongoProcessorDao {
                     datasetPageBuilder = new DatasetPageBuilder(datasetStatus.getDatasetId(), nextPage);
                 }
             }
-            metisProcessorDatastore.save(datasetStatus);
+            metisProcessorDatastore.save(datasetStatuses);
         }
         return datasetPageBuilder;
     }

@@ -124,7 +124,7 @@ public class MongoSourceMongoDao {
     );
 
     for (String validLicense : validLicenses) {
-      if (rights.contains(validLicense))
+      if (rights.startsWith(validLicense))
         return true;
     }
     return false;
@@ -132,7 +132,7 @@ public class MongoSourceMongoDao {
 
   private boolean hasThumbnailsAndValidLicense(RDF rdfRecord) {
     RdfWrapper rdfWrapper = new RdfWrapper(rdfRecord);
-    boolean validLicense = rdfRecord.getAggregationList().stream().anyMatch(a -> isValidLicense(a.getRights().getResource()));
+    boolean validLicense = rdfRecord.getAggregationList().stream().allMatch(a -> isValidLicense(a.getRights().getResource()));
     boolean hasThumbnails = rdfWrapper.hasThumbnails();
     return hasThumbnails && validLicense;
   }
