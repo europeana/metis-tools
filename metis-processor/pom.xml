@@ -22,6 +22,8 @@
     <version.metis-common-mongo>11-SNAPSHOT</version.metis-common-mongo>
     <version.metis-core-service>11-SNAPSHOT</version.metis-core-service>
     <version.metis-indexing>11-SNAPSHOT</version.metis-indexing>
+    <version.metis-mediaprocessing>11-SNAPSHOT</version.metis-mediaprocessing>
+    <version.metis-image-enhancer>1-SNAPSHOT</version.metis-image-enhancer>
   </properties>
 
   <dependencies>
@@ -80,6 +82,16 @@
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-s3</artifactId>
       <version>${version.amazonaws}</version>
+    </dependency>
+    <dependency>
+      <artifactId>metis-media-service</artifactId>
+      <groupId>eu.europeana.metis</groupId>
+      <version>${version.metis-mediaprocessing}</version>
+    </dependency>
+    <dependency>
+      <groupId>eu.europeana.metis.image.enhancement</groupId>
+      <artifactId>metis-image-enhancer-client</artifactId>
+      <version>1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

@@ -25,7 +25,7 @@ public class S3Client {
     /**
      * Instantiates a new Amazon client.
      *
-     * @param amazonS3  the amazon s 3
+     * @param amazonS3  the amazon s3
      * @param s3BucketName the aws bucket
      */
     public S3Client(AmazonS3 amazonS3, String s3BucketName) {
@@ -65,7 +65,7 @@ public class S3Client {
             s3is.close();
             return fos.toByteArray();
         } catch (AmazonServiceException | IOException e) {
-            LOGGER.error("occurred in getting thumbnail", e);
+            LOGGER.error("occurred in getting object", e);
             return new byte[0];
         }
     }
