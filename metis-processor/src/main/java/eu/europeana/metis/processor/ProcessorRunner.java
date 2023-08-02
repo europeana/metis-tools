@@ -5,10 +5,14 @@ import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.metis.network.ExternalRequestUtil;
+import eu.europeana.metis.processor.dao.DatasetStatus;
+import eu.europeana.metis.processor.dao.MongoCoreDao;
+import eu.europeana.metis.processor.dao.MongoProcessorDao;
+import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.properties.general.ApplicationProperties;
-import eu.europeana.metis.processor.dao.*;
 import eu.europeana.metis.processor.utilities.DatasetPage;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
+import eu.europeana.metis.processor.utilities.S3Client;
 import eu.europeana.metis.schema.jibx.EdmType;
 import eu.europeana.metis.schema.jibx.RDF;
 import org.redisson.api.RLock;
@@ -23,7 +27,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Map.Entry.comparingByValue;
@@ -49,21 +52,25 @@ public class ProcessorRunner implements CommandLineRunner {
     }
 
 
-    public ProcessorRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao, RedissonClient redissonClient, IndexerPool indexerPool) {
+    public ProcessorRunner(ApplicationProperties applicationProperties,
+                           MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao,
+                           MongoSourceDao mongoSourceDao, RedissonClient redissonClient, IndexerPool indexerPool, S3Client s3Client) {
         this.applicationProperties = applicationProperties;
         this.mongoProcessorDao = mongoProcessorDao;
         this.mongoCoreDao = mongoCoreDao;
         this.mongoSourceDao = mongoSourceDao;
         this.redissonClient = redissonClient;
         this.indexerPool = indexerPool;
-        this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads());
+        this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads(), s3Client);
     }
 
     @Override
     public void run(String... args) throws Exception {
         LOGGER.info("START");
 
+        // TODO: 01/08/2023 If the db is not in the same network the lock might timeout until initialization is finished
         initializeLockWrapped();
+        // TODO: 01/08/2023 Create threaded prefetch of pages?
         DatasetPage datasetPage = getNextPageLockWrapped();
         while (!datasetPage.getFullBeanList().isEmpty()) {
             LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
@@ -169,11 +176,11 @@ public class ProcessorRunner implements CommandLineRunner {
             if (allDatasetStatuses.isEmpty()) {
                 LOGGER.info("DatasetStatuses: is empty.");
                 LOGGER.info("DatasetStatuses: Start initialization.");
-//                Map<String, Long> datasetsWithSize = getDatasetWithSize(10);
-                Map<String, Long> datasetsWithSize = getDatasetWithSize();
+                Map<String, Long> datasetsWithSize = getDatasetWithSize(10);
+//                Map<String, Long> datasetsWithSize = getDatasetWithSize();
                 //--Remove this block
                 Optional<Map.Entry<String, Long>> entry = datasetsWithSize.entrySet().stream().findFirst();
-                entry.ifPresent(stringLongEntry -> LOGGER.info("{}: {}", stringLongEntry.getKey(), stringLongEntry.getValue()));
+                entry.ifPresent(stringLongEntry -> LOGGER.debug("{}: {}", stringLongEntry.getKey(), stringLongEntry.getValue()));
                 //--Remove this block
                 allDatasetStatuses = orderAndInitialDatasetStatuses(datasetsWithSize);
                 LOGGER.info("DatasetStatuses: End initialization.");
@@ -183,8 +190,7 @@ public class ProcessorRunner implements CommandLineRunner {
             Optional<DatasetStatus> datasetStatus = allDatasetStatuses.stream().findFirst();
             datasetStatus.ifPresent(datasetStatusItem -> LOGGER.info("{}: {}", datasetStatusItem.getDatasetId(), datasetStatusItem.getTotalRecords()));
             //--Remove this block
-        }
-        finally {
+        } finally {
             lock.unlock();
         }
         //Distributed UNLOCK for datasetStatuses initialization
@@ -225,8 +231,11 @@ public class ProcessorRunner implements CommandLineRunner {
 
     private Map<String, Long> getDatasetWithSize(long limit) {
         //Request all datasetIds from metis core database(our source of truth)
-        return mongoCoreDao.getAllDatasetIds().parallelStream().limit(limit).collect(
-                toMap(Function.identity(), mongoSourceDao::getTotalRecordsForDataset));
+        return mongoCoreDao.getAllDatasetIds().parallelStream()
+                .map(datasetId -> new AbstractMap.SimpleEntry<>(datasetId, mongoSourceDao.getTotalRecordsForDataset(datasetId)))
+                .filter(entry -> entry.getValue() > 0)
+                .limit(limit)
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private DatasetPage getNextPageLockWrapped() {

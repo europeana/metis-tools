@@ -17,7 +17,7 @@
     <version.spring.boot>2.7.14</version.spring.boot>
     <version.log4j>2.17.1</version.log4j>
     <version.commons.lang3>3.12.0</version.commons.lang3>
-    <version.morphia.core>2.3.0</version.morphia.core>
+    <version.amazonaws>1.12.385</version.amazonaws>
     <version.metis-common-utils>11-SNAPSHOT</version.metis-common-utils>
     <version.metis-common-mongo>11-SNAPSHOT</version.metis-common-mongo>
     <version.metis-core-service>11-SNAPSHOT</version.metis-core-service>
@@ -59,11 +59,6 @@
       <artifactId>metis-common-mongo</artifactId>
       <version>${version.metis-common-mongo}</version>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>dev.morphia.morphia</groupId>-->
-<!--      <artifactId>morphia-core</artifactId>-->
-<!--      <version>${version.morphia.core}</version>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-core-service</artifactId>
@@ -80,6 +75,11 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>${version.amazonaws}</version>
     </dependency>
   </dependencies>
 

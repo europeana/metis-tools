@@ -1,21 +1,26 @@
 package eu.europeana.metis.processor.config;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.processor.ProcessorRunner;
-import eu.europeana.metis.processor.properties.general.ApplicationProperties;
-import eu.europeana.metis.processor.properties.general.RedisProperties;
-import eu.europeana.metis.processor.properties.general.SolrZookeeperTargetProperties;
-import eu.europeana.metis.processor.properties.general.TruststoreProperties;
-import eu.europeana.metis.processor.properties.mongo.MongoCoreProperties;
-import eu.europeana.metis.processor.properties.mongo.MongoProcessorProperties;
-import eu.europeana.metis.processor.properties.mongo.MongoSourceProperties;
-import eu.europeana.metis.processor.properties.mongo.MongoTargetProperties;
 import eu.europeana.metis.processor.dao.MongoCoreDao;
 import eu.europeana.metis.processor.dao.MongoProcessorDao;
 import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.dao.MongoTargetDao;
+import eu.europeana.metis.processor.properties.general.*;
+import eu.europeana.metis.processor.properties.mongo.MongoCoreProperties;
+import eu.europeana.metis.processor.properties.mongo.MongoProcessorProperties;
+import eu.europeana.metis.processor.properties.mongo.MongoSourceProperties;
+import eu.europeana.metis.processor.properties.mongo.MongoTargetProperties;
+import eu.europeana.metis.processor.utilities.S3Client;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
@@ -102,13 +107,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
-                                               RedissonClient redissonClient, IndexerPool indexerPool) {
-        return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient, indexerPool);
-    }
-
-    @Bean
-    RedissonClient getRedissonClient(RedisProperties redisProperties, TruststoreProperties truststoreProperties) throws MalformedURLException {
+    public RedissonClient getRedissonClient(RedisProperties redisProperties, TruststoreProperties truststoreProperties) throws MalformedURLException {
         Config config = new Config();
 
         SingleServerConfig singleServerConfig;
@@ -145,5 +144,29 @@ public class ApplicationConfiguration {
         config.setLockWatchdogTimeout(TimeUnit.SECONDS.toMillis(redisProperties
                 .getRedissonLockWatchdogTimeoutInSecs())); //Give some secs to unlock if connection lost, or if too long to unlock
         return Redisson.create(config);
+    }
+
+    @Bean
+    public AmazonS3 getAmazonS3(S3Properties s3Properties) {
+
+        AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(s3Properties.getS3AccessKey(), s3Properties.getS3SecretKey()));
+        AwsClientBuilder.EndpointConfiguration endpointConfiguration = new AwsClientBuilder.EndpointConfiguration(s3Properties.getS3Endpoint(), Regions.DEFAULT_REGION.getName());
+
+        return AmazonS3ClientBuilder.standard()
+                .withCredentials(credentialsProvider)
+                .withEndpointConfiguration(endpointConfiguration)
+                .build();
+    }
+
+    @Bean
+    public S3Client getS3Client(AmazonS3 amazonS3, S3Properties s3Properties) {
+        return new S3Client(amazonS3, s3Properties.getS3BucketName());
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao,
+                                               MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
+                                               RedissonClient redissonClient, IndexerPool indexerPool, S3Client s3Client) {
+        return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient, indexerPool, s3Client);
     }
 }
