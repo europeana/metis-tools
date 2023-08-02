@@ -91,7 +91,7 @@
     <dependency>
       <groupId>eu.europeana.metis.image.enhancement</groupId>
       <artifactId>metis-image-enhancer-client</artifactId>
-      <version>1-SNAPSHOT</version>
+      <version>${version.metis-image-enhancer}</version>
     </dependency>
   </dependencies>
 
