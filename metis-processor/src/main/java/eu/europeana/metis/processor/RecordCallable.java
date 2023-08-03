@@ -2,6 +2,9 @@ package eu.europeana.metis.processor;
 
 import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.metis.image.enhancement.client.ImageEnhancerClient;
+import eu.europeana.metis.image.enhancement.config.ImageEnhancerClientConfig;
+import eu.europeana.metis.processor.image.enhancer.EnhancementProcessor;
 import eu.europeana.metis.processor.utilities.RdfUtil;
 import eu.europeana.metis.processor.utilities.S3Client;
 import eu.europeana.metis.schema.jibx.RDF;
@@ -34,6 +37,13 @@ public class RecordCallable implements Callable<RDF> {
         if(rdfUtil.hasThumbnailsAndValidLicense(rdf)){
             LOGGER.info("RDF HAS thumbnails and valid license");
             LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
+
+            // Example prototype for processing records
+            // ----------------------------------------
+            ImageEnhancerClientConfig enhancerClientConfig = new ImageEnhancerClientConfig("http://localhost:5050",300,300);
+            ImageEnhancerClient enhancerClient = new ImageEnhancerClient(enhancerClientConfig);
+            EnhancementProcessor enhancementProcessor = new EnhancementProcessor(s3Client, enhancerClient);
+            enhancementProcessor.processRecord(rdf);
 
             //Decide if we proceed
             //Extract thumbnail s3 file names
