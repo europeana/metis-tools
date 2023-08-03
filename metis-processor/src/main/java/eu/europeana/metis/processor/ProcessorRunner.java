@@ -25,6 +25,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -44,6 +46,9 @@ public class ProcessorRunner implements CommandLineRunner {
     private final IndexerPool indexerPool;
     private final RecordsProcessor recordsProcessor;
 
+    private final DatasetPageProducer datasetPageProducer;
+    private final BlockingQueue<DatasetPage> datasetPageBlockingQueue;
+
     private static final Map<Class<?>, String> retryExceptions;
 
     static {
@@ -62,6 +67,8 @@ public class ProcessorRunner implements CommandLineRunner {
         this.redissonClient = redissonClient;
         this.indexerPool = indexerPool;
         this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads(), imageEnhancerUtil);
+        this.datasetPageBlockingQueue = new ArrayBlockingQueue<>(2);
+        this.datasetPageProducer = new DatasetPageProducer(datasetPageBlockingQueue, this::getNextPageLockWrapped);
     }
 
     @Override
@@ -70,17 +77,30 @@ public class ProcessorRunner implements CommandLineRunner {
 
         // TODO: 01/08/2023 If the db is not in the same network the lock might timeout until initialization is finished
         initializeLockWrapped();
-        // TODO: 01/08/2023 Create threaded prefetch of pages?
-        DatasetPage datasetPage = getNextPageLockWrapped();
-        while (!datasetPage.getFullBeanList().isEmpty()) {
-            LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
-            pageProcess(datasetPage);
-            updateDatasetStatusLockWrapped(datasetPage);
-            datasetPage = getNextPageLockWrapped();
-        }
+        new Thread(datasetPageProducer).start();
+        consume();
+//        DatasetPage datasetPage = getNextPageLockWrapped();
+//        while (!datasetPage.getFullBeanList().isEmpty()) {
+//            LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
+//            pageProcess(datasetPage);
+//            updateDatasetStatusLockWrapped(datasetPage);
+//            datasetPage = getNextPageLockWrapped();
+//        }
 
         recordsProcessor.close();
         LOGGER.info("END");
+    }
+
+    private void consume() throws InterruptedException {
+        DatasetPage datasetPage;
+        do {
+            datasetPage = datasetPageBlockingQueue.take();
+            LOGGER.info("BlockingQueue size: {}", datasetPageBlockingQueue.size());
+            LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
+            pageProcess(datasetPage);
+            updateDatasetStatusLockWrapped(datasetPage);
+
+        }while(!datasetPage.getFullBeanList().isEmpty());
     }
 
     private void pageProcess(DatasetPage datasetPage) throws InterruptedException {
