@@ -1,8 +1,7 @@
-package eu.europeana.metis.processor.utilities;
+package eu.europeana.metis.image.enhancement.domain.service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import eu.europeana.metis.image.enhancement.client.ImageEnhancerClient;
-import eu.europeana.metis.image.enhancement.config.ImageEnhancerClientConfig;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.mediaprocessing.extraction.CommandExecutor;
