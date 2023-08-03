@@ -12,7 +12,7 @@ import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.properties.general.ApplicationProperties;
 import eu.europeana.metis.processor.utilities.DatasetPage;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
-import eu.europeana.metis.processor.utilities.S3Client;
+import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
 import eu.europeana.metis.schema.jibx.EdmType;
 import eu.europeana.metis.schema.jibx.RDF;
 import org.redisson.api.RLock;
@@ -54,14 +54,14 @@ public class ProcessorRunner implements CommandLineRunner {
 
     public ProcessorRunner(ApplicationProperties applicationProperties,
                            MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao,
-                           MongoSourceDao mongoSourceDao, RedissonClient redissonClient, IndexerPool indexerPool, S3Client s3Client) {
+                           MongoSourceDao mongoSourceDao, RedissonClient redissonClient, IndexerPool indexerPool, ImageEnhancerUtil imageEnhancerUtil) {
         this.applicationProperties = applicationProperties;
         this.mongoProcessorDao = mongoProcessorDao;
         this.mongoCoreDao = mongoCoreDao;
         this.mongoSourceDao = mongoSourceDao;
         this.redissonClient = redissonClient;
         this.indexerPool = indexerPool;
-        this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads(), s3Client);
+        this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads(), imageEnhancerUtil);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package eu.europeana.metis.processor;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.metis.processor.utilities.S3Client;
+import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
 import eu.europeana.metis.schema.jibx.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +15,12 @@ public class RecordsProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ExecutorService threadPool;
-    private final S3Client s3Client;
+    private final ImageEnhancerUtil imageEnhancerUtil;
     private final ExecutorCompletionService<RDF> completionService;
 
-    public RecordsProcessor(int maxThreads, S3Client s3Client) {
+    public RecordsProcessor(int maxThreads, ImageEnhancerUtil imageEnhancerUtil) {
         this.threadPool = Executors.newFixedThreadPool(maxThreads);
-        this.s3Client = s3Client;
+        this.imageEnhancerUtil = imageEnhancerUtil;
         this.completionService = new ExecutorCompletionService<>(threadPool);
     }
 
@@ -28,7 +28,7 @@ public class RecordsProcessor {
 
         List<Future<RDF>> futureList = new ArrayList<>(fullBeans.size());
         for (FullBeanImpl fullbean : fullBeans) {
-            RecordCallable recordCallable = new RecordCallable(fullbean, s3Client);
+            RecordCallable recordCallable = new RecordCallable(fullbean, imageEnhancerUtil);
             futureList.add(completionService.submit(recordCallable));
         }
 

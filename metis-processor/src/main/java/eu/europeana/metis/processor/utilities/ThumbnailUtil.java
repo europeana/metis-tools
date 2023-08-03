@@ -1,13 +1,14 @@
 package eu.europeana.metis.processor.utilities;
 
-import eu.europeana.metis.processor.image.enhancer.ThumbnailKind;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
+import eu.europeana.metis.mediaprocessing.model.ThumbnailKind;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+// TODO: 03/08/2023 Make the identical code in metis media service reusable, instead of copying this.
 /**
  * The type Thumbnail util.
  */

@@ -10,6 +10,8 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.metis.image.enhancement.client.ImageEnhancerClient;
+import eu.europeana.metis.image.enhancement.config.ImageEnhancerClientConfig;
 import eu.europeana.metis.processor.ProcessorRunner;
 import eu.europeana.metis.processor.dao.MongoCoreDao;
 import eu.europeana.metis.processor.dao.MongoProcessorDao;
@@ -20,6 +22,7 @@ import eu.europeana.metis.processor.properties.mongo.MongoCoreProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoProcessorProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoSourceProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoTargetProperties;
+import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
 import eu.europeana.metis.processor.utilities.S3Client;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.lang3.StringUtils;
@@ -164,9 +167,22 @@ public class ApplicationConfiguration {
     }
 
     @Bean
+    public ImageEnhancerClient getImageEnhancerClient(ImageEnhancerClientProperties imageEnhancerClientProperties) {
+        ImageEnhancerClientConfig enhancerClientConfig = new ImageEnhancerClientConfig(imageEnhancerClientProperties.getImageEnhancerEndpoint(), imageEnhancerClientProperties.getImageEnhancerConnectTimeout(), imageEnhancerClientProperties.getImageEnhancerReadTimeout());
+        return new ImageEnhancerClient(enhancerClientConfig);
+    }
+
+    @Bean
+    public ImageEnhancerUtil getImageEnhancerUtil(S3Client s3Client, ImageEnhancerClientProperties imageEnhancerClientProperties) {
+        ImageEnhancerClientConfig enhancerClientConfig = new ImageEnhancerClientConfig(imageEnhancerClientProperties.getImageEnhancerEndpoint(), imageEnhancerClientProperties.getImageEnhancerConnectTimeout(), imageEnhancerClientProperties.getImageEnhancerReadTimeout());
+        ImageEnhancerClient imageEnhancerClient = new ImageEnhancerClient(enhancerClientConfig);
+        return new ImageEnhancerUtil(s3Client, imageEnhancerClient);
+    }
+
+    @Bean
     public CommandLineRunner commandLineRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao,
                                                MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
-                                               RedissonClient redissonClient, IndexerPool indexerPool, S3Client s3Client) {
-        return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient, indexerPool, s3Client);
+                                               RedissonClient redissonClient, IndexerPool indexerPool, ImageEnhancerUtil imageEnhancerUtil) {
+        return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient, indexerPool, imageEnhancerUtil);
     }
 }
