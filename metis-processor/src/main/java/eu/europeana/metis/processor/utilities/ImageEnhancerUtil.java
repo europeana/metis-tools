@@ -136,6 +136,7 @@ public class ImageEnhancerUtil {
         reportRow.setElapsedTime(TimeUnit.SECONDS.convert(elapsedTimeInNanoSec, TimeUnit.NANOSECONDS));
         reportRow.setStatus("PROCESSED");
         for (Thumbnail thumbnail : thumbnails) {
+            reportRow.setThumbnailId(thumbnail.getTargetName());
             fileCsvImageReporter.appendRow(getNewWidthAndHeight(thumbnail, reportRow));
         }
     }

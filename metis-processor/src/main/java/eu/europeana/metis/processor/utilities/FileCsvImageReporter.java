@@ -1,41 +1,34 @@
 package eu.europeana.metis.processor.utilities;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.invoke.MethodHandles;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class FileCsvImageReporter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String HEADER_ROW = "RecordId, Status, Elapsed Time, Width Before, Height Before"
-            + " Width After, Height After";
+    private static final String HEADER_ROW =
+            "RecordId,ThumbnailId,Status,Elapsed Time,Width Before,Height Before,Width After,Height After";
+    private final PrintWriter printWriter;
 
-    private final String pathToReport;
-
-    public FileCsvImageReporter(String pathToReport) {
-        this.pathToReport = pathToReport;
-        initReport();
-    }
-
-    private void initReport() {
-        // TODO: 10/08/2023 Update to make the file should be unique so that overwriting won't occur.
-        try (PrintWriter printWriter = new PrintWriter(pathToReport)) {
-            printWriter.println(HEADER_ROW);
-        } catch (FileNotFoundException e) {
-            LOGGER.error("File path {} does not exist", pathToReport);
-        }
+    public FileCsvImageReporter() throws IOException {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        File file = new File("report_" + dateFormat.format(date) + ".csv");
+        printWriter = new PrintWriter(new FileWriter(file));
+        printWriter.println(HEADER_ROW);
     }
 
     public void appendRow(ReportRow recordRow) {
         synchronized (this) {
-            try (PrintWriter printWriter = new PrintWriter(pathToReport)) {
-                printWriter.append(recordRow.toString());
-                printWriter.flush();
-            } catch (FileNotFoundException e) {
-                LOGGER.error("File path {} does not exist", pathToReport);
-            }
+            printWriter.println(recordRow.toString());
+            printWriter.flush();
         }
+    }
+
+    public void close() {
+        printWriter.flush();
+        printWriter.close();
     }
 }

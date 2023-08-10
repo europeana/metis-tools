@@ -5,6 +5,7 @@ package eu.europeana.metis.processor.utilities;
  */
 public class ReportRow {
     private String recordId;
+    private String thumbnailId;
     private String status;
     private long elapsedTime;
     private long widthBefore;
@@ -18,6 +19,14 @@ public class ReportRow {
 
     public void setRecordId(String recordId) {
         this.recordId = recordId;
+    }
+
+    public String getThumbnailId() {
+        return thumbnailId;
+    }
+
+    public void setThumbnailId(String thumbnailId) {
+        this.thumbnailId = thumbnailId;
     }
 
     public String getStatus() {
@@ -70,8 +79,9 @@ public class ReportRow {
 
     @Override
     public String toString() {
-        return "'" + recordId + '\'' +
-                ",'" + status + '\'' +
+        return recordId +
+                "," + thumbnailId +
+                "," + status +
                 "," + elapsedTime +
                 "," + widthBefore +
                 "," + heightBefore +

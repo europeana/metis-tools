@@ -45,6 +45,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -55,6 +57,7 @@ import java.util.concurrent.TimeUnit;
 public class ApplicationConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private FileCsvImageReporter fileCsvImageReporter;
 
     /**
      * Autowired constructor for Spring Configuration class.
@@ -181,8 +184,8 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public ImageEnhancerUtil getImageEnhancerUtil(S3Client s3Client, ImageEnhancerClientProperties imageEnhancerClientProperties) {
-        FileCsvImageReporter fileCsvImageReporter = new FileCsvImageReporter(imageEnhancerClientProperties.getImageEnhancerReportPath());
+    public ImageEnhancerUtil getImageEnhancerUtil(S3Client s3Client, ImageEnhancerClientProperties imageEnhancerClientProperties) throws IOException {
+        fileCsvImageReporter = new FileCsvImageReporter();
         ImageEnhancerWorker imageEnhancerWorker = new ImageEnhancerWorker(
                 new ImageEnhancerScript(imageEnhancerClientProperties.getImageEnhancerScriptPath()));
         return new ImageEnhancerUtil(s3Client, imageEnhancerWorker, fileCsvImageReporter);
@@ -194,4 +197,14 @@ public class ApplicationConfiguration {
                                                RedissonClient redissonClient, IndexerPool indexerPool, ImageEnhancerUtil imageEnhancerUtil) {
         return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient, indexerPool, imageEnhancerUtil);
     }
+    /**
+     * Close resources
+     */
+    @PreDestroy
+    public void close() {
+        if (fileCsvImageReporter != null) {
+            fileCsvImageReporter.close();
+        }
+    }
+
 }
