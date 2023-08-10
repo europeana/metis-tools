@@ -5,7 +5,8 @@ package eu.europeana.metis.processor.utilities;
  */
 public class ReportRow {
     private String recordId;
-    private String thumbnailId;
+    private String imageLink;
+    private String imageLinkHex;
     private String status;
     private long elapsedTime;
     private long widthBefore;
@@ -21,12 +22,20 @@ public class ReportRow {
         this.recordId = recordId;
     }
 
-    public String getThumbnailId() {
-        return thumbnailId;
+    public String getImageLink() {
+        return imageLink;
     }
 
-    public void setThumbnailId(String thumbnailId) {
-        this.thumbnailId = thumbnailId;
+    public void setImageLink(String imageLink) {
+        this.imageLink = imageLink;
+    }
+
+    public String getImageLinkHex() {
+        return imageLinkHex;
+    }
+
+    public void setImageLinkHex(String imageLinkHex) {
+        this.imageLinkHex = imageLinkHex;
     }
 
     public String getStatus() {
@@ -80,7 +89,8 @@ public class ReportRow {
     @Override
     public String toString() {
         return recordId +
-                "," + thumbnailId +
+                "," + imageLink +
+                "," + imageLinkHex +
                 "," + status +
                 "," + elapsedTime +
                 "," + widthBefore +

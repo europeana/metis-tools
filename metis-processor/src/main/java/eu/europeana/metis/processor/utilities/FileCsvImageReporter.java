@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class FileCsvImageReporter {
     private static final String HEADER_ROW =
-            "RecordId,ThumbnailId,Status,Elapsed Time,Width Before,Height Before,Width After,Height After";
+            "RecordId,imageLink,thumbnailObjectHash,Status,Elapsed Time(ms),Width Before,Height Before,Width After,Height After";
     private final PrintWriter printWriter;
 
     public FileCsvImageReporter() throws IOException {

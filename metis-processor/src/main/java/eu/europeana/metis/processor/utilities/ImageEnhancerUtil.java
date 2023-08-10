@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -81,10 +82,12 @@ public class ImageEnhancerUtil {
 
         thumbnailResourceList.forEach(thumbnailResource -> {
             ReportRow reportRow = new ReportRow();
-            reportRow.setRecordId(thumbnailResource.getAbout());
+            reportRow.setRecordId(recordToProcess.getProvidedCHOList().get(0).getAbout());
+            reportRow.setImageLink(thumbnailResource.getAbout());
             try {
                 if (hasThumbnailResolutionLowerThan400(thumbnailResource)) {
-                    final String largeThumbnailObjectName = md5Hex(thumbnailResource.getAbout()) + ThumbnailKind.LARGE.getNameSuffix();
+                    final String thumbnailHex = md5Hex(thumbnailResource.getAbout());
+                    final String largeThumbnailObjectName = thumbnailHex  + ThumbnailKind.LARGE.getNameSuffix();
                     LOGGER.info("{}\t=>\t{}", thumbnailResource.getAbout(), largeThumbnailObjectName);
                     byte[] largeThumbnail = s3Client.getObject(largeThumbnailObjectName);
 
@@ -94,7 +97,7 @@ public class ImageEnhancerUtil {
 
                     List<Thumbnail> thumbnails = generateThumbnails(thumbnailResource, largeThumbnailObjectName, enhancedImage);
                     uploadThumbnails(thumbnailResource, thumbnails);
-                    appendSuccessReport(thumbnailResource, thumbnails, elapsedTimeInNanoSec, reportRow);
+                    appendSuccessReport(thumbnailResource, enhancedImage, thumbnailHex, elapsedTimeInNanoSec, reportRow);
                 }
             } catch (MediaExtractionException | IOException e) {
                 LOGGER.error("Failed enhancing thumbnail image {} {}", thumbnailResource.getAbout(), e);
@@ -130,15 +133,14 @@ public class ImageEnhancerUtil {
         }
     }
 
-    private void appendSuccessReport(WebResourceType thumbnailResource, List<Thumbnail> thumbnails, long elapsedTimeInNanoSec, ReportRow reportRow) {
+    private void appendSuccessReport(WebResourceType thumbnailResource, byte[] enhancedImage, String thumbnailHex, long elapsedTimeInNanoSec, ReportRow reportRow) {
         reportRow.setHeightBefore(thumbnailResource.getHeight().getLong());
         reportRow.setWidthBefore(thumbnailResource.getWidth().getLong());
-        reportRow.setElapsedTime(TimeUnit.SECONDS.convert(elapsedTimeInNanoSec, TimeUnit.NANOSECONDS));
+        reportRow.setElapsedTime(TimeUnit.MILLISECONDS.convert(elapsedTimeInNanoSec, TimeUnit.NANOSECONDS));
+        reportRow.setImageLinkHex(thumbnailHex);
+        getNewWidthAndHeight(enhancedImage, reportRow);
         reportRow.setStatus("PROCESSED");
-        for (Thumbnail thumbnail : thumbnails) {
-            reportRow.setThumbnailId(thumbnail.getTargetName());
-            fileCsvImageReporter.appendRow(getNewWidthAndHeight(thumbnail, reportRow));
-        }
+        fileCsvImageReporter.appendRow(reportRow);
     }
 
     private void appendFailReport(ReportRow reportRow){
@@ -146,9 +148,9 @@ public class ImageEnhancerUtil {
         fileCsvImageReporter.appendRow(reportRow);
     }
 
-    private ReportRow getNewWidthAndHeight(Thumbnail thumbnail, ReportRow reportRow) {
+    private ReportRow getNewWidthAndHeight(byte[] image, ReportRow reportRow) {
         try {
-            BufferedImage bufferedImage = ImageIO.read(thumbnail.getContentStream());
+            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
             reportRow.setHeightAfter(bufferedImage.getHeight());
             reportRow.setWidthAfter(bufferedImage.getWidth());
         } catch (IOException e) {
