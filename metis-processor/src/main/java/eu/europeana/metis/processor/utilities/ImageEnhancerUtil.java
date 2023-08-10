@@ -1,7 +1,7 @@
 package eu.europeana.metis.processor.utilities;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import eu.europeana.metis.image.enhancement.client.ImageEnhancerScript;
+import eu.europeana.metis.image.enhancement.domain.worker.ImageEnhancerWorker;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.mediaprocessing.extraction.CommandExecutor;
@@ -17,15 +17,19 @@ import org.apache.http.NoHttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static eu.europeana.metis.mediaprocessing.extraction.ThumbnailGenerator.md5Hex;
+import static eu.europeana.metis.network.ExternalRequestUtil.retryableExternalRequest;
 
 /**
  * The type Enhancement processor.
@@ -33,7 +37,8 @@ import static eu.europeana.metis.mediaprocessing.extraction.ThumbnailGenerator.m
 public class ImageEnhancerUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final S3Client s3Client;
-    private final ImageEnhancerScript imageEnhancerScript;
+    private final ImageEnhancerWorker imageEnhancerWorker;
+    private final FileCsvImageReporter fileCsvImageReporter;
 
     private static final Map<Class<?>, String> retryExceptions;
 
@@ -46,11 +51,12 @@ public class ImageEnhancerUtil {
      * Instantiates a new Enhancement processor.
      *
      * @param s3Client            the s3 client
-     * @param imageEnhancerScript the image enhancer client
+     * @param imageEnhancerWorker the image enhancer client
      */
-    public ImageEnhancerUtil(S3Client s3Client, ImageEnhancerScript imageEnhancerScript) {
+    public ImageEnhancerUtil(S3Client s3Client, ImageEnhancerWorker imageEnhancerWorker, FileCsvImageReporter fileCsvImageReporter) {
         this.s3Client = s3Client;
-        this.imageEnhancerScript = imageEnhancerScript;
+        this.imageEnhancerWorker = imageEnhancerWorker;
+        this.fileCsvImageReporter = fileCsvImageReporter;
     }
 
 
@@ -74,38 +80,46 @@ public class ImageEnhancerUtil {
                 .collect(Collectors.toList());
 
         thumbnailResourceList.forEach(thumbnailResource -> {
+            ReportRow reportRow = new ReportRow();
+            reportRow.setRecordId(thumbnailResource.getAbout());
             try {
                 if (hasThumbnailResolutionLowerThan400(thumbnailResource)) {
                     final String largeThumbnailObjectName = md5Hex(thumbnailResource.getAbout()) + ThumbnailKind.LARGE.getNameSuffix();
                     LOGGER.info("{}\t=>\t{}", thumbnailResource.getAbout(), largeThumbnailObjectName);
                     byte[] largeThumbnail = s3Client.getObject(largeThumbnailObjectName);
-                    Files.write(new File("/tmp/s3Large").toPath(), largeThumbnail);
 
-                    byte[] enhancedImage = ExternalRequestUtil.retryableExternalRequest(() ->{
-                        byte[] enhance;
-                        try {
-                            enhance = imageEnhancerScript.enhance(largeThumbnail);
-                        }catch (Exception e){
-                            LOGGER.info(largeThumbnailObjectName);
-                            throw e;
-                        }
-                        return enhance;
+                    final long startTime = System.nanoTime();
+                    byte[] enhancedImage = enhanceImage(largeThumbnail, largeThumbnailObjectName);
+                    final long elapsedTimeInNanoSec = System.nanoTime() - startTime;
 
-                    }, retryExceptions);
-                    Files.write(new File("/tmp/enhanced").toPath(), enhancedImage);
                     List<Thumbnail> thumbnails = generateThumbnails(thumbnailResource, largeThumbnailObjectName, enhancedImage);
                     uploadThumbnails(thumbnailResource, thumbnails);
+                    appendSuccessReport(thumbnailResource, thumbnails, elapsedTimeInNanoSec, reportRow);
                 }
             } catch (MediaExtractionException | IOException e) {
-                LOGGER.error("enhancing thumbnail image {} {}", thumbnailResource.getAbout(), e);
+                LOGGER.error("Failed enhancing thumbnail image {} {}", thumbnailResource.getAbout(), e);
+                appendFailReport(reportRow);
             }
         });
+    }
+
+    private byte[] enhanceImage(byte[] largeThumbnail, String largeThumbnailObjectName) {
+        return retryableExternalRequest(() -> {
+            byte[] enhance;
+            try {
+                enhance = imageEnhancerWorker.enhance(largeThumbnail);
+            } catch (Exception e) {
+                LOGGER.info(largeThumbnailObjectName);
+                throw e;
+            }
+            return enhance;
+
+        }, retryExceptions);
     }
 
     private void uploadThumbnails(WebResourceType thumbnailResource, List<Thumbnail> thumbnails) throws IOException {
         for (Thumbnail thumbnail : thumbnails) {
             if (thumbnail.getTargetName().endsWith(ThumbnailKind.LARGE.getNameSuffix())) {
-                Files.write(new File("/tmp/thumbnailLarge").toPath(), thumbnail.getContentStream().readAllBytes());
                 LOGGER.info("{}\t=>\t{}", thumbnailResource.getAbout(), thumbnail.getTargetName());
 //                s3Client.putObject(thumbnail.getTargetName(), thumbnail.getContentStream(), prepareObjectMetadata(thumbnailResource));
             } else if (thumbnail.getTargetName().endsWith(ThumbnailKind.MEDIUM.getNameSuffix()) &&
@@ -113,10 +127,33 @@ public class ImageEnhancerUtil {
                 LOGGER.info("{}\t=>\t{}", thumbnailResource.getAbout(), thumbnail.getTargetName());
 //                s3Client.putObject(thumbnail.getTargetName(), thumbnail.getContentStream(), prepareObjectMetadata(thumbnailResource));
             }
-            else{
-                Files.write(new File("/tmp/thumbnailMedium").toPath(), thumbnail.getContentStream().readAllBytes());
-            }
         }
+    }
+
+    private void appendSuccessReport(WebResourceType thumbnailResource, List<Thumbnail> thumbnails, long elapsedTimeInNanoSec, ReportRow reportRow) {
+        reportRow.setHeightBefore(thumbnailResource.getHeight().getLong());
+        reportRow.setWidthBefore(thumbnailResource.getWidth().getLong());
+        reportRow.setElapsedTime(TimeUnit.SECONDS.convert(elapsedTimeInNanoSec, TimeUnit.NANOSECONDS));
+        reportRow.setStatus("PROCESSED");
+        for (Thumbnail thumbnail : thumbnails) {
+            fileCsvImageReporter.appendRow(getNewWidthAndHeight(thumbnail, reportRow));
+        }
+    }
+
+    private void appendFailReport(ReportRow reportRow){
+        reportRow.setStatus("FAILED");
+        fileCsvImageReporter.appendRow(reportRow);
+    }
+
+    private ReportRow getNewWidthAndHeight(Thumbnail thumbnail, ReportRow reportRow) {
+        try {
+            BufferedImage bufferedImage = ImageIO.read(thumbnail.getContentStream());
+            reportRow.setHeightAfter(bufferedImage.getHeight());
+            reportRow.setWidthAfter(bufferedImage.getWidth());
+        } catch (IOException e) {
+            LOGGER.error("Cannot get width or height of generated image thumbnail", e);
+        }
+        return reportRow;
     }
 
     private List<Thumbnail> generateThumbnails(WebResourceType resource, String thumbnailName, byte[] imageToEnhance) throws IOException {

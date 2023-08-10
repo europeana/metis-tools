@@ -13,17 +13,24 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.image.enhancement.client.ImageEnhancerClient;
 import eu.europeana.metis.image.enhancement.client.ImageEnhancerScript;
 import eu.europeana.metis.image.enhancement.config.ImageEnhancerClientConfig;
+import eu.europeana.metis.image.enhancement.domain.worker.ImageEnhancerWorker;
 import eu.europeana.metis.processor.ProcessorRunner;
 import eu.europeana.metis.processor.dao.MongoCoreDao;
 import eu.europeana.metis.processor.dao.MongoProcessorDao;
 import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.dao.MongoTargetDao;
-import eu.europeana.metis.processor.properties.general.*;
+import eu.europeana.metis.processor.properties.general.ApplicationProperties;
+import eu.europeana.metis.processor.properties.general.ImageEnhancerClientProperties;
+import eu.europeana.metis.processor.properties.general.RedisProperties;
+import eu.europeana.metis.processor.properties.general.S3Properties;
+import eu.europeana.metis.processor.properties.general.SolrZookeeperTargetProperties;
+import eu.europeana.metis.processor.properties.general.TruststoreProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoCoreProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoProcessorProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoSourceProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoTargetProperties;
 import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
+import eu.europeana.metis.processor.utilities.FileCsvImageReporter;
 import eu.europeana.metis.processor.utilities.S3Client;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.lang3.StringUtils;
@@ -175,10 +182,10 @@ public class ApplicationConfiguration {
 
     @Bean
     public ImageEnhancerUtil getImageEnhancerUtil(S3Client s3Client, ImageEnhancerClientProperties imageEnhancerClientProperties) {
-//        ImageEnhancerClientConfig enhancerClientConfig = new ImageEnhancerClientConfig(imageEnhancerClientProperties.getImageEnhancerEndpoint(), imageEnhancerClientProperties.getImageEnhancerConnectTimeout(), imageEnhancerClientProperties.getImageEnhancerReadTimeout());
-//        ImageEnhancerClient imageEnhancerClient = new ImageEnhancerClient(enhancerClientConfig);
-        ImageEnhancerScript imageEnhancerScript = new ImageEnhancerScript(imageEnhancerClientProperties.getImageEnhancerScriptPath());
-        return new ImageEnhancerUtil(s3Client, imageEnhancerScript);
+        FileCsvImageReporter fileCsvImageReporter = new FileCsvImageReporter(imageEnhancerClientProperties.getImageEnhancerReportPath());
+        ImageEnhancerWorker imageEnhancerWorker = new ImageEnhancerWorker(
+                new ImageEnhancerScript(imageEnhancerClientProperties.getImageEnhancerScriptPath()));
+        return new ImageEnhancerUtil(s3Client, imageEnhancerWorker, fileCsvImageReporter);
     }
 
     @Bean
