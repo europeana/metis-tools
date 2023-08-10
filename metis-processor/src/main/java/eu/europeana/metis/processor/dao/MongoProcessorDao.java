@@ -59,21 +59,21 @@ public class MongoProcessorDao {
         ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> metisProcessorDatastore.save(datasetStatus));
     }
 
-    public DatasetPageBuilder getNextDatasetPageNumber() {
+    public DatasetPageBuilder getNextDatasetPageNumber(int recordPageSize) {
         // TODO: 24/07/2023 Remove this. It is only for testing
 //        if (counter >= 2) {
 //            return new DatasetPageBuilder(null, -1);
 //        }
 //        counter++;
 
-        //fix this
-        int pageSize = 10;
         Query<DatasetStatus> query = metisProcessorDatastore.find(DatasetStatus.class);
         query.filter(Filters.expr(Expressions.value("{$lt: [\"$totalProcessed\", \"$totalRecords\"]}")));
+        // TODO: 10/08/2023 Fix this limit.
         final List<DatasetStatus> datasetStatuses = MorphiaUtils.getListOfQueryRetryable(query, new FindOptions().limit(1));
 
         DatasetPageBuilder datasetPageBuilder = new DatasetPageBuilder(null, -1);
         if (!datasetStatuses.isEmpty()) {
+            // TODO: 10/08/2023 Fix this. It gets only the first from the list.
             DatasetStatus datasetStatus = datasetStatuses.get(0);
             final SortedSet<Integer> pagesProcessed = new TreeSet<>(datasetStatus.getPagesProcessed());
             final SortedSet<Integer> currentPagesProcessing = new TreeSet<>(datasetStatus.getCurrentPagesProcessing());
@@ -82,7 +82,7 @@ public class MongoProcessorDao {
                 datasetPageBuilder = new DatasetPageBuilder(datasetStatus.getDatasetId(), 0);
             } else {
                 //Possible total pages Math.ceil((float)processedRecords/pageSize)
-                int totalPages = (int) Math.ceil((float) datasetStatus.getTotalRecords() / pageSize);
+                int totalPages = (int) Math.ceil((float) datasetStatus.getTotalRecords() / recordPageSize);
                 //Ensure that if a page failed in the meantime, we don't get stuck repeating the last page.
                 boolean isLastPageProcessed = pagesProcessed.contains(totalPages - 1);
                 int nextPage = Math.max(pagesProcessed.last(), currentPagesProcessing.isEmpty() ? Integer.MIN_VALUE : currentPagesProcessing.last()) + 1;

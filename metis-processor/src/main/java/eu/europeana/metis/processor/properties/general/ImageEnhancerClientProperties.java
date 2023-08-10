@@ -12,6 +12,8 @@ public class ImageEnhancerClientProperties {
     private int imageEnhancerConnectTimeout;
     @Value("${image.enhancer.read.timeout}")
     private int imageEnhancerReadTimeout;
+    @Value("${image.enhancer.script.path}")
+    private String imageEnhancerScriptPath;
 
     public String getImageEnhancerEndpoint() {
         return imageEnhancerEndpoint;
@@ -23,5 +25,9 @@ public class ImageEnhancerClientProperties {
 
     public int getImageEnhancerReadTimeout() {
         return imageEnhancerReadTimeout;
+    }
+
+    public String getImageEnhancerScriptPath() {
+        return imageEnhancerScriptPath;
     }
 }

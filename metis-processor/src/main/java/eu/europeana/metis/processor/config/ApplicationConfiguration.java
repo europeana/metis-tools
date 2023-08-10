@@ -11,6 +11,7 @@ import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.image.enhancement.client.ImageEnhancerClient;
+import eu.europeana.metis.image.enhancement.client.ImageEnhancerScript;
 import eu.europeana.metis.image.enhancement.config.ImageEnhancerClientConfig;
 import eu.europeana.metis.processor.ProcessorRunner;
 import eu.europeana.metis.processor.dao.MongoCoreDao;
@@ -174,9 +175,10 @@ public class ApplicationConfiguration {
 
     @Bean
     public ImageEnhancerUtil getImageEnhancerUtil(S3Client s3Client, ImageEnhancerClientProperties imageEnhancerClientProperties) {
-        ImageEnhancerClientConfig enhancerClientConfig = new ImageEnhancerClientConfig(imageEnhancerClientProperties.getImageEnhancerEndpoint(), imageEnhancerClientProperties.getImageEnhancerConnectTimeout(), imageEnhancerClientProperties.getImageEnhancerReadTimeout());
-        ImageEnhancerClient imageEnhancerClient = new ImageEnhancerClient(enhancerClientConfig);
-        return new ImageEnhancerUtil(s3Client, imageEnhancerClient);
+//        ImageEnhancerClientConfig enhancerClientConfig = new ImageEnhancerClientConfig(imageEnhancerClientProperties.getImageEnhancerEndpoint(), imageEnhancerClientProperties.getImageEnhancerConnectTimeout(), imageEnhancerClientProperties.getImageEnhancerReadTimeout());
+//        ImageEnhancerClient imageEnhancerClient = new ImageEnhancerClient(enhancerClientConfig);
+        ImageEnhancerScript imageEnhancerScript = new ImageEnhancerScript(imageEnhancerClientProperties.getImageEnhancerScriptPath());
+        return new ImageEnhancerUtil(s3Client, imageEnhancerScript);
     }
 
     @Bean

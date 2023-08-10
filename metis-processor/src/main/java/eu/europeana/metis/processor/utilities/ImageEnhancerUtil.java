@@ -1,7 +1,7 @@
 package eu.europeana.metis.processor.utilities;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import eu.europeana.metis.image.enhancement.client.ImageEnhancerClient;
+import eu.europeana.metis.image.enhancement.client.ImageEnhancerScript;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.mediaprocessing.exception.MediaProcessorException;
 import eu.europeana.metis.mediaprocessing.extraction.CommandExecutor;
@@ -9,9 +9,11 @@ import eu.europeana.metis.mediaprocessing.extraction.ImageMetadata;
 import eu.europeana.metis.mediaprocessing.extraction.ThumbnailGenerator;
 import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.mediaprocessing.model.ThumbnailKind;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.schema.jibx.WebResourceType;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.NoHttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static eu.europeana.metis.mediaprocessing.extraction.ThumbnailGenerator.md5Hex;
@@ -32,17 +33,24 @@ import static eu.europeana.metis.mediaprocessing.extraction.ThumbnailGenerator.m
 public class ImageEnhancerUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final S3Client s3Client;
-    private final ImageEnhancerClient imageEnhancerClient;
+    private final ImageEnhancerScript imageEnhancerScript;
+
+    private static final Map<Class<?>, String> retryExceptions;
+
+    static {
+        retryExceptions = new HashMap<>(ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
+        retryExceptions.put(NoHttpResponseException.class, "");
+    }
 
     /**
      * Instantiates a new Enhancement processor.
      *
      * @param s3Client            the s3 client
-     * @param imageEnhancerClient the image enhancer client
+     * @param imageEnhancerScript the image enhancer client
      */
-    public ImageEnhancerUtil(S3Client s3Client, ImageEnhancerClient imageEnhancerClient) {
+    public ImageEnhancerUtil(S3Client s3Client, ImageEnhancerScript imageEnhancerScript) {
         this.s3Client = s3Client;
-        this.imageEnhancerClient = imageEnhancerClient;
+        this.imageEnhancerScript = imageEnhancerScript;
     }
 
 
@@ -68,9 +76,23 @@ public class ImageEnhancerUtil {
         thumbnailResourceList.forEach(thumbnailResource -> {
             try {
                 if (hasThumbnailResolutionLowerThan400(thumbnailResource)) {
-                    final String largeThumbnailObjectName = md5Hex(thumbnailResource.getAbout()) + ThumbnailKind.LARGE;
+                    final String largeThumbnailObjectName = md5Hex(thumbnailResource.getAbout()) + ThumbnailKind.LARGE.getNameSuffix();
+                    LOGGER.info("{}\t=>\t{}", thumbnailResource.getAbout(), largeThumbnailObjectName);
                     byte[] largeThumbnail = s3Client.getObject(largeThumbnailObjectName);
-                    byte[] enhancedImage = imageEnhancerClient.enhance(largeThumbnail);
+                    Files.write(new File("/tmp/s3Large").toPath(), largeThumbnail);
+
+                    byte[] enhancedImage = ExternalRequestUtil.retryableExternalRequest(() ->{
+                        byte[] enhance;
+                        try {
+                            enhance = imageEnhancerScript.enhance(largeThumbnail);
+                        }catch (Exception e){
+                            LOGGER.info(largeThumbnailObjectName);
+                            throw e;
+                        }
+                        return enhance;
+
+                    }, retryExceptions);
+                    Files.write(new File("/tmp/enhanced").toPath(), enhancedImage);
                     List<Thumbnail> thumbnails = generateThumbnails(thumbnailResource, largeThumbnailObjectName, enhancedImage);
                     uploadThumbnails(thumbnailResource, thumbnails);
                 }
@@ -83,12 +105,16 @@ public class ImageEnhancerUtil {
     private void uploadThumbnails(WebResourceType thumbnailResource, List<Thumbnail> thumbnails) throws IOException {
         for (Thumbnail thumbnail : thumbnails) {
             if (thumbnail.getTargetName().endsWith(ThumbnailKind.LARGE.getNameSuffix())) {
+                Files.write(new File("/tmp/thumbnailLarge").toPath(), thumbnail.getContentStream().readAllBytes());
                 LOGGER.info("{}\t=>\t{}", thumbnailResource.getAbout(), thumbnail.getTargetName());
 //                s3Client.putObject(thumbnail.getTargetName(), thumbnail.getContentStream(), prepareObjectMetadata(thumbnailResource));
             } else if (thumbnail.getTargetName().endsWith(ThumbnailKind.MEDIUM.getNameSuffix()) &&
                     hasThumbnailResolutionLowerThan200(thumbnailResource)) {
                 LOGGER.info("{}\t=>\t{}", thumbnailResource.getAbout(), thumbnail.getTargetName());
 //                s3Client.putObject(thumbnail.getTargetName(), thumbnail.getContentStream(), prepareObjectMetadata(thumbnailResource));
+            }
+            else{
+                Files.write(new File("/tmp/thumbnailMedium").toPath(), thumbnail.getContentStream().readAllBytes());
             }
         }
     }
@@ -105,7 +131,8 @@ public class ImageEnhancerUtil {
         try {
             ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(new CommandExecutor(300));
             Pair<ImageMetadata, List<Thumbnail>> output =
-                    thumbnailGenerator.generateThumbnails(thumbnailName, resource.getHasMimeType().getHasMimeType(), tempImageFile, false);
+                    thumbnailGenerator.generateThumbnails(resource.getAbout(), resource.getHasMimeType().getHasMimeType(), tempImageFile, false);
+            Files.deleteIfExists(tempImageFile.toPath());
             return output.getRight();
         } catch (MediaProcessorException | MediaExtractionException e) {
             LOGGER.error("running extracting media", e);

@@ -263,7 +263,7 @@ public class ProcessorRunner implements CommandLineRunner {
         RLock lock = redissonClient.getFairLock(DATASET_STATUS);
         lock.lock();
         try {
-            DatasetPageBuilder datasetPageNumber = mongoProcessorDao.getNextDatasetPageNumber();
+            DatasetPageBuilder datasetPageNumber = mongoProcessorDao.getNextDatasetPageNumber(applicationProperties.getRecordPageSize());
             if (datasetPageNumber.getDatasetId() == null) {
                 datasetPageNumber.setFullBeanList(Collections.emptyList());
             } else {
