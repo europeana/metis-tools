@@ -19,18 +19,22 @@ import java.lang.invoke.MethodHandles;
  */
 public class S3Client {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final AmazonS3 ibmAmazonS3;
+    private final String ibmS3BucketName;
     private final AmazonS3 amazonS3;
-    private final String awsBucket;
+    private final String amazonS3BucketName;
 
     /**
      * Instantiates a new Amazon client.
      *
-     * @param amazonS3  the amazon s3
-     * @param s3BucketName the aws bucket
+     * @param ibmAmazonS3  the amazon s3
+     * @param ibmS3BucketName the aws bucket
      */
-    public S3Client(AmazonS3 amazonS3, String s3BucketName) {
+    public S3Client(AmazonS3 ibmAmazonS3, String ibmS3BucketName, AmazonS3 amazonS3, String amazonS3BucketName) {
+        this.ibmAmazonS3 = ibmAmazonS3;
+        this.ibmS3BucketName = ibmS3BucketName;
         this.amazonS3 = amazonS3;
-        this.awsBucket = s3BucketName;
+        this.amazonS3BucketName = amazonS3BucketName;
     }
 
     /**
@@ -41,20 +45,34 @@ public class S3Client {
      * @param objectMetadata object metadata
      * @return result from AmazonS3
      */
-    public PutObjectResult putObject(String awsObjectName, InputStream inputStream, ObjectMetadata objectMetadata) {
-        return amazonS3.putObject(awsBucket, awsObjectName, inputStream, objectMetadata);
+    public PutObjectResult putIbmObject(String awsObjectName, InputStream inputStream, ObjectMetadata objectMetadata) {
+        return ibmAmazonS3.putObject(ibmS3BucketName, awsObjectName, inputStream, objectMetadata);
     }
 
 
     /**
-     * Gets object from the default bucket.
+     * Gets object from ibm
      *
      * @param awsObjectName the name
      * @return the object
      */
-    public byte[] getObject(String awsObjectName) {
+    public byte[] getIbmObject(String awsObjectName) {
+        return getObject(ibmAmazonS3, ibmS3BucketName, awsObjectName);
+    }
+
+    /**
+     * Gets object from amazon
+     *
+     * @param awsObjectName the name
+     * @return the object
+     */
+    public byte[] getAmazonObject(String awsObjectName) {
+        return getObject(amazonS3, amazonS3BucketName, awsObjectName);
+    }
+
+    private byte[] getObject(AmazonS3 s3, String bucketName, String awsObjectName) {
         try {
-            final S3Object s3Object = amazonS3.getObject(awsBucket, awsObjectName);
+            final S3Object s3Object = s3.getObject(bucketName, awsObjectName);
             final S3ObjectInputStream s3is = s3Object.getObjectContent();
             ByteArrayOutputStream fos = new ByteArrayOutputStream();
             final byte[] readBuffer = new byte[1024];

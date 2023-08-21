@@ -84,8 +84,8 @@
       <version>${version.amazonaws}</version>
     </dependency>
     <dependency>
-      <artifactId>metis-media-service</artifactId>
       <groupId>eu.europeana.metis</groupId>
+      <artifactId>metis-media-service</artifactId>
       <version>${version.metis-mediaprocessing}</version>
     </dependency>
     <dependency>

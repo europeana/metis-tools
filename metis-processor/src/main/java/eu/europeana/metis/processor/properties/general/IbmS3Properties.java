@@ -4,15 +4,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class S3Properties {
+public class IbmS3Properties {
 
-    @Value("${s3.endpoint}")
+    @Value("${ibm.s3.endpoint}")
     private String s3Endpoint;
-    @Value("${s3.bucket.name}")
+    @Value("${ibm.s3.bucket.name}")
     private String s3BucketName;
-    @Value("${s3.access.key}")
+    @Value("${ibm.s3.access.key}")
     private String s3AccessKey;
-    @Value("${s3.secret.key}")
+    @Value("${ibm.s3.secret.key}")
     private String s3SecretKey;
 
     public String getS3Endpoint() {

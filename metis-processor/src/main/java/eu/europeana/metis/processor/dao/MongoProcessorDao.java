@@ -5,7 +5,6 @@ import dev.morphia.Datastore;
 import dev.morphia.Morphia;
 import dev.morphia.aggregation.expressions.Expressions;
 import dev.morphia.mapping.Mapper;
-import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.filters.Filters;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
@@ -18,6 +17,7 @@ import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class MongoProcessorDao {
 
@@ -26,8 +26,6 @@ public class MongoProcessorDao {
     private final MongoProcessorProperties mongoProcessorProperties;
     private final MongoClient mongoClient;
     private final Datastore metisProcessorDatastore;
-
-    private int counter = 0;
 
     public MongoProcessorDao(MongoProcessorProperties mongoProcessorProperties) throws DataAccessConfigException {
         this.mongoProcessorProperties = mongoProcessorProperties;
@@ -60,21 +58,15 @@ public class MongoProcessorDao {
     }
 
     public DatasetPageBuilder getNextDatasetPageNumber(int recordPageSize) {
-        // TODO: 24/07/2023 Remove this. It is only for testing
-//        if (counter >= 2) {
-//            return new DatasetPageBuilder(null, -1);
-//        }
-//        counter++;
-
         Query<DatasetStatus> query = metisProcessorDatastore.find(DatasetStatus.class);
         query.filter(Filters.expr(Expressions.value("{$lt: [\"$totalProcessed\", \"$totalRecords\"]}")));
-        // TODO: 10/08/2023 Fix this limit.
-        final List<DatasetStatus> datasetStatuses = MorphiaUtils.getListOfQueryRetryable(query, new FindOptions().limit(1));
+        List<DatasetStatus> datasetStatuses = MorphiaUtils.getListOfQueryRetryable(query);
 
         DatasetPageBuilder datasetPageBuilder = new DatasetPageBuilder(null, -1);
-        if (!datasetStatuses.isEmpty()) {
-            // TODO: 10/08/2023 Fix this. It gets only the first from the list.
-            DatasetStatus datasetStatus = datasetStatuses.get(0);
+        // TODO: 21/08/2023 Remove this, only for testing.
+        datasetStatuses = datasetStatuses.stream()
+                .filter(datasetStatus -> datasetStatus.getDatasetId().equals("2048087")).collect(Collectors.toList());
+        for (DatasetStatus datasetStatus : datasetStatuses) {
             final SortedSet<Integer> pagesProcessed = new TreeSet<>(datasetStatus.getPagesProcessed());
             final SortedSet<Integer> currentPagesProcessing = new TreeSet<>(datasetStatus.getCurrentPagesProcessing());
             if (pagesProcessed.isEmpty()) {

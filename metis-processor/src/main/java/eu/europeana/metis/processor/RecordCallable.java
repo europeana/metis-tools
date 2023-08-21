@@ -25,15 +25,19 @@ public class RecordCallable implements Callable<RDF> {
 
     @Override
     public RDF call() throws Exception {
-        // TODO: 25/07/2023 Can we implement it with steps? 
-        //Process RDF and exit
-        RDF rdf = EdmUtils.toRDF(fullBean, true);
-        if(rdfUtil.hasThumbnailsAndValidLicense(rdf)){
-            LOGGER.info("RDF HAS thumbnails and valid license");
-            LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
+        // TODO: 25/07/2023 Can we implement it with steps?
 
+        final long startTime = System.nanoTime();
+
+        RDF rdf = EdmUtils.toRDF(fullBean, true);
+        if (rdfUtil.hasThumbnailsAndValidLicense(rdf)) {
+            LOGGER.debug("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
             imageEnhancerUtil.processRecord(rdf);
+        } else {
+            LOGGER.debug("Thread: {} - Skipping RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
         }
+        final long elapsedTimeInNanoSec = System.nanoTime() - startTime;
+        LOGGER.debug("Elapsed time for whole processing {}ns", elapsedTimeInNanoSec);
         return rdf;
     }
 

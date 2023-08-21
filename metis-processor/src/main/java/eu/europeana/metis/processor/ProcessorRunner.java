@@ -79,14 +79,6 @@ public class ProcessorRunner implements CommandLineRunner {
         initializeLockWrapped();
         new Thread(datasetPageProducer).start();
         consume();
-//        DatasetPage datasetPage = getNextPageLockWrapped();
-//        while (!datasetPage.getFullBeanList().isEmpty()) {
-//            LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
-//            pageProcess(datasetPage);
-//            updateDatasetStatusLockWrapped(datasetPage);
-//            datasetPage = getNextPageLockWrapped();
-//        }
-
         recordsProcessor.close();
         LOGGER.info("END");
     }
@@ -99,8 +91,7 @@ public class ProcessorRunner implements CommandLineRunner {
             LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
             pageProcess(datasetPage);
             updateDatasetStatusLockWrapped(datasetPage);
-
-        }while(!datasetPage.getFullBeanList().isEmpty());
+        } while (!datasetPage.getFullBeanList().isEmpty());
     }
 
     private void pageProcess(DatasetPage datasetPage) throws InterruptedException {
@@ -175,6 +166,9 @@ public class ProcessorRunner implements CommandLineRunner {
                 final Set<Integer> pagesProcessed = datasetStatus.getPagesProcessed();
                 pagesProcessed.add(datasetPage.getPage());
                 datasetStatus.getCurrentPagesProcessing().remove(datasetPage.getPage());
+                long recordAfterAddingPage = datasetStatus.getTotalProcessed() + applicationProperties.getRecordPageSize();
+                long recordsProcessed = Math.min(recordAfterAddingPage, datasetStatus.getTotalRecords());
+                datasetStatus.setTotalProcessed(recordsProcessed);
                 mongoProcessorDao.storeDatasetStatusToDb(datasetStatus);
             } finally {
                 lock.unlock();
@@ -196,20 +190,11 @@ public class ProcessorRunner implements CommandLineRunner {
             if (allDatasetStatuses.isEmpty()) {
                 LOGGER.info("DatasetStatuses: is empty.");
                 LOGGER.info("DatasetStatuses: Start initialization.");
-                Map<String, Long> datasetsWithSize = getDatasetWithSize(10);
-//                Map<String, Long> datasetsWithSize = getDatasetWithSize();
-                //--Remove this block
-                Optional<Map.Entry<String, Long>> entry = datasetsWithSize.entrySet().stream().findFirst();
-                entry.ifPresent(stringLongEntry -> LOGGER.debug("{}: {}", stringLongEntry.getKey(), stringLongEntry.getValue()));
-                //--Remove this block
-                allDatasetStatuses = orderAndInitialDatasetStatuses(datasetsWithSize);
+//                Map<String, Long> datasetsWithSize = getDatasetWithSize(10);
+                Map<String, Long> datasetsWithSize = getDatasetWithSize();
+                orderAndInitialDatasetStatuses(datasetsWithSize);
                 LOGGER.info("DatasetStatuses: End initialization.");
             }
-
-            //--Remove this block
-            Optional<DatasetStatus> datasetStatus = allDatasetStatuses.stream().findFirst();
-            datasetStatus.ifPresent(datasetStatusItem -> LOGGER.info("{}: {}", datasetStatusItem.getDatasetId(), datasetStatusItem.getTotalRecords()));
-            //--Remove this block
         } finally {
             lock.unlock();
         }

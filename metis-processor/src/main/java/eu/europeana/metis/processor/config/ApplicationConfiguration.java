@@ -19,18 +19,13 @@ import eu.europeana.metis.processor.dao.MongoCoreDao;
 import eu.europeana.metis.processor.dao.MongoProcessorDao;
 import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.dao.MongoTargetDao;
-import eu.europeana.metis.processor.properties.general.ApplicationProperties;
-import eu.europeana.metis.processor.properties.general.ImageEnhancerClientProperties;
-import eu.europeana.metis.processor.properties.general.RedisProperties;
-import eu.europeana.metis.processor.properties.general.S3Properties;
-import eu.europeana.metis.processor.properties.general.SolrZookeeperTargetProperties;
-import eu.europeana.metis.processor.properties.general.TruststoreProperties;
+import eu.europeana.metis.processor.properties.general.*;
 import eu.europeana.metis.processor.properties.mongo.MongoCoreProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoProcessorProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoSourceProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoTargetProperties;
-import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
 import eu.europeana.metis.processor.utilities.FileCsvImageReporter;
+import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
 import eu.europeana.metis.processor.utilities.S3Client;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import org.apache.commons.lang3.StringUtils;
@@ -160,11 +155,25 @@ public class ApplicationConfiguration {
         return Redisson.create(config);
     }
 
-    @Bean
-    public AmazonS3 getAmazonS3(S3Properties s3Properties) {
+    @Bean(name = "amazonS3")
+    public AmazonS3 getAmazonS3(AmazonS3Properties s3Properties) {
 
         AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(s3Properties.getS3AccessKey(), s3Properties.getS3SecretKey()));
-        AwsClientBuilder.EndpointConfiguration endpointConfiguration = new AwsClientBuilder.EndpointConfiguration(s3Properties.getS3Endpoint(), Regions.DEFAULT_REGION.getName());
+        AwsClientBuilder.EndpointConfiguration endpointConfiguration =
+                new AwsClientBuilder.EndpointConfiguration(s3Properties.getS3Endpoint(), Regions.EU_CENTRAL_1.getName());
+
+        return AmazonS3ClientBuilder.standard()
+                .withCredentials(credentialsProvider)
+                .withEndpointConfiguration(endpointConfiguration)
+                .build();
+    }
+
+    @Bean(name = "ibmAmazonS3")
+    public AmazonS3 getIbmAmazonS3(IbmS3Properties ibmS3Properties) {
+
+        AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(ibmS3Properties.getS3AccessKey(), ibmS3Properties.getS3SecretKey()));
+        AwsClientBuilder.EndpointConfiguration endpointConfiguration =
+                new AwsClientBuilder.EndpointConfiguration(ibmS3Properties.getS3Endpoint(), Regions.DEFAULT_REGION.getName());
 
         return AmazonS3ClientBuilder.standard()
                 .withCredentials(credentialsProvider)
@@ -173,8 +182,8 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public S3Client getS3Client(AmazonS3 amazonS3, S3Properties s3Properties) {
-        return new S3Client(amazonS3, s3Properties.getS3BucketName());
+    public S3Client getS3Client(AmazonS3 ibmAmazonS3, IbmS3Properties ibmS3Properties, AmazonS3 amazonS3, AmazonS3Properties amazons3Properties) {
+        return new S3Client(ibmAmazonS3, ibmS3Properties.getS3BucketName(), amazonS3, amazons3Properties.getS3BucketName());
     }
 
     @Bean
