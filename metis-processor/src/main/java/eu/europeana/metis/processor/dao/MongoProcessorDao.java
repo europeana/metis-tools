@@ -17,7 +17,6 @@ import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 public class MongoProcessorDao {
 
@@ -64,8 +63,8 @@ public class MongoProcessorDao {
 
         DatasetPageBuilder datasetPageBuilder = new DatasetPageBuilder(null, -1);
         // TODO: 21/08/2023 Remove this, only for testing.
-        datasetStatuses = datasetStatuses.stream()
-                .filter(datasetStatus -> datasetStatus.getDatasetId().equals("2048087")).collect(Collectors.toList());
+//        datasetStatuses = datasetStatuses.stream()
+//                .filter(datasetStatus -> datasetStatus.getDatasetId().equals("2048087")).collect(Collectors.toList());
         for (DatasetStatus datasetStatus : datasetStatuses) {
             final SortedSet<Integer> pagesProcessed = new TreeSet<>(datasetStatus.getPagesProcessed());
             final SortedSet<Integer> currentPagesProcessing = new TreeSet<>(datasetStatus.getCurrentPagesProcessing());
@@ -83,7 +82,10 @@ public class MongoProcessorDao {
                     datasetPageBuilder = new DatasetPageBuilder(datasetStatus.getDatasetId(), nextPage);
                 }
             }
-            metisProcessorDatastore.save(datasetStatuses);
+            if(datasetPageBuilder.getDatasetId() != null){
+                metisProcessorDatastore.save(datasetStatuses);
+                break;
+            }
         }
         return datasetPageBuilder;
     }

@@ -173,7 +173,7 @@ public class ImageEnhancerUtil {
         reportRow.setHeightBefore(thumbnailResource.getHeight());
         reportRow.setWidthBefore(thumbnailResource.getWidth());
         reportRow.setImageLinkHex(thumbnailHex);
-        reportRow.setStatus("PROCESSED");
+        reportRow.setStatus("ALREADYPROCESSED");
         fileCsvImageReporter.appendRow(reportRow);
     }
 
