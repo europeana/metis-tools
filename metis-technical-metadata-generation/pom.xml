@@ -49,12 +49,12 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <version.metis>6-SNAPSHOT</version.metis>
+    <version.metis>11-SNAPSHOT</version.metis>
     <!-- These two versions are interdependent. -->
     <version.slf4j>1.7.30</version.slf4j>
     <version.log4j>2.17.1</version.log4j>
     <version.aws-java-sdk-s3>1.11.64</version.aws-java-sdk-s3>
-    <version.morphia>1.3.2</version.morphia>
+    <version.morphia>2.4.5</version.morphia>
   </properties>
 
   <dependencies>
