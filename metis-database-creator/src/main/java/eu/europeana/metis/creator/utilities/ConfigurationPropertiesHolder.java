@@ -1,6 +1,7 @@
 package eu.europeana.metis.creator.utilities;
 
 import eu.europeana.metis.mongo.connection.MongoProperties;
+import eu.europeana.metis.mongo.connection.MongoProperties.ReadPreferenceValue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -54,7 +55,7 @@ public class ConfigurationPropertiesHolder {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
         IllegalArgumentException::new);
     mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
-        mongoPassword, mongoEnableSSL, null);
+        mongoPassword, mongoEnableSSL, ReadPreferenceValue.PRIMARY ,null);
     return mongoProperties;
   }
 
