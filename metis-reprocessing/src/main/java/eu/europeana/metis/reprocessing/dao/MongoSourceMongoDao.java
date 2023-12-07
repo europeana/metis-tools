@@ -8,7 +8,9 @@ import dev.morphia.mapping.Mapper;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.filters.Filters;
+import eu.europeana.corelib.definitions.model.RightsOption;
 import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
+import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
@@ -23,11 +25,16 @@ import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
+import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.PropertiesHolder;
+import eu.europeana.metis.schema.jibx.RDF;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Mongo Dao for source records.
@@ -40,6 +47,10 @@ public class MongoSourceMongoDao {
 
   private static final int DEFAULT_PAGE_SIZE = 200;
   public static final String ABOUT = "about";
+  public static final String CONTENT_TIER_ZERO = "http://www.europeana.eu/schemas/epf/contentTier0";
+  public static final String QUALITY_ANNOTATIONS = "qualityAnnotations.body";
+  public static final String TYPE = "type";
+  public static final String RESOURCE_TYPE = "IMAGE";
   public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   private final MongoInitializer sourceMongoInitializer;
@@ -80,6 +91,50 @@ public class MongoSourceMongoDao {
       fullBeans.add(ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::first));
     });
     return fullBeans;
+  }
+
+  public List<FullBeanImpl> getThumbnailRecordsToProcess(String datasetId, int nextPage) {
+    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
+
+    query.filter(Filters.and(Filters.eq(QUALITY_ANNOTATIONS, CONTENT_TIER_ZERO),
+            Filters.eq(TYPE, RESOURCE_TYPE)
+    ));
+    query.filter(Filters.regex(ABOUT).pattern("^/" + datasetId + "/"));
+
+    List<FullBeanImpl> fullBeanList = MorphiaUtils.getListOfQueryRetryable(query, new FindOptions()
+            .skip(nextPage * PAGE_SIZE)
+            .limit(PAGE_SIZE));
+
+    fullBeanList = fullBeanList.stream()
+            .filter(recordStage -> hasThumbnailsAndValidLicense(EdmUtils.toRDF(recordStage)))
+            .collect(Collectors.toList());
+    return fullBeanList;
+  }
+
+  private boolean isValidLicense(String rights) {
+    Set<String> validLicenses = Set.of(
+            RightsOption.CC_BY.getUrl(),
+            RightsOption.CC_ZERO.getUrl(),
+            RightsOption.CC_BY_SA.getUrl(),
+            RightsOption.CC_NOC.getUrl(),
+            RightsOption.CC_BY_NC_SA.getUrl(),
+            RightsOption.CC_BY_NC_ND.getUrl(),
+            RightsOption.CC_BY_ND.getUrl(),
+            RightsOption.CC_BY_NC.getUrl()
+    );
+
+    for (String validLicense : validLicenses) {
+      if (rights.startsWith(validLicense))
+        return true;
+    }
+    return false;
+  }
+
+  private boolean hasThumbnailsAndValidLicense(RDF rdfRecord) {
+    RdfWrapper rdfWrapper = new RdfWrapper(rdfRecord);
+    boolean validLicense = rdfRecord.getAggregationList().stream().allMatch(a -> isValidLicense(a.getRights().getResource()));
+    boolean hasThumbnails = rdfWrapper.hasThumbnails();
+    return hasThumbnails && validLicense;
   }
 
   public long getTotalRecordsForDataset(String datasetId) {
