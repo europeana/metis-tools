@@ -44,6 +44,7 @@ public class RecordsProcessor {
                 throw e;
             }
         }
+        futureList.clear();
         return rdfs;
     }
 

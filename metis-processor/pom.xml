@@ -12,8 +12,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
     <version.spring.boot>2.7.14</version.spring.boot>
     <version.log4j>2.17.1</version.log4j>
     <version.commons.lang3>3.12.0</version.commons.lang3>
@@ -92,6 +92,12 @@
       <groupId>eu.europeana.metis.image.enhancement</groupId>
       <artifactId>metis-image-enhancer-client</artifactId>
       <version>${version.metis-image-enhancer}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.8.2</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
