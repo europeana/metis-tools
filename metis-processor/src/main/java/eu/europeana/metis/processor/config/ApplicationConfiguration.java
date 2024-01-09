@@ -197,7 +197,7 @@ public class ApplicationConfiguration {
     fileCsvImageReporter = new FileCsvImageReporter();
     ImageEnhancerWorker imageEnhancerWorker = new ImageEnhancerWorker(
         new ImageEnhancerScript(imageEnhancerClientProperties.getImageEnhancerScriptPath()));
-    return new ImageEnhancerUtil(s3Client, imageEnhancerWorker, fileCsvImageReporter, applicationProperties);
+    return new ImageEnhancerUtil(s3Client, imageEnhancerWorker, fileCsvImageReporter, applicationProperties.getMode());
   }
 
   @Bean

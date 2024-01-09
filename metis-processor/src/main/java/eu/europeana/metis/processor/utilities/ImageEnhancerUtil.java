@@ -17,7 +17,6 @@ import eu.europeana.metis.mediaprocessing.model.Thumbnail;
 import eu.europeana.metis.mediaprocessing.model.ThumbnailKind;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.processor.config.Mode;
-import eu.europeana.metis.processor.properties.general.ApplicationProperties;
 import eu.europeana.metis.schema.jibx.Aggregation;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.awt.image.BufferedImage;
@@ -58,7 +57,7 @@ public class ImageEnhancerUtil {
   private final S3Client s3Client;
   private final ImageEnhancerWorker imageEnhancerWorker;
   private final FileCsvImageReporter fileCsvImageReporter;
-  private final ApplicationProperties applicationProperties;
+  private final Mode proccesingMode;
 
   /**
    * Instantiates a new Enhancement processor.
@@ -69,11 +68,11 @@ public class ImageEnhancerUtil {
   public ImageEnhancerUtil(S3Client s3Client,
       ImageEnhancerWorker imageEnhancerWorker,
       FileCsvImageReporter fileCsvImageReporter,
-      ApplicationProperties applicationProperties) {
+      Mode processingMode) {
     this.s3Client = s3Client;
     this.imageEnhancerWorker = imageEnhancerWorker;
     this.fileCsvImageReporter = fileCsvImageReporter;
-    this.applicationProperties = applicationProperties;
+    this.proccesingMode = processingMode;
   }
 
   /**
@@ -92,30 +91,32 @@ public class ImageEnhancerUtil {
     if (hasAggregationWithHasView(curatedAggregationList)) {
       LOGGER.info("=>hasView");
       curatedAggregationList.forEach(aggregationItem -> {
-            if (hasShownBy(aggregationItem)) {
+            if (hasIsShownBy(aggregationItem)) {
               LOGGER.info("=>shownByItem");
-              processShownBy(recordToProcess, aggregationItem, recordId);
+              processWebResourceEntry(WebResourceLinkType.IS_SHOWN_BY, recordToProcess, recordId);
             }
             LOGGER.info("=>hasViewItem");
-            processHasView(recordToProcess, aggregationItem, recordId);
+            processWebResourceEntry(WebResourceLinkType.HAS_VIEW, recordToProcess, recordId);
           }
       );
-    } else {
-      processSimpleEntry(recordToProcess, recordId);
     }
+      // else {
+      // this is just for backwards compatibilty Batch A
+      // processWebResourceEntry(WebResourceLinkType.IS_SHOWN_BY, recordToProcess, recordId);
+      // }
   }
 
-  private void processSimpleEntry(RDF recordToProcess, String recordId) {
+  private void processWebResourceEntry(WebResourceLinkType linkType, RDF recordToProcess, String recordId) {
     List<WebResourceWrapper> webResourceWrappers = new RdfWrapper(recordToProcess)
-        .getWebResourceWrappers(Set.of(WebResourceLinkType.IS_SHOWN_BY))
+        .getWebResourceWrappers(Set.of(linkType))
         .stream()
-        .filter(webResourceWrapper -> webResourceWrapper != null && webResourceWrapper.getMimeType() != null)
-        .filter(webResourceWrapper -> webResourceWrapper.getMimeType().startsWith("image/"))
+        .filter(webResourceWrapper -> webResourceWrapper != null
+            && webResourceWrapper.getMimeType() != null
+            && webResourceWrapper.getMimeType().startsWith("image/"))
         .distinct()
         .collect(Collectors.toList());
-
     webResourceWrappers.forEach(webResourceWrapper -> {
-      LOGGER.info("=>SimpleItem {}", webResourceWrapper.getAbout());
+      LOGGER.info("=>SimpleItem{} {}", linkType, webResourceWrapper.getAbout());
       processItem(recordId, webResourceWrapper);
     });
   }
@@ -124,7 +125,7 @@ public class ImageEnhancerUtil {
     ReportRow reportRow = new ReportRow();
     reportRow.setRecordId(recordId);
     reportRow.setImageLink(webResourceWrapper.getAbout());
-    if (!applicationProperties.getMode().equals(Mode.DRY_RUN)) {
+    if (!proccesingMode.equals(Mode.DRY_RUN)) {
       try {
         if (hasThumbnailResolutionLowerThan400(webResourceWrapper)) {
           final String thumbnailHex = md5Hex(webResourceWrapper.getAbout());
@@ -166,42 +167,6 @@ public class ImageEnhancerUtil {
     }
   }
 
-  private void processShownBy(RDF recordToProcess, Aggregation aggregationItem, String recordId) {
-    ReportRow reportRow = new ReportRow();
-    reportRow.setRecordId(recordId);
-    reportRow.setImageLink(aggregationItem.getIsShownBy().getResource());
-    LOGGER.info("{}", aggregationItem.getIsShownBy().getResource());
-    List<WebResourceWrapper> webResourceWrappers = new RdfWrapper(recordToProcess)
-        .getWebResourceWrappers(Set.of(WebResourceLinkType.IS_SHOWN_BY))
-        .stream()
-        .filter(webResourceWrapper -> webResourceWrapper != null && webResourceWrapper.getMimeType() != null)
-        .filter(webResourceWrapper -> webResourceWrapper.getMimeType().startsWith("image/"))
-        .distinct()
-        .collect(Collectors.toList());
-    webResourceWrappers.forEach(webResourceWrapper -> {
-      LOGGER.info("=>SimpleItemShownBy {}", webResourceWrapper.getAbout());
-      processItem(recordId, webResourceWrapper);
-    });
-  }
-
-  private void processHasView(RDF recordToProcess, Aggregation aggregationItem, String recordId) {
-    ReportRow reportRow = new ReportRow();
-    reportRow.setRecordId(recordId);
-    reportRow.setImageLink(aggregationItem.getIsShownBy().getResource());
-    LOGGER.info("{}", aggregationItem.getIsShownBy().getResource());
-    List<WebResourceWrapper> webResourceWrappers = new RdfWrapper(recordToProcess)
-        .getWebResourceWrappers(Set.of(WebResourceLinkType.HAS_VIEW))
-        .stream()
-        .filter(webResourceWrapper -> webResourceWrapper != null && webResourceWrapper.getMimeType() != null)
-        .filter(webResourceWrapper -> webResourceWrapper.getMimeType().startsWith("image/"))
-        .distinct()
-        .collect(Collectors.toList());
-    webResourceWrappers.forEach(webResourceWrapper -> {
-      LOGGER.info("=>SimpleItemHasView {}", webResourceWrapper.getAbout());
-      processItem(recordId, webResourceWrapper);
-    });
-  }
-
   private boolean isWebResourceResolutionAndImageResolutionSame(WebResourceWrapper webResourceWrapper, byte[] imageBytes)
       throws IOException {
     final BufferedImage largeThumbnailBufferedImage = getBufferedImage(imageBytes);
@@ -213,7 +178,7 @@ public class ImageEnhancerUtil {
   }
 
   private byte[] enhanceImage(byte[] largeThumbnail, String largeThumbnailObjectName) {
-    if (applicationProperties.getMode().equals(Mode.DEFAULT)) {
+    if (proccesingMode.equals(Mode.DEFAULT)) {
       return retryableExternalRequest(() -> {
         byte[] enhance;
         try {
@@ -237,7 +202,7 @@ public class ImageEnhancerUtil {
               hasThumbnailResolutionLowerThan200(thumbnailResource))) {
         LOGGER.debug("{}\t=>\t{}", thumbnailResource.getAbout(), thumbnail.getTargetName());
         //                Files.write(Paths.get("/tmp/test_thumbnails/newThumbnail-" + thumbnail.getTargetName()), thumbnail.getContentStream().readAllBytes());
-        if (applicationProperties.getMode().equals(Mode.DEFAULT)) {
+        if (proccesingMode.equals(Mode.DEFAULT)) {
           s3Client.putIbmObject(thumbnail.getTargetName(), thumbnail.getContentStream(),
               prepareObjectMetadata(thumbnailResource.getMimeType(), thumbnail.getContentSize()));
         }
@@ -334,7 +299,7 @@ public class ImageEnhancerUtil {
     return Math.min(thumbnailResource.getHeight(), thumbnailResource.getWidth()) < 200;
   }
 
-  private boolean hasShownBy(Aggregation aggregation) {
+  private boolean hasIsShownBy(Aggregation aggregation) {
     return aggregation != null && aggregation.getIsShownBy() != null;
   }
 
