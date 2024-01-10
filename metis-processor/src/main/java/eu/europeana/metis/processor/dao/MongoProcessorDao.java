@@ -48,6 +48,10 @@ public class MongoProcessorDao {
         return MorphiaUtils.getListOfQueryRetryable(metisProcessorDatastore.find(DatasetStatus.class));
     }
 
+    public List<FailedEnhancementRecord> getAllFailedEnhancementRecords() {
+        return MorphiaUtils.getListOfQueryRetryable(metisProcessorDatastore.find(FailedEnhancementRecord.class));
+    }
+
     public DatasetStatus getDatasetStatus(String datasetId) {
         return metisProcessorDatastore.find(DatasetStatus.class).filter(Filters.eq(DATASET_ID, datasetId)).first();
     }

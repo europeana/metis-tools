@@ -1,0 +1,103 @@
+#Spring
+logging.config=log4j2.xml
+spring.autoconfigure.exclude=\
+  org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration, \
+  org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration, \
+  org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo Metis process configuration
+mongo.metis.processor.hosts=
+mongo.metis.processor.port=
+mongo.metis.processor.authentication.db=
+mongo.metis.processor.username=
+mongo.metis.processor.password=
+mongo.metis.processor.enable.ssl=
+mongo.metis.processor.db=
+mongo.metis.processor.connection.pool.size=
+mongo.metis.processor.application.name=
+
+#Mongo Metis Core
+mongo.metis.core.hosts=
+mongo.metis.core.port=
+mongo.metis.core.authentication.db=
+mongo.metis.core.username=
+mongo.metis.core.password=
+mongo.metis.core.enable.ssl=
+mongo.metis.core.db=
+mongo.metis.core.connection.pool.size=
+mongo.metis.core.application.name=
+
+#Mongo Source
+mongo.source.hosts=
+mongo.source.port=
+mongo.source.authentication.db=
+mongo.source.username=
+mongo.source.password=
+mongo.source.enable.ssl=
+mongo.source.db=
+mongo.source.connection.pool.size=
+mongo.source.application.name=
+
+#Mongo Target
+mongo.target.hosts=
+mongo.target.port=
+mongo.target.authentication.db=
+mongo.target.username=
+mongo.target.password=
+mongo.target.enable.ssl=
+mongo.target.db=
+mongo.target.connection.pool.size=
+mongo.target.application.name=
+
+#Solr/Zookeeper Target
+solr.target.hosts=
+zookeeper.target.hosts=
+zookeeper.target.port=
+zookeeper.target.chroot=
+zookeeper.target.defaultCollection=
+
+#Redis
+redis.host=
+redis.port=
+redis.username=
+redis.password=
+redis.enableSSL=
+redis.enable.custom.truststore=
+redisson.connection.pool.size=
+redisson.connect.timeout.in.millisecs=
+redisson.lock.watchdog.timeout.in.secs=
+#Setting to -1 disables DNS monitoring
+redisson.dns.monitor.interval.in.millisecs=
+redisson.idle.connection.timeout.in.millisecs=
+redisson.retry.attempts=
+
+#IBM S3
+ibm.s3.endpoint=
+ibm.s3.bucket.name=
+ibm.s3.access.key=
+ibm.s3.secret.key=
+
+#Amazon S3
+amazon.s3.endpoint=
+amazon.s3.bucket.name=
+amazon.s3.access.key=
+amazon.s3.secret.key=
+
+#Image Enhancer Client
+image.enhancer.endpoint=
+image.enhancer.connect.timeout=
+image.enhancer.read.timeout=
+image.enhancer.script.path=
+
+#Application
+record.parallel.threads=
+record.page.size=
+# execution modes
+# DEFAULT, normal execution.
+# DRY_RUN, run through processing without updating records.
+# REPROCESS_ALL_FAILED, reprocessing failed records.
+execution.mode = DRY_RUN

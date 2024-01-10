@@ -89,7 +89,7 @@ public class ReportRow {
     @Override
     public String toString() {
         return recordId +
-                "," + imageLink +
+                "," + String.format("\"%s\"",imageLink) +
                 "," + imageLinkHex +
                 "," + status +
                 "," + elapsedTime +

@@ -29,15 +29,15 @@ public class RecordCallable implements Callable<RDF> {
 
         final long startTime = System.nanoTime();
 
-        RDF rdf = EdmUtils.toRDF(fullBean, true);
+        final RDF rdf = EdmUtils.toRDF(fullBean, true);
         if (rdfUtil.hasThumbnailsAndValidLicense(rdf)) {
-            LOGGER.debug("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
+            LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
             imageEnhancerUtil.processRecord(rdf);
         } else {
             LOGGER.debug("Thread: {} - Skipping RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
         }
         final long elapsedTimeInNanoSec = System.nanoTime() - startTime;
-        LOGGER.debug("Elapsed time for whole processing {}ns", elapsedTimeInNanoSec);
+        LOGGER.info("Elapsed time for whole processing {}ns", elapsedTimeInNanoSec);
         return rdf;
     }
 
