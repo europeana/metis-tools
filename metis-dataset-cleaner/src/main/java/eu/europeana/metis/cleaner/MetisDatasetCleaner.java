@@ -27,8 +27,9 @@ public class MetisDatasetCleaner implements ApplicationRunner {
     LOGGER.info("Starting cleaning database script");
     ApplicationInitializer applicationInitializer = new ApplicationInitializer();
     // Help
-    LOGGER.info("Usage: where # is dataset id number.");
-    LOGGER.info("mvn spring-boot:run -Dspring-boot.run.arguments=\"--dataset.id=#\"");
+    LOGGER.info("Usage: where # is record id number.");
+    LOGGER.info("mvn spring-boot:run -Dspring-boot.run.arguments=\"--record.id=#\"");
+    LOGGER.info("java -jar metis-dataset-cleaner-1.0-SNAPSHOT.jar --record.id=#");
     // Reading Command-Line arguments
     LOGGER.info("Application started with command-line arguments: {}", Arrays.toString(args.getSourceArgs()));
     LOGGER.info("NonOptionArgs: {}", args.getNonOptionArgs());
@@ -38,15 +39,15 @@ public class MetisDatasetCleaner implements ApplicationRunner {
       LOGGER.info("arg-" + name + "=" + args.getOptionValues(name));
     }
 
-    boolean containsOption = args.containsOption("dataset.id");
-    LOGGER.info("Contains dataset.id: " + containsOption);
+    boolean containsOption = args.containsOption("record.id");
+    LOGGER.info("Contains record.id: " + containsOption);
 
     if (containsOption) {
-      final String datasetId = args.getOptionValues("dataset.id").getFirst();
-      LOGGER.info("cleaning preview datasetid: {}", datasetId);
-      applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PREVIEW).remove(datasetId);
-      LOGGER.info("cleaning publish datasetid: {}", datasetId);
-      applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PUBLISH).remove(datasetId);
+      final String recordId = args.getOptionValues("record.id").getFirst();
+      LOGGER.info("cleaning preview record.id: {}", recordId);
+      applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PREVIEW).remove(recordId);
+      LOGGER.info("cleaning publish record.id: {}", recordId);
+      applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PUBLISH).remove(recordId);
     }
     LOGGER.info("Finished cleaning database script");
     System.exit(0);
