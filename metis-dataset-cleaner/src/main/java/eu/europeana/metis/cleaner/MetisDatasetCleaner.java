@@ -1,9 +1,5 @@
 package eu.europeana.metis.cleaner;
 
-import eu.europeana.cloud.service.commons.utils.DateHelper;
-import eu.europeana.cloud.service.dps.DpsTask;
-import eu.europeana.cloud.service.dps.PluginParameterKeys;
-import eu.europeana.cloud.service.dps.metis.indexing.DataSetCleanerParameters;
 import eu.europeana.metis.cleaner.common.TargetIndexingDatabase;
 import java.util.Arrays;
 import org.slf4j.Logger;
@@ -23,7 +19,7 @@ public class MetisDatasetCleaner implements ApplicationRunner {
   }
 
   @Override
-  public void run( ApplicationArguments args ) throws Exception {
+  public void run(ApplicationArguments args) throws Exception {
     LOGGER.info("Starting cleaning database script");
     ApplicationInitializer applicationInitializer = new ApplicationInitializer();
     // Help
@@ -35,7 +31,7 @@ public class MetisDatasetCleaner implements ApplicationRunner {
     LOGGER.info("NonOptionArgs: {}", args.getNonOptionArgs());
     LOGGER.info("OptionNames: {}", args.getOptionNames());
 
-    for (String name : args.getOptionNames()){
+    for (String name : args.getOptionNames()) {
       LOGGER.info("arg-" + name + "=" + args.getOptionValues(name));
     }
 
