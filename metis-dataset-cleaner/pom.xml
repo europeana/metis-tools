@@ -13,7 +13,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <version.spring.boot>2.7.18</version.spring.boot>
+    <version.spring.boot>3.2.3</version.spring.boot>
     <version.metis>12-SNAPSHOT</version.metis>
     <version.corelib>2.16.8</version.corelib>
     <!-- These two versions are interdependent. -->
@@ -50,13 +50,6 @@
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-indexing</artifactId>
       <version>${version.metis}</version>
-      <exclusions>
-        <!--Exclude those because of eu.europeana.api:entity-api-client:jar:0.0.1-SNAPSHOT transitive of metis-enrichment-client-->
-        <exclusion>
-          <groupId>io.netty</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>eu.europeana.corelib</groupId>
