@@ -4,6 +4,7 @@ import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.metis.cleaner.common.TargetIndexingDatabase;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
@@ -69,14 +70,18 @@ public class MetisDatasetCleaner implements ApplicationRunner {
       LOGGER.info("::Contains index.file::");
       final String fileName = args.getOptionValues("index.file").getFirst();
       try(FileInputStream fileInputStream = new FileInputStream(fileName)) {
+        final String fileData = new String(fileInputStream.readAllBytes(), StandardCharsets.UTF_8);
         IndexingProperties indexingProperties = new IndexingProperties(Date.from(Instant.now()), true, null, true, true);
+        LOGGER.info("contents: {}", fileData);
         LOGGER.info("indexing preview file: {}", fileName);
         applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PREVIEW)
-                              .index(fileInputStream, indexingProperties);
+                              .index(fileData, indexingProperties);
         LOGGER.info("indexing publish file: {}", fileName);
         applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PUBLISH)
-                              .index(fileInputStream, indexingProperties);
+                              .index(fileData, indexingProperties);
       }
+
+
     }
 
     LOGGER.info("Finished cleaning database script");
