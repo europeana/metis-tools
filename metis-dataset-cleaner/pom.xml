@@ -7,17 +7,13 @@
   <groupId>eu.europeana.metis</groupId>
   <artifactId>metis-dataset-cleaner</artifactId>
   <version>1.0-SNAPSHOT</version>
-
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.18</version>
-    <relativePath/> <!-- lookup parent from repository -->
-  </parent>
+  <packaging>jar</packaging>
+  <name>metis-dataset-cleaner</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
+    <version.spring.boot>2.7.18</version.spring.boot>
     <version.metis>12-SNAPSHOT</version.metis>
     <version.corelib>2.16.8</version.corelib>
     <!-- These two versions are interdependent. -->
@@ -25,45 +21,7 @@
     <version.log4j>2.17.1</version.log4j>
   </properties>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${version.maven.compiler.plugin}</version>
-        <configuration>
-          <release>21</release>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
   <dependencies>
-    <dependency>
-      <artifactId>metis-core-common</artifactId>
-      <groupId>eu.europeana.metis</groupId>
-      <version>${version.metis}</version>
-    </dependency>
-    <dependency>
-      <artifactId>metis-core-service</artifactId>
-      <groupId>eu.europeana.metis</groupId>
-      <version>${version.metis}</version>
-    </dependency>
-    <dependency>
-      <groupId>eu.europeana.metis</groupId>
-      <artifactId>metis-indexing</artifactId>
-      <version>${version.metis}</version>
-    </dependency>
-    <dependency>
-      <groupId>eu.europeana.corelib</groupId>
-      <artifactId>corelib-storage</artifactId>
-      <version>${version.corelib}</version>
-    </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -78,37 +36,71 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-log4j2</artifactId>
     </dependency>
-
-    <!--Logging-->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${version.slf4j}</version>
-    </dependency>
-    <!-- Binding for Log4J -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
       <version>${version.log4j}</version>
+    </dependency>
+    <dependency>
+      <groupId>eu.europeana.metis</groupId>
+      <artifactId>metis-core-service</artifactId>
+      <version>${version.metis}</version>
+    </dependency>
+    <dependency>
+      <groupId>eu.europeana.metis</groupId>
+      <artifactId>metis-indexing</artifactId>
+      <version>${version.metis}</version>
       <exclusions>
+        <!--Exclude those because of eu.europeana.api:entity-api-client:jar:0.0.1-SNAPSHOT transitive of metis-enrichment-client-->
         <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
+          <groupId>io.netty</groupId>
+          <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- Log4j API and Core implementation required for binding -->
     <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>${version.log4j}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${version.log4j}</version>
+      <groupId>eu.europeana.corelib</groupId>
+      <artifactId>corelib-storage</artifactId>
+      <version>${version.corelib}</version>
     </dependency>
   </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${version.spring.boot}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${version.maven.compiler.plugin}</version>
+        <configuration>
+          <release>21</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${version.spring.boot}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
   <repositories>
     <!--Release repositories-->
