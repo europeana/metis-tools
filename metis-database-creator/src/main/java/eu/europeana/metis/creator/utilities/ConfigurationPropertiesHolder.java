@@ -26,16 +26,6 @@ public class ConfigurationPropertiesHolder {
   private  String truststorePath;
   @Value("${truststore.password}")
   private  String truststorePassword;
-  @Value("${socks.proxy.enabled}")
-  private boolean socksProxyEnabled;
-  @Value("${socks.proxy.host}")
-  private String socksProxyHost;
-  @Value("${socks.proxy.port}")
-  private String socksProxyPort;
-  @Value("${socks.proxy.username}")
-  private String socksProxyUsername;
-  @Value("${socks.proxy.password}")
-  private String socksProxyPassword;
   @Value("${mongo.hosts}")
   private  String[] mongoHosts;
   @Value("${mongo.port}")
@@ -73,26 +63,6 @@ public class ConfigurationPropertiesHolder {
 
   public String getTruststorePassword() {
     return truststorePassword;
-  }
-
-  public boolean isSocksProxyEnabled() {
-    return socksProxyEnabled;
-  }
-
-  public String getSocksProxyHost() {
-    return socksProxyHost;
-  }
-
-  public String getSocksProxyPort() {
-    return socksProxyPort;
-  }
-
-  public String getSocksProxyUsername() {
-    return socksProxyUsername;
-  }
-
-  public String getSocksProxyPassword() {
-    return socksProxyPassword;
   }
 
   public String[] getMongoHosts() {
