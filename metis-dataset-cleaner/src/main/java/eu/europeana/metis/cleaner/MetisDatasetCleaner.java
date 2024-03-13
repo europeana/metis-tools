@@ -35,7 +35,7 @@ public class MetisDatasetCleaner implements ApplicationRunner {
     LOGGER.info(
         "mvn spring-boot:run -Dspring-boot.run.arguments=\"--record.id=#\" or \"--dataset.id=#\" or --index.file=\"X\" or --index.files=\"Y,Z\"");
     LOGGER.info("java -jar metis-dataset-cleaner-1.0-SNAPSHOT.jar --record.id=# or --dataset.id=#");
-    LOGGER.info("java -jar metis-dataset-cleaner-1.0-SNAPSHOT.jar --index.file=\"X\" or --index.list=\"Y,Z\"");
+    LOGGER.info("java -jar metis-dataset-cleaner-1.0-SNAPSHOT.jar --index.file=\"X\" or --index.files=\"Y,Z\"");
 
     // Reading command-Line arguments
     LOGGER.info("Application started with command-line arguments: {}", Arrays.toString(args.getSourceArgs()));
