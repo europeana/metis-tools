@@ -32,9 +32,10 @@ public class MetisDatasetCleaner implements ApplicationRunner {
     // Usage help
     LOGGER.info("Usage: where # is record or dataset id number.");
     LOGGER.info("       where X is path to a rdf xml record ready for preview and publish.");
-    LOGGER.info("mvn spring-boot:run -Dspring-boot.run.arguments=\"--record.id=#\" or \"--dataset.id=#\" or --index.file=\"X\" or --index.files=\"Y,Z\"");
+    LOGGER.info(
+        "mvn spring-boot:run -Dspring-boot.run.arguments=\"--record.id=#\" or \"--dataset.id=#\" or --index.file=\"X\" or --index.files=\"Y,Z\"");
     LOGGER.info("java -jar metis-dataset-cleaner-1.0-SNAPSHOT.jar --record.id=# or --dataset.id=#");
-    LOGGER.info("java -jar metis-dataset-cleaner-1.0-SNAPSHOT.jar --index.file=\"X\" or --index.files=\"Y,Z\"");
+    LOGGER.info("java -jar metis-dataset-cleaner-1.0-SNAPSHOT.jar --index.file=\"X\" or --index.list=\"Y,Z\"");
 
     // Reading command-Line arguments
     LOGGER.info("Application started with command-line arguments: {}", Arrays.toString(args.getSourceArgs()));
@@ -82,27 +83,27 @@ public class MetisDatasetCleaner implements ApplicationRunner {
         applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PUBLISH)
                               .index(fileData, indexingProperties);
       }
+    }
 
-      final boolean containsRecordFiles = args.containsOption("index.files");
-      if (containsRecordFiles) {
-        LOGGER.info("::Contains index.files::");
-        final String fileNames = args.getOptionValues("index.files").getFirst();
-        List<String> recordList = new ArrayList<>(fileNames.length());
-        for (String fName : fileNames.split(",")) {
-          try (FileInputStream fileInputStream = new FileInputStream(fName)) {
-            final String fileData = new String(fileInputStream.readAllBytes(), StandardCharsets.UTF_8);
-            LOGGER.info("contents: {}", fileData);
-            recordList.add(fileData);
-          }
+    final boolean containsRecordFiles = args.containsOption("index.files");
+    if (containsRecordFiles) {
+      LOGGER.info("::Contains index.files::");
+      final String fileNames = args.getOptionValues("index.files").getFirst();
+      List<String> recordList = new ArrayList<>(fileNames.split(",").length);
+      for (String fName : fileNames.split(",")) {
+        try (FileInputStream fileInputStream = new FileInputStream(fName)) {
+          final String fileData = new String(fileInputStream.readAllBytes(), StandardCharsets.UTF_8);
+          LOGGER.info("contents: {}", fileData);
+          recordList.add(fileData);
         }
-        IndexingProperties indexingProperties = new IndexingProperties(Date.from(Instant.now()), true, null, true, true);
-        LOGGER.info("indexing preview record list");
-        applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PREVIEW)
-                              .index(recordList, indexingProperties);
-        LOGGER.info("indexing publish record list");
-        applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PUBLISH)
-                              .index(recordList, indexingProperties);
       }
+      IndexingProperties indexingProperties = new IndexingProperties(Date.from(Instant.now()), true, null, true, true);
+      LOGGER.info("indexing preview record list");
+      applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PREVIEW)
+                            .index(recordList, indexingProperties);
+      LOGGER.info("indexing publish record list");
+      applicationInitializer.getIndexWrapper().getIndexer(TargetIndexingDatabase.PUBLISH)
+                            .index(recordList, indexingProperties);
     }
 
     LOGGER.info("Finished cleaning database script");
