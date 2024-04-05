@@ -5,8 +5,6 @@ import eu.europeana.metis.creator.utilities.ConfigurationPropertiesHolder;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +25,17 @@ public class ApplicationInitializer implements AutoCloseable {
     mongoClient = initializeApplication(configurationPropertiesHolder);
   }
 
+  public MongoClient getMongoClient() {
+    return mongoClient;
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (mongoClient != null) {
+      mongoClient.close();
+    }
+  }
+
   private MongoClient initializeApplication(ConfigurationPropertiesHolder propertiesHolder)
       throws TrustStoreConfigurationException {
 
@@ -38,31 +47,7 @@ public class ApplicationInitializer implements AutoCloseable {
           propertiesHolder.getTruststorePassword());
     }
 
-    // Initialize the socks proxy.
-    if (propertiesHolder.isSocksProxyEnabled()) {
-      System.setProperty("socksProxyHost", propertiesHolder.getSocksProxyHost());
-      System.setProperty("socksProxyPort", propertiesHolder.getSocksProxyPort());
-      Authenticator.setDefault(new Authenticator() {
-        @Override
-        protected PasswordAuthentication getPasswordAuthentication() {
-          return new PasswordAuthentication(propertiesHolder.getSocksProxyUsername(),
-              propertiesHolder.getSocksProxyPassword().toCharArray());
-        }
-      });
-    }
-
     // Initialize the Mongo connection
     return new MongoClientProvider<>(propertiesHolder.getMongoProperties()).createMongoClient();
-  }
-
-  public MongoClient getMongoClient() {
-    return mongoClient;
-  }
-
-  @Override
-  public void close() throws Exception {
-    if (mongoClient != null) {
-      mongoClient.close();
-    }
   }
 }
