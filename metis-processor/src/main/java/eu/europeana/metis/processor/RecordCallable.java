@@ -16,7 +16,6 @@ public class RecordCallable implements Callable<RDF> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final FullBeanImpl fullBean;
     private final ImageEnhancerUtil imageEnhancerUtil;
-    private final RdfUtil rdfUtil = new RdfUtil();
 
     public RecordCallable(FullBeanImpl fullBean, ImageEnhancerUtil imageEnhancerUtil) {
         this.fullBean = fullBean;
@@ -30,7 +29,7 @@ public class RecordCallable implements Callable<RDF> {
         final long startTime = System.nanoTime();
 
         final RDF rdf = EdmUtils.toRDF(fullBean, true);
-        if (rdfUtil.hasThumbnailsAndValidLicense(rdf)) {
+        if (RdfUtil.hasThumbnailsAndValidLicense(rdf)) {
             LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(), rdf.getProvidedCHOList().get(0).getAbout());
             imageEnhancerUtil.processRecord(rdf);
         } else {
