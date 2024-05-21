@@ -99,7 +99,7 @@ public class ProcessorRunner implements CommandLineRunner {
     LOGGER.info("END");
   }
 
-  private void consume() throws InterruptedException {
+  private void consume() throws Exception {
     DatasetPage datasetPage;
     do {
         datasetPage = datasetPageBlockingQueue.take();
@@ -142,7 +142,7 @@ public class ProcessorRunner implements CommandLineRunner {
   //        }
   //    }
 
-  private void pageProcess(DatasetPage datasetPage) throws InterruptedException {
+  private void pageProcess(DatasetPage datasetPage) throws Exception {
     try {
       List<RDF> rdfs = recordsProcessor.process(datasetPage.getFullBeanList());
       rdfs.clear();
