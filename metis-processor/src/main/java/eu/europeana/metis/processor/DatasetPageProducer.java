@@ -24,7 +24,7 @@ class DatasetPageProducer implements Runnable {
             do {
                 datasetPage = supplier.get();
                 blockingQueue.put(datasetPage);
-                LOGGER.info("QUEUE size {}", blockingQueue.size());
+                LOGGER.debug("QUEUE size {}", blockingQueue.size());
             }while(!datasetPage.getFullBeanList().isEmpty());
         } catch (InterruptedException e) {
             LOGGER.warn("Interrupted while waiting for blocking queue", e);

@@ -44,6 +44,9 @@ public class RecordsProcessor {
       }
     } catch (InterruptedException | ExecutionException e) {
       LOGGER.error("Exception processing the future", e);
+      if (e instanceof InterruptedException) {
+        Thread.currentThread().interrupt();
+      }
       throw e;
     } finally {
       for (Future<RDF> future : futureList) {
