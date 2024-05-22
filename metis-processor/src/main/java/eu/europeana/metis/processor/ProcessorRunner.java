@@ -116,11 +116,10 @@ public class ProcessorRunner implements CommandLineRunner {
     boolean isMoreData = datasetPage.getFullBeanList().isEmpty();
     boolean contains = datasetPageBlockingQueue.contains(datasetPage);
     boolean isRemoved = datasetPageBlockingQueue.remove(datasetPage);
-    LOGGER.info("It was removed: {} {} :: size of page :: {} contains:: {}", isRemoved, pageId, itemsOnPage, contains);
+    LOGGER.debug("It was removed: {} {} :: size of page :: {} contains:: {}", isRemoved, pageId, itemsOnPage, contains);
     datasetPage.getFullBeanList().clear();
     itemsOnPage = datasetPage.getFullBeanList().size();
-    datasetPage = null;
-    LOGGER.info("Items of page freed: {} :: size of page :: {} :: is more data {}", pageId, itemsOnPage, isMoreData);
+    LOGGER.debug("Items of page freed: {} :: size of page :: {} :: is more data {}", pageId, itemsOnPage, isMoreData);
     return isMoreData;
   }
 
