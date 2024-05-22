@@ -38,19 +38,6 @@ public class ApplicationInitializer implements AutoCloseable {
           propertiesHolder.getTruststorePassword());
     }
 
-    // Initialize the socks proxy.
-    if (propertiesHolder.isSocksProxyEnabled()) {
-      System.setProperty("socksProxyHost", propertiesHolder.getSocksProxyHost());
-      System.setProperty("socksProxyPort", propertiesHolder.getSocksProxyPort());
-      Authenticator.setDefault(new Authenticator() {
-        @Override
-        protected PasswordAuthentication getPasswordAuthentication() {
-          return new PasswordAuthentication(propertiesHolder.getSocksProxyUsername(),
-              propertiesHolder.getSocksProxyPassword().toCharArray());
-        }
-      });
-    }
-
     // Initialize the Mongo connection
     return new MongoClientProvider<>(propertiesHolder.getMongoProperties()).createMongoClient();
   }

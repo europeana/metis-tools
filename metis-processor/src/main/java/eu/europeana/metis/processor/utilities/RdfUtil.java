@@ -10,6 +10,7 @@ public class RdfUtil {
 
   public static boolean hasThumbnailsAndValidLicense(RDF rdfRecord) {
     RdfWrapper rdfWrapper = new RdfWrapper(rdfRecord);
+
     boolean hasResourceImage = rdfWrapper.getProxies().stream().anyMatch( p -> p.getType().getType().equals(EdmType.IMAGE));
     boolean validLicense = rdfWrapper.getAggregations().stream().allMatch( a -> isValidLicense(a.getRights().getResource()));
     boolean hasThumbnails = rdfWrapper.hasThumbnails();
