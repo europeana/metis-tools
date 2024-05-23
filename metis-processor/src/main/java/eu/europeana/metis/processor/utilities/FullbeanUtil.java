@@ -22,10 +22,7 @@ import org.slf4j.LoggerFactory;
 public class FullbeanUtil {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-  public FullbeanUtil() {
-  }
-
+  
   private static void checkMatchingWebResourcesAndGenerateHash(String fullBeanAbout,
       Aggregation aggregation, Set<String> urls, Map<String, WebResource> hashCodes) {
     for (final WebResource webResource : aggregation.getWebResources()) {

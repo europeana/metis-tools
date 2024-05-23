@@ -8,18 +8,17 @@ import java.util.Set;
 
 public class RdfUtil {
 
-  public RdfUtil() {
-  }
-
-  public boolean hasThumbnailsAndValidLicense(RDF rdfRecord) {
+  public static boolean hasThumbnailsAndValidLicense(RDF rdfRecord) {
     RdfWrapper rdfWrapper = new RdfWrapper(rdfRecord);
-    boolean hasResourceImage = rdfRecord.getProxyList().stream().anyMatch(p -> p.getType().getType().equals(EdmType.IMAGE));
-    boolean validLicense = rdfRecord.getAggregationList().stream().allMatch(a -> isValidLicense(a.getRights().getResource()));
+
+    boolean hasResourceImage = rdfWrapper.getProxies().stream().anyMatch( p -> p.getType().getType().equals(EdmType.IMAGE));
+    boolean validLicense = rdfWrapper.getAggregations().stream().allMatch( a -> isValidLicense(a.getRights().getResource()));
     boolean hasThumbnails = rdfWrapper.hasThumbnails();
+    rdfWrapper = null;
     return hasThumbnails && hasResourceImage && validLicense;
   }
 
-  private boolean isValidLicense(String rights) {
+  private static boolean isValidLicense(String rights) {
     Set<String> validLicenses = Set.of(
         RightsOption.CC_BY.getUrl(),
         RightsOption.CC_ZERO.getUrl(),

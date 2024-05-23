@@ -9,6 +9,36 @@ public class DatasetPage {
     private final int page;
     private final List<FullBeanImpl> fullBeanList;
 
+    @Override
+    public String toString() {
+        return "DatasetPage{" +
+            "datasetId='" + datasetId + '\'' +
+            ", page=" + page +
+            ", fullBeanList=" + fullBeanList +
+            '}';
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DatasetPage)) {
+            return false;
+        }
+
+        DatasetPage that = (DatasetPage) o;
+        return page == that.page && datasetId.equals(that.datasetId) && fullBeanList.equals(that.fullBeanList);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = datasetId.hashCode();
+        result = 31 * result + page;
+        result = 31 * result + fullBeanList.hashCode();
+        return result;
+    }
+
     public DatasetPage(String datasetId, int page, List<FullBeanImpl> fullBeanList) {
         this.datasetId = datasetId;
         this.page = page;
