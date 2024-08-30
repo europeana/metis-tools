@@ -30,13 +30,13 @@ public class Historical {
     private String country;
 
     @Property("3D")
-    private int threeD;
+    private Integer threeD;
 
     @Property("highQuality")
-    private int highQuality;
+    private Integer highQuality;
 
     @Property("totalRecords")
-    private int totalRecords;
+    private Integer totalRecords;
 
     @Property("timestamp")
     private LocalDateTime timestamp;
@@ -44,7 +44,7 @@ public class Historical {
     //Empty constructor for when we perform queries
     public Historical(){}
 
-    public Historical(String country, int threeD, int highQuality, int totalRecords, LocalDateTime timestamp) {
+    public Historical(String country, Integer threeD, Integer highQuality, Integer totalRecords, LocalDateTime timestamp) {
         this.country = country;
         this.threeD = threeD;
         this.highQuality = highQuality;

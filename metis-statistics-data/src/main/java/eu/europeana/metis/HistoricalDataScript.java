@@ -20,14 +20,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class ScriptsRunner implements CommandLineRunner {
+public class HistoricalDataScript implements CommandLineRunner {
 
     private static final String COMMA_DELIMITER = ",";
 
     private final ConfigurationPropertiesHolder propertiesHolder;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptsRunner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HistoricalDataScript.class);
 
-    public ScriptsRunner(ConfigurationPropertiesHolder propertiesHolder) {
+    public HistoricalDataScript(ConfigurationPropertiesHolder propertiesHolder) {
         this.propertiesHolder = propertiesHolder;
     }
 
@@ -46,8 +46,6 @@ public class ScriptsRunner implements CommandLineRunner {
                 List<List<String>> fileContent = readCsvFile(file.getAbsolutePath());
                 writeHistoricalData(fileContent, mongoSDDao);
             }
-
-
 
         }
 
@@ -72,13 +70,14 @@ public class ScriptsRunner implements CommandLineRunner {
 
     private static void writeHistoricalData(List<List<String>> targetData, MongoSDDao mongoSDDao){
         final List<Historical> results = new ArrayList<>();
-        //TODO: GET TIMESTAMP
+        List<String> firstRow = targetData.getFirst();
+        LocalDateTime calculationDate = LocalDateTime.parse(firstRow.getFirst());
         LOGGER.info("Started writing data into database");
         for(int i = 1; i < targetData.size(); i++){
             List<String> row = targetData.get(i);
             LOGGER.info("Started writing data of country {} into database", row.get(0));
-            Historical data = new Historical(row.get(0), Integer.parseInt(row.get(3)),
-                    Integer.parseInt(row.get(2)), Integer.parseInt(row.get(1)), LocalDateTime.MIN);
+            Historical data = new Historical(row.get(0), null,
+                    Integer.parseInt(row.get(2)), Integer.parseInt(row.get(1)), calculationDate);
             results.add(data);
         }
 

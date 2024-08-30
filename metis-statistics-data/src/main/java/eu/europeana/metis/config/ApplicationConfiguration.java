@@ -1,7 +1,7 @@
 package eu.europeana.metis.config;
 
 import eu.europeana.metis.utils.CustomTruststoreAppender;
-import eu.europeana.metis.ScriptsRunner;
+import eu.europeana.metis.HistoricalDataScript;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +49,6 @@ public class ApplicationConfiguration {
 
     @Bean
     public CommandLineRunner commandLineRunner() {
-        return new ScriptsRunner(propertiesHolder);
+        return new HistoricalDataScript(propertiesHolder);
     }
 }
