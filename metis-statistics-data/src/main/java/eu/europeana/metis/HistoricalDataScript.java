@@ -1,6 +1,7 @@
 package eu.europeana.metis;
 
 import com.mongodb.client.MongoClient;
+import eu.europeana.metis.utils.Country;
 import eu.europeana.metis.model.Historical;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.config.MongoSDDao;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +25,8 @@ import java.util.Objects;
 public class HistoricalDataScript implements CommandLineRunner {
 
     private static final String COMMA_DELIMITER = ",";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 
     private final ConfigurationPropertiesHolder propertiesHolder;
     private static final Logger LOGGER = LoggerFactory.getLogger(HistoricalDataScript.class);
@@ -34,7 +38,7 @@ public class HistoricalDataScript implements CommandLineRunner {
     @Override
     public void run(String... args) throws DataAccessConfigException {
 
-        File folder = new File("src/main/resources/historicalData");
+        File folder = new File("metis-statistics-data/src/main/resources/historicalData");
         File[] dataFiles = Objects.requireNonNull(folder.listFiles());
 
         final MongoClientProvider<DataAccessConfigException> mongoSDClientProvider = new MongoClientProvider<>(propertiesHolder.getMongoSDProperties());
@@ -71,12 +75,12 @@ public class HistoricalDataScript implements CommandLineRunner {
     private static void writeHistoricalData(List<List<String>> targetData, MongoSDDao mongoSDDao){
         final List<Historical> results = new ArrayList<>();
         List<String> firstRow = targetData.getFirst();
-        LocalDateTime calculationDate = LocalDateTime.parse(firstRow.getFirst());
+        LocalDateTime calculationDate = LocalDateTime.parse(firstRow.getFirst(), FORMATTER);
         LOGGER.info("Started writing data into database");
         for(int i = 1; i < targetData.size(); i++){
             List<String> row = targetData.get(i);
             LOGGER.info("Started writing data of country {} into database", row.get(0));
-            Historical data = new Historical(row.get(0), null,
+            Historical data = new Historical(Country.fromCountryNameToIsoCode(row.get(0)).getIsoCode(), null,
                     Integer.parseInt(row.get(2)), Integer.parseInt(row.get(1)), calculationDate);
             results.add(data);
         }
