@@ -15,8 +15,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.metis-common-utils>13-SNAPSHOT</version.metis-common-utils>
-        <version.metis-common-mongo>13-SNAPSHOT</version.metis-common-mongo>
+        <version.metis-framework>13-SNAPSHOT</version.metis-framework>
         <version.spring.boot>3.2.3</version.spring.boot>
         <version.corelib>2.16.10-SNAPSHOT</version.corelib>
         <version.metis-schema>10-SNAPSHOT</version.metis-schema>
@@ -59,12 +58,12 @@
         <dependency>
             <groupId>eu.europeana.metis</groupId>
             <artifactId>metis-common-utils</artifactId>
-            <version>${version.metis-common-utils}</version>
+            <version>${version.metis-framework}</version>
         </dependency>
         <dependency>
             <groupId>eu.europeana.metis</groupId>
             <artifactId>metis-common-mongo</artifactId>
-            <version>${version.metis-common-mongo}</version>
+            <version>${version.metis-framework}</version>
         </dependency>
     </dependencies>
 
