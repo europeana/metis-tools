@@ -1,0 +1,19 @@
+#Spring
+logging.config=metis-statistics-data/src/main/resources/log4j2.xml
+spring.autoconfigure.exclude=\
+  org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration, \
+  org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+
+#Mongo statistics dashboard
+mongo.sd.hosts=
+mongo.sd.port=
+mongo.sd.authentication.db=
+mongo.sd.username=
+mongo.sd.password=
+mongo.sd.enable.ssl=
+mongo.sd.db=metis-statistics-dashboard
+mongo.sd.application.name=metis-statistics-data-local
+
+#Truststore
+truststore.path=
+truststore.password=

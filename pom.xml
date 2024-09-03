@@ -8,6 +8,7 @@
 	<packaging>pom</packaging>
     <modules>
         <module>metis-performance-metric</module>
+        <module>metis-statistics-data</module>
     </modules>
 </project>
 
