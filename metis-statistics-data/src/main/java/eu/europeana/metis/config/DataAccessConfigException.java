@@ -6,7 +6,4 @@ public class DataAccessConfigException extends Exception {
     super(message);
   }
 
-  public DataAccessConfigException(String message, Throwable cause) {
-    super(message, cause);
-  }
 }

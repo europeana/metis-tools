@@ -22,64 +22,64 @@ import static eu.europeana.metis.network.ExternalRequestUtil.retryableExternalRe
  */
 public class MongoSDDao {
 
-  private final Datastore datastore;
+    private final Datastore datastore;
 
-  /**
-   * Constructor.
-   *
-   * @param mongoClient       The mongo client.
-   * @param mongoDatabaseName The name of the database in the Mongo.
-   * @param createIndexes     The flag that initiates the database indexes
-   */
-  public MongoSDDao(MongoClient mongoClient, String mongoDatabaseName, boolean createIndexes) {
-    final MapperOptions mapperOptions = MapperOptions.builder()
-        .collectionNaming(NamingStrategy.identity()).build();
-    this.datastore = Morphia.createDatastore(mongoClient, mongoDatabaseName, mapperOptions);
-    this.datastore.getMapper().map(Historical.class);
-    if(createIndexes){
-      datastore.ensureIndexes();
+    /**
+     * Constructor.
+     *
+     * @param mongoClient       The mongo client.
+     * @param mongoDatabaseName The name of the database in the Mongo.
+     * @param createIndexes     The flag that initiates the database indexes
+     */
+    public MongoSDDao(MongoClient mongoClient, String mongoDatabaseName, boolean createIndexes) {
+        final MapperOptions mapperOptions = MapperOptions.builder()
+                .collectionNaming(NamingStrategy.identity()).build();
+        this.datastore = Morphia.createDatastore(mongoClient, mongoDatabaseName, mapperOptions);
+        this.datastore.getMapper().map(Historical.class);
+        if (createIndexes) {
+            datastore.ensureIndexes();
+        }
     }
-  }
 
 
-  /**
-   * Saves a list of historical data to the database.
-   *
-   * @param records the list of historical records.
-   */
-  public void saveHistoricalRecord(List<Historical> records) {
-    records.forEach(record -> record.setId(new ObjectId()));
-    retryableExternalRequestForNetworkExceptions(() -> datastore.save(records));
+    /**
+     * Saves a list of historical data to the database.
+     *
+     * @param records the list of historical records.
+     */
+    public void saveHistoricalRecord(List<Historical> records) {
+        records.forEach(record -> record.setId(new ObjectId()));
+        retryableExternalRequestForNetworkExceptions(() -> datastore.save(records));
 
-  }
+    }
 
-  /**
-   * Returns all existing values of countries from Historical data collection
-   *
-   * @return All existing values of countries from Historical data collection
-   */
-  public List<String> getAllCountryValuesHistoricalCollection() {
-    ArrayList<String> countries = new ArrayList<>();
-    DistinctIterable<String> docs = retryableExternalRequestForNetworkExceptions(() -> datastore
-            .getCollection(Historical.class).distinct("country", String.class));
-    docs.forEach(countries::add);
-    return countries;
-  }
+    /**
+     * Returns all existing values of countries from Historical data collection
+     *
+     * @return All existing values of countries from Historical data collection
+     */
+    public List<String> getAllCountryValuesHistoricalCollection() {
+        ArrayList<String> countries = new ArrayList<>();
+        DistinctIterable<String> docs = retryableExternalRequestForNetworkExceptions(() -> datastore
+                .getCollection(Historical.class).distinct("country", String.class));
+        docs.forEach(countries::add);
+        return countries;
+    }
 
 
-  /**
-   * Returns all historical data of a given country
-   *
-   * @param country - The country to get the historical data from
-   * @return The historical data of a given country
-   */
-  public List<Historical> getAllHistoricalOfCountry(String country){
-    ArrayList<Historical> queryResult = new ArrayList<>();
-    Filter filter = Filters.eq("country", country);
-    Query<Historical> result = retryableExternalRequestForNetworkExceptions(() ->
-            datastore.find(Historical.class).filter(filter));
-    result.forEach(queryResult::add);
-    return queryResult;
-  }
+    /**
+     * Returns all historical data of a given country
+     *
+     * @param country - The country to get the historical data from
+     * @return The historical data of a given country
+     */
+    public List<Historical> getAllHistoricalOfCountry(String country) {
+        ArrayList<Historical> queryResult = new ArrayList<>();
+        Filter filter = Filters.eq("country", country);
+        Query<Historical> result = retryableExternalRequestForNetworkExceptions(() ->
+                datastore.find(Historical.class).filter(filter));
+        result.forEach(queryResult::add);
+        return queryResult;
+    }
 
 }

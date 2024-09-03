@@ -42,7 +42,8 @@ public class Historical {
     private LocalDateTime timestamp;
 
     //Empty constructor for when we perform queries
-    public Historical(){}
+    public Historical() {
+    }
 
     public Historical(String country, Integer threeD, Integer highQuality, Integer totalRecords, LocalDateTime timestamp) {
         this.country = country;
