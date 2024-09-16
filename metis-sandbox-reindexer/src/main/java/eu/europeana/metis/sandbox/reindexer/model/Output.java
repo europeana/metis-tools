@@ -22,7 +22,7 @@ public class Output {
   /**
    * The constant log.
    */
-  protected static final Logger LOGGER = LogManager.getLogger(Output.class);
+  private static final Logger LOGGER = LogManager.getLogger(Output.class);
   /**
    * The Client.
    */
