@@ -81,7 +81,7 @@ public class Input {
   public SolrDocumentList getPage() throws SolrServerException, IOException, InterruptedException {
     if (done) {
       // return an empty document list
-      return new SolrDocumentList();
+      return null;
     } else {
       solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
       QueryResponse queryResponse;
