@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  metis-sandbox-solr:
+    image: solr:7.7.3
+    container_name: solr-1
+    restart: always
+    ports:
+      - "9091:8983"
+    environment:
+      - ZK_HOST=zoo-1:2181
+    depends_on:
+      - zoo-1
+    networks:
+      - metis-sandbox-solr
+
+  metis-sandbox-zookeeper:
+    image: zookeeper:3.7.2
+    container_name: zoo-1
+    hostname: zoo-1
+    restart: always
+    ports:
+      - "2282:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
+    volumes:
+      - ./zoo1data:/data
+    networks:
+      - metis-sandbox-solr
+
+networks:
+  metis-sandbox-solr:
