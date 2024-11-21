@@ -68,7 +68,7 @@ public class MetisCoreMongoDao {
     if (StringUtils.isNotEmpty(propertiesHolder.truststorePath) && StringUtils
         .isNotEmpty(propertiesHolder.truststorePassword)) {
       LOGGER.info("Append default truststore with custom truststore");
-      CustomTruststoreAppender.appendCustomTrustoreToDefault(propertiesHolder.truststorePath,
+      CustomTruststoreAppender.appendCustomTruststoreToDefault(propertiesHolder.truststorePath,
           propertiesHolder.truststorePassword);
     }
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.metisCoreMongoHosts,

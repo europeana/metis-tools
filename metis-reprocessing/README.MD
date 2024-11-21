@@ -46,7 +46,7 @@ Example command:
 
 **Modifying implementation for a future reprocess operation**
 The changes on the implementation, per reprocessing operation should be limited in the following files:  
-- `PropertysHolderExtension` For the extra required properties from the properties file
+- `PropertiesHolderExtension` For the extra required properties from the properties file
 - `DefaultConfiguration` For any extra fields that need to be initialized and the initialization of the required 
 functional interfaces. The processRDF method is used in turn in the ProcessUtilities and it's functionality can be modified from this file.
 - `ProcessUtilities` That contains all functionality for processing records and datasets

@@ -9,20 +9,33 @@ import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.filters.Filters;
 import eu.europeana.corelib.definitions.model.RightsOption;
+import eu.europeana.corelib.edm.model.metainfo.AudioMetaInfoImpl;
+import eu.europeana.corelib.edm.model.metainfo.ImageMetaInfoImpl;
+import eu.europeana.corelib.edm.model.metainfo.TextMetaInfoImpl;
+import eu.europeana.corelib.edm.model.metainfo.ThreeDMetaInfoImpl;
+import eu.europeana.corelib.edm.model.metainfo.VideoMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.corelib.solr.derived.AttributionSnippet;
+import eu.europeana.corelib.solr.entity.AddressImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.BasicProxyImpl;
+import eu.europeana.corelib.solr.entity.ChangeLogImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.ConceptSchemeImpl;
+import eu.europeana.corelib.solr.entity.DatasetImpl;
 import eu.europeana.corelib.solr.entity.EuropeanaAggregationImpl;
 import eu.europeana.corelib.solr.entity.EventImpl;
+import eu.europeana.corelib.solr.entity.LicenseImpl;
+import eu.europeana.corelib.solr.entity.OrganizationImpl;
 import eu.europeana.corelib.solr.entity.PhysicalThingImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
+import eu.europeana.corelib.solr.entity.QualityAnnotationImpl;
+import eu.europeana.corelib.solr.entity.ServiceImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.indexing.utils.RdfWrapper;
@@ -55,8 +68,6 @@ public class MongoSourceMongoDao {
 
   private final MongoInitializer sourceMongoInitializer;
   private final Datastore mongoSourceDatastore;
-  // TODO: 15/05/2023 Temporary Datastore for translations
-  private final Datastore mongoSourceTranslationsDatastore;
   private final PropertiesHolder propertiesHolder;
 
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
@@ -65,15 +76,6 @@ public class MongoSourceMongoDao {
     sourceMongoInitializer = prepareMongoSourceConfiguration();
     mongoSourceDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
         propertiesHolder.sourceMongoDb);
-    mongoSourceTranslationsDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
-            propertiesHolder.sourceTranslationsMongoDb);
-  }
-
-  // TODO: 15/05/2023 Temporary method for translations.
-  public FullBeanImpl getTranslationsRecord(String about){
-    Query<FullBeanImpl> query = mongoSourceTranslationsDatastore.find(FullBeanImpl.class);
-    query.filter(Filters.eq(ABOUT, about));
-    return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::first);
   }
 
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
@@ -164,21 +166,34 @@ public class MongoSourceMongoDao {
       String databaseName) {
     final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName);
     final Mapper mapper = datastore.getMapper();
-    mapper.map(FullBeanImpl.class);
-    mapper.map(ProvidedCHOImpl.class);
-    mapper.map(AgentImpl.class);
-    mapper.map(AggregationImpl.class);
-    mapper.map(ConceptImpl.class);
-    mapper.map(ProxyImpl.class);
-    mapper.map(PlaceImpl.class);
-    mapper.map(TimespanImpl.class);
-    mapper.map(WebResourceImpl.class);
-    mapper.map(EuropeanaAggregationImpl.class);
-    mapper.map(EventImpl.class);
-    mapper.map(PhysicalThingImpl.class);
-    mapper.map(ConceptSchemeImpl.class);
-    mapper.map(BasicProxyImpl.class);
-    mapper.map(WebResourceMetaInfoImpl.class);
+    mapper.getEntityModel(FullBeanImpl.class);
+    mapper.getEntityModel(ProvidedCHOImpl.class);
+    mapper.getEntityModel(AgentImpl.class);
+    mapper.getEntityModel(AddressImpl.class);
+    mapper.getEntityModel(AggregationImpl.class);
+    mapper.getEntityModel(OrganizationImpl.class);
+    mapper.getEntityModel(ConceptImpl.class);
+    mapper.getEntityModel(ProxyImpl.class);
+    mapper.getEntityModel(PlaceImpl.class);
+    mapper.getEntityModel(TimespanImpl.class);
+    mapper.getEntityModel(WebResourceImpl.class);
+    mapper.getEntityModel(EuropeanaAggregationImpl.class);
+    mapper.getEntityModel(ChangeLogImpl.class);
+    mapper.getEntityModel(EventImpl.class);
+    mapper.getEntityModel(PhysicalThingImpl.class);
+    mapper.getEntityModel(ConceptSchemeImpl.class);
+    mapper.getEntityModel(BasicProxyImpl.class);
+    mapper.getEntityModel(WebResourceMetaInfoImpl.class);
+    mapper.getEntityModel(LicenseImpl.class);
+    mapper.getEntityModel(ServiceImpl.class);
+    mapper.getEntityModel(QualityAnnotationImpl.class);
+    mapper.getEntityModel(AttributionSnippet.class);
+    mapper.getEntityModel(DatasetImpl.class);
+    mapper.getEntityModel(ImageMetaInfoImpl.class);
+    mapper.getEntityModel(AudioMetaInfoImpl.class);
+    mapper.getEntityModel(TextMetaInfoImpl.class);
+    mapper.getEntityModel(VideoMetaInfoImpl.class);
+    mapper.getEntityModel(ThreeDMetaInfoImpl.class);
     return datastore;
   }
 

@@ -15,12 +15,12 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${version.maven.compiler.plugin}</version>
                 <configuration>
-                    <release>11</release>
+                    <release>21</release>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.7.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -46,13 +46,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-        <version.metis-schema>8-SNAPSHOT</version.metis-schema>
-        <version.metis>11-SNAPSHOT</version.metis>
-        <version.corelib>2.16.3-SNAPSHOT</version.corelib>
+        <version.maven.compiler.plugin>3.13.0</version.maven.compiler.plugin>
+        <version.metis-schema>11-SNAPSHOT</version.metis-schema>
+        <version.metis>14-SNAPSHOT</version.metis>
+        <version.metis-core>14-SNAPSHOT</version.metis-core>
+        <version.metis-normalization>14-SNAPSHOT</version.metis-normalization>
+        <version.corelib>2.16.10-SNAPSHOT</version.corelib>
         <!-- These two versions are interdependent. -->
-        <version.slf4j>1.7.30</version.slf4j>
-        <version.log4j>2.17.2</version.log4j>
+        <version.slf4j>2.0.12</version.slf4j>
+        <version.log4j>2.23.0</version.log4j>
     </properties>
 
     <dependencies>
@@ -64,7 +66,7 @@
         <dependency>
             <artifactId>metis-core-common</artifactId>
             <groupId>eu.europeana.metis</groupId>
-            <version>${version.metis}</version>
+            <version>${version.metis-core}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -79,13 +81,13 @@
         <dependency>
             <groupId>eu.europeana.metis</groupId>
             <artifactId>metis-normalization</artifactId>
-            <version>${version.metis}</version>
+            <version>${version.metis-normalization}</version>
         </dependency>
 
         <dependency>
             <artifactId>metis-core-service</artifactId>
             <groupId>eu.europeana.metis</groupId>
-            <version>${version.metis}</version>
+            <version>${version.metis-core}</version>
             <exclusions>
                 <!--Exclude those because of eu.europeana.api:entity-api-client:jar:0.0.1-SNAPSHOT transitive of metis-enrichment-client-->
                 <exclusion>
