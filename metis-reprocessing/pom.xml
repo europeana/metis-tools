@@ -48,8 +48,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.maven.compiler.plugin>3.13.0</version.maven.compiler.plugin>
         <version.metis-schema>11-SNAPSHOT</version.metis-schema>
-        <version.metis>14-SNAPSHOT</version.metis>
-        <version.metis-core>14-SNAPSHOT</version.metis-core>
+        <version.metis>15-SNAPSHOT</version.metis>
+        <version.metis-core>15-SNAPSHOT</version.metis-core>
         <version.metis-normalization>14-SNAPSHOT</version.metis-normalization>
         <version.corelib>2.16.10-SNAPSHOT</version.corelib>
         <!-- These two versions are interdependent. -->
