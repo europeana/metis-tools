@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -245,9 +246,14 @@ public class ProcessDataset implements Callable<Void> {
    * @return the list of records
    */
   private List<FullBeanImpl> getFailedFullBeans(List<FailedRecord> failedRecords) {
-    final List<String> failedRecordsUrls = failedRecords.stream().map(FailedRecord::getFailedUrl)
-                                                        .collect(Collectors.toList());
-    return configuration.getMongoSourceMongoDao().getRecordsFromList(failedRecordsUrls);
+    final List<String> failedRecordsUrls = failedRecords.stream()
+                                                        .map(FailedRecord::getFailedUrl)
+                                                        .toList();
+    return configuration.getMongoSourceMongoDao()
+                        .getRecordsFromList(failedRecordsUrls)
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .toList();
   }
 
   private List<FailedRecord> getFailedRecords(int nextPage) {
