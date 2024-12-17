@@ -46,7 +46,7 @@ public class RecordCallable implements Callable<RDF> {
     if (RdfUtil.hasThumbnailsAndValidLicense(rdf)) {
       LOGGER.info("Thread: {} - Processing RDF: {}", Thread.currentThread().getName(),
           rdf.getProvidedCHOList().getFirst().getAbout());
-
+          indexRdf(rdf);
     } else {
       LOGGER.debug("Thread: {} - Skipping RDF: {}", Thread.currentThread().getName(),
           rdf.getProvidedCHOList().getFirst().getAbout());
