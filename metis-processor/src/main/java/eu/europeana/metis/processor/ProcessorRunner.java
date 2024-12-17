@@ -15,7 +15,6 @@ import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.properties.general.ApplicationProperties;
 import eu.europeana.metis.processor.utilities.DatasetPage;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
-import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
 import eu.europeana.metis.schema.jibx.EdmType;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.io.ByteArrayOutputStream;
@@ -66,15 +65,14 @@ public class ProcessorRunner implements CommandLineRunner {
 
   public ProcessorRunner(ApplicationProperties applicationProperties,
       MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao,
-      MongoSourceDao mongoSourceDao, RedissonClient redissonClient, IndexerPool indexerPool,
-      ImageEnhancerUtil imageEnhancerUtil) {
+      MongoSourceDao mongoSourceDao, RedissonClient redissonClient, IndexerPool indexerPool) {
     this.applicationProperties = applicationProperties;
     this.mongoProcessorDao = mongoProcessorDao;
     this.mongoCoreDao = mongoCoreDao;
     this.mongoSourceDao = mongoSourceDao;
     this.redissonClient = redissonClient;
     this.indexerPool = indexerPool;
-    this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads(), imageEnhancerUtil);
+    this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads());
     this.datasetPageBlockingQueue = new ArrayBlockingQueue<>(2);
     this.datasetPageProducer = new DatasetPageProducer(datasetPageBlockingQueue, this::getNextPageLockWrapped);
   }

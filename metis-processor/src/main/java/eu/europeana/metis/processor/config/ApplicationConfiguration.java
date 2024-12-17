@@ -1,28 +1,15 @@
 package eu.europeana.metis.processor.config;
 
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+
 import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
-import eu.europeana.metis.image.enhancement.client.ImageEnhancerClient;
-import eu.europeana.metis.image.enhancement.client.ImageEnhancerScript;
-import eu.europeana.metis.image.enhancement.config.ImageEnhancerClientConfig;
-import eu.europeana.metis.image.enhancement.domain.worker.ImageEnhancerWorker;
 import eu.europeana.metis.processor.ProcessorRunner;
 import eu.europeana.metis.processor.dao.MongoCoreDao;
 import eu.europeana.metis.processor.dao.MongoProcessorDao;
 import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.dao.MongoTargetDao;
-import eu.europeana.metis.processor.properties.general.AmazonS3Properties;
 import eu.europeana.metis.processor.properties.general.ApplicationProperties;
-import eu.europeana.metis.processor.properties.general.IbmS3Properties;
-import eu.europeana.metis.processor.properties.general.ImageEnhancerClientProperties;
 import eu.europeana.metis.processor.properties.general.RedisProperties;
 import eu.europeana.metis.processor.properties.general.SolrZookeeperTargetProperties;
 import eu.europeana.metis.processor.properties.general.TruststoreProperties;
@@ -31,15 +18,11 @@ import eu.europeana.metis.processor.properties.mongo.MongoProcessorProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoSourceProperties;
 import eu.europeana.metis.processor.properties.mongo.MongoTargetProperties;
 import eu.europeana.metis.processor.utilities.FileCsvImageReporter;
-import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
-import eu.europeana.metis.processor.utilities.S3Client;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PreDestroy;
 import org.apache.commons.lang3.StringUtils;
@@ -148,64 +131,12 @@ public class ApplicationConfiguration {
     return Redisson.create(config);
   }
 
-  @Bean(name = "amazonS3")
-  public AmazonS3 getAmazonS3(AmazonS3Properties s3Properties) {
-
-    AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(
-        new BasicAWSCredentials(s3Properties.getS3AccessKey(), s3Properties.getS3SecretKey()));
-    AwsClientBuilder.EndpointConfiguration endpointConfiguration =
-        new AwsClientBuilder.EndpointConfiguration(s3Properties.getS3Endpoint(), Regions.EU_CENTRAL_1.getName());
-
-    return AmazonS3ClientBuilder.standard()
-                                .withCredentials(credentialsProvider)
-                                .withEndpointConfiguration(endpointConfiguration)
-                                .build();
-  }
-
-  @Bean(name = "ibmAmazonS3")
-  public AmazonS3 getIbmAmazonS3(IbmS3Properties ibmS3Properties) {
-
-    AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(
-        new BasicAWSCredentials(ibmS3Properties.getS3AccessKey(), ibmS3Properties.getS3SecretKey()));
-    AwsClientBuilder.EndpointConfiguration endpointConfiguration =
-        new AwsClientBuilder.EndpointConfiguration(ibmS3Properties.getS3Endpoint(), Regions.DEFAULT_REGION.getName());
-
-    return AmazonS3ClientBuilder.standard()
-                                .withCredentials(credentialsProvider)
-                                .withEndpointConfiguration(endpointConfiguration)
-                                .build();
-  }
-
-  @Bean
-  public S3Client getS3Client(AmazonS3 ibmAmazonS3, IbmS3Properties ibmS3Properties, AmazonS3 amazonS3,
-      AmazonS3Properties amazons3Properties) {
-    return new S3Client(ibmAmazonS3, ibmS3Properties.getS3BucketName(), amazonS3, amazons3Properties.getS3BucketName());
-  }
-
-  @Bean
-  public ImageEnhancerClient getImageEnhancerClient(ImageEnhancerClientProperties imageEnhancerClientProperties) {
-    ImageEnhancerClientConfig enhancerClientConfig = new ImageEnhancerClientConfig(
-        imageEnhancerClientProperties.getImageEnhancerEndpoint(), imageEnhancerClientProperties.getImageEnhancerConnectTimeout(),
-        imageEnhancerClientProperties.getImageEnhancerReadTimeout());
-    return new ImageEnhancerClient(enhancerClientConfig);
-  }
-
-  @Bean
-  public ImageEnhancerUtil getImageEnhancerUtil(S3Client s3Client,
-      ImageEnhancerClientProperties imageEnhancerClientProperties,
-      ApplicationProperties applicationProperties) throws IOException {
-    fileCsvImageReporter = new FileCsvImageReporter();
-    ImageEnhancerWorker imageEnhancerWorker = new ImageEnhancerWorker(
-        new ImageEnhancerScript(imageEnhancerClientProperties.getImageEnhancerScriptPath()));
-    return new ImageEnhancerUtil(s3Client, imageEnhancerWorker, fileCsvImageReporter, applicationProperties.getMode());
-  }
-
   @Bean
   public CommandLineRunner commandLineRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao,
       MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
-      RedissonClient redissonClient, IndexerPool indexerPool, ImageEnhancerUtil imageEnhancerUtil) {
+      RedissonClient redissonClient, IndexerPool indexerPool) {
     return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient,
-        indexerPool, imageEnhancerUtil);
+        indexerPool);
   }
 
   /**
@@ -230,8 +161,7 @@ public class ApplicationConfiguration {
     // Load the trust store file.
     if (StringUtils.isNotEmpty(propertiesHolder.getTruststorePath()) && StringUtils
         .isNotEmpty(propertiesHolder.getTruststorePassword())) {
-      CustomTruststoreAppender
-          .appendCustomTrustoreToDefault(propertiesHolder.getTruststorePath(),
+      CustomTruststoreAppender.appendCustomTruststoreToDefault(propertiesHolder.getTruststorePath(),
               propertiesHolder.getTruststorePassword());
       LOGGER.info("Custom truststore appended to default truststore");
     }
