@@ -135,8 +135,8 @@ public class ApplicationConfiguration {
   public CommandLineRunner commandLineRunner(ApplicationProperties applicationProperties, MongoProcessorDao mongoProcessorDao,
       MongoCoreDao mongoCoreDao, MongoSourceDao mongoSourceDao,
       RedissonClient redissonClient, IndexerPool indexerPool) {
-    return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao, mongoSourceDao, redissonClient,
-        indexerPool);
+    return new ProcessorRunner(applicationProperties, mongoProcessorDao, mongoCoreDao,
+        mongoSourceDao, redissonClient, indexerPool);
   }
 
   /**
@@ -162,7 +162,7 @@ public class ApplicationConfiguration {
     if (StringUtils.isNotEmpty(propertiesHolder.getTruststorePath()) && StringUtils
         .isNotEmpty(propertiesHolder.getTruststorePassword())) {
       CustomTruststoreAppender.appendCustomTruststoreToDefault(propertiesHolder.getTruststorePath(),
-              propertiesHolder.getTruststorePassword());
+          propertiesHolder.getTruststorePassword());
       LOGGER.info("Custom truststore appended to default truststore");
     }
   }

@@ -3,11 +3,7 @@ package eu.europeana.metis.processor;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toMap;
 
-import com.mongodb.MongoWriteException;
 import eu.europeana.indexing.IndexerPool;
-import eu.europeana.indexing.IndexingProperties;
-import eu.europeana.indexing.exception.RecordRelatedIndexingException;
-import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.processor.dao.DatasetStatus;
 import eu.europeana.metis.processor.dao.MongoCoreDao;
 import eu.europeana.metis.processor.dao.MongoProcessorDao;
@@ -15,16 +11,12 @@ import eu.europeana.metis.processor.dao.MongoSourceDao;
 import eu.europeana.metis.processor.properties.general.ApplicationProperties;
 import eu.europeana.metis.processor.utilities.DatasetPage;
 import eu.europeana.metis.processor.utilities.DatasetPage.DatasetPageBuilder;
-import eu.europeana.metis.schema.jibx.EdmType;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,23 +37,15 @@ public class ProcessorRunner implements CommandLineRunner {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final String DATASET_STATUS = "datasetStatus";
-  private static final Map<Class<?>, String> retryExceptions;
-
-  static {
-    retryExceptions = new HashMap<>(ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
-    retryExceptions.put(MongoWriteException.class, "E11000 duplicate key error collection");
-  }
 
   private final MongoProcessorDao mongoProcessorDao;
   private final MongoCoreDao mongoCoreDao;
   private final MongoSourceDao mongoSourceDao;
   private final RedissonClient redissonClient;
   private final ApplicationProperties applicationProperties;
-  private final IndexerPool indexerPool;
   private final RecordsProcessor recordsProcessor;
   private final DatasetPageProducer datasetPageProducer;
   private final BlockingQueue<DatasetPage> datasetPageBlockingQueue;
-
 
   public ProcessorRunner(ApplicationProperties applicationProperties,
       MongoProcessorDao mongoProcessorDao, MongoCoreDao mongoCoreDao,
@@ -71,8 +55,7 @@ public class ProcessorRunner implements CommandLineRunner {
     this.mongoCoreDao = mongoCoreDao;
     this.mongoSourceDao = mongoSourceDao;
     this.redissonClient = redissonClient;
-    this.indexerPool = indexerPool;
-    this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads());
+    this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads(), indexerPool);
     this.datasetPageBlockingQueue = new ArrayBlockingQueue<>(2);
     this.datasetPageProducer = new DatasetPageProducer(datasetPageBlockingQueue, this::getNextPageLockWrapped);
   }
@@ -100,11 +83,11 @@ public class ProcessorRunner implements CommandLineRunner {
   private void consume() throws Exception {
     DatasetPage datasetPage;
     do {
-        datasetPage = datasetPageBlockingQueue.take();
-        LOGGER.info("BlockingQueue size: {}", datasetPageBlockingQueue.size());
-        LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
-        pageProcess(datasetPage);
-        updateDatasetStatusLockWrapped(datasetPage);
+      datasetPage = datasetPageBlockingQueue.take();
+      LOGGER.info("BlockingQueue size: {}", datasetPageBlockingQueue.size());
+      LOGGER.info("Processing dataset {} - page {}", datasetPage.getDatasetId(), datasetPage.getPage());
+      pageProcess(datasetPage);
+      updateDatasetStatusLockWrapped(datasetPage);
     } while (!isThereMoreDataAndCleanUp(datasetPage));
   }
 
@@ -152,29 +135,6 @@ public class ProcessorRunner implements CommandLineRunner {
       LOGGER.error("{} - Could not process or index(RuntimeException) page: {}", datasetPage.getDatasetId(),
           datasetPage.getPage(), e);
       exceptionStacktraceToString(e);
-    }
-  }
-
-  private void indexRdfs(List<RDF> rdfs) throws RecordRelatedIndexingException {
-    //Timestamps should be preserved, Redirects calculation disabled
-    final Date recordDate = null;
-    final List<String> datasetIdsForRedirection = null;
-    final boolean performRedirects = false;
-    final boolean tierRecalculation = false;
-    final boolean preserveTimestamps = true;
-    final Set<EdmType> typesEnabledForTierCalculation = EnumSet.of(EdmType._3_D);
-    final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
-        datasetIdsForRedirection, performRedirects, tierRecalculation, typesEnabledForTierCalculation);
-
-    for (RDF rdf : rdfs) {
-      try {
-        ExternalRequestUtil.retryableExternalRequest(() -> {
-          indexerPool.indexRdf(rdf, indexingProperties);
-          return null;
-        }, retryExceptions);
-      } catch (Exception e) {
-        throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
-      }
     }
   }
 
@@ -252,7 +212,6 @@ public class ProcessorRunner implements CommandLineRunner {
     }
     return retrievedDatasetStatus;
   }
-
 
   private Map<String, Long> getDatasetWithSize() {
     return getDatasetWithSize(Long.MAX_VALUE);
