@@ -22,6 +22,8 @@
     <version.slf4j>2.0.12</version.slf4j>
     <version.log4j>2.23.0</version.log4j>
     <version.junit>5.8.2</version.junit>
+    <version.morphia>2.4.5</version.morphia>
+    <version.mongodb>4.10.2</version.mongodb>
     <version.metis-common-utils>15-SNAPSHOT</version.metis-common-utils>
     <version.metis-common-mongo>15-SNAPSHOT</version.metis-common-mongo>
     <version.metis-core-service>15-SNAPSHOT</version.metis-core-service>
@@ -63,6 +65,42 @@
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-common-mongo</artifactId>
       <version>${version.metis-common-mongo}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>dev.morphia.morphia</groupId>
+          <artifactId>morphia-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>dev.morphia.morphia</groupId>
+      <artifactId>morphia-core</artifactId>
+      <version>${version.morphia}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-core</artifactId>
+      <version>${version.mongodb}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>bson</artifactId>
+      <version>${version.mongodb}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>bson-record-codec</artifactId>
+      <version>${version.mongodb}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-sync</artifactId>
+      <version>${version.mongodb}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-legacy</artifactId>
+      <version>${version.mongodb}</version>
     </dependency>
     <dependency>
       <groupId>eu.europeana.metis</groupId>
