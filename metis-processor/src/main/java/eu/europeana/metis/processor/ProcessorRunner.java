@@ -56,7 +56,7 @@ public class ProcessorRunner implements CommandLineRunner {
     this.mongoSourceDao = mongoSourceDao;
     this.redissonClient = redissonClient;
     this.recordsProcessor = new RecordsProcessor(applicationProperties.getRecordParallelThreads(), indexerPool);
-    this.datasetPageBlockingQueue = new ArrayBlockingQueue<>(2);
+    this.datasetPageBlockingQueue = new ArrayBlockingQueue<>(8);
     this.datasetPageProducer = new DatasetPageProducer(datasetPageBlockingQueue, this::getNextPageLockWrapped);
   }
 
