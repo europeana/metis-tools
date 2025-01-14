@@ -98,7 +98,7 @@ public class ApplicationConfiguration {
     SingleServerConfig singleServerConfig;
     if (redisProperties.isRedisEnableSSL()) {
       singleServerConfig = config.useSingleServer().setAddress(String
-          .format("rediss://%s:%s", redisProperties.getRedisHost(),
+          .format("redis://%s:%s", redisProperties.getRedisHost(),
               redisProperties.getRedisPort()));
       LOGGER.info("Redis enabled SSL");
       if (redisProperties.isRedisEnableCustomTruststore()) {

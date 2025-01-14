@@ -32,12 +32,7 @@ public class MongoSourceDao {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String ABOUT = "about";
-    public static final String CONTENT_TIER_ZERO = "http://www.europeana.eu/schemas/epf/contentTier0";
-    public static final String QUALITY_ANNOTATIONS = "qualityAnnotations.body";
-    public static final String TYPE = "type";
-    public static final String RESOURCE_TYPE = "IMAGE";
-    private static final Supplier<Filter> extraFilterProvider = () ->
-            Filters.and(Filters.eq(TYPE, RESOURCE_TYPE), Filters.eq(QUALITY_ANNOTATIONS, CONTENT_TIER_ZERO));
+    private static final Supplier<Filter> extraFilterProvider = () -> null;
 
     /**
      * Change this to add an extra filter or return null to not apply any additional filters
@@ -54,7 +49,6 @@ public class MongoSourceDao {
         this.mongoClient = initializeMongoClient();
         this.metisSourceDatastore = initializeDatastore();
         this.fullbeanUtil = new FullbeanUtil();
-
     }
 
     private MongoClient initializeMongoClient() throws DataAccessConfigException {
