@@ -1,6 +1,9 @@
 package eu.europeana.metis.processor.dao;
 
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCompressor;
 import com.mongodb.client.MongoClient;
+import com.mongodb.connection.SocketSettings;
 import dev.morphia.Datastore;
 import dev.morphia.query.Query;
 import eu.europeana.metis.core.dataset.Dataset;
@@ -9,7 +12,9 @@ import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.processor.config.DataAccessConfigException;
 import eu.europeana.metis.processor.properties.mongo.MongoCoreProperties;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Data access object for the Metis core Mongo.
@@ -33,7 +38,21 @@ public class MongoCoreDao {
   }
 
   private MongoClient initializeMongoClient() throws DataAccessConfigException {
-    return new MongoClientProvider<>(mongoCoreProperties.getMongoCoreProperties()).createMongoClient();
+    // Configure SocketSettings with a 16 MB buffer for send and receive
+    SocketSettings socketSettings = SocketSettings.builder()
+                                                  .receiveBufferSize(16 * 1024 * 1024) // 16 MB buffer for receiving
+                                                  .sendBufferSize(16 * 1024 * 1024)    // 16 MB buffer for sending
+                                                  .connectTimeout(30, TimeUnit.SECONDS) // Connection timeout
+                                                  .readTimeout(30, TimeUnit.SECONDS)    // Read timeout
+                                                  .build();
+    MongoClientSettings.Builder settings = MongoClientSettings.builder()
+                                                              .applyToSocketSettings(
+                                                                  builder -> builder.applySettings(socketSettings))
+                                                              .compressorList(
+                                                                  Arrays.asList(MongoCompressor.createSnappyCompressor(),
+                                                                      MongoCompressor.createZlibCompressor(),
+                                                                      MongoCompressor.createZstdCompressor()));
+    return new MongoClientProvider<>(mongoCoreProperties.getMongoCoreProperties(), settings).createMongoClient();
   }
 
   private Datastore initializeDatastore() {
