@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.config;
 
+import eu.europeana.indexing.tiers.TierCalculationMode;
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -41,6 +42,7 @@ public class PropertiesHolder {
   public final boolean identityProcess;
   public final boolean cleanDatabasesBeforeProcess;
   public final boolean tierRecalculation;
+  public final TierCalculationMode tierCalculationMode;
 
   public final ExecutablePluginType reprocessBasedOnPluginType;
   public final List<ExecutablePluginType> invalidatePluginTypes;
@@ -123,6 +125,7 @@ public class PropertiesHolder {
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
     tierRecalculation = Boolean.parseBoolean(properties.getProperty("tier.recalculation"));
+    tierCalculationMode = TierCalculationMode.INITIALISE; //TierCalculationMode.valueOf(properties.getProperty("tier.calculation.mode"));
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
     invalidatePluginTypes = Arrays

@@ -21,6 +21,7 @@ import eu.europeana.enrichment.utils.RdfEntityUtils;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.web.EntityClientApiImpl;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
@@ -147,10 +148,15 @@ public class DefaultConfiguration extends Configuration {
 //        rdf = europeanaLinksReDereference(rdf);
 //        rdf = organizationEnrichment(rdf);
 //        rdf = rightsFix(rdf);
-
+        rdf = computeTierCalculation(rdf);
         LOGGER.debug("DONE");
         return rdf;
     }
+
+    RDF computeTierCalculation(RDF rdf) {
+        return rdf;
+    }
+
 
 //    RDF translations(RDF rdf) {
 //        //Get the translation if exists

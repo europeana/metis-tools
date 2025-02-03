@@ -5,10 +5,12 @@ import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
+import eu.europeana.indexing.tiers.TierCalculationMode;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.schema.jibx.EdmType;
 import eu.europeana.metis.schema.jibx.RDF;
+//import eu.europeana.metis.utils.DepublicationReason;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -46,7 +48,6 @@ public class IndexUtilities {
    */
   public static void indexRecord(RDF rdf, Boolean preserveTimestamps, Configuration configuration)
       throws IndexingException {
-
     try {
       //The indexer pool shouldn't be closed here, therefore it's not initialized in a
       // try-with-resources block
@@ -56,10 +57,10 @@ public class IndexUtilities {
         final Date recordDate = null;
         final List<String> datasetIdsForRedirection = null;
         final boolean performRedirects = false;
-        final boolean tierRecalculation = configuration.isTierRecalculation();
-        final Set<EdmType> typesEnabledForTierCalculation = EnumSet.of(EdmType._3_D);
+        final TierCalculationMode tierCalculationMode = configuration.getTierCalculationMode();
+        final Set<EdmType> typesEnabledForTierCalculation = EnumSet.of(EdmType._3_D); //<--check this
         final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
-            datasetIdsForRedirection, performRedirects, tierRecalculation, typesEnabledForTierCalculation);
+            datasetIdsForRedirection, performRedirects, tierCalculationMode, typesEnabledForTierCalculation);
         indexerPool.indexRdf(rdf, indexingProperties);
         return null;
       }, retryExceptions);
@@ -67,4 +68,20 @@ public class IndexUtilities {
       throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
     }
   }
+
+//  public static void indexTombstone(String rdfAbout, DepublicationReason depublicationReason, Configuration configuration)
+//      throws IndexingException {
+//    try {
+//      //The indexer pool shouldn't be closed here, therefore it's not initialized in a
+//      // try-with-resources block
+//      final IndexerPool indexerPool = configuration.getDestinationIndexerPool();
+//      ExternalRequestUtil.retryableExternalRequest(() -> {
+//        indexerPool.indexTombstone(rdfAbout, depublicationReason);
+//        return null;
+//      }, retryExceptions);
+//    } catch (Exception e) {
+//      throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
+//    }
+//  }
+
 }

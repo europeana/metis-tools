@@ -7,6 +7,7 @@ import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.SetupRelatedIndexingException;
+import eu.europeana.indexing.tiers.TierCalculationMode;
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
@@ -51,6 +52,7 @@ public abstract class Configuration {
   private final boolean identityProcess;
   private final boolean clearDatabasesBeforeProcess;
   private final boolean tierRecalculation;
+  private final TierCalculationMode tierCalculationMode;
   private final List<String> datasetIdsToProcess;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private final List<ExecutablePluginType> invalidatePluginTypes;
@@ -83,6 +85,7 @@ public abstract class Configuration {
     identityProcess = propertiesHolder.identityProcess;
     clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
     tierRecalculation = propertiesHolder.tierRecalculation;
+    tierCalculationMode = propertiesHolder.tierCalculationMode;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
@@ -185,6 +188,10 @@ public abstract class Configuration {
 
   public boolean isTierRecalculation() {
     return tierRecalculation;
+  }
+
+  public TierCalculationMode getTierCalculationMode() {
+    return tierCalculationMode;
   }
 
   public ExecutablePluginType getReprocessBasedOnPluginType() {
