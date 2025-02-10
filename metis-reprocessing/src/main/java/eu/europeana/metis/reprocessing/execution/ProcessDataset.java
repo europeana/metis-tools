@@ -11,6 +11,7 @@ import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.schema.jibx.RDF;
+import eu.europeana.metis.utils.DepublicationReason;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Date;

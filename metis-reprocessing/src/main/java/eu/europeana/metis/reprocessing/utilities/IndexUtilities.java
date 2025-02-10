@@ -6,17 +6,26 @@ import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.indexing.tiers.TierCalculationMode;
+import eu.europeana.indexing.tiers.model.MediaTier;
+import eu.europeana.indexing.utils.RdfTier;
+import eu.europeana.indexing.utils.RdfTierUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.schema.convert.RdfConversionUtils;
+import eu.europeana.metis.schema.jibx.Aggregation;
 import eu.europeana.metis.schema.jibx.EdmType;
+import eu.europeana.metis.schema.jibx.ProvidedCHOType;
 import eu.europeana.metis.schema.jibx.RDF;
-//import eu.europeana.metis.utils.DepublicationReason;
+import eu.europeana.metis.utils.DepublicationReason;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Contains functionality for indexing.
@@ -24,7 +33,7 @@ import java.util.Set;
  * performing the indexing of records</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-05-17
+ * @since 2019 -05-17
  */
 public class IndexUtilities {
 
@@ -61,27 +70,47 @@ public class IndexUtilities {
         final Set<EdmType> typesEnabledForTierCalculation = EnumSet.of(EdmType._3_D); //<--check this
         final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
             datasetIdsForRedirection, performRedirects, tierCalculationMode, typesEnabledForTierCalculation);
-        indexerPool.indexRdf(rdf, indexingProperties);
+        final String datasetId = getDatasetIdOfRecordToBePurged(rdf);
+        if (datasetId.isEmpty()) {
+          indexerPool.indexRdf(rdf, indexingProperties);
+        } else {
+          RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
+          List<String> tierData;
+          if (RdfTierUtils.hasTierCalculation(rdf, MediaTier.class)) {
+            tierData = RdfTierUtils.extractTierData(rdf.getAggregationList(), Aggregation::getHasQualityAnnotationList);
+          } else {
+            tierData = List.of();
+          }
+          final String stringRdf = rdfConversionUtils.convertRdfToString(rdf);
+          if ((datasetId.equals("9200359")
+              && tierData.contains(RdfTier.CONTENT_TIER_1.getUri()))
+              || (datasetId.equals("9200579"))) {
+            indexerPool.indexTombstone(stringRdf, DepublicationReason.GENERIC);
+            indexerPool.remove(stringRdf);
+          }
+        }
         return null;
       }, retryExceptions);
     } catch (Exception e) {
-      throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
+      throw new RecordRelatedIndexingException("A Runtime Exception occurred while indexing record", e);
     }
   }
 
-//  public static void indexTombstone(String rdfAbout, DepublicationReason depublicationReason, Configuration configuration)
-//      throws IndexingException {
-//    try {
-//      //The indexer pool shouldn't be closed here, therefore it's not initialized in a
-//      // try-with-resources block
-//      final IndexerPool indexerPool = configuration.getDestinationIndexerPool();
-//      ExternalRequestUtil.retryableExternalRequest(() -> {
-//        indexerPool.indexTombstone(rdfAbout, depublicationReason);
-//        return null;
-//      }, retryExceptions);
-//    } catch (Exception e) {
-//      throw new RecordRelatedIndexingException("A Runtime Exception occurred", e);
-//    }
-//  }
+  static String getDatasetIdOfRecordToBePurged(RDF rdf) {
+    Optional<String> about = rdf.getProvidedCHOList()
+                                .stream()
+                                .filter(Objects::nonNull)
+                                .findFirst()
+                                .map(ProvidedCHOType::getAbout);
 
+    String result = "";
+    if (about.isPresent()) {
+      String datasetId = about.get().substring(1, StringUtils.ordinalIndexOf(about.get(), "/", 2));
+      if (datasetId.equals("9200359") || datasetId.equals("9200369") || datasetId.equals("2048128") || datasetId.equals(
+          "2048087")) {
+        result = datasetId;
+      }
+    }
+    return result;
+  }
 }

@@ -17,6 +17,7 @@ import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.solr.client.CompoundSolrClient;
 import eu.europeana.metis.solr.connection.SolrClientProvider;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import eu.europeana.metis.utils.DepublicationReason;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
