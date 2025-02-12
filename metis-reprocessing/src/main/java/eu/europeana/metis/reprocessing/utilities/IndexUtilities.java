@@ -1,5 +1,7 @@
 package eu.europeana.metis.reprocessing.utilities;
 
+import static org.apache.commons.lang3.BooleanUtils.isFalse;
+
 import com.mongodb.MongoWriteException;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
@@ -14,9 +16,14 @@ import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.schema.convert.RdfConversionUtils;
 import eu.europeana.metis.schema.jibx.Aggregation;
 import eu.europeana.metis.schema.jibx.EdmType;
+import eu.europeana.metis.schema.jibx.EuropeanaType;
+import eu.europeana.metis.schema.jibx.EuropeanaType.Choice;
 import eu.europeana.metis.schema.jibx.ProvidedCHOType;
+import eu.europeana.metis.schema.jibx.ProxyType;
 import eu.europeana.metis.schema.jibx.RDF;
+import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.utils.DepublicationReason;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -25,6 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -84,7 +93,7 @@ public class IndexUtilities {
           final String stringRdf = rdfConversionUtils.convertRdfToString(rdf);
           if ((datasetId.equals("9200359")
               && tierData.contains(RdfTier.CONTENT_TIER_1.getUri()))
-              || (datasetId.equals("9200579"))) {
+              || (datasetId.equals("9200579") && hasDcCreator(rdf))) {
             indexerPool.indexTombstone(stringRdf, DepublicationReason.GENERIC);
             indexerPool.remove(stringRdf);
           }
@@ -112,5 +121,43 @@ public class IndexUtilities {
       }
     }
     return result;
+  }
+
+  static boolean hasDcCreator(RDF rdf) {
+    final List<Choice> choices = getProviderProxies(rdf)
+        .stream()
+        .map(EuropeanaType::getChoiceList)
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
+        .toList();
+    final List<String> creators = getChoicesInStringList(choices,
+        Choice::ifCreator,
+        Choice::getCreator,
+        ResourceOrLiteralType::getString);
+
+    return creators.contains("Science Museum, London");
+  }
+
+  static boolean isProviderProxy(ProxyType proxy) {
+    return proxy.getEuropeanaProxy() == null || isFalse(proxy.getEuropeanaProxy().isEuropeanaProxy());
+  }
+
+  static List<ProxyType> getProviderProxies(RDF rdf) {
+    return Optional.ofNullable(rdf.getProxyList())
+                   .stream()
+                   .flatMap(Collection::stream)
+                   .filter(Objects::nonNull)
+                   .filter(IndexUtilities::isProviderProxy)
+                   .toList();
+  }
+
+  static <T> List<String> getChoicesInStringList(List<Choice> choices, Predicate<Choice> choicePredicate,
+      Function<Choice, T> choiceGetter, Function<T, String> getString) {
+    return choices.stream()
+                  .filter(Objects::nonNull)
+                  .filter(choicePredicate)
+                  .map(choiceGetter)
+                  .map(getString)
+                  .toList();
   }
 }

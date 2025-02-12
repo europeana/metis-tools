@@ -48,6 +48,7 @@ mongo.source.username=
 mongo.source.password=
 mongo.source.enableSSL=false
 mongo.source.db=
+mongo.source.tombstone.db=
 #Not setting this will results to default
 mongo.metis.core.connection.pool.size=
 
@@ -59,6 +60,7 @@ mongo.destination.username=
 mongo.destination.password=
 mongo.destination.enableSSL=false
 mongo.destination.db=
+mongo.destination.tombstone.db=
 #Not setting this will results to default
 mongo.metis.core.connection.pool.size=
 

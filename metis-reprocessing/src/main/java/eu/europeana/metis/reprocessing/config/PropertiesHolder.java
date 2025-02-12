@@ -67,6 +67,7 @@ public class PropertiesHolder {
   public final boolean sourceMongoEnableSSL;
   public final String sourceMongoDb;
   public final int sourceMongoConnectionPoolSize;
+  public final String sourceMongoTombstoneDb;
 
   //Mongo Destination
   public final String[] destinationMongoHosts;
@@ -77,6 +78,8 @@ public class PropertiesHolder {
   public final boolean destinationMongoEnableSSL;
   public final String destinationMongoDb;
   public final int destinationMongoConnectionPoolSize;
+  public final String destinationMongoTombstoneDb;
+
   //Solr/Zookeeper Destination
   public final String[] destinationSolrHosts;
   public final String[] destinationZookeeperHosts;
@@ -170,6 +173,7 @@ public class PropertiesHolder {
     sourceMongoEnableSSL = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
     sourceMongoDb = properties.getProperty("mongo.source.db");
     sourceMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.source.connection.pool.size"), 500);
+    sourceMongoTombstoneDb = properties.getProperty("mongo.source.tombstone.db");
 
     //Mongo Destination
     destinationMongoHosts = properties.getProperty("mongo.destination.hosts").split(",");
@@ -184,6 +188,7 @@ public class PropertiesHolder {
         .parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
     destinationMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.destination.connection.pool.size"), 500);
+    destinationMongoTombstoneDb = properties.getProperty("mongo.destination.tombstone.db");
 
     //Solr/Zookeeper Destination
     destinationSolrHosts = properties.getProperty("solr.destination.hosts").split(",");

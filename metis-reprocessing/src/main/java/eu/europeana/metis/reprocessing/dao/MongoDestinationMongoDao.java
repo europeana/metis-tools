@@ -59,6 +59,7 @@ public class MongoDestinationMongoDao {
 
   private final MongoInitializer destinationMongoInitializer;
   private final Datastore mongoDestinationDatastore;
+  private final Datastore mongoDestinationTombstoneDatastore;
   private final PropertiesHolder propertiesHolder;
 
   public MongoDestinationMongoDao(PropertiesHolder propertiesHolder) {
@@ -66,6 +67,8 @@ public class MongoDestinationMongoDao {
     destinationMongoInitializer = prepareMongoDestinationConfiguration();
     mongoDestinationDatastore = createMongoDestinationDatastore(
         destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoDb);
+    mongoDestinationTombstoneDatastore = createMongoDestinationDatastore(
+        destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoTombstoneDb);
   }
 
   public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
@@ -95,6 +98,8 @@ public class MongoDestinationMongoDao {
   public void deleteAll() {
     mongoDestinationDatastore.getDatabase().drop();
     mongoDestinationDatastore.ensureIndexes();
+    mongoDestinationTombstoneDatastore.getDatabase().drop();
+    mongoDestinationTombstoneDatastore.ensureIndexes();
   }
 
   public void dropTemporaryCollections() {

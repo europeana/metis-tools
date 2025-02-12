@@ -131,12 +131,14 @@ public abstract class Configuration {
     indexingSettings.setMongoDatabaseName(propertiesHolder.destinationMongoDb);
     if (StringUtils.isEmpty(propertiesHolder.destinationMongoAuthenticationDb) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoUsername) || StringUtils
-        .isEmpty(propertiesHolder.destinationMongoPassword)) {
+        .isEmpty(propertiesHolder.destinationMongoPassword) || StringUtils
+        .isEmpty(propertiesHolder.destinationMongoTombstoneDb)) {
       LOGGER.info("Mongo credentials not provided");
     } else {
       indexingSettings.setMongoCredentials(propertiesHolder.destinationMongoUsername,
           propertiesHolder.destinationMongoPassword,
           propertiesHolder.destinationMongoAuthenticationDb);
+      indexingSettings.setMongoTombstoneDatabaseName(propertiesHolder.destinationMongoTombstoneDb);
     }
 
     if (propertiesHolder.destinationMongoEnableSSL) {

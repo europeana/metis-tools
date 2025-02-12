@@ -68,6 +68,7 @@ public class MongoSourceMongoDao {
 
   private final MongoInitializer sourceMongoInitializer;
   private final Datastore mongoSourceDatastore;
+  private final Datastore mongoSourceTombstoneDatastore;
   private final PropertiesHolder propertiesHolder;
 
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
@@ -76,6 +77,8 @@ public class MongoSourceMongoDao {
     sourceMongoInitializer = prepareMongoSourceConfiguration();
     mongoSourceDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
         propertiesHolder.sourceMongoDb);
+    mongoSourceTombstoneDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
+        propertiesHolder.sourceMongoTombstoneDb);
   }
 
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
