@@ -67,7 +67,6 @@ public class PropertiesHolder {
   public final boolean sourceMongoEnableSSL;
   public final String sourceMongoDb;
   public final int sourceMongoConnectionPoolSize;
-  public final String sourceMongoTombstoneDb;
 
   //Mongo Destination
   public final String[] destinationMongoHosts;
@@ -128,7 +127,7 @@ public class PropertiesHolder {
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
     tierRecalculation = Boolean.parseBoolean(properties.getProperty("tier.recalculation"));
-    tierCalculationMode = TierCalculationMode.INITIALISE; //TierCalculationMode.valueOf(properties.getProperty("tier.calculation.mode"));
+    tierCalculationMode = TierCalculationMode.valueOf(properties.getProperty("tier.calculation.mode"));
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
     invalidatePluginTypes = Arrays
@@ -173,7 +172,6 @@ public class PropertiesHolder {
     sourceMongoEnableSSL = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
     sourceMongoDb = properties.getProperty("mongo.source.db");
     sourceMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.source.connection.pool.size"), 500);
-    sourceMongoTombstoneDb = properties.getProperty("mongo.source.tombstone.db");
 
     //Mongo Destination
     destinationMongoHosts = properties.getProperty("mongo.destination.hosts").split(",");
