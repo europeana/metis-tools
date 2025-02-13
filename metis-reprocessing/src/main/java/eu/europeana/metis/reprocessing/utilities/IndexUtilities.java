@@ -22,6 +22,7 @@ import eu.europeana.metis.schema.jibx.ProvidedCHOType;
 import eu.europeana.metis.schema.jibx.ProxyType;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
+import eu.europeana.metis.schema.jibx.Type2;
 import eu.europeana.metis.utils.DepublicationReason;
 import java.util.Collection;
 import java.util.Date;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -93,7 +95,9 @@ public class IndexUtilities {
           final String stringRdf = rdfConversionUtils.convertRdfToString(rdf);
           if ((datasetId.equals("9200359")
               && tierData.contains(RdfTier.CONTENT_TIER_1.getUri()))
-              || (datasetId.equals("9200579") && hasDcCreator(rdf))) {
+              || (datasetId.equals("9200579") && hasDcCreator(rdf))
+              || (datasetId.equals("2048128") && hasEdmType3D(rdf))
+          ) {
             indexerPool.indexTombstone(stringRdf, DepublicationReason.GENERIC);
             indexerPool.remove(stringRdf);
           }
@@ -159,5 +163,22 @@ public class IndexUtilities {
                   .map(choiceGetter)
                   .map(getString)
                   .toList();
+  }
+
+  static boolean hasEdmType3D(RDF rdf) {
+    if (rdf.getProxyList() != null && !rdf.getProxyList().isEmpty()) {
+      final Set<EdmType> types = rdf.getProxyList()
+                                    .stream()
+                                    .map(ProxyType::getType)
+                                    .filter(Objects::nonNull)
+                                    .map(Type2::getType)
+                                    .filter(Objects::nonNull)
+                                    .collect(Collectors.toSet());
+      if (types.size() == 1) {
+        EdmType type = types.iterator().next();
+        return type.equals(EdmType._3_D);
+      }
+    }
+    return false;
   }
 }
