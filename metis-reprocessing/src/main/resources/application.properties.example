@@ -24,7 +24,7 @@ tier.recalculation=
 #INITIALISE Initialise perform tier calculation only if no tiers exist
 #SKIP Skip tier calculation mode. Do not perform any tier calculation
 #OVERWRITE Overwrite tier calculation mode. Always perform tier calculation, overwriting any existing tiers
-tier.calculation.mode=
+tier.calculation.mode=INITIALISE
 #The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon. For example ENRICHMENT. MUST not be empty if mode is POST_PROCESS
 reprocess.based.on.plugin.type=
 #The plugins in metis core to invalidate during POST_PROCESS. For example if the base plugin type was ENRICHMENT then the plugins that have to be invalidated would be the ones following ENRICHMENT. MUST not be empty if mode is POST_PROCESS
