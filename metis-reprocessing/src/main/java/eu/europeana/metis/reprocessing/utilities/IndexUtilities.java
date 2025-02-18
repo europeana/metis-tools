@@ -8,6 +8,8 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.OrganizationImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
+import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
+import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.IndexingException;
@@ -20,6 +22,8 @@ import eu.europeana.indexing.utils.RdfTierUtils;
 import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
+import eu.europeana.metis.reprocessing.config.PropertiesHolderExtension;
 import eu.europeana.metis.schema.convert.RdfConversionUtils;
 import eu.europeana.metis.schema.convert.SerializationException;
 import eu.europeana.metis.schema.jibx.Aggregation;
@@ -31,7 +35,10 @@ import eu.europeana.metis.schema.jibx.ProxyType;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.schema.jibx.Type2;
+import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.metis.utils.DepublicationReason;
+import eu.europeana.normalization.util.NormalizationConfigurationException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,6 +84,7 @@ public class IndexUtilities {
       "Wakefield Council",
       "Horniman Museum and Gardens",
       "Battersea Arts Centre");
+  private static final RdfConversionUtils RDF_CONVERSION_UTILS = new RdfConversionUtils();
 
   static {
     retryExceptions = new HashMap<>(ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
@@ -113,21 +121,15 @@ public class IndexUtilities {
         if (datasetId.isEmpty()) {
           indexerPool.indexRdf(rdf, indexingProperties);
         } else {
-          RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
-          List<String> tierData;
-          if (RdfTierUtils.hasTierCalculation(rdf, MediaTier.class)) {
-            tierData = RdfTierUtils.extractTierData(rdf.getAggregationList(), Aggregation::getHasQualityAnnotationList);
-          } else {
-            tierData = List.of();
-          }
-          final String stringRdf = rdfConversionUtils.convertRdfToString(rdf);
-          if ((datasetId.equals("9200359")
-              && tierData.contains(RdfTier.CONTENT_TIER_1.getUri()))
+          final String stringRdf = RDF_CONVERSION_UTILS.convertRdfToString(rdf);
+          if ((datasetId.equals("9200359") && hasContentTier(rdf))
               || (datasetId.equals("9200579") && hasDcCreator(rdf))
               || (datasetId.equals("2048128") && hasEdmType3D(rdf))
               || (datasetId.equals("2048087") && hasDataProviders(rdf, DATA_PROVIDERS))
           ) {
+            LOGGER.info("Tombstoned records for dataset {}", datasetId);
             indexerPool.indexTombstone(stringRdf, DepublicationReason.GENERIC);
+            LOGGER.info("Removed record for dataset {}", datasetId);
             indexerPool.remove(stringRdf);
           }
         }
@@ -138,12 +140,17 @@ public class IndexUtilities {
     }
   }
 
-  public static void main(String[] args) throws SerializationException {
-    final RdfConversionUtils conversionUtils = new RdfConversionUtils();
-    RDF inputRdf = conversionUtils.convertStringToRdf(
-        IndexingTestUtils.getResourceFileContent("test_record.xml"));
-    hasDataProviders(inputRdf, DATA_PROVIDERS);
-  }
+//  public static void main(String[] args)
+//      throws SerializationException, IndexingException, DereferenceException, NormalizationConfigurationException, TrustStoreConfigurationException, EnrichmentException, URISyntaxException {
+//    final RdfConversionUtils conversionUtils = new RdfConversionUtils();
+//    RDF inputRdf = conversionUtils.convertStringToRdf(
+//        IndexingTestUtils.getResourceFileContent("unit_test/test_dccreator_remove.xml"));
+////    LOGGER.info("Has contentTier1: {}", hasContentTier(inputRdf));
+////    LOGGER.info("Has dc creator: {}", hasDcCreator(inputRdf));
+////    LOGGER.info("Has Edm 3D type: {}", hasEdmType3D(inputRdf));
+////    LOGGER.info("Has provider: {}", hasDataProviders(inputRdf, DATA_PROVIDERS));
+//    indexRecord(inputRdf, true, new DefaultConfiguration(new PropertiesHolderExtension("application.properties")));
+//  }
 
   private static Pair<String, String> findPrefLabelForOrganization(OrganizationImpl organization) {
 
@@ -231,12 +238,28 @@ public class IndexUtilities {
     String result = "";
     if (about.isPresent()) {
       String datasetId = about.get().substring(1, StringUtils.ordinalIndexOf(about.get(), "/", 2));
-      if (datasetId.equals("9200359") || datasetId.equals("9200369") || datasetId.equals("2048128") || datasetId.equals(
-          "2048087")) {
+      if (datasetId.equals("9200359") || datasetId.equals("9200579")
+          || datasetId.equals("2048128") || datasetId.equals("2048087")) {
         result = datasetId;
       }
     }
     return result;
+  }
+
+  static boolean hasContentTier(RDF rdf) {
+    List<String> tierData;
+    if (RdfTierUtils.hasTierCalculation(rdf, MediaTier.class)) {
+      tierData = RdfTierUtils.extractTierData(rdf.getAggregationList(), Aggregation::getHasQualityAnnotationList);
+    } else {
+      tierData = List.of();
+    }
+    boolean result = tierData.contains(RdfTier.CONTENT_TIER_1.getUri());
+    if (result) {
+      LOGGER.info("Has content tier 1: {}", result);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   static boolean hasDcCreator(RDF rdf) {
@@ -326,7 +349,12 @@ public class IndexUtilities {
       return false;
     } else {
       if (dataProviderPair.getKey().contains(rdf.getAggregationList().getFirst().getDataProvider().getResource().getResource())) {
-        String dataProvider = dataProviderPair.getValue().values().stream().findFirst().get().getFirst();
+        String dataProvider = "";
+
+        if (dataProviderPair.getValue().values().stream().findFirst().isPresent()) {
+          dataProvider = dataProviderPair.getValue().values().stream().findFirst().get().getFirst();
+        }
+
         if (providersList.contains(dataProvider)) {
           LOGGER.info("Has DataProvider: {} => {}", fullBean.getAbout(), dataProvider);
           return true;
@@ -335,6 +363,5 @@ public class IndexUtilities {
     }
     return false;
   }
-
 
 }

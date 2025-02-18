@@ -15,13 +15,14 @@ import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.web.EntityClientApiImpl;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
 import eu.europeana.metis.schema.convert.RdfConversionUtils;
+import eu.europeana.metis.schema.convert.SerializationException;
 import eu.europeana.metis.schema.jibx.*;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
-import eu.europeana.metis.utils.DepublicationReason;
 import eu.europeana.normalization.Normalizer;
 import eu.europeana.normalization.NormalizerFactory;
 import eu.europeana.normalization.NormalizerStep;
@@ -132,6 +133,26 @@ public class DefaultConfiguration extends Configuration {
         rdf = computeTierCalculation(rdf);
         LOGGER.debug("DONE");
         return rdf;
+    }
+
+    // change method name to main to generate xml for checks
+    static void generateXML(String [] args)
+        throws IndexingException, DereferenceException, NormalizationConfigurationException, TrustStoreConfigurationException, EnrichmentException, URISyntaxException, ProcessingException, SerializationException {
+        DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
+            "application.properties"));
+        List<FullBeanImpl> fullBeanList = defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(
+            List.of(
+                //"/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
+                //"/2048128/114145",
+                //"/9200579/kyaq8pq9",
+                //"/9200359/BibliographicResource_3000123626519",
+                "/9200579/cynwkevu"
+            ));
+
+        for (FullBeanImpl fb : fullBeanList) {
+            RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
+            LOGGER.info ("{}\r\n",defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+        }
     }
 
     RDF computeTierCalculation(RDF rdf) {
