@@ -139,21 +139,6 @@ public class IndexUtilities {
     }
   }
 
-  //  public static void main(String[] args)
-  //      throws SerializationException, IndexingException,
-  //      DereferenceException, NormalizationConfigurationException,
-  //      TrustStoreConfigurationException, EnrichmentException, URISyntaxException {
-  //    final RdfConversionUtils conversionUtils = new RdfConversionUtils();
-  //    RDF inputRdf = conversionUtils.convertStringToRdf(
-  //        IndexingTestUtils.getResourceFileContent("unit_test/test_dccreator_remove.xml"));
-  //
-  //    //    LOGGER.info("Has contentTier1: {}", hasContentTier(inputRdf));
-  //    //        LOGGER.info("Has dc creator: {}",hasDcCreator(inputRdf));
-  //    //            LOGGER.info("Has Edm 3D type: {}", hasEdmType3D(inputRdf));
-  //    //                LOGGER.info("Has provider:   {}", hasDataProviders(inputRdf, DATA_PROVIDERS));
-  //    indexRecord(inputRdf, true, new DefaultConfiguration(new PropertiesHolderExtension("application.properties")));
-  //  }
-
   private static Pair<String, String> findPrefLabelForOrganization(OrganizationImpl organization) {
 
     // Try to find an English one first.
@@ -230,7 +215,7 @@ public class IndexUtilities {
     }
   }
 
-  static String getDatasetIdOfRecordToBePurged(RDF rdf) {
+  private static String getDatasetIdOfRecordToBePurged(RDF rdf) {
     Optional<String> about = rdf.getProvidedCHOList()
                                 .stream()
                                 .filter(Objects::nonNull)
@@ -248,6 +233,35 @@ public class IndexUtilities {
     return result;
   }
 
+  private static boolean isProviderProxy(ProxyType proxy) {
+    return proxy.getEuropeanaProxy() == null || isFalse(proxy.getEuropeanaProxy().isEuropeanaProxy());
+  }
+
+  private static List<ProxyType> getProviderProxies(RDF rdf) {
+    return Optional.ofNullable(rdf.getProxyList())
+                   .stream()
+                   .flatMap(Collection::stream)
+                   .filter(Objects::nonNull)
+                   .filter(IndexUtilities::isProviderProxy)
+                   .toList();
+  }
+
+  private static <T> List<String> getChoicesInStringList(List<Choice> choices, Predicate<Choice> choicePredicate,
+      Function<Choice, T> choiceGetter, Function<T, String> getString) {
+    return choices.stream()
+                  .filter(Objects::nonNull)
+                  .filter(choicePredicate)
+                  .map(choiceGetter)
+                  .map(getString)
+                  .toList();
+  }
+
+  /**
+   * MET-6359 Has content tier 1 boolean.
+   *
+   * @param rdf the rdf
+   * @return the boolean
+   */
   static boolean hasContentTier(RDF rdf) {
     List<String> tierData;
     if (RdfTierUtils.hasTierCalculation(rdf, MediaTier.class)) {
@@ -264,6 +278,12 @@ public class IndexUtilities {
     }
   }
 
+  /**
+   * MET-6360 Has dc creator boolean.
+   *
+   * @param rdf the rdf
+   * @return the boolean
+   */
   static boolean hasDcCreator(RDF rdf) {
     final List<Choice> choices = getProviderProxies(rdf)
         .stream()
@@ -284,29 +304,12 @@ public class IndexUtilities {
     }
   }
 
-  static boolean isProviderProxy(ProxyType proxy) {
-    return proxy.getEuropeanaProxy() == null || isFalse(proxy.getEuropeanaProxy().isEuropeanaProxy());
-  }
-
-  static List<ProxyType> getProviderProxies(RDF rdf) {
-    return Optional.ofNullable(rdf.getProxyList())
-                   .stream()
-                   .flatMap(Collection::stream)
-                   .filter(Objects::nonNull)
-                   .filter(IndexUtilities::isProviderProxy)
-                   .toList();
-  }
-
-  static <T> List<String> getChoicesInStringList(List<Choice> choices, Predicate<Choice> choicePredicate,
-      Function<Choice, T> choiceGetter, Function<T, String> getString) {
-    return choices.stream()
-                  .filter(Objects::nonNull)
-                  .filter(choicePredicate)
-                  .map(choiceGetter)
-                  .map(getString)
-                  .toList();
-  }
-
+  /**
+   * MET-6361 Has edm type 3D boolean.
+   *
+   * @param rdf the rdf
+   * @return the boolean
+   */
   static boolean hasEdmType3D(RDF rdf) {
     if (rdf.getProxyList() != null && !rdf.getProxyList().isEmpty()) {
       final Set<EdmType> types = rdf.getProxyList()
@@ -330,6 +333,13 @@ public class IndexUtilities {
     return false;
   }
 
+  /**
+   * MET-6362 Has data providers boolean.
+   *
+   * @param rdf the rdf
+   * @param providersList the providers list
+   * @return the boolean
+   */
   static boolean hasDataProviders(RDF rdf, List<String> providersList) {
     RdfToFullBeanConverter rdfToFullBeanConverter = new RdfToFullBeanConverter();
     FullBeanImpl fullBean = rdfToFullBeanConverter.convertRdfToFullBean(new RdfWrapper(rdf));
@@ -365,5 +375,4 @@ public class IndexUtilities {
     }
     return false;
   }
-
 }
