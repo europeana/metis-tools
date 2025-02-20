@@ -129,6 +129,7 @@ public abstract class Configuration {
       }
     }
     indexingSettings.setMongoDatabaseName(propertiesHolder.destinationMongoDb);
+    indexingSettings.setMongoTombstoneDatabaseName(propertiesHolder.destinationMongoTombstoneDb);
     if (StringUtils.isEmpty(propertiesHolder.destinationMongoAuthenticationDb) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoUsername) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoPassword) || StringUtils
@@ -138,7 +139,7 @@ public abstract class Configuration {
       indexingSettings.setMongoCredentials(propertiesHolder.destinationMongoUsername,
           propertiesHolder.destinationMongoPassword,
           propertiesHolder.destinationMongoAuthenticationDb);
-      indexingSettings.setMongoTombstoneDatabaseName(propertiesHolder.destinationMongoTombstoneDb);
+
     }
 
     if (propertiesHolder.destinationMongoEnableSSL) {
