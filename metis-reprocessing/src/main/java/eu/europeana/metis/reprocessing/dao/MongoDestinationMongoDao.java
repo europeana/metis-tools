@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.dao;
 
+import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
 import dev.morphia.DeleteOptions;
@@ -41,7 +42,10 @@ import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.reprocessing.config.PropertiesHolder;
+import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mongo Dao for destination mongo.
@@ -56,6 +60,7 @@ public class MongoDestinationMongoDao {
   private static final String DATASET_ID = "datasetId";
   private static final String FAILED_URL = "failedUrl";
   private static final String SUCCESSFULLY_REPROCESSED = "successfullyReprocessed";
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoDestinationMongoDao.class);
 
   private final MongoInitializer destinationMongoInitializer;
   private final Datastore mongoDestinationDatastore;
@@ -96,10 +101,14 @@ public class MongoDestinationMongoDao {
   }
 
   public void deleteAll() {
-    mongoDestinationDatastore.getDatabase().drop();
-    mongoDestinationDatastore.ensureIndexes();
-    mongoDestinationTombstoneDatastore.getDatabase().drop();
-    mongoDestinationTombstoneDatastore.ensureIndexes();
+    try {
+      mongoDestinationDatastore.getDatabase().drop();
+      mongoDestinationDatastore.ensureIndexes();
+      mongoDestinationTombstoneDatastore.getDatabase().drop();
+      mongoDestinationTombstoneDatastore.ensureIndexes();
+    } catch (Exception e) {
+      LOGGER.error("Error deleting all", e);
+    }
   }
 
   public void dropTemporaryCollections() {
@@ -177,7 +186,11 @@ public class MongoDestinationMongoDao {
     mapper.getEntityModel(VideoMetaInfoImpl.class);
     mapper.getEntityModel(ThreeDMetaInfoImpl.class);
     //Ensure indexes, to create them in destination only
-    datastore.ensureIndexes();
+    try {
+      datastore.ensureIndexes();
+    } catch (DuplicateKeyException e) {
+      LOGGER.error("Ensuring database indexes failed", e);
+    }
     return datastore;
   }
 
