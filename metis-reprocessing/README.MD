@@ -87,3 +87,9 @@ so that morphia would not throw an error during reading
 - Rights statements fixes for 2020702, 364
 - Tier re-calculation only for 3D
 - Re-enrichment with entity-api
+
+<u>*Version 5(February 2025)*</u>
+- Addition of properties
+  - `tier.calculation.mode` upgraded way to enable tier calculation.
+- contentTier calculation when is needed. 
+- MET-6260 Tombstone and remove records of datasets 9200359, 9200579, 2048128, 2048087. 

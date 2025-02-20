@@ -18,8 +18,6 @@ dataset.ids.to.process=
 identity.process=
 #Set to true if we want to clear the database before we start a new process. Only applicable for DEFAULT Mode
 clean.databases.before.process=
-#tier.recalculation => true or false
-tier.recalculation=
 #Possible values INITIALISE, SKIP, OVERWRITE
 #INITIALISE Initialise perform tier calculation only if no tiers exist
 #SKIP Skip tier calculation mode. Do not perform any tier calculation

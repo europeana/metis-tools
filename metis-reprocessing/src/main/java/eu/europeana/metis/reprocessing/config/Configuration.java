@@ -17,7 +17,6 @@ import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.solr.client.CompoundSolrClient;
 import eu.europeana.metis.solr.connection.SolrClientProvider;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
-import eu.europeana.metis.utils.DepublicationReason;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -32,8 +31,7 @@ import org.springframework.util.CollectionUtils;
 /**
  * Basic configuration of the re-processing operation.
  * <p>Functionality here should be the same for each re-processing.
- * Extend this class with a class that should also contain the
- * functionality per re-process operation.</p>
+ * Extend this class with a class that should also contain the functionality per re-process operation.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
@@ -52,7 +50,6 @@ public abstract class Configuration {
   private final Mode mode;
   private final boolean identityProcess;
   private final boolean clearDatabasesBeforeProcess;
-  private final boolean tierRecalculation;
   private final TierCalculationMode tierCalculationMode;
   private final List<String> datasetIdsToProcess;
   private final ExecutablePluginType reprocessBasedOnPluginType;
@@ -85,7 +82,6 @@ public abstract class Configuration {
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
     clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
-    tierRecalculation = propertiesHolder.tierRecalculation;
     tierCalculationMode = propertiesHolder.tierCalculationMode;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
@@ -113,6 +109,53 @@ public abstract class Configuration {
 
   public Indexer getDestinationIndexer() {
     return destinationIndexer;
+  }
+
+  public Mode getMode() {
+    return mode;
+  }
+
+  public List<String> getDatasetIdsToProcess() {
+    return datasetIdsToProcess;
+  }
+
+  public boolean isIdentityProcess() {
+    return identityProcess;
+  }
+
+  public boolean isClearDatabasesBeforeProcess() {
+    return clearDatabasesBeforeProcess;
+  }
+
+  public TierCalculationMode getTierCalculationMode() {
+    return tierCalculationMode;
+  }
+
+  public ExecutablePluginType getReprocessBasedOnPluginType() {
+    return reprocessBasedOnPluginType;
+  }
+
+  public List<ExecutablePluginType> getInvalidatePluginTypes() {
+    return invalidatePluginTypes;
+  }
+
+  public abstract ThrowingBiFunction<FullBeanImpl, Configuration, RDF> getFullBeanProcessor();
+
+  public abstract ThrowingTriConsumer<RDF, Boolean, Configuration> getRdfIndexer();
+
+  public abstract ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor();
+
+  public abstract RDF processRDF(RDF rdf);
+
+  public void close() throws IOException {
+    if (metisCoreMongoDao != null) {
+      metisCoreMongoDao.close();
+    }
+    mongoSourceMongoDao.close();
+    mongoDestinationMongoDao.close();
+    destinationCompoundSolrClient.close();
+    destinationIndexerPool.close();
+    destinationIndexer.close();
   }
 
   private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
@@ -172,57 +215,6 @@ public abstract class Configuration {
     indexingSettings.setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
     indexingSettings
         .setZookeeperDefaultCollection(propertiesHolder.destinationZookeeperDefaultCollection);
-  }
-
-  public Mode getMode() {
-    return mode;
-  }
-
-  public List<String> getDatasetIdsToProcess() {
-    return datasetIdsToProcess;
-  }
-
-  public boolean isIdentityProcess() {
-    return identityProcess;
-  }
-
-  public boolean isClearDatabasesBeforeProcess() {
-    return clearDatabasesBeforeProcess;
-  }
-
-  public boolean isTierRecalculation() {
-    return tierRecalculation;
-  }
-
-  public TierCalculationMode getTierCalculationMode() {
-    return tierCalculationMode;
-  }
-
-  public ExecutablePluginType getReprocessBasedOnPluginType() {
-    return reprocessBasedOnPluginType;
-  }
-
-  public List<ExecutablePluginType> getInvalidatePluginTypes() {
-    return invalidatePluginTypes;
-  }
-
-  public abstract ThrowingBiFunction<FullBeanImpl, Configuration, RDF> getFullBeanProcessor();
-
-  public abstract ThrowingTriConsumer<RDF, Boolean, Configuration> getRdfIndexer();
-
-  public abstract ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor();
-
-  public abstract RDF processRDF(RDF rdf);
-
-  public void close() throws IOException {
-    if (metisCoreMongoDao != null) {
-      metisCoreMongoDao.close();
-    }
-    mongoSourceMongoDao.close();
-    mongoDestinationMongoDao.close();
-    destinationCompoundSolrClient.close();
-    destinationIndexerPool.close();
-    destinationIndexer.close();
   }
 
   @FunctionalInterface

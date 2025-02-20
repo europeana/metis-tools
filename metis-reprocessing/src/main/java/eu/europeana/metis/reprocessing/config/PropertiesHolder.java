@@ -41,7 +41,6 @@ public class PropertiesHolder {
   public final List<String> datasetIdsToProcess;
   public final boolean identityProcess;
   public final boolean cleanDatabasesBeforeProcess;
-  public final boolean tierRecalculation;
   public final TierCalculationMode tierCalculationMode;
 
   public final ExecutablePluginType reprocessBasedOnPluginType;
@@ -126,7 +125,6 @@ public class PropertiesHolder {
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
-    tierRecalculation = Boolean.parseBoolean(properties.getProperty("tier.recalculation"));
     tierCalculationMode = TierCalculationMode.valueOf(properties.getProperty("tier.calculation.mode"));
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
