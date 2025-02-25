@@ -224,7 +224,8 @@ public class IndexUtilities {
 
     String result = "";
     if (about.isPresent()) {
-      String datasetId = about.get().substring(1, StringUtils.ordinalIndexOf(about.get(), "/", 2));
+      final String[] splitRecordIdentifier = about.get().split("/");
+      String datasetId = splitRecordIdentifier[1];
       if (datasetId.equals("9200359") || datasetId.equals("9200579")
           || datasetId.equals("2048128") || datasetId.equals("2048087")) {
         result = datasetId;
