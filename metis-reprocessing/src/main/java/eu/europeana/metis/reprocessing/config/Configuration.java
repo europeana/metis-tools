@@ -49,6 +49,7 @@ public abstract class Configuration {
   private final Indexer destinationIndexer;
   private final Mode mode;
   private final boolean identityProcess;
+  private final boolean depublicationEnabled;
   private final boolean clearDatabasesBeforeProcess;
   private final TierCalculationMode tierCalculationMode;
   private final List<String> datasetIdsToProcess;
@@ -81,6 +82,7 @@ public abstract class Configuration {
     mode = propertiesHolder.mode;
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
+    depublicationEnabled = propertiesHolder.depublicationEnabled;
     clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
     tierCalculationMode = propertiesHolder.tierCalculationMode;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
@@ -122,6 +124,8 @@ public abstract class Configuration {
   public boolean isIdentityProcess() {
     return identityProcess;
   }
+
+  public boolean isDepublicationEnabled() { return depublicationEnabled; }
 
   public boolean isClearDatabasesBeforeProcess() {
     return clearDatabasesBeforeProcess;
