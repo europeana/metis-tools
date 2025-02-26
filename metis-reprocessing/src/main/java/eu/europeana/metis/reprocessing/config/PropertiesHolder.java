@@ -40,6 +40,7 @@ public class PropertiesHolder {
   public final Mode mode;
   public final List<String> datasetIdsToProcess;
   public final boolean identityProcess;
+  public final boolean depublicationEnabled;
   public final boolean cleanDatabasesBeforeProcess;
   public final TierCalculationMode tierCalculationMode;
 
@@ -123,6 +124,7 @@ public class PropertiesHolder {
     datasetIdsToProcess = Arrays.stream(properties.getProperty("dataset.ids.to.process").split(","))
                                 .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
+    depublicationEnabled = Boolean.parseBoolean(properties.getProperty("depublication.enabled"));
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
     tierCalculationMode = TierCalculationMode.valueOf(properties.getProperty("tier.calculation.mode"));

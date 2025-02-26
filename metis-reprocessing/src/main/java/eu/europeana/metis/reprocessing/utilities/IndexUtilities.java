@@ -118,24 +118,30 @@ public class IndexUtilities {
         LOGGER.info("Indexing record {}", rdfAbout);
         indexerPool.indexRdf(rdf, indexingProperties);
 
-        if ((datasetId.equals("9200359") && hasContentTier(rdf))
-            || (datasetId.equals("9200579") && hasDcCreator(rdf))
-            || (datasetId.equals("2048128") && hasEdmType3D(rdf))
-            || (datasetId.equals("2048087") && hasDataProviders(rdf, DATA_PROVIDERS))
-        ) {
-          boolean isTombStoned;
-          boolean isRemoved;
-          LOGGER.info("Tombstone record for dataset {} {}", datasetId, rdfAbout);
-          isTombStoned = indexerPool.indexTombstone(rdfAbout, DepublicationReason.REMOVED_DATA_AT_SOURCE);
-          LOGGER.info("Tombstoned record result {} {}", isTombStoned, rdfAbout);
-          LOGGER.info("Remove record for dataset {} {}", datasetId, rdfAbout);
-          isRemoved = indexerPool.removeRecord(rdfAbout);
-          LOGGER.info("Removed record result {} {}", isRemoved, rdfAbout);
+        if (configuration.isDepublicationEnabled()) {
+          depublishRecord(rdf, datasetId, rdfAbout, indexerPool);
         }
         return null;
       }, retryExceptions);
     } catch (Exception e) {
       throw new RecordRelatedIndexingException("A Runtime Exception occurred while indexing record", e);
+    }
+  }
+
+  private static void depublishRecord(RDF rdf, String datasetId, String rdfAbout, IndexerPool indexerPool) throws IndexingException {
+    if ((datasetId.equals("9200359") && hasContentTier(rdf))
+        || (datasetId.equals("9200579") && hasDcCreator(rdf))
+        || (datasetId.equals("2048128") && hasEdmType3D(rdf))
+        || (datasetId.equals("2048087") && hasDataProviders(rdf, DATA_PROVIDERS))
+    ) {
+      boolean isTombStoned;
+      boolean isRemoved;
+      LOGGER.info("Tombstone record for dataset {} {}", datasetId, rdfAbout);
+      isTombStoned = indexerPool.indexTombstone(rdfAbout, DepublicationReason.REMOVED_DATA_AT_SOURCE);
+      LOGGER.info("Tombstoned record result {} {}", isTombStoned, rdfAbout);
+      LOGGER.info("Remove record for dataset {} {}", datasetId, rdfAbout);
+      isRemoved = indexerPool.removeRecord(rdfAbout);
+      LOGGER.info("Removed record result {} {}", isRemoved, rdfAbout);
     }
   }
 

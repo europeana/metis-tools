@@ -16,6 +16,8 @@ mode=DEFAULT
 dataset.ids.to.process=
 #Set to true to do a simple read and then write reindex, without altering the record
 identity.process=
+#set to true to enable depublication, this works for content tier generation without removing or generating preview db
+depublication.enabled=
 #Set to true if we want to clear the database before we start a new process. Only applicable for DEFAULT Mode
 clean.databases.before.process=
 #Possible values INITIALISE, SKIP, OVERWRITE
