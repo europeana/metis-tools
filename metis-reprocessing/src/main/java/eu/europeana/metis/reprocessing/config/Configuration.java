@@ -7,6 +7,7 @@ import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.SetupRelatedIndexingException;
+import eu.europeana.indexing.tiers.TierCalculationMode;
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import eu.europeana.metis.reprocessing.dao.MetisCoreMongoDao;
 import eu.europeana.metis.reprocessing.dao.MongoDestinationMongoDao;
@@ -30,8 +31,7 @@ import org.springframework.util.CollectionUtils;
 /**
  * Basic configuration of the re-processing operation.
  * <p>Functionality here should be the same for each re-processing.
- * Extend this class with a class that should also contain the
- * functionality per re-process operation.</p>
+ * Extend this class with a class that should also contain the functionality per re-process operation.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-05-16
@@ -50,7 +50,7 @@ public abstract class Configuration {
   private final Mode mode;
   private final boolean identityProcess;
   private final boolean clearDatabasesBeforeProcess;
-  private final boolean tierRecalculation;
+  private final TierCalculationMode tierCalculationMode;
   private final List<String> datasetIdsToProcess;
   private final ExecutablePluginType reprocessBasedOnPluginType;
   private final List<ExecutablePluginType> invalidatePluginTypes;
@@ -82,7 +82,7 @@ public abstract class Configuration {
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
     clearDatabasesBeforeProcess = propertiesHolder.cleanDatabasesBeforeProcess;
-    tierRecalculation = propertiesHolder.tierRecalculation;
+    tierCalculationMode = propertiesHolder.tierCalculationMode;
     reprocessBasedOnPluginType = propertiesHolder.reprocessBasedOnPluginType;
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
@@ -111,6 +111,53 @@ public abstract class Configuration {
     return destinationIndexer;
   }
 
+  public Mode getMode() {
+    return mode;
+  }
+
+  public List<String> getDatasetIdsToProcess() {
+    return datasetIdsToProcess;
+  }
+
+  public boolean isIdentityProcess() {
+    return identityProcess;
+  }
+
+  public boolean isClearDatabasesBeforeProcess() {
+    return clearDatabasesBeforeProcess;
+  }
+
+  public TierCalculationMode getTierCalculationMode() {
+    return tierCalculationMode;
+  }
+
+  public ExecutablePluginType getReprocessBasedOnPluginType() {
+    return reprocessBasedOnPluginType;
+  }
+
+  public List<ExecutablePluginType> getInvalidatePluginTypes() {
+    return invalidatePluginTypes;
+  }
+
+  public abstract ThrowingBiFunction<FullBeanImpl, Configuration, RDF> getFullBeanProcessor();
+
+  public abstract ThrowingTriConsumer<RDF, Boolean, Configuration> getRdfIndexer();
+
+  public abstract ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor();
+
+  public abstract RDF processRDF(RDF rdf);
+
+  public void close() throws IOException {
+    if (metisCoreMongoDao != null) {
+      metisCoreMongoDao.close();
+    }
+    mongoSourceMongoDao.close();
+    mongoDestinationMongoDao.close();
+    destinationCompoundSolrClient.close();
+    destinationIndexerPool.close();
+    destinationIndexer.close();
+  }
+
   private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
     for (int i = 0; i < propertiesHolder.destinationMongoHosts.length; i++) {
       if (propertiesHolder.destinationMongoHosts.length
@@ -125,14 +172,17 @@ public abstract class Configuration {
       }
     }
     indexingSettings.setMongoDatabaseName(propertiesHolder.destinationMongoDb);
+    indexingSettings.setMongoTombstoneDatabaseName(propertiesHolder.destinationMongoTombstoneDb);
     if (StringUtils.isEmpty(propertiesHolder.destinationMongoAuthenticationDb) || StringUtils
         .isEmpty(propertiesHolder.destinationMongoUsername) || StringUtils
-        .isEmpty(propertiesHolder.destinationMongoPassword)) {
+        .isEmpty(propertiesHolder.destinationMongoPassword) || StringUtils
+        .isEmpty(propertiesHolder.destinationMongoTombstoneDb)) {
       LOGGER.info("Mongo credentials not provided");
     } else {
       indexingSettings.setMongoCredentials(propertiesHolder.destinationMongoUsername,
           propertiesHolder.destinationMongoPassword,
           propertiesHolder.destinationMongoAuthenticationDb);
+
     }
 
     if (propertiesHolder.destinationMongoEnableSSL) {
@@ -165,53 +215,6 @@ public abstract class Configuration {
     indexingSettings.setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
     indexingSettings
         .setZookeeperDefaultCollection(propertiesHolder.destinationZookeeperDefaultCollection);
-  }
-
-  public Mode getMode() {
-    return mode;
-  }
-
-  public List<String> getDatasetIdsToProcess() {
-    return datasetIdsToProcess;
-  }
-
-  public boolean isIdentityProcess() {
-    return identityProcess;
-  }
-
-  public boolean isClearDatabasesBeforeProcess() {
-    return clearDatabasesBeforeProcess;
-  }
-
-  public boolean isTierRecalculation() {
-    return tierRecalculation;
-  }
-
-  public ExecutablePluginType getReprocessBasedOnPluginType() {
-    return reprocessBasedOnPluginType;
-  }
-
-  public List<ExecutablePluginType> getInvalidatePluginTypes() {
-    return invalidatePluginTypes;
-  }
-
-  public abstract ThrowingBiFunction<FullBeanImpl, Configuration, RDF> getFullBeanProcessor();
-
-  public abstract ThrowingTriConsumer<RDF, Boolean, Configuration> getRdfIndexer();
-
-  public abstract ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor();
-
-  public abstract RDF processRDF(RDF rdf);
-
-  public void close() throws IOException {
-    if (metisCoreMongoDao != null) {
-      metisCoreMongoDao.close();
-    }
-    mongoSourceMongoDao.close();
-    mongoDestinationMongoDao.close();
-    destinationCompoundSolrClient.close();
-    destinationIndexerPool.close();
-    destinationIndexer.close();
   }
 
   @FunctionalInterface

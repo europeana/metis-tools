@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.config;
 
+import eu.europeana.indexing.tiers.TierCalculationMode;
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -40,7 +41,7 @@ public class PropertiesHolder {
   public final List<String> datasetIdsToProcess;
   public final boolean identityProcess;
   public final boolean cleanDatabasesBeforeProcess;
-  public final boolean tierRecalculation;
+  public final TierCalculationMode tierCalculationMode;
 
   public final ExecutablePluginType reprocessBasedOnPluginType;
   public final List<ExecutablePluginType> invalidatePluginTypes;
@@ -75,6 +76,8 @@ public class PropertiesHolder {
   public final boolean destinationMongoEnableSSL;
   public final String destinationMongoDb;
   public final int destinationMongoConnectionPoolSize;
+  public final String destinationMongoTombstoneDb;
+
   //Solr/Zookeeper Destination
   public final String[] destinationSolrHosts;
   public final String[] destinationZookeeperHosts;
@@ -122,7 +125,7 @@ public class PropertiesHolder {
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     cleanDatabasesBeforeProcess = Boolean
         .parseBoolean(properties.getProperty("clean.databases.before.process"));
-    tierRecalculation = Boolean.parseBoolean(properties.getProperty("tier.recalculation"));
+    tierCalculationMode = TierCalculationMode.valueOf(properties.getProperty("tier.calculation.mode"));
     reprocessBasedOnPluginType = ExecutablePluginType
         .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
     invalidatePluginTypes = Arrays
@@ -181,6 +184,7 @@ public class PropertiesHolder {
         .parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
     destinationMongoDb = properties.getProperty("mongo.destination.db");
     destinationMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.destination.connection.pool.size"), 500);
+    destinationMongoTombstoneDb = properties.getProperty("mongo.destination.tombstone.db");
 
     //Solr/Zookeeper Destination
     destinationSolrHosts = properties.getProperty("solr.destination.hosts").split(",");

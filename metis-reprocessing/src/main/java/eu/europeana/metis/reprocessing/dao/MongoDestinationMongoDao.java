@@ -38,10 +38,12 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
+import eu.europeana.metis.reprocessing.config.PropertiesHolder;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
-import eu.europeana.metis.reprocessing.config.PropertiesHolder;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mongo Dao for destination mongo.
@@ -56,9 +58,11 @@ public class MongoDestinationMongoDao {
   private static final String DATASET_ID = "datasetId";
   private static final String FAILED_URL = "failedUrl";
   private static final String SUCCESSFULLY_REPROCESSED = "successfullyReprocessed";
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoDestinationMongoDao.class);
 
   private final MongoInitializer destinationMongoInitializer;
   private final Datastore mongoDestinationDatastore;
+  private final Datastore mongoDestinationTombstoneDatastore;
   private final PropertiesHolder propertiesHolder;
 
   public MongoDestinationMongoDao(PropertiesHolder propertiesHolder) {
@@ -66,74 +70,8 @@ public class MongoDestinationMongoDao {
     destinationMongoInitializer = prepareMongoDestinationConfiguration();
     mongoDestinationDatastore = createMongoDestinationDatastore(
         destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoDb);
-  }
-
-  public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
-    Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
-    query.filter(Filters.regex(FAILED_URL).pattern("^/" + datasetId + "/"))
-        .filter(Filters.eq(SUCCESSFULLY_REPROCESSED, false));
-    return MorphiaUtils.getListOfQueryRetryable(query,
-        new FindOptions().skip(nextPage * MongoSourceMongoDao.PAGE_SIZE)
-            .limit(MongoSourceMongoDao.PAGE_SIZE));
-  }
-
-  public List<DatasetStatus> getAllDatasetStatuses() {
-    return MorphiaUtils
-        .getListOfQueryRetryable(mongoDestinationDatastore.find(DatasetStatus.class));
-  }
-
-  public DatasetStatus getDatasetStatus(String datasetId) {
-    return mongoDestinationDatastore.find(DatasetStatus.class)
-        .filter(Filters.eq(DATASET_ID, datasetId)).first();
-  }
-
-  public void deleteDatasetStatus(String datasetId) {
-    mongoDestinationDatastore.find(DatasetStatus.class).filter(Filters.eq(DATASET_ID, datasetId))
-        .delete();
-  }
-
-  public void deleteAll() {
-    mongoDestinationDatastore.getDatabase().drop();
-    mongoDestinationDatastore.ensureIndexes();
-  }
-
-  public void dropTemporaryCollections() {
-    mongoDestinationDatastore.getDatabase().getCollection(DatasetStatus.class.getSimpleName())
-        .drop();
-    mongoDestinationDatastore.getDatabase().getCollection(FailedRecord.class.getSimpleName())
-        .drop();
-  }
-
-  public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
-    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
-        () -> mongoDestinationDatastore.save(datasetStatus));
-  }
-
-  public void storeFailedRecordToDb(FailedRecord failedRecord) {
-    //Will replace it if already existent
-    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
-        () -> mongoDestinationDatastore.save(failedRecord));
-  }
-
-  public void deleteFailedRecordFromDb(FailedRecord failedRecord) {
-    //Will replace it if already existent
-    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
-        () -> mongoDestinationDatastore.delete(failedRecord));
-  }
-
-  public void deleteAllSuccessfulReprocessedFailedRecords() {
-    Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
-    query.filter(Filters.eq(SUCCESSFULLY_REPROCESSED, true));
-    query.delete(new DeleteOptions().multi(true));
-  }
-
-  private MongoInitializer prepareMongoDestinationConfiguration() {
-    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.destinationMongoHosts,
-        propertiesHolder.destinationMongoPorts, propertiesHolder.destinationMongoAuthenticationDb,
-        propertiesHolder.destinationMongoUsername, propertiesHolder.destinationMongoPassword,
-        propertiesHolder.destinationMongoEnableSSL, propertiesHolder.destinationMongoConnectionPoolSize);
-    mongoInitializer.initializeMongoClient();
-    return mongoInitializer;
+    mongoDestinationTombstoneDatastore = createMongoDestinationDatastore(
+        destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoTombstoneDb);
   }
 
   private static Datastore createMongoDestinationDatastore(MongoClient mongoClient,
@@ -176,8 +114,76 @@ public class MongoDestinationMongoDao {
     return datastore;
   }
 
+  public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
+    Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
+    query.filter(Filters.regex(FAILED_URL).pattern("^/" + datasetId + "/"))
+         .filter(Filters.eq(SUCCESSFULLY_REPROCESSED, false));
+    return MorphiaUtils.getListOfQueryRetryable(query,
+        new FindOptions().skip(nextPage * MongoSourceMongoDao.PAGE_SIZE)
+                         .limit(MongoSourceMongoDao.PAGE_SIZE));
+  }
+
+  public List<DatasetStatus> getAllDatasetStatuses() {
+    return MorphiaUtils
+        .getListOfQueryRetryable(mongoDestinationDatastore.find(DatasetStatus.class));
+  }
+
+  public DatasetStatus getDatasetStatus(String datasetId) {
+    return mongoDestinationDatastore.find(DatasetStatus.class)
+                                    .filter(Filters.eq(DATASET_ID, datasetId)).first();
+  }
+
+  public void deleteDatasetStatus(String datasetId) {
+    mongoDestinationDatastore.find(DatasetStatus.class).filter(Filters.eq(DATASET_ID, datasetId))
+                             .delete();
+  }
+
+  public void deleteAll() {
+      mongoDestinationDatastore.getDatabase().drop();
+      mongoDestinationDatastore.ensureIndexes();
+  }
+
+  public void dropTemporaryCollections() {
+    mongoDestinationDatastore.getDatabase().getCollection(DatasetStatus.class.getSimpleName())
+                             .drop();
+    mongoDestinationDatastore.getDatabase().getCollection(FailedRecord.class.getSimpleName())
+                             .drop();
+  }
+
+  public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
+        () -> mongoDestinationDatastore.save(datasetStatus));
+  }
+
+  public void storeFailedRecordToDb(FailedRecord failedRecord) {
+    //Will replace it if already existent
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
+        () -> mongoDestinationDatastore.save(failedRecord));
+  }
+
+  public void deleteFailedRecordFromDb(FailedRecord failedRecord) {
+    //Will replace it if already existent
+    ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
+        () -> mongoDestinationDatastore.delete(failedRecord));
+  }
+
+  public void deleteAllSuccessfulReprocessedFailedRecords() {
+    Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
+    query.filter(Filters.eq(SUCCESSFULLY_REPROCESSED, true));
+    query.delete(new DeleteOptions().multi(true));
+  }
+
   public void close() {
     destinationMongoInitializer.close();
+  }
+
+  private MongoInitializer prepareMongoDestinationConfiguration() {
+    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.destinationMongoHosts,
+        propertiesHolder.destinationMongoPorts, propertiesHolder.destinationMongoAuthenticationDb,
+        propertiesHolder.destinationMongoUsername, propertiesHolder.destinationMongoPassword,
+        propertiesHolder.destinationMongoEnableSSL, propertiesHolder.destinationMongoConnectionPoolSize);
+    mongoInitializer.initializeMongoClient();
+    return mongoInitializer;
   }
 
 }

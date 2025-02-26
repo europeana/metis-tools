@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:doap="http://usefulinc.com/ns/doap#" xmlns:odrl="http://www.w3.org/ns/odrl/2/" xmlns:cc="http://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:svcs="http://rdfs.org/sioc/services#" xmlns:oa="http://www.w3.org/ns/oa#" xmlns:dqv="http://www.w3.org/ns/dqv#">
+  <edm:ProvidedCHO rdf:about="/9200579/kyaq8pq9"/>
+  <edm:WebResource rdf:about="https://iiif.wellcomecollection.org/image/L0057920.jpg/full/512,/0/default.jpg">
+    <ebucore:hasMimeType>image/jpeg</ebucore:hasMimeType>
+    <ebucore:fileByteSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">32330</ebucore:fileByteSize>
+    <ebucore:width rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">512</ebucore:width>
+    <ebucore:height rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">338</ebucore:height>
+    <edm:hasColorSpace>sRGB</edm:hasColorSpace>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#696969</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#2F4F4F</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#808080</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#000000</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#800000</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#556B2F</edm:componentColor>
+    <ebucore:orientation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">landscape</ebucore:orientation>
+    <svcs:has_service rdf:resource="https://iiif.wellcomecollection.org/image/L0057920.jpg"/>
+  </edm:WebResource>
+  <edm:WebResource rdf:about="https://wellcomecollection.org/works/kyaq8pq9">
+    <ebucore:hasMimeType>text/html</ebucore:hasMimeType>
+    <ebucore:fileByteSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">266688</ebucore:fileByteSize>
+  </edm:WebResource>
+  <edm:WebResource rdf:about="https://iiif.wellcomecollection.org/image/L0057920.jpg/full/500,/0/default.jpg">
+    <ebucore:hasMimeType>image/jpeg</ebucore:hasMimeType>
+    <ebucore:fileByteSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">30958</ebucore:fileByteSize>
+    <ebucore:width rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">500</ebucore:width>
+    <ebucore:height rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">330</ebucore:height>
+    <edm:hasColorSpace>sRGB</edm:hasColorSpace>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#696969</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#2F4F4F</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#808080</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#000000</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#800000</edm:componentColor>
+    <edm:componentColor rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">#556B2F</edm:componentColor>
+    <ebucore:orientation rdf:datatype="http://www.w3.org/2001/XMLSchema#string">landscape</ebucore:orientation>
+  </edm:WebResource>
+  <ore:Aggregation rdf:about="/aggregation/provider/9200579/kyaq8pq9">
+    <edm:aggregatedCHO rdf:resource="/9200579/kyaq8pq9"/>
+    <edm:dataProvider rdf:resource="http://data.europeana.eu/organization/1482250000044932001"></edm:dataProvider>
+    <edm:isShownAt rdf:resource="https://wellcomecollection.org/works/kyaq8pq9"/>
+    <edm:isShownBy rdf:resource="https://iiif.wellcomecollection.org/image/L0057920.jpg/full/512,/0/default.jpg"/>
+    <edm:object rdf:resource="https://iiif.wellcomecollection.org/image/L0057920.jpg/full/500,/0/default.jpg"/>
+    <edm:provider rdf:resource="http://data.europeana.eu/organization/1482250000044932001"></edm:provider>
+    <edm:rights rdf:resource="http://creativecommons.org/licenses/by/4.0/"/>
+    <dqv:hasQualityAnnotation>
+      <dqv:QualityAnnotation>
+        <dcterms:created>2019-07-17T02:22:31.290Z</dcterms:created>
+        <oa:hasTarget rdf:resource="/aggregation/provider/9200579/kyaq8pq9"/>
+        <oa:hasBody rdf:resource="http://www.europeana.eu/schemas/epf/contentTier1"/>
+      </dqv:QualityAnnotation>
+    </dqv:hasQualityAnnotation>
+    <dqv:hasQualityAnnotation>
+      <dqv:QualityAnnotation>
+        <dcterms:created>2019-07-17T02:22:31.290Z</dcterms:created>
+        <oa:hasTarget rdf:resource="/aggregation/provider/9200579/kyaq8pq9"/>
+        <oa:hasBody rdf:resource="http://www.europeana.eu/schemas/epf/metadataTierA"/>
+      </dqv:QualityAnnotation>
+    </dqv:hasQualityAnnotation>
+  </ore:Aggregation>
+  <ore:Proxy rdf:about="/proxy/provider/9200579/kyaq8pq9">
+    <dc:creator>Science Museum, London</dc:creator>
+    <dc:description xml:lang="en">This invention was made for a man who had lost both arms at the shoulders, an extremely rare injury even among the 41,000 British servicemen who lost one or more limbs during the First World War. For these men, their injuries were so severe that no limb stump remained to which an artificial limb could be attached. In this crude device, a canvas strip which has a pencil attached to a wooden disc at the front was strapped around the chest. Once the pencil was on a sheet of paper, the amputee would write via movements of his torso. This would have been extremely difficult. It was invented by a Major Maclure, an officer in the British Army. maker: Unknown maker Place made: England, United Kingdom</dc:description>
+    <dc:identifier>L0057920</dc:identifier>
+    <dc:identifier>Science Museum A602815</dc:identifier>
+    <dc:identifier>kyaq8pq9</dc:identifier>
+    <dc:rights>Credit: Science Museum, London</dc:rights>
+    <dc:source>L0057920</dc:source>
+    <dc:subject xml:lang="en">chest pencil</dc:subject>
+    <dc:title>Chest pencil, England, 1914-1920</dc:title>
+    <edm:europeanaProxy>false</edm:europeanaProxy>
+    <ore:proxyFor rdf:resource="/9200579/kyaq8pq9"/>
+    <ore:proxyIn rdf:resource="/aggregation/provider/9200579/kyaq8pq9"/>
+    <edm:type>IMAGE</edm:type>
+  </ore:Proxy>
+  <ore:Proxy rdf:about="/proxy/europeana/9200579/kyaq8pq9">
+    <edm:europeanaProxy>true</edm:europeanaProxy>
+    <ore:proxyFor rdf:resource="/9200579/kyaq8pq9"/>
+    <ore:proxyIn rdf:resource="/aggregation/europeana/9200579/kyaq8pq9"/>
+    <edm:type>IMAGE</edm:type>
+  </ore:Proxy>
+  <edm:EuropeanaAggregation rdf:about="/aggregation/europeana/9200579/kyaq8pq9">
+    <edm:aggregatedCHO rdf:resource="/9200579/kyaq8pq9"/>
+    <edm:datasetName>9200579_Ag_UK_WellcomeCollection_IIIF</edm:datasetName>
+    <edm:country>United Kingdom</edm:country>
+    <edm:preview rdf:resource="https://iiif.wellcomecollection.org/image/L0057920.jpg/full/500,/0/default.jpg"/>
+    <edm:landingPage rdf:resource="https://www.europeana.eu/item/9200579/kyaq8pq9"/>
+    <edm:language>en</edm:language>
+    <edm:completeness>10</edm:completeness>
+    <dcterms:created>2019-06-09T12:27:15.240Z</dcterms:created>
+    <dcterms:modified>2019-06-09T12:27:15.240Z</dcterms:modified>
+    <dqv:hasQualityAnnotation>
+      <dqv:QualityAnnotation>
+        <dcterms:created>2019-07-17T02:22:31.290Z</dcterms:created>
+        <oa:hasTarget rdf:resource="/aggregation/europeana/9200579/kyaq8pq9"/>
+        <oa:hasBody rdf:resource="http://www.europeana.eu/schemas/epf/contentTier1"/>
+      </dqv:QualityAnnotation>
+    </dqv:hasQualityAnnotation>
+    <dqv:hasQualityAnnotation>
+      <dqv:QualityAnnotation>
+        <dcterms:created>2019-07-17T02:22:31.290Z</dcterms:created>
+        <oa:hasTarget rdf:resource="/aggregation/europeana/9200579/kyaq8pq9"/>
+        <oa:hasBody rdf:resource="http://www.europeana.eu/schemas/epf/metadataTierA"/>
+      </dqv:QualityAnnotation>
+    </dqv:hasQualityAnnotation>
+  </edm:EuropeanaAggregation>
+  <foaf:Organization rdf:about="http://data.europeana.eu/organization/1482250000044932001">
+    <skos:prefLabel xml:lang="en">Wellcome Collection</skos:prefLabel>
+  </foaf:Organization>
+  <svcs:Service rdf:about="https://iiif.wellcomecollection.org/image/L0057920.jpg">
+    <dcterms:conformsTo rdf:resource="http://iiif.io/api/image"></dcterms:conformsTo>
+    <doap:implements rdf:resource="http://iiif.io/api/image/2/level1.json"/>
+  </svcs:Service>
+</rdf:RDF>

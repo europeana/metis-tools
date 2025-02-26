@@ -18,7 +18,11 @@ dataset.ids.to.process=
 identity.process=
 #Set to true if we want to clear the database before we start a new process. Only applicable for DEFAULT Mode
 clean.databases.before.process=
-tier.recalculation=
+#Possible values INITIALISE, SKIP, OVERWRITE
+#INITIALISE Initialise perform tier calculation only if no tiers exist
+#SKIP Skip tier calculation mode. Do not perform any tier calculation
+#OVERWRITE Overwrite tier calculation mode. Always perform tier calculation, overwriting any existing tiers
+tier.calculation.mode=INITIALISE
 #The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon. For example ENRICHMENT. MUST not be empty if mode is POST_PROCESS
 reprocess.based.on.plugin.type=
 #The plugins in metis core to invalidate during POST_PROCESS. For example if the base plugin type was ENRICHMENT then the plugins that have to be invalidated would be the ones following ENRICHMENT. MUST not be empty if mode is POST_PROCESS
@@ -58,6 +62,7 @@ mongo.destination.username=
 mongo.destination.password=
 mongo.destination.enableSSL=false
 mongo.destination.db=
+mongo.destination.tombstone.db=
 #Not setting this will results to default
 mongo.metis.core.connection.pool.size=
 

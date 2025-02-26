@@ -1,26 +1,21 @@
 package eu.europeana.metis.reprocessing.config;
 
-import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.enrichment.api.external.impl.ClientEntityResolver;
-import eu.europeana.enrichment.api.external.model.EnrichmentBase;
 import eu.europeana.enrichment.api.internal.*;
 import eu.europeana.enrichment.rest.client.EnrichmentWorker;
 import eu.europeana.enrichment.rest.client.EnrichmentWorkerImpl;
-import eu.europeana.enrichment.rest.client.dereference.DereferencedEntities;
 import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
 import eu.europeana.enrichment.rest.client.dereference.DereferencerProvider;
 import eu.europeana.enrichment.rest.client.enrichment.Enricher;
 import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
-import eu.europeana.enrichment.rest.client.enrichment.MetisRecordParser;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
-import eu.europeana.enrichment.rest.client.report.Report;
 import eu.europeana.enrichment.utils.EntityMergeEngine;
-import eu.europeana.enrichment.utils.RdfEntityUtils;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.web.EntityClientApiImpl;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
@@ -31,26 +26,14 @@ import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfiguration
 import eu.europeana.normalization.Normalizer;
 import eu.europeana.normalization.NormalizerFactory;
 import eu.europeana.normalization.NormalizerStep;
-import eu.europeana.normalization.model.NormalizationBatchResult;
 import eu.europeana.normalization.util.NormalizationConfigurationException;
-import eu.europeana.normalization.util.NormalizationException;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import static eu.europeana.enrichment.api.internal.EntityResolver.europeanaLinkPattern;
 
 /**
  * Extra configuration class that is part of {@link Configuration}.
@@ -147,8 +130,32 @@ public class DefaultConfiguration extends Configuration {
 //        rdf = europeanaLinksReDereference(rdf);
 //        rdf = organizationEnrichment(rdf);
 //        rdf = rightsFix(rdf);
-
+        rdf = computeTierCalculation(rdf);
         LOGGER.debug("DONE");
+        return rdf;
+    }
+
+    // change method name to main to generate xml for checks
+    static void generateXML(String [] args)
+        throws IndexingException, DereferenceException, NormalizationConfigurationException, TrustStoreConfigurationException, EnrichmentException, URISyntaxException, ProcessingException, SerializationException {
+        DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
+            "application.properties"));
+        List<FullBeanImpl> fullBeanList = defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(
+            List.of(
+                //"/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
+                //"/2048128/114145",
+                //"/9200579/kyaq8pq9",
+                //"/9200359/BibliographicResource_3000123626519",
+                "/9200579/cynwkevu"
+            ));
+
+        for (FullBeanImpl fb : fullBeanList) {
+            RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
+            LOGGER.info ("{}\r\n",defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+        }
+    }
+
+    RDF computeTierCalculation(RDF rdf) {
         return rdf;
     }
 
