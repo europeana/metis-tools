@@ -9,9 +9,6 @@ import org.springframework.context.annotation.PropertySource;
 /**
  * Contains all properties that are required for execution.
  * <p>During construction will read properties from the specified file from the classpath.</p>
- *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2020-03-11
  */
 @Configuration
 @PropertySource(value = "file:application.properties", ignoreResourceNotFound = true)
@@ -19,33 +16,33 @@ import org.springframework.context.annotation.PropertySource;
 public class ConfigurationPropertiesHolder {
 
   @Value("${creation.database.type}")
-  private  CreationDatabaseType creationDatabaseType;
+  private CreationDatabaseType creationDatabaseType;
   @Value("${database.drop.first}")
   private Boolean databaseDropFirst;
   @Value("${truststore.path}")
-  private  String truststorePath;
+  private String truststorePath;
   @Value("${truststore.password}")
-  private  String truststorePassword;
+  private String truststorePassword;
   @Value("${mongo.hosts}")
-  private  String[] mongoHosts;
+  private String[] mongoHosts;
   @Value("${mongo.port}")
-  private  int[] mongoPorts;
+  private int[] mongoPorts;
   @Value("${mongo.authentication.db}")
-  private  String mongoAuthenticationDb;
+  private String mongoAuthenticationDb;
   @Value("${mongo.username}")
-  private  String mongoUsername;
+  private String mongoUsername;
   @Value("${mongo.password}")
-  public  String mongoPassword;
+  public String mongoPassword;
   @Value("${mongo.enableSSL}")
-  private  boolean mongoEnableSSL;
+  private boolean mongoEnableSSL;
   @Value("${mongo.db}")
-  private  String[] mongoDb;
+  private String[] mongoDb;
 
   public MongoProperties<IllegalArgumentException> getMongoProperties() {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
         IllegalArgumentException::new);
     mongoProperties.setAllProperties(mongoHosts, mongoPorts, mongoAuthenticationDb, mongoUsername,
-        mongoPassword, mongoEnableSSL, ReadPreferenceValue.PRIMARY ,null);
+        mongoPassword, mongoEnableSSL, ReadPreferenceValue.PRIMARY, null);
     return mongoProperties;
   }
 

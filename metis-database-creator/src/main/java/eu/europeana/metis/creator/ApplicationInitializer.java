@@ -5,17 +5,12 @@ import eu.europeana.metis.creator.utilities.ConfigurationPropertiesHolder;
 import eu.europeana.metis.mongo.connection.MongoClientProvider;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Initialize MongoClient
- *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2020-03-11
  */
 public class ApplicationInitializer implements AutoCloseable {
 
@@ -34,7 +29,7 @@ public class ApplicationInitializer implements AutoCloseable {
     LOGGER.info("Append default truststore with custom truststore");
     if (StringUtils.isNotEmpty(propertiesHolder.getTruststorePath()) && StringUtils
         .isNotEmpty(propertiesHolder.getTruststorePassword())) {
-      CustomTruststoreAppender.appendCustomTrustoreToDefault(propertiesHolder.getTruststorePath(),
+      CustomTruststoreAppender.appendCustomTruststoreToDefault(propertiesHolder.getTruststorePath(),
           propertiesHolder.getTruststorePassword());
     }
 

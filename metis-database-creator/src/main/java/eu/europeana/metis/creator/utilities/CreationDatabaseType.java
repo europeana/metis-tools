@@ -1,9 +1,8 @@
 package eu.europeana.metis.creator.utilities;
 
 /**
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2020-03-11
+ * Enum used for selecting the database that we wish to create/initialize.
  */
 public enum CreationDatabaseType {
-  RECORD_REDIRECT, RECORD, METIS_CORE;
+  RECORD_TOMBSTONE, RECORD_REDIRECT, RECORD, METIS_CORE;
 }

@@ -6,6 +6,7 @@ import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.creator.utilities.ConfigurationPropertiesHolder;
 import eu.europeana.metis.mongo.dao.RecordDao;
 import eu.europeana.metis.mongo.dao.RecordRedirectDao;
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import org.slf4j.Logger;
@@ -15,16 +16,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * This class is used to create databases based on configuration or initialize the creation of
- * indexes on fields in an already existent database. It should be ran with extreme caution.
- *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2020-03-11
+ * This class is used to create databases based on configuration or initialize the creation of indexes on fields in an already
+ * existent database. It should be ran with extreme caution.
  */
 @SpringBootApplication
 public class DatabaseCreatorMain {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseCreatorMain.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final BiConsumer<MongoClient, String> NOOP = (p1, p2) -> {
   };
   private static ConfigurationPropertiesHolder configurationPropertiesHolder;
@@ -45,7 +43,7 @@ public class DatabaseCreatorMain {
       //Drop dbs first if requested
       if (Boolean.TRUE.equals(configurationPropertiesHolder.getDatabaseDropFirst())) {
         Arrays.stream(configurationPropertiesHolder.getMongoDb()).map(mongoClient::getDatabase)
-            .forEach(MongoDatabase::drop);
+              .forEach(MongoDatabase::drop);
       }
       //Choose type of morphia initialization
       final BiConsumer<MongoClient, String> morphiaInitializer;
@@ -56,7 +54,7 @@ public class DatabaseCreatorMain {
         case METIS_CORE:
           morphiaInitializer = getMetisCoreDatabaseInitializer();
           break;
-        case RECORD:
+        case RECORD, RECORD_TOMBSTONE:
           morphiaInitializer = getRecordDatabaseInitializer();
           break;
         default:
@@ -65,13 +63,14 @@ public class DatabaseCreatorMain {
       }
       //Create dbs and/or indexes
       Arrays.stream(configurationPropertiesHolder.getMongoDb())
-          .forEach(databaseName -> morphiaInitializer.accept(mongoClient, databaseName));
+            .forEach(databaseName -> morphiaInitializer.accept(mongoClient, databaseName));
     }
     LOGGER.info("Finished creation database script");
   }
 
   /**
    * Get the initializer for record redirect database.
+   *
    * @return the initializer for record redirect database
    */
   private static BiConsumer<MongoClient, String> getRecordRedirectDatabaseInitializer() {
@@ -80,6 +79,7 @@ public class DatabaseCreatorMain {
 
   /**
    * Get the initializer for metis core database.
+   *
    * @return the initializer for metis core database
    */
   private static BiConsumer<MongoClient, String> getMetisCoreDatabaseInitializer() {
@@ -91,6 +91,7 @@ public class DatabaseCreatorMain {
    * Get the initializer for record database.
    * <p>The europeana database that contains the
    * {@link eu.europeana.corelib.solr.bean.impl.FullBeanImpl}s</p>
+   *
    * @return the initializer for record database
    */
   private static BiConsumer<MongoClient, String> getRecordDatabaseInitializer() {
