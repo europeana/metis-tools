@@ -1,16 +1,24 @@
 package eu.europeana.metis.reprocessing.config;
 
+import static eu.europeana.enrichment.api.internal.EntityResolver.europeanaLinkPattern;
+
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.enrichment.api.external.impl.ClientEntityResolver;
-import eu.europeana.enrichment.api.internal.*;
+import eu.europeana.enrichment.api.external.model.EnrichmentBase;
+import eu.europeana.enrichment.api.internal.AggregationFieldType;
+import eu.europeana.enrichment.api.internal.EntityResolver;
+import eu.europeana.enrichment.api.internal.ReferenceTerm;
+import eu.europeana.enrichment.api.internal.ReferenceTermImpl;
 import eu.europeana.enrichment.rest.client.EnrichmentWorker;
 import eu.europeana.enrichment.rest.client.EnrichmentWorkerImpl;
+import eu.europeana.enrichment.rest.client.dereference.DereferencedEntities;
 import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
 import eu.europeana.enrichment.rest.client.dereference.DereferencerProvider;
 import eu.europeana.enrichment.rest.client.enrichment.Enricher;
 import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
+import eu.europeana.enrichment.rest.client.report.Report;
 import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.web.EntityClientApiImpl;
@@ -21,19 +29,40 @@ import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
 import eu.europeana.metis.schema.convert.RdfConversionUtils;
 import eu.europeana.metis.schema.convert.SerializationException;
-import eu.europeana.metis.schema.jibx.*;
+import eu.europeana.metis.schema.jibx.AboutType;
+import eu.europeana.metis.schema.jibx.Aggregation;
+import eu.europeana.metis.schema.jibx.DataProvider;
+import eu.europeana.metis.schema.jibx.Organization;
+import eu.europeana.metis.schema.jibx.Provider;
+import eu.europeana.metis.schema.jibx.RDF;
+import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.normalization.Normalizer;
 import eu.europeana.normalization.NormalizerFactory;
 import eu.europeana.normalization.NormalizerStep;
 import eu.europeana.normalization.util.NormalizationConfigurationException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.*;
 
 /**
  * Extra configuration class that is part of {@link Configuration}.
@@ -100,7 +129,7 @@ public class DefaultConfiguration extends Configuration {
     private Dereferencer getDereferencer(PropertiesHolderExtension propertiesHolderExtension) throws DereferenceException {
         if (StringUtils.isNotBlank(propertiesHolderExtension.dereferenceUrl)) {
             final DereferencerProvider dereferencerProvider = new DereferencerProvider();
-            dereferencerProvider.setEnrichmentPropertiesValues(propertiesHolderExtension.entityManagementUrl, propertiesHolderExtension.entityApiUrl, propertiesHolderExtension.entityApiKey);
+            dereferencerProvider.setEnrichmentPropertiesValuesWithRedirect(propertiesHolderExtension.entityManagementUrl, propertiesHolderExtension.entityApiUrl, propertiesHolderExtension.entityApiKey);
             dereferencerProvider.setDereferenceUrl(propertiesHolderExtension.dereferenceUrl);
             return dereferencerProvider.create();
         }
@@ -131,12 +160,13 @@ public class DefaultConfiguration extends Configuration {
 //        rdf = organizationEnrichment(rdf);
 //        rdf = rightsFix(rdf);
         rdf = computeTierCalculation(rdf);
+        rdf = updateOrganizations(rdf);
         LOGGER.debug("DONE");
         return rdf;
     }
 
-    // change method name to main to generate xml for checks
-    static void generateXML(String [] args)
+    // change method name to `main` to generate xml for checks of the rdf
+    public static void testMain(String [] args)
         throws IndexingException, DereferenceException, NormalizationConfigurationException, TrustStoreConfigurationException, EnrichmentException, URISyntaxException, ProcessingException, SerializationException {
         DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
             "application.properties"));
@@ -145,18 +175,153 @@ public class DefaultConfiguration extends Configuration {
                 //"/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
                 //"/2048128/114145",
                 //"/9200579/kyaq8pq9",
-                //"/9200359/BibliographicResource_3000123626519",
-                "/9200579/cynwkevu"
+                //"/2051906/data_euscreenXL_PGM4299160"
+                //"/9200359/BibliographicResource_3000123626519"
+                //"/9200579/cynwkevu"
+                "/9200359/BibliographicResource_3000115604529" //organization example
+               // "/1262/21_15123__myx4AY"
             ));
 
         for (FullBeanImpl fb : fullBeanList) {
             RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
-            LOGGER.info ("{}\r\n",defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+
+            LOGGER.info ("Before:\r\n{}\r\n",defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+            defaultConfiguration.updateOrganizations(rdf);
+            LOGGER.info ("After:\r\n{}\r\n",defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
         }
     }
 
     RDF computeTierCalculation(RDF rdf) {
         return rdf;
+    }
+
+    RDF updateOrganizations(RDF rdf) {
+        LOGGER.info("Organization Update");
+        //Find europeana id organizations that are linked in provider aggregation supported fields
+        List<Aggregation> aggregationList = rdf.getAggregationList();
+        Set<String> aggregationEuropeanaLinks = new HashSet<>();
+        for (AggregationFieldType aggregationFieldType : AggregationFieldType.values()) {
+            aggregationList.stream().flatMap(aggregationFieldType::extractFields)
+                           .map(ResourceOrLiteralType::getResource)
+                           .filter(Objects::nonNull)
+                           .map(ResourceOrLiteralType.Resource::getResource)
+                           .filter(europeanaLinkPattern.asPredicate()) // check if only this organization
+                           .forEach(aggregationEuropeanaLinks::add);
+        }
+        //Check all present entities and collect links that match
+        final Map<Class<? extends AboutType>, Set<String>> entitiesToUpdate = new HashMap<>();
+        extendEntitiesMap(entitiesToUpdate, Organization.class, findMatchingEntityLinks(aggregationEuropeanaLinks, rdf::getOrganizationList));
+
+        //Request new entities
+        HashMap<Class<? extends AboutType>, DereferencedEntities> dereferencedEntities = dereferenceEntities(entitiesToUpdate);
+        replaceEntities(rdf, dereferencedEntities);
+        return rdf;
+    }
+
+    private static void extendEntitiesMap(Map<Class<? extends AboutType>, Set<String>> entities,
+        Class<? extends AboutType> classType, Set<String> entitiesToUpdate) {
+        entities.computeIfAbsent(classType, v -> new HashSet<>());
+        entities.computeIfPresent(classType, (k, v) -> {
+            v.addAll(entitiesToUpdate);
+            return v;
+        });
+    }
+
+    private static <T extends AboutType> Set<String> findMatchingEntityLinks(Set<String> europeanaLinks, Supplier<List<T>> entitySupplier) {
+        return Optional.ofNullable(entitySupplier.get()).orElseGet(Collections::emptyList)
+                       .stream().map(AboutType::getAbout)
+                       .filter(europeanaLinks::contains)
+                       .collect(Collectors.toSet());
+    }
+
+    private static void replaceEntities(RDF rdf,
+        HashMap<Class<? extends AboutType>, DereferencedEntities> dereferencedEntitiesMap) {
+        for (Map.Entry<Class<? extends AboutType>, DereferencedEntities> entry : dereferencedEntitiesMap.entrySet()) {
+            DereferencedEntities dereferencedEntities = entry.getValue();
+            Map<ReferenceTerm, List<EnrichmentBase>> referenceTermListMap = dereferencedEntities.getReferenceTermListMap();
+
+            List<? extends AboutType> entitiesList = new ArrayList<>();
+            if (entry.getKey().isNestmateOf(Organization.class)) {
+                entitiesList = rdf.getOrganizationList();
+            }
+
+            findAndReplaceUpdatedEntity(rdf, referenceTermListMap, entitiesList);
+        }
+    }
+
+    private static void findAndReplaceUpdatedEntity(RDF rdf, Map<ReferenceTerm, List<EnrichmentBase>> referenceTermListMap,
+        List<? extends AboutType> entitiesList) {
+        //At this point the dereference values should contain 0 or 1 but not more results per reference
+        for (Map.Entry<ReferenceTerm, List<EnrichmentBase>> referenceTermListEntry : referenceTermListMap.entrySet()) {
+            if (CollectionUtils.isNotEmpty(referenceTermListEntry.getValue())
+                && referenceTermListEntry.getValue().getFirst() != null) {
+                EnrichmentBase enrichmentBase = referenceTermListEntry.getValue().getFirst();
+
+                //Find if we have a match and update current rdf
+                ListIterator<? extends AboutType> entitiesListIterator = entitiesList.listIterator();
+                boolean removedOld = false;
+                while (entitiesListIterator.hasNext()) {
+                    String about = entitiesListIterator.next().getAbout();
+                    if (referenceTermListEntry.getKey().getReference().toString().equals(about)) {
+                        entitiesListIterator.remove();
+                        removedOld = true;
+                        updateAggregationResources(rdf, about, enrichmentBase);
+                        break;
+                    }
+                }
+
+                //Replace if removed
+                if (removedOld) {
+                    EntityMergeEngine.convertAndAddEntity(rdf, enrichmentBase);
+                }
+            }
+        }
+    }
+
+    private static void updateAggregationResources(RDF rdf, String about, EnrichmentBase enrichmentBase) {
+        List<Aggregation> list = new ArrayList<>();
+        for (Aggregation aggregation : rdf.getAggregationList()) {
+            if (aggregation.getDataProvider().getResource().getResource().equals(about)) {
+                DataProvider dataProvider = aggregation.getDataProvider();
+                dataProvider.getResource().setResource(enrichmentBase.getAbout());
+            }
+            if (aggregation.getProvider().getResource().getResource().equals(about)) {
+                Provider provider = aggregation.getProvider();
+                provider.getResource().setResource(enrichmentBase.getAbout());
+            }
+            aggregation.getIntermediateProviderList().forEach(p -> {
+                    if (p.getResource().getResource().equals(about)) {
+                        p.getResource().setResource(enrichmentBase.getAbout());
+                    }
+                }
+            );
+
+            list.add(aggregation);
+        }
+        rdf.setAggregationList(list);
+    }
+
+    private static URL getUrl(String link) {
+        try {
+            return URI.create(link).toURL();
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
+    private HashMap<Class<? extends AboutType>, DereferencedEntities> dereferenceEntities(
+        Map<Class<? extends AboutType>, Set<String>> entitiesLinksToDereference) {
+        HashMap<Class<? extends AboutType>, DereferencedEntities> dereferencedResultEntities = new HashMap<>();
+
+        for (Map.Entry<Class<? extends AboutType>, Set<String>> entry : entitiesLinksToDereference.entrySet()) {
+            final HashSet<Report> reports = new HashSet<>();
+            Set<ReferenceTerm> referenceTerms = entry.getValue().stream()
+                    .map(DefaultConfiguration::getUrl).filter(Objects::nonNull).map(url -> new ReferenceTermImpl(url, new HashSet<>()))
+                    .collect(Collectors.toSet());
+            final DereferencedEntities dereferencedOwnEntities = dereferencer.dereferenceOwnEntities(referenceTerms, reports, entry.getKey());
+            dereferencedResultEntities.put(entry.getKey(), dereferencedOwnEntities);
+        }
+
+        return dereferencedResultEntities;
     }
 
 //    RDF translations(RDF rdf) {
