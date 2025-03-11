@@ -16,6 +16,7 @@ import eu.europeana.enrichment.rest.client.enrichment.Enricher;
 import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
+import eu.europeana.enrichment.rest.client.report.Report;
 import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.web.EntityClientApiImpl;
@@ -23,6 +24,8 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
+import eu.europeana.metis.schema.convert.RdfConversionUtils;
+import eu.europeana.metis.schema.convert.SerializationException;
 import eu.europeana.metis.schema.jibx.AboutType;
 import eu.europeana.metis.schema.jibx.Aggregation;
 import eu.europeana.metis.schema.jibx.DataProvider;
@@ -32,6 +35,7 @@ import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.normalization.util.NormalizationConfigurationException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -70,7 +74,7 @@ public class DefaultConfiguration extends Configuration {
   private final ThrowingQuadConsumer<String, Date, Date, Configuration> afterReprocessProcessor;
 
   private EnrichmentWorker enrichmentWorker;
-  //    private final RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
+  private final RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
   //    private final Normalizer normalizer = new NormalizerFactory().getNormalizer(NormalizerStep.DATES_NORMALIZER);
   private Dereferencer dereferencer;
   private Enricher enricher;
@@ -153,20 +157,27 @@ public class DefaultConfiguration extends Configuration {
   private static void updateAggregationResources(RDF rdf, String about, EnrichmentBase enrichmentBase) {
     List<Aggregation> list = new ArrayList<>();
     for (Aggregation aggregation : rdf.getAggregationList()) {
-      if (aggregation.getDataProvider().getResource().getResource().equals(about)) {
+      if (aggregation.getDataProvider().getResource() != null
+          && aggregation.getDataProvider().getResource().getResource()
+                        .equals(about)) {
         DataProvider dataProvider = aggregation.getDataProvider();
         dataProvider.getResource().setResource(enrichmentBase.getAbout());
       }
-      if (aggregation.getProvider().getResource().getResource().equals(about)) {
+      if (aggregation.getProvider().getResource() != null
+          && aggregation.getProvider().getResource().getResource()
+                        .equals(about)) {
         Provider provider = aggregation.getProvider();
         provider.getResource().setResource(enrichmentBase.getAbout());
       }
-      aggregation.getIntermediateProviderList().forEach(p -> {
-            if (p.getResource().getResource().equals(about)) {
-              p.getResource().setResource(enrichmentBase.getAbout());
+      if (aggregation.getIntermediateProviderList() != null) {
+        aggregation.getIntermediateProviderList().forEach(p -> {
+              if (p.getResource().getResource().equals(about)) {
+                p.getResource().setResource(enrichmentBase.getAbout());
+              }
             }
-          }
-      );
+        );
+      }
+
 
       list.add(aggregation);
     }
@@ -191,31 +202,51 @@ public class DefaultConfiguration extends Configuration {
     return rdfIndexer;
   }
 
+  public static String getResourceFileContent(String fileName) {
+    try {
+      return new String(DefaultConfiguration.class.getClassLoader().getResourceAsStream(fileName).readAllBytes());
+    } catch (IOException ioException) {
+      return "";
+    }
+  }
+
   // change method name to `main` to generate xml for checks of the rdf
-  //    public static void testMain(String [] args)
-  //        throws IndexingException, DereferenceException, NormalizationConfigurationException, TrustStoreConfigurationException, EnrichmentException, URISyntaxException, ProcessingException, SerializationException {
-  //        DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
-  //            "application.properties"));
-  //        List<FullBeanImpl> fullBeanList = defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(
-  //            List.of(
-  //                //"/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
-  //                //"/2048128/114145",
-  //                //"/9200579/kyaq8pq9",
-  //                //"/2051906/data_euscreenXL_PGM4299160"
-  //                //"/9200359/BibliographicResource_3000123626519"
-  //                //"/9200579/cynwkevu"
-  //                "/9200359/BibliographicResource_3000115604529" //organization example
-  //               // "/1262/21_15123__myx4AY"
-  //            ));
-  //
-  //        for (FullBeanImpl fb : fullBeanList) {
-  //            RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
-  //
-  //            LOGGER.info ("Before:\r\n{}\r\n",defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-  //            defaultConfiguration.updateOrganizations(rdf);
-  //            LOGGER.info ("After:\r\n{}\r\n",defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-  //        }
-  //    }
+//  public static void main(String[] args)
+//      throws IndexingException, DereferenceException, NormalizationConfigurationException,
+//      TrustStoreConfigurationException, EnrichmentException, URISyntaxException,
+//      SerializationException {
+//    DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
+//        "application.properties"));
+//
+//    //    List<FullBeanImpl> fullBeanList = defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(
+//    //        List.of(
+//    //            //"/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
+//    //            //"/2048128/114145",
+//    //            //"/9200579/kyaq8pq9",
+//    //            //"/2051906/data_euscreenXL_PGM4299160"
+//    //            //"/9200359/BibliographicResource_3000123626519"
+//    //            //"/9200579/cynwkevu"
+//    //            "/9200359/BibliographicResource_3000115604529" //organization example
+//    //            // "/1262/21_15123__myx4AY"
+//    //        ));
+//
+//    //    for (FullBeanImpl fb : fullBeanList) {
+//    //      RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
+//    //
+//    //      LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+//    //      defaultConfiguration.updateOrganizations(rdf);
+//    //      LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+//    //    }
+//    /// //////////////////////////////////////////////////////////
+////    RDF rdf = defaultConfiguration.rdfConversionUtils.convertStringToRdf(
+////        getResourceFileContent("unit_test/test_enrichment_organizations.xml"));
+////    LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+////    Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
+////    defaultConfiguration.updateOrganizations(rdf);
+////    LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+////    reports.forEach(System.out::println);
+//    /// //////////////////////////////////////////////////////////
+//  }
 
   @Override
   public ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor() {

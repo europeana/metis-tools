@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+  xmlns:ore="http://www.openarchives.org/ore/terms/"
+  xmlns:oa="http://www.w3.org/ns/oa#" xmlns:dqv="http://www.w3.org/ns/dqv#">
+  <edm:ProvidedCHO
+    rdf:about="http://data.europeana.eu/item/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+  <edm:WebResource rdf:about="https://ddd.uab.cat/pub/llibres/1916/100377/ferdef_a1916.pdf">
+    <rdf:type rdf:resource="http://www.europeana.eu/schemas/edm/FullTextResource"/>
+    <ebucore:hasMimeType>application/pdf</ebucore:hasMimeType>
+    <ebucore:fileByteSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">28996767</ebucore:fileByteSize>
+    <edm:spatialResolution rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">150</edm:spatialResolution>
+    <dcterms:isReferencedBy
+      rdf:resource="https://iiif.europeana.eu/presentation/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1/manifest"></dcterms:isReferencedBy>
+  </edm:WebResource>
+  <edm:WebResource rdf:about="https://ddd.uab.cat/record/100377">
+    <ebucore:hasMimeType>application/xhtml+xml</ebucore:hasMimeType>
+    <ebucore:fileByteSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ebucore:fileByteSize>
+  </edm:WebResource>
+  <edm:WebResource
+    rdf:about="https://iiif.europeana.eu/presentation/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1/manifest">
+    <rdf:type rdf:resource="http://iiif.io/api/presentation/3#Manifest"/>
+  </edm:WebResource>
+  <edm:TimeSpan rdf:about="#1916">
+    <skos:prefLabel xml:lang="zxx">1916</skos:prefLabel>
+    <dcterms:isPartOf rdf:resource="http://data.europeana.eu/timespan/20"></dcterms:isPartOf>
+    <edm:begin>1916-01-01</edm:begin>
+    <edm:end>1916-12-31</edm:end>
+  </edm:TimeSpan>
+  <edm:TimeSpan rdf:about="http://data.europeana.eu/timespan/20">
+    <skos:prefLabel xml:lang="de">20. Jahrhundert</skos:prefLabel>
+    <skos:prefLabel xml:lang="ru">XX век</skos:prefLabel>
+    <skos:prefLabel xml:lang="fi">1900-luku</skos:prefLabel>
+    <skos:prefLabel xml:lang="pt">Século XX</skos:prefLabel>
+    <skos:prefLabel xml:lang="bg">20 век</skos:prefLabel>
+    <skos:prefLabel xml:lang="lt">XX amžius</skos:prefLabel>
+    <skos:prefLabel xml:lang="lv">20. gadsimts</skos:prefLabel>
+    <skos:prefLabel xml:lang="hr">20. stoljeće</skos:prefLabel>
+    <skos:prefLabel xml:lang="fr">XXe siècle</skos:prefLabel>
+    <skos:prefLabel xml:lang="hu">20. század</skos:prefLabel>
+    <skos:prefLabel xml:lang="sk">20. storočie</skos:prefLabel>
+    <skos:prefLabel xml:lang="sl">20. stoletje</skos:prefLabel>
+    <skos:prefLabel xml:lang="ga">20ú haois</skos:prefLabel>
+    <skos:prefLabel xml:lang="ca">Segle XX</skos:prefLabel>
+    <skos:prefLabel xml:lang="sv">1900-talet</skos:prefLabel>
+    <skos:prefLabel xml:lang="el">20ός αιώνας</skos:prefLabel>
+    <skos:prefLabel xml:lang="en">20th century</skos:prefLabel>
+    <skos:prefLabel xml:lang="it">XX secolo</skos:prefLabel>
+    <skos:prefLabel xml:lang="es">Siglo XX</skos:prefLabel>
+    <skos:prefLabel xml:lang="et">20. sajand</skos:prefLabel>
+    <skos:prefLabel xml:lang="eu">XX. mendea</skos:prefLabel>
+    <skos:prefLabel xml:lang="cs">20. století</skos:prefLabel>
+    <skos:prefLabel xml:lang="pl">XX wiek</skos:prefLabel>
+    <skos:prefLabel xml:lang="ro">Secolul al XX-lea</skos:prefLabel>
+    <skos:prefLabel xml:lang="da">20. århundrede</skos:prefLabel>
+    <skos:prefLabel xml:lang="nl">20e eeuw</skos:prefLabel>
+    <skos:altLabel xml:lang="ru">20 век</skos:altLabel>
+    <skos:altLabel xml:lang="sv">20:e århundradet</skos:altLabel>
+    <skos:altLabel xml:lang="sv">20:e seklet</skos:altLabel>
+    <skos:altLabel xml:lang="sv">1900-tal</skos:altLabel>
+    <skos:altLabel xml:lang="sv">1900-talet (århundrade)</skos:altLabel>
+    <skos:altLabel xml:lang="sv">1900-talet (sekel)</skos:altLabel>
+    <skos:altLabel xml:lang="pt">Século 20</skos:altLabel>
+    <skos:altLabel xml:lang="pt">Século vinte</skos:altLabel>
+    <skos:altLabel xml:lang="pt">Periodo 1901-2000</skos:altLabel>
+    <skos:altLabel xml:lang="pt">Ciclo (1901-2000)</skos:altLabel>
+    <skos:altLabel xml:lang="en">20th-century</skos:altLabel>
+    <skos:altLabel xml:lang="en">20th-century</skos:altLabel>
+    <skos:altLabel xml:lang="en">Twentieth century</skos:altLabel>
+    <skos:altLabel xml:lang="en">The past century</skos:altLabel>
+    <skos:altLabel xml:lang="en">History, 20th Century</skos:altLabel>
+    <skos:altLabel xml:lang="en">XX Century</skos:altLabel>
+    <skos:altLabel xml:lang="it">Novecento</skos:altLabel>
+    <skos:altLabel xml:lang="it">20° secolo</skos:altLabel>
+    <skos:altLabel xml:lang="it">'900</skos:altLabel>
+    <skos:altLabel xml:lang="it">Novecento</skos:altLabel>
+    <skos:altLabel xml:lang="fr">20e siècle</skos:altLabel>
+    <skos:altLabel xml:lang="es">Siglo 20</skos:altLabel>
+    <skos:altLabel xml:lang="es">El siglo pasado</skos:altLabel>
+    <skos:altLabel xml:lang="es">Siglo veinte</skos:altLabel>
+    <skos:altLabel xml:lang="es">Siglo XX después de Cristo</skos:altLabel>
+    <skos:altLabel xml:lang="es">Siglo XX d. C.</skos:altLabel>
+    <edm:begin>1901-01-01</edm:begin>
+    <edm:end>2000-12-31</edm:end>
+    <owl:sameAs rdf:resource="http://www.wikidata.org/entity/Q6927"/>
+    <owl:sameAs rdf:resource="http://id.loc.gov/authorities/names/sh2002012476"/>
+    <owl:sameAs rdf:resource="http://id.loc.gov/authorities/names/sh85139020"/>
+    <owl:sameAs rdf:resource="http://id.nlm.nih.gov/mesh/D049673"/>
+    <owl:sameAs rdf:resource="https://www.freebase.com/m/089_x"/>
+    <owl:sameAs rdf:resource="https://g.co/kg/m/089_x"/>
+    <owl:sameAs rdf:resource="http://id.nlm.nih.gov/mesh/K01.400.504.968"/>
+    <owl:sameAs rdf:resource="http://vocab.getty.edu/aat/300404514"/>
+    <owl:sameAs rdf:resource="http://id.worldcat.org/fast/1159810"/>
+    <owl:sameAs rdf:resource="http://dbpedia.org/resource/20th_century"/>
+  </edm:TimeSpan>
+  <skos:Concept rdf:about="http://data.europeana.eu/concept/6">
+    <skos:prefLabel xml:lang="de">Buch</skos:prefLabel>
+    <skos:prefLabel xml:lang="ru">Книга</skos:prefLabel>
+    <skos:prefLabel xml:lang="fi">Kirja</skos:prefLabel>
+    <skos:prefLabel xml:lang="pt">Livro</skos:prefLabel>
+    <skos:prefLabel xml:lang="bg">Книга</skos:prefLabel>
+    <skos:prefLabel xml:lang="lt">Knyga</skos:prefLabel>
+    <skos:prefLabel xml:lang="lv">Grāmata</skos:prefLabel>
+    <skos:prefLabel xml:lang="hr">Knjiga</skos:prefLabel>
+    <skos:prefLabel xml:lang="fr">Livre</skos:prefLabel>
+    <skos:prefLabel xml:lang="hu">Könyv</skos:prefLabel>
+    <skos:prefLabel xml:lang="sk">Kniha</skos:prefLabel>
+    <skos:prefLabel xml:lang="sl">Knjiga</skos:prefLabel>
+    <skos:prefLabel xml:lang="ga">Leabhar</skos:prefLabel>
+    <skos:prefLabel xml:lang="ca">Llibre</skos:prefLabel>
+    <skos:prefLabel xml:lang="sv">Bok</skos:prefLabel>
+    <skos:prefLabel xml:lang="mt">Ktieb</skos:prefLabel>
+    <skos:prefLabel xml:lang="el">Βιβλίο</skos:prefLabel>
+    <skos:prefLabel xml:lang="en">Book</skos:prefLabel>
+    <skos:prefLabel xml:lang="it">Libro</skos:prefLabel>
+    <skos:prefLabel xml:lang="es">Libro</skos:prefLabel>
+    <skos:prefLabel xml:lang="et">Raamat</skos:prefLabel>
+    <skos:prefLabel xml:lang="eu">Liburu</skos:prefLabel>
+    <skos:prefLabel xml:lang="cs">Kniha</skos:prefLabel>
+    <skos:prefLabel xml:lang="pl">Książka</skos:prefLabel>
+    <skos:prefLabel xml:lang="ro">Carte</skos:prefLabel>
+    <skos:prefLabel xml:lang="da">Bog</skos:prefLabel>
+    <skos:prefLabel xml:lang="nl">Boek</skos:prefLabel>
+    <skos:note xml:lang="de">In sich abgeschlossene Sammlung von Text oder Bildern auf Papier (klassisches Buch), in digitaler
+      Form (E-Book) oder als Tonaufzeichnung (Hörbuch)
+    </skos:note>
+    <skos:note xml:lang="fi">Painettu tai sähköinen teksti</skos:note>
+    <skos:note xml:lang="sv">Pappersmedium eller digitalt medium med samling av ord och bilder som representerar kunskap eller en
+      fiktiv berättelse
+    </skos:note>
+    <skos:note xml:lang="ru">Носитель информации; вид печатной продукции; объединённые листы с информацией</skos:note>
+    <skos:note xml:lang="pt">Coleção de palavras e/ou imagens para representar o conhecimento ou uma história fictícia, muitas
+      vezes manifestada em papel amarrado e tinta ou em livros digitais
+    </skos:note>
+    <skos:note xml:lang="bg">Напечатано издание</skos:note>
+    <skos:note xml:lang="el">Υλικός φορέας γραπτού ή και εικαστικού περιεχομένου</skos:note>
+    <skos:note xml:lang="en">Medium for recording information (words or images) typically on bound pages or more abstractly in
+      electronic or audio form
+    </skos:note>
+    <skos:note xml:lang="it">Documento scritto costituito da un insieme di fogli stampati oppure manoscritti</skos:note>
+    <skos:note xml:lang="fr">Document écrit formé de pages reliées entre elles</skos:note>
+    <skos:note xml:lang="hu">Információhordozó közeg, leggyakrabban papírra írott, nyomtatott, festett jelek, betűk</skos:note>
+    <skos:note xml:lang="es">Medio para registrar información en forma de escritura o imágenes impresas</skos:note>
+    <skos:note xml:lang="et">Meedium teabe üles kirjutamiseks (sõnad või pildid) tavaliselt köidetud lehekülgedel, või
+      abstraktsemas mõttes elektrooniliselt või audioformaadis
+    </skos:note>
+    <skos:note xml:lang="eu">Lan inprimatua edo eskuz izkiriatua biltzeko erabiltzen den euskarri fisikoa edo digitala</skos:note>
+    <skos:note xml:lang="cs">Psaný text vydaný v tištěné či elektronické formě</skos:note>
+    <skos:note xml:lang="sk">Dielo vydané tlačou v samostatnom zväzku</skos:note>
+    <skos:note xml:lang="pl">Dokument piśmienniczy w postaci wielostronicowej publikacji</skos:note>
+    <skos:note xml:lang="da">En samling af én eller flere tekster og/eller billeder for at representere viden eller en fiktiv
+      historie, ofte manifesteret i fysisk form, eller i elektronisk format.
+    </skos:note>
+    <skos:note xml:lang="ro">Document scris format din mai multe pagini</skos:note>
+    <skos:note xml:lang="ca">Obra impresa o manuscrita cosida o enquadernada de manera que es reuneix en un volum</skos:note>
+    <skos:note xml:lang="nl">Informatiedrager, gedrukt, op papier geschreven of digitaal</skos:note>
+    <skos:exactMatch rdf:resource="http://www.wikidata.org/entity/Q571"/>
+    <skos:exactMatch rdf:resource="http://dbpedia.org/ontology/Book"/>
+    <skos:exactMatch rdf:resource="https://schema.org/Book"/>
+    <skos:exactMatch rdf:resource="http://purl.org/ontology/bibo/Book"/>
+    <skos:exactMatch rdf:resource="http://purl.org/net/nknouf/ns/bibtex#Book"/>
+    <skos:exactMatch rdf:resource="http://www.ontotext.com/proton/protonext#Book"/>
+    <skos:exactMatch rdf:resource="https://id.oclc.org/worldcat/entity/Q13"/>
+    <skos:exactMatch rdf:resource="http://purl.org/spar/fabio/Book"/>
+    <skos:exactMatch rdf:resource="https://citationstyles.org/ontology/type/book"/>
+    <skos:exactMatch rdf:resource="http://purl.org/coar/resource_type/c_2f33"/>
+    <skos:exactMatch rdf:resource="http://linked.earth/ontology/#book"/>
+    <skos:exactMatch rdf:resource="https://d-nb.info/gnd/4008570-3"/>
+    <skos:exactMatch rdf:resource="http://id.loc.gov/authorities/names/sh85015738"/>
+    <skos:exactMatch rdf:resource="http://data.bnf.fr/ark:/12148/cb119322951"/>
+    <skos:exactMatch rdf:resource="http://id.ndl.go.jp/auth/ndlna/00573378"/>
+    <skos:exactMatch rdf:resource="http://id.nlm.nih.gov/mesh/D001877"/>
+    <skos:exactMatch rdf:resource="http://purl.org/bncf/tid/303"/>
+    <skos:exactMatch rdf:resource="https://www.freebase.com/m/0bt_c3"/>
+    <skos:exactMatch rdf:resource="https://g.co/kg/m/0bt_c3"/>
+    <skos:exactMatch rdf:resource="http://datos.bne.es/resource/XX4576243"/>
+    <skos:exactMatch rdf:resource="http://vocab.getty.edu/aat/300028051"/>
+    <skos:exactMatch rdf:resource="http://iconclass.org/49M32"/>
+    <skos:exactMatch rdf:resource="http://www.yso.fi/onto/yso/p156"/>
+    <skos:exactMatch rdf:resource="http://babelnet.org/rdf/s00012059n"/>
+    <skos:exactMatch rdf:resource="http://thesaurus.europeanafashion.eu/thesaurus/10321"/>
+    <skos:exactMatch rdf:resource="http://zbw.eu/stw/descriptor/13650-3"/>
+    <skos:exactMatch rdf:resource="http://vocabularies.unesco.org/thesaurus/concept500"/>
+    <skos:exactMatch rdf:resource="http://dbpedia.org/resource/Book"/>
+    <skos:related rdf:resource="http://data.europeana.eu/concept/2245"/>
+  </skos:Concept>
+  <ore:Aggregation
+    rdf:about="http://data.europeana.eu/aggregation/provider/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1">
+    <edm:aggregatedCHO
+      rdf:resource="http://data.europeana.eu/item/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+    <edm:dataProvider rdf:resource="http://data.europeana.eu/organization/1482250000004671162"></edm:dataProvider>
+    <edm:isShownAt rdf:resource="https://ddd.uab.cat/record/100377"/>
+    <edm:isShownBy rdf:resource="https://ddd.uab.cat/pub/llibres/1916/100377/ferdef_a1916.pdf"/>
+    <edm:provider>Catalònica</edm:provider>
+    <dc:rights rdf:resource="http://creativecommons.org/publicdomain/mark/1.0/"></dc:rights>
+    <edm:rights rdf:resource="http://creativecommons.org/publicdomain/mark/1.0/"/>
+    <dqv:hasQualityAnnotation>
+      <dqv:QualityAnnotation>
+        <dcterms:created>2024-04-18T14:38:37.619648795Z</dcterms:created>
+        <oa:hasTarget
+          rdf:resource="http://data.europeana.eu/aggregation/provider/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+        <oa:hasBody rdf:resource="http://www.europeana.eu/schemas/epf/contentTier4"/>
+      </dqv:QualityAnnotation>
+    </dqv:hasQualityAnnotation>
+    <dqv:hasQualityAnnotation>
+      <dqv:QualityAnnotation>
+        <dcterms:created>2024-04-18T14:38:37.619663489Z</dcterms:created>
+        <oa:hasTarget
+          rdf:resource="http://data.europeana.eu/aggregation/provider/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+        <oa:hasBody rdf:resource="http://www.europeana.eu/schemas/epf/metadataTier0"/>
+      </dqv:QualityAnnotation>
+    </dqv:hasQualityAnnotation>
+  </ore:Aggregation>
+  <ore:Proxy
+    rdf:about="http://data.europeana.eu/proxy/europeana/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1">
+    <dc:date rdf:resource="#1916"></dc:date>
+    <dc:identifier>https://catalonica.bnc.cat/catalonicahub/lod/oai:ddd.uab.cat:100377#ent1</dc:identifier>
+    <dc:language>spa</dc:language>
+    <dc:type rdf:resource="http://data.europeana.eu/concept/6"></dc:type>
+    <edm:europeanaProxy>true</edm:europeanaProxy>
+    <edm:year>1916</edm:year>
+    <ore:proxyFor
+      rdf:resource="http://data.europeana.eu/item/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+    <ore:proxyIn
+      rdf:resource="http://data.europeana.eu/aggregation/europeana/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+    <ore:lineage
+      rdf:resource="http://data.europeana.eu/proxy/provider/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+    <edm:type>TEXT</edm:type>
+  </ore:Proxy>
+  <ore:Proxy
+    rdf:about="http://data.europeana.eu/proxy/provider/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1">
+    <dc:creator>Turró, Ramon,</dc:creator>
+    <dc:creator>Real Academia de Medicina y Cirugía de Barcelona</dc:creator>
+    <dc:date>1916</dc:date>
+    <dc:description>A la part superior de la portada: Real Academia de Medicina y Cirugía de Barcelona.</dc:description>
+    <dc:format>application/pdf</dc:format>
+    <dc:identifier>oai:ddd.uab.cat:100377</dc:identifier>
+    <dc:publisher>Barcelona : Revista Veterinaria de España,</dc:publisher>
+    <dc:language>spa</dc:language>
+    <dc:rights>open access</dc:rights>
+    <dc:rights>Aquesta obra ha estat identificada com a lliure de restriccions d'ús conegudes segons la llei de propietat
+      intel·lectual, incloent-hi els drets afins. Podeu copiar, modificar i distribuir l'obra, així com fer-ne comunicació
+      pública, fins i tot amb finalitat comercial, sense necessitat de demanar permís.
+    </dc:rights>
+    <dc:rights rdf:resource="http://creativecommons.org/publicdomain/mark/1.0/"></dc:rights>
+    <dc:subject>Immunitat</dc:subject>
+    <dc:subject>Vacunació</dc:subject>
+    <dc:title>Los Fermentos defensivos en la inmunidad natural y adquirida</dc:title>
+    <dc:type>TEXT</dc:type>
+    <dc:type>Llibre</dc:type>
+    <edm:europeanaProxy>false</edm:europeanaProxy>
+    <ore:proxyFor
+      rdf:resource="http://data.europeana.eu/item/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+    <ore:proxyIn
+      rdf:resource="http://data.europeana.eu/aggregation/provider/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+    <edm:type>TEXT</edm:type>
+  </ore:Proxy>
+  <edm:EuropeanaAggregation
+    rdf:about="http://data.europeana.eu/aggregation/europeana/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1">
+    <edm:aggregatedCHO
+      rdf:resource="http://data.europeana.eu/item/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+    <edm:datasetName>164_Universitat_Autonoma_de_Barcelona</edm:datasetName>
+    <edm:country>Spain</edm:country>
+    <edm:preview
+      rdf:resource="https://api.europeana.eu/thumbnail/v2/url.json?uri=https%3A%2F%2Fddd.uab.cat%2Fpub%2Fllibres%2F1916%2F100377%2Fferdef_a1916.pdf&amp;type=TEXT"/>
+    <edm:landingPage
+      rdf:resource="https://www.europeana.eu/item/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"/>
+    <edm:language>ca</edm:language>
+    <edm:completeness>0</edm:completeness>
+    <dcterms:created>2020-02-03T09:21:29.432Z</dcterms:created>
+    <dcterms:modified>2024-04-18T14:27:16.485Z</dcterms:modified>
+  </edm:EuropeanaAggregation>
+  <foaf:Organization rdf:about="http://data.europeana.eu/organization/1482250000004671162">
+    <skos:prefLabel xml:lang="en">Autonomous University of Barcelona</skos:prefLabel>
+    <skos:prefLabel xml:lang="ca">Universitat Autònoma de Barcelona</skos:prefLabel>
+    <skos:prefLabel xml:lang="es">Universidad Autonoma de Barcelona</skos:prefLabel>
+  </foaf:Organization>
+</rdf:RDF>
