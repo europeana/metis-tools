@@ -307,35 +307,26 @@ public class ProcessDataset implements Callable<Void> {
   }
 
   private void preProcessAndCleanUpHasTargetQualityAnnotations(FullBeanImpl fullBean) {
-    if (fullBean.getAggregations() != null) {
-      fullBean.setAggregations(
-          fullBean.getAggregations()
-                  .stream()
-                  .map(aggregation -> {
-                    if (aggregation.getDqvHasQualityAnnotation() != null) {
-                      aggregation.setDqvHasQualityAnnotation(
-                          Stream.concat(
-                              aggregation.getDqvHasQualityAnnotation()
-                                         .stream()
-                                         .filter(qualityAnnotation -> qualityAnnotation.getTarget().length == 1),
-                              aggregation.getDqvHasQualityAnnotation()
-                                         .stream()
-                                         .filter(qualityAnnotation -> qualityAnnotation.getTarget().length > 1)
-                                         .map(
-                                             qualityAnnotation -> {
-                                               qualityAnnotation.setTarget(
-                                                   Arrays.stream(qualityAnnotation.getTarget())
-                                                         .filter(target -> !target.startsWith("/aggregation/provider"))
-                                                         .toArray(String[]::new)
-                                               );
-                                               return qualityAnnotation;
-                                             }
-                                         )
-                          ).toList()
-                      );
-                    }
-                    return aggregation;
-                  }).toList()
+    if (fullBean.getQualityAnnotations() != null) {
+      fullBean.setQualityAnnotations(
+          Stream.concat(
+              fullBean.getQualityAnnotations()
+                      .stream()
+                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length == 1),
+              fullBean.getQualityAnnotations()
+                      .stream()
+                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length > 1)
+                      .map(
+                          qualityAnnotation -> {
+                            qualityAnnotation.setTarget(
+                                Arrays.stream(qualityAnnotation.getTarget())
+                                      .filter(target -> !target.startsWith("/aggregation/provider"))
+                                      .toArray(String[]::new)
+                            );
+                            return qualityAnnotation;
+                          }
+                      )
+          ).toList()
       );
     }
   }
