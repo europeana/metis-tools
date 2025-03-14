@@ -276,7 +276,7 @@ public class ExecutorManager {
       final List<DatasetStatus> datasetStatusesSnapshot = datasetStatuses.stream().map(
           datasetStatus -> configuration.getMongoDestinationMongoDao()
                                         .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
-          .collect(toList());
+          .toList();
       final long totalProcessedFromStartDate = datasetStatusesSnapshot.stream()
           .filter(ds -> ds.getStartDate() != null)
           .filter(ds -> ds.getStartDate().compareTo(startDate) >= 0)
