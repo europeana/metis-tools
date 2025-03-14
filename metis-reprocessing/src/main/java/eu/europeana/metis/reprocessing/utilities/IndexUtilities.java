@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -105,10 +104,8 @@ public class IndexUtilities {
         final List<String> datasetIdsForRedirection = null;
         final boolean performRedirects = false;
         final TierCalculationMode tierCalculationMode = configuration.getTierCalculationMode();
-        final Set<EdmType> typesEnabledForTierCalculation = EnumSet.of(EdmType._3_D); //<--check this
         final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
-            datasetIdsForRedirection, performRedirects, tierCalculationMode, typesEnabledForTierCalculation);
-        final String datasetId = getDatasetIdOfRecordToBePurged(rdf);
+            datasetIdsForRedirection, performRedirects, tierCalculationMode);
         final String rdfAbout = rdf.getProvidedCHOList()
                                    .stream()
                                    .filter(Objects::nonNull)
@@ -119,6 +116,7 @@ public class IndexUtilities {
         indexerPool.indexRdf(rdf, indexingProperties);
 
         if (configuration.isDepublicationEnabled()) {
+          final String datasetId = getDatasetIdOfRecordToBePurged(rdf);
           depublishRecord(rdf, datasetId, rdfAbout, indexerPool);
         }
         return null;

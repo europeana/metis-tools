@@ -4,16 +4,16 @@ import static eu.europeana.metis.reprocessing.config.PropertiesHolder.STATISTICS
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
-import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
-import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.schema.jibx.RDF;
-import eu.europeana.metis.utils.DepublicationReason;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -24,8 +24,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -209,10 +209,26 @@ public class ProcessDataset implements Callable<Void> {
   }
 
   void processRecords(List<FullBeanImpl> nextPageOfRecords) {
-    for (FullBeanImpl fullBean : nextPageOfRecords) {
-      final String exceptionStackTrace = processAndIndex(fullBean);
-      updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
+    try (ExecutorService executorService = Executors.newFixedThreadPool(2, Thread.ofVirtual().factory())) {
+      for (int i = 0; i < nextPageOfRecords.size(); i += 2) {
+        FullBeanImpl first = nextPageOfRecords.get(i);
+        FullBeanImpl second = (i + 1 < nextPageOfRecords.size()) ? nextPageOfRecords.get(i + 1) : null;
+        executorService.submit(() -> {
+          final String exceptionStackTrace1 = processAndIndex(first);
+          updateProcessCounts(exceptionStackTrace1, first.getAbout());
+        });
+        if (second != null) {
+          executorService.submit(() -> {
+            final String exceptionStackTrace2 = processAndIndex(second);
+            updateProcessCounts(exceptionStackTrace2, second.getAbout());
+          });
+        }
+      }
     }
+//    for (FullBeanImpl fullBean : nextPageOfRecords) {
+//      final String exceptionStackTrace = processAndIndex(fullBean);
+//      updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
+//    }
   }
 
   void updateDatasetStatus(int pageProcessed) {
@@ -274,6 +290,7 @@ public class ProcessDataset implements Callable<Void> {
 
   private String processAndIndex(FullBeanImpl fullBean) {
     try {
+      preProcessAndCleanUpHasTargetQualityAnnotations(fullBean);
       final RDF rdf = processRecord(fullBean);
       indexRecord(rdf);
     } catch (ProcessingException e) {
@@ -287,6 +304,31 @@ public class ProcessDataset implements Callable<Void> {
       return exceptionStacktraceToString(e);
     }
     return "";
+  }
+
+  private void preProcessAndCleanUpHasTargetQualityAnnotations(FullBeanImpl fullBean) {
+    if (fullBean.getQualityAnnotations() != null) {
+      fullBean.setQualityAnnotations(
+          Stream.concat(
+              fullBean.getQualityAnnotations()
+                      .stream()
+                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length == 1),
+              fullBean.getQualityAnnotations()
+                      .stream()
+                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length > 1)
+                      .map(
+                          qualityAnnotation -> {
+                            qualityAnnotation.setTarget(
+                                Arrays.stream(qualityAnnotation.getTarget())
+                                      .filter(target -> !target.startsWith("/aggregation/provider"))
+                                      .toArray(String[]::new)
+                            );
+                            return qualityAnnotation;
+                          }
+                      )
+          ).toList()
+      );
+    }
   }
 
   private void updateProcessFailedOnlyCounts(String exceptionStackTrace, String resourceId,
