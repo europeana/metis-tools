@@ -53,7 +53,6 @@
         <version.metis-normalization>15-SNAPSHOT</version.metis-normalization>
         <version.corelib>2.17.3-SNAPSHOT</version.corelib>
         <version.entity-api-client>2.1.1-SNAPSHOT</version.entity-api-client>
-        <version.spring-web>6.1.4</version.spring-web>
         <version.spring-webflux>6.1.4</version.spring-webflux>
         <version.reactor-core>3.6.3</version.reactor-core>
         <version.reactor-netty-http>1.1.23</version.reactor-netty-http>
@@ -175,11 +174,6 @@
             <groupId>eu.europeana.api</groupId>
             <artifactId>entity-api-client</artifactId>
             <version>${version.entity-api-client}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${version.spring-web}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

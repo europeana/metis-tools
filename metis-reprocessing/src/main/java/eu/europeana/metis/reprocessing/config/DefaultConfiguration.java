@@ -10,8 +10,6 @@ import eu.europeana.enrichment.api.internal.EntityResolver;
 import eu.europeana.enrichment.api.internal.ReferenceTermContext;
 import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
 import eu.europeana.enrichment.rest.client.dereference.DereferencerProvider;
-import eu.europeana.enrichment.rest.client.enrichment.Enricher;
-import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
 import eu.europeana.enrichment.utils.EntityMergeEngine;
@@ -205,7 +203,6 @@ public class DefaultConfiguration extends Configuration {
   }
 
   private EntityResolver prepareClientEntityResolver(PropertiesHolderExtension propertiesHolderExtension) {
-    final EntityResolver entityResolver;
     //Sanity check
     if (StringUtils.isAnyBlank(propertiesHolderExtension.entityManagementUrl, propertiesHolderExtension.entityApiUrl,
         propertiesHolderExtension.entityApiKey)) {
@@ -215,9 +212,9 @@ public class DefaultConfiguration extends Configuration {
     properties.put("entity.management.url", propertiesHolderExtension.entityManagementUrl);
     properties.put("entity.api.url", propertiesHolderExtension.entityApiUrl);
     properties.put("entity.api.key", propertiesHolderExtension.entityApiKey);
-    entityResolver = new ClientEntityResolver(new EntityClientApiImpl(new EntityClientConfiguration(properties)),
+
+    return new ClientEntityResolver(new EntityClientApiImpl(new EntityClientConfiguration(properties)),
         propertiesHolderExtension.enrichmentBatchSize);
-    return entityResolver;
   }
 
   private Dereferencer getDereferencer(PropertiesHolderExtension propertiesHolderExtension) throws DereferenceException {
