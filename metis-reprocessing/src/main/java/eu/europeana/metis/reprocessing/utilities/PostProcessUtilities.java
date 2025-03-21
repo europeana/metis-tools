@@ -100,8 +100,11 @@ public class PostProcessUtilities {
     final ArrayList<AbstractMetisPlugin> abstractMetisPlugins = new ArrayList<>();
     abstractMetisPlugins.add(reindexToPreviewPlugin);
     abstractMetisPlugins.add(reindexToPublishPlugin);
-    final WorkflowExecution workflowExecution = new WorkflowExecution(dataset, abstractMetisPlugins,
-        0);
+    final WorkflowExecution workflowExecution = new WorkflowExecution();
+    workflowExecution.setDatasetId(dataset.getDatasetId());
+    workflowExecution.setEcloudDatasetId(dataset.getEcloudDatasetId());
+    workflowExecution.setMetisPlugins(abstractMetisPlugins);
+    workflowExecution.setWorkflowPriority(0);
     workflowExecution.setWorkflowStatus(WorkflowStatus.FINISHED);
     workflowExecution.setCreatedDate(startDate);
     workflowExecution.setStartedDate(startDate);
@@ -119,13 +122,18 @@ public class PostProcessUtilities {
         .stream().map(executablePluginType -> workflowExecutionDao
             .getLatestSuccessfulExecutablePlugin(datasetId,
                 Collections.singleton(executablePluginType), false)).filter(Objects::nonNull)
-        .collect(Collectors.toList());
+        .toList();
 
     deprecatedPlugins.stream().map(abstractExecutablePlugin -> {
       final WorkflowExecution workflowExecution = workflowExecutionDao.getByExternalTaskId(
           Long.parseLong(abstractExecutablePlugin.getPlugin().getExternalTaskId()));
       final Optional<AbstractMetisPlugin> metisPluginWithType = workflowExecution
-          .getMetisPluginWithType(abstractExecutablePlugin.getPlugin().getPluginType());
+          .getMetisPlugins()
+          .stream()
+          .filter(plugin ->
+                  plugin.getPluginType() == abstractExecutablePlugin.getPlugin().getPluginType())
+          .findFirst();
+
       metisPluginWithType.ifPresent(
           abstractMetisPlugin -> (abstractMetisPlugin).setDataStatus(DataStatus.DEPRECATED));
       return workflowExecution;

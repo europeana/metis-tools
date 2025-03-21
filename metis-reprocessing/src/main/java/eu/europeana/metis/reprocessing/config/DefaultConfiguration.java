@@ -8,15 +8,12 @@ import eu.europeana.enrichment.api.external.model.EnrichmentBase;
 import eu.europeana.enrichment.api.internal.AggregationFieldType;
 import eu.europeana.enrichment.api.internal.EntityResolver;
 import eu.europeana.enrichment.api.internal.ReferenceTermContext;
-import eu.europeana.enrichment.rest.client.EnrichmentWorker;
-import eu.europeana.enrichment.rest.client.EnrichmentWorkerImpl;
 import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
 import eu.europeana.enrichment.rest.client.dereference.DereferencerProvider;
 import eu.europeana.enrichment.rest.client.enrichment.Enricher;
 import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
-import eu.europeana.enrichment.rest.client.report.Report;
 import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.web.EntityClientApiImpl;
@@ -24,8 +21,6 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
-import eu.europeana.metis.schema.convert.RdfConversionUtils;
-import eu.europeana.metis.schema.convert.SerializationException;
 import eu.europeana.metis.schema.jibx.AboutType;
 import eu.europeana.metis.schema.jibx.Aggregation;
 import eu.europeana.metis.schema.jibx.DataProvider;
@@ -35,7 +30,6 @@ import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.normalization.util.NormalizationConfigurationException;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -73,8 +67,6 @@ public class DefaultConfiguration extends Configuration {
   private final ThrowingTriConsumer<RDF, Boolean, Configuration> rdfIndexer;
   private final ThrowingQuadConsumer<String, Date, Date, Configuration> afterReprocessProcessor;
 
-  private Dereferencer dereferencer;
-  private Enricher enricher;
   private ClientEntityResolver entityResolver;
 
   public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
@@ -208,18 +200,8 @@ public class DefaultConfiguration extends Configuration {
     return rdf;
   }
 
-  private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension)
-      throws DereferenceException, EnrichmentException {
-    dereferencer = getDereferencer(propertiesHolderExtension);
-    enricher = getEnricher(propertiesHolderExtension);
-
+  private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension) {
     entityResolver = (ClientEntityResolver) prepareClientEntityResolver(propertiesHolderExtension);
-  }
-
-  private Enricher getEnricher(PropertiesHolderExtension propertiesHolderExtension) throws EnrichmentException {
-    final EnricherProvider enricherProvider = new EnricherProvider();
-    enricherProvider.setEntityResolver(prepareClientEntityResolver(propertiesHolderExtension));
-    return enricherProvider.create();
   }
 
   private EntityResolver prepareClientEntityResolver(PropertiesHolderExtension propertiesHolderExtension) {
