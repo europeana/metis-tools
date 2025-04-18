@@ -2,6 +2,7 @@ package eu.europeana.metis.reprocessing;
 
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
+import eu.europeana.entity.client.exception.EntityClientException;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
@@ -29,7 +30,7 @@ public class ReprocessingMain {
   private static final PropertiesHolderExtension propertiesHolder = new PropertiesHolderExtension(CONFIGURATION_FILE);
 
   public static void main(String[] args)
-          throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException, DereferenceException, EnrichmentException, NormalizationConfigurationException {
+      throws InterruptedException, IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException, IOException, DereferenceException, EnrichmentException, NormalizationConfigurationException, EntityClientException {
     LOGGER.info("Starting script");
 
     final Configuration configuration = new DefaultConfiguration(propertiesHolder);
