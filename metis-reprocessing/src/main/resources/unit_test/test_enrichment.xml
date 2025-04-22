@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><rdf:RDF xmlns:adms="http://www.w3.org/ns/adms#" xmlns:cc="http://creativecommons.org/ns#" xmlns:crm="http://www.cidoc-crm.org/rdfs/cidoc_crm_v5.0.2_english_label.rdfs#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcat="http://www.w3.org/ns/dcat#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:doap="http://usefulinc.com/ns/doap#" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:odrl="http://www.w3.org/ns/odrl/2/" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:svcs="http://rdfs.org/sioc/services#" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <edm:ProvidedCHO rdf:about="/5/H_5260_3878A_1"/>
+  <edm:WebResource rdf:about="https://stacks.stanford.edu/file/jn213vc2281/jn213vc2281_H-5260_3878A_1_REST_sl.m4a">
+    <dc:description xml:lang="en">Audio file, restored</dc:description>
+  </edm:WebResource>
+  <edm:WebResource rdf:about="https://stacks.stanford.edu/image/iiif/jn213vc2281/jn213vc2281_H-5260_3878A_0_img/full/full/0/default.jpg">
+    <dc:description xml:lang="en">Image of media</dc:description>
+    <svcs:has_service rdf:resource="https://stacks.stanford.edu/image/iiif/jn213vc2281/jn213vc2281_H-5260_3878A_0_img"/>
+  </edm:WebResource><edm:TimeSpan rdf:about="#1946-10-01"><skos:prefLabel xml:lang="zxx">1946-10-01</skos:prefLabel><dcterms:isPartOf rdf:resource="http://data.europeana.eu/timespan/20"/><edm:begin>1946-10-01</edm:begin><edm:end>1946-10-01</edm:end><skos:notation rdf:datatype="http://id.loc.gov/datatypes/edtf/EDTF-level1">1946-10-01</skos:notation></edm:TimeSpan>
+  <ore:Aggregation rdf:about="/aggregation/provider/5/H_5260_3878A_1">
+    <edm:aggregatedCHO rdf:resource="/5/H_5260_3878A_1"/>
+    <edm:dataProvider>International Military Tribunal at Nuremberg</edm:dataProvider>
+    <edm:hasView rdf:resource="https://stacks.stanford.edu/image/iiif/jn213vc2281/jn213vc2281_H-5260_3878A_0_img/full/full/0/default.jpg"/>
+    <edm:isShownAt rdf:resource="https://purl.stanford.edu/jn213vc2281"/>
+    <edm:isShownBy rdf:resource="https://stacks.stanford.edu/file/jn213vc2281/jn213vc2281_H-5260_3878A_1_REST_sl.m4a"/>
+    <edm:object rdf:resource="https://stacks.stanford.edu/image/iiif/jn213vc2281/jn213vc2281_H-5260_3878A_0_img/full/400,/0/default.jpg"/>
+    <edm:provider>International Court of Justice</edm:provider>
+    <edm:rights rdf:resource="http://rightsstatements.org/vocab/CNE/1.0/"/>
+  </ore:Aggregation>
+  <ore:Proxy rdf:about="/proxy/provider/5/H_5260_3878A_1">
+    <dc:format xml:lang="en">16” Aluminum Presto Instantaneous Disc</dc:format>
+    <dc:identifier>Item H-5260</dc:identifier>
+    <dc:identifier>Disc No. 3878A</dc:identifier>
+    <dc:source>D-3876A-3878A</dc:source>
+    <dc:subject rdf:resource="http://www.wikidata.org/entity/Q80130"/>
+    <dc:subject rdf:resource="http://id.loc.gov/authorities/subjects/sh85093307"/>
+    <dc:title xml:lang="en">Biddle and French Judge</dc:title>
+    <dc:type xml:lang="en">Disc recording</dc:type>
+    <dcterms:created>1946-10-01</dcterms:created>
+    <dcterms:extent>00:16:11</dcterms:extent>
+    <dcterms:isPartOf xml:lang="en">International Military Tribunal at Nuremberg, Trial Archives</dcterms:isPartOf>
+    <dcterms:temporal>1946-10-01T12:31+01:00/1946-10-01T12:48+01:00</dcterms:temporal>
+    <edm:europeanaProxy>false</edm:europeanaProxy>
+    <ore:proxyFor rdf:resource="/5/H_5260_3878A_1"/>
+    <ore:proxyIn rdf:resource="/aggregation/provider/5/H_5260_3878A_1"/>
+    <edm:type>SOUND</edm:type>
+    <owl:sameAs rdf:resource="https://purl.stanford.edu/jn213vc2281"/>
+  </ore:Proxy>
+  <ore:Proxy rdf:about="/proxy/europeana/5/H_5260_3878A_1"><dcterms:temporal rdf:resource="#1946-10-01"/><dcterms:created rdf:resource="#1946-10-01"/>
+    <dc:identifier>H-5260_3878A_1</dc:identifier>
+    <edm:europeanaProxy>true</edm:europeanaProxy>
+    <ore:proxyFor rdf:resource="/5/H_5260_3878A_1"/>
+    <ore:proxyIn rdf:resource="/aggregation/europeana/5/H_5260_3878A_1"/>
+    <ore:lineage rdf:resource="/proxy/provider/5/H_5260_3878A_1"/>
+  </ore:Proxy>
+  <edm:EuropeanaAggregation rdf:about="/aggregation/europeana/5/H_5260_3878A_1">
+    <edm:aggregatedCHO rdf:resource="/5/H_5260_3878A_1"/>
+    <edm:dataProvider xml:lang="en">Europeana Foundation</edm:dataProvider>
+    <edm:provider xml:lang="en">Europeana Foundation</edm:provider>
+    <edm:datasetName>5_local_16042024_1759</edm:datasetName>
+    <edm:country>Netherlands</edm:country>
+    <edm:language>nl</edm:language>
+  </edm:EuropeanaAggregation>
+  <svcs:Service rdf:about="https://stacks.stanford.edu/image/iiif/jn213vc2281/jn213vc2281_H-5260_3878A_0_img">
+    <dcterms:conformsTo rdf:resource="http://iiif.io/api/image"/>
+    <doap:implements rdf:resource="http://iiif.io/api/image/2/level2.json"/>
+  </svcs:Service>
+</rdf:RDF>

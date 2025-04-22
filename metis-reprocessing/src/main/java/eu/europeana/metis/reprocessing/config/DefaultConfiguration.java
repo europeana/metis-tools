@@ -10,15 +10,22 @@ import eu.europeana.enrichment.api.internal.EntityResolver;
 import eu.europeana.enrichment.api.internal.ReferenceTermContext;
 import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
 import eu.europeana.enrichment.rest.client.dereference.DereferencerProvider;
+import eu.europeana.enrichment.rest.client.enrichment.Enricher;
+import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
+import eu.europeana.enrichment.rest.client.report.Report;
 import eu.europeana.enrichment.utils.EntityMergeEngine;
+import eu.europeana.entity.client.EntityApiClient;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
-import eu.europeana.entity.client.web.EntityClientApiImpl;
+import eu.europeana.entity.client.exception.EntityClientException;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
+import eu.europeana.metis.schema.convert.RdfConversionUtils;
+import eu.europeana.metis.schema.convert.SerializationException;
 import eu.europeana.metis.schema.jibx.AboutType;
 import eu.europeana.metis.schema.jibx.Aggregation;
 import eu.europeana.metis.schema.jibx.DataProvider;
@@ -28,6 +35,10 @@ import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.normalization.util.NormalizationConfigurationException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -64,18 +75,77 @@ public class DefaultConfiguration extends Configuration {
   private final ThrowingBiFunction<FullBeanImpl, Configuration, RDF> fullBeanProcessor;
   private final ThrowingTriConsumer<RDF, Boolean, Configuration> rdfIndexer;
   private final ThrowingQuadConsumer<String, Date, Date, Configuration> afterReprocessProcessor;
-
+  private final RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
   private ClientEntityResolver entityResolver;
+  private Enricher enricher;
+
 
   public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
-      throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException, NormalizationConfigurationException {
+      throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException, NormalizationConfigurationException, EntityClientException {
     super(propertiesHolderExtension);
 
     this.fullBeanProcessor = ProcessUtilities::processFullBean;
     this.rdfIndexer = IndexUtilities::indexRecord;
     this.afterReprocessProcessor = PostProcessUtilities::postProcess;
-
     initializeAdditionalElements(propertiesHolderExtension);
+  }
+
+  public static String readFileToString(String file) throws IOException {
+    ClassLoader classLoader = DefaultConfiguration.class.getClassLoader();
+    InputStream inputStream = classLoader.getResourceAsStream(file);
+    if (inputStream == null) {
+      throw new IOException("Failed reading file " + file);
+    }
+    return new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"));
+  }
+
+  public static void renameToMainForTests(String[] args)
+      throws IndexingException, DereferenceException, NormalizationConfigurationException,
+      TrustStoreConfigurationException, EnrichmentException, URISyntaxException,
+      SerializationException, ProcessingException, EntityClientException, IOException {
+    DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
+        "application.properties"));
+
+    processAnXmlFile(defaultConfiguration);
+
+    processARecordFromMongoSource(defaultConfiguration);
+
+  }
+
+  private static void processARecordFromMongoSource(DefaultConfiguration defaultConfiguration)
+      throws ProcessingException, SerializationException {
+    List<FullBeanImpl> fullBeanList = defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(
+        List.of(
+            "/954/Culturalia_fd913fb8_8a14_40c9_94ec_38158f4d4c81"
+        ));
+
+    for (FullBeanImpl fb : fullBeanList) {
+
+      RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
+
+      LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+      //      final boolean preserveTimestamps = true;
+      //      final Date recordDate = null;
+      //      final List<String> datasetIdsForRedirection = null;
+      //      final boolean performRedirects = false;
+      //      final TierCalculationMode tierCalculationMode = TierCalculationMode.INITIALISE;//defaultConfiguration.getTierCalculationMode();
+      //      final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
+      //          datasetIdsForRedirection, performRedirects, tierCalculationMode);
+      //      IndexerPreprocessor.preprocessRecord(rdf, indexingProperties);
+      Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
+      LOGGER.info("{}\r\n", reports);
+      defaultConfiguration.updateOrganizations(rdf);
+      LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+    }
+  }
+
+  private static void processAnXmlFile(DefaultConfiguration defaultConfiguration) throws SerializationException, IOException {
+    RDF rdf = defaultConfiguration.rdfConversionUtils.convertStringToRdf(readFileToString("unit_test/test_enrichment.xml"));
+    LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+    Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
+    LOGGER.info("{}\r\n", reports);
+    defaultConfiguration.updateOrganizations(rdf);
+    LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
   }
 
   private static void extendEntitiesMap(Map<Class<? extends AboutType>, Set<String>> entities,
@@ -198,34 +268,48 @@ public class DefaultConfiguration extends Configuration {
     return rdf;
   }
 
-  private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension) {
-    entityResolver = (ClientEntityResolver) prepareClientEntityResolver(propertiesHolderExtension);
+  private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension)
+      throws EntityClientException, EnrichmentException {
+    this.entityResolver = (ClientEntityResolver) prepareClientEntityResolver(propertiesHolderExtension);
+    this.enricher = getEnricher(propertiesHolderExtension);
   }
 
-  private EntityResolver prepareClientEntityResolver(PropertiesHolderExtension propertiesHolderExtension) {
+  private EntityResolver prepareClientEntityResolver(PropertiesHolderExtension propertiesHolderExtension)
+      throws EntityClientException {
     //Sanity check
-    if (StringUtils.isAnyBlank(propertiesHolderExtension.entityManagementUrl, propertiesHolderExtension.entityApiUrl,
-        propertiesHolderExtension.entityApiKey)) {
+    if (StringUtils.isAnyBlank(propertiesHolderExtension.entityManagementUrl,
+        propertiesHolderExtension.entityApiUrl,
+        propertiesHolderExtension.entityApiTokenEndpoint,
+        propertiesHolderExtension.entityApiGrantParams)) {
       throw new IllegalArgumentException("Requested resolver but configuration is missing");
     }
     final Properties properties = new Properties();
     properties.put("entity.management.url", propertiesHolderExtension.entityManagementUrl);
     properties.put("entity.api.url", propertiesHolderExtension.entityApiUrl);
-    properties.put("entity.api.key", propertiesHolderExtension.entityApiKey);
+    properties.put("token_endpoint", propertiesHolderExtension.entityApiTokenEndpoint);
+    properties.put("grant_params", propertiesHolderExtension.entityApiGrantParams);
 
-    return new ClientEntityResolver(new EntityClientApiImpl(new EntityClientConfiguration(properties)),
-        propertiesHolderExtension.enrichmentBatchSize);
+    return new ClientEntityResolver(new EntityApiClient(new EntityClientConfiguration(properties)));
   }
 
   private Dereferencer getDereferencer(PropertiesHolderExtension propertiesHolderExtension) throws DereferenceException {
     if (StringUtils.isNotBlank(propertiesHolderExtension.dereferenceUrl)) {
       final DereferencerProvider dereferencerProvider = new DereferencerProvider();
       dereferencerProvider.setEnrichmentPropertiesValues(propertiesHolderExtension.entityManagementUrl,
-          propertiesHolderExtension.entityApiUrl, propertiesHolderExtension.entityApiKey);
+          propertiesHolderExtension.entityApiUrl, propertiesHolderExtension.entityApiTokenEndpoint,
+          propertiesHolderExtension.entityApiGrantParams);
       dereferencerProvider.setDereferenceUrl(propertiesHolderExtension.dereferenceUrl);
       return dereferencerProvider.create();
     }
     return null;
+  }
+
+  private Enricher getEnricher(PropertiesHolderExtension propertiesHolderExtension) throws EnrichmentException {
+    final EnricherProvider enricherProvider = new EnricherProvider();
+    enricherProvider.setEnrichmentPropertiesValues(propertiesHolderExtension.entityManagementUrl,
+        propertiesHolderExtension.entityApiUrl, propertiesHolderExtension.entityApiTokenEndpoint,
+        propertiesHolderExtension.entityApiGrantParams);
+    return enricherProvider.create();
   }
 
   private HashMap<Class<? extends AboutType>, Map<ReferenceTermContext, List<EnrichmentBase>>> enrichEntities(
@@ -268,5 +352,4 @@ public class DefaultConfiguration extends Configuration {
     replaceEntities(rdf, enrichedEntities);
     return rdf;
   }
-
 }

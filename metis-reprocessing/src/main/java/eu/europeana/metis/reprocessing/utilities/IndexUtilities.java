@@ -269,7 +269,7 @@ public class IndexUtilities {
    */
   static boolean hasContentTier(RDF rdf) {
     List<String> tierData;
-    if (RdfTierUtils.hasTierCalculation(rdf, MediaTier.class)) {
+    if (RdfTierUtils.hasTierCalculationByTarget(rdf, RdfTier.CONTENT_TIER_1.getTier())) {
       tierData = RdfTierUtils.extractTierData(rdf.getAggregationList(), Aggregation::getHasQualityAnnotationList);
     } else {
       tierData = List.of();

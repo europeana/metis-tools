@@ -20,8 +20,11 @@ public class PropertiesHolderExtension extends PropertiesHolder {
   @Value("${entity.api.url}")
   public final String entityApiUrl;
 
-  @Value("${entity.api.key}")
-  public final String entityApiKey;
+  @Value("${entity.api.token-endpoint}")
+  public final String entityApiTokenEndpoint;
+
+  @Value("${entity.api.grant-params}")
+  public final String entityApiGrantParams;
 
   public PropertiesHolderExtension(String configurationFileName) {
     super(configurationFileName);
@@ -29,6 +32,7 @@ public class PropertiesHolderExtension extends PropertiesHolder {
     enrichmentBatchSize = Integer.parseInt(properties.getProperty("enrichment.batch.size"));
     entityManagementUrl = properties.getProperty("entity.management.url");
     entityApiUrl = properties.getProperty("entity.api.url");
-    entityApiKey = properties.getProperty("entity.api.key");
+    entityApiTokenEndpoint = properties.getProperty("entity.api.token-endpoint");
+    entityApiGrantParams = properties.getProperty("entity.api.grant-params");
   }
 }

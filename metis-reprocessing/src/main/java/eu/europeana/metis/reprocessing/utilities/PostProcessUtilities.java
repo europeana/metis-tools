@@ -104,7 +104,6 @@ public class PostProcessUtilities {
     workflowExecution.setDatasetId(dataset.getDatasetId());
     workflowExecution.setEcloudDatasetId(dataset.getEcloudDatasetId());
     workflowExecution.setMetisPlugins(abstractMetisPlugins);
-    workflowExecution.setWorkflowPriority(0);
     workflowExecution.setWorkflowStatus(WorkflowStatus.FINISHED);
     workflowExecution.setCreatedDate(startDate);
     workflowExecution.setStartedDate(startDate);
