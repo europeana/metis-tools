@@ -151,18 +151,6 @@
                     <artifactId>jackson-module-jaxb-annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-webflux</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.projectreactor.netty</groupId>
-                    <artifactId>reactor-netty-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-web</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>eu.europeana.api</groupId>
                     <artifactId>entity-api-client</artifactId>
                 </exclusion>
