@@ -19,7 +19,10 @@ import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.entity.client.EntityApiClient;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.exception.EntityClientException;
+import eu.europeana.indexing.IndexerPreprocessor;
+import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.indexing.tiers.TierCalculationMode;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
@@ -36,6 +39,7 @@ import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.normalization.util.NormalizationConfigurationException;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,6 +47,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -99,43 +104,58 @@ public class DefaultConfiguration extends Configuration {
     return new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"));
   }
 
-  public static void renameToMainForTests(String[] args)
+  public static void main(String[] args)
       throws IndexingException, DereferenceException, NormalizationConfigurationException,
       TrustStoreConfigurationException, EnrichmentException, URISyntaxException,
       SerializationException, ProcessingException, EntityClientException, IOException {
     DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
         "application.properties"));
 
-    processAnXmlFile(defaultConfiguration);
+    // processAnXmlFile(defaultConfiguration);
 
     processARecordFromMongoSource(defaultConfiguration);
 
   }
 
   private static void processARecordFromMongoSource(DefaultConfiguration defaultConfiguration)
-      throws ProcessingException, SerializationException {
+      throws ProcessingException, SerializationException, IOException, IndexingException {
     List<FullBeanImpl> fullBeanList = defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(
         List.of(
-            "/954/Culturalia_fd913fb8_8a14_40c9_94ec_38158f4d4c81"
+            //f "/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002"
+            //e "/2048128/114145"
+            //d "/9200579/kyaq8pq9"
+            //c "/9200359/BibliographicResource_3000123626519"
+            // a"/9200579/cynwkevu"
+            //b "/954/Culturalia_fd913fb8_8a14_40c9_94ec_38158f4d4c81"
+            //g "/1087/https___catalonica_bnc_cat_catalonicahub_lod_oai_arca_bnc_cat_10000296883_ent0"
+            //h
+            "/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"
         ));
 
     for (FullBeanImpl fb : fullBeanList) {
 
       RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
-
-      LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-      //      final boolean preserveTimestamps = true;
-      //      final Date recordDate = null;
-      //      final List<String> datasetIdsForRedirection = null;
-      //      final boolean performRedirects = false;
-      //      final TierCalculationMode tierCalculationMode = TierCalculationMode.INITIALISE;//defaultConfiguration.getTierCalculationMode();
-      //      final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
-      //          datasetIdsForRedirection, performRedirects, tierCalculationMode);
-      //      IndexerPreprocessor.preprocessRecord(rdf, indexingProperties);
-      Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
-      LOGGER.info("{}\r\n", reports);
+      String before = defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf);
+      LOGGER.info("Before:\r\n{}\r\n", before);
+      try (FileOutputStream fos = new FileOutputStream("/home/jortiz/Downloads/24042025_1_h.xml")) {
+        fos.write(before.getBytes(StandardCharsets.UTF_8));
+      }
+      final boolean preserveTimestamps = true;
+      final Date recordDate = null;
+      final List<String> datasetIdsForRedirection = null;
+      final boolean performRedirects = false;
+      final TierCalculationMode tierCalculationMode = TierCalculationMode.INITIALISE;//defaultConfiguration.getTierCalculationMode();
+      final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
+          datasetIdsForRedirection, performRedirects, tierCalculationMode);
+      IndexerPreprocessor.preprocessRecord(rdf, indexingProperties);
+      //Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
+      //LOGGER.info("{}\r\n", reports);
       defaultConfiguration.updateOrganizations(rdf);
-      LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+      String after = defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf);
+      try (FileOutputStream fosa = new FileOutputStream("/home/jortiz/Downloads/24042025_2_h.xml")) {
+        fosa.write(after.getBytes(StandardCharsets.UTF_8));
+      }
+      LOGGER.info("After:\r\n{}\r\n", after);
     }
   }
 
