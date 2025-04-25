@@ -104,7 +104,7 @@ public class DefaultConfiguration extends Configuration {
     return new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"));
   }
 
-  public static void main(String[] args)
+  public static void renameToMainForTests(String[] args)
       throws IndexingException, DereferenceException, NormalizationConfigurationException,
       TrustStoreConfigurationException, EnrichmentException, URISyntaxException,
       SerializationException, ProcessingException, EntityClientException, IOException {
