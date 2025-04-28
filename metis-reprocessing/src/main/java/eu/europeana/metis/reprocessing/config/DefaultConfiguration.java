@@ -225,7 +225,7 @@ public class DefaultConfiguration extends Configuration {
       }
       if (aggregation.getIntermediateProviderList() != null) {
         aggregation.getIntermediateProviderList().forEach(p -> {
-              if (p.getResource()!=null && p.getResource().getResource().equals(about)) {
+              if (p.getResource() != null && p.getResource().getResource().equals(about)) {
                 p.getResource().setResource(enrichmentBase.getAbout());
               }
             }
