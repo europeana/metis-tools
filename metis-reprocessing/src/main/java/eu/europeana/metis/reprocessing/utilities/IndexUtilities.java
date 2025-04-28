@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.utilities;
 
+import static eu.europeana.metis.reprocessing.utilities.RdfIndexTierUtils.hasContentTier;
 import static java.util.function.Predicate.not;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
@@ -14,14 +15,10 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.indexing.fullbean.RdfToFullBeanConverter;
 import eu.europeana.indexing.tiers.TierCalculationMode;
-import eu.europeana.indexing.tiers.model.MediaTier;
-import eu.europeana.indexing.utils.RdfTier;
-import eu.europeana.indexing.utils.RdfTierUtils;
 import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.schema.jibx.AboutType;
-import eu.europeana.metis.schema.jibx.Aggregation;
 import eu.europeana.metis.schema.jibx.EdmType;
 import eu.europeana.metis.schema.jibx.EuropeanaType;
 import eu.europeana.metis.schema.jibx.EuropeanaType.Choice;
@@ -31,6 +28,7 @@ import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.schema.jibx.Type2;
 import eu.europeana.metis.utils.DepublicationReason;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -65,7 +63,7 @@ import org.slf4j.LoggerFactory;
 public class IndexUtilities {
 
   private static final Map<Class<?>, String> retryExceptions;
-  private static final Logger LOGGER = LoggerFactory.getLogger(IndexUtilities.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final List<String> DATA_PROVIDERS = List.of(
       "Burns Scotland",
       "Royal Albert Memorial Museum & Art Gallery",
@@ -126,7 +124,8 @@ public class IndexUtilities {
     }
   }
 
-  private static void depublishRecord(RDF rdf, String datasetId, String rdfAbout, IndexerPool indexerPool) throws IndexingException {
+  private static void depublishRecord(RDF rdf, String datasetId, String rdfAbout, IndexerPool indexerPool)
+      throws IndexingException {
     if ((datasetId.equals("9200359") && hasContentTier(rdf))
         || (datasetId.equals("9200579") && hasDcCreator(rdf))
         || (datasetId.equals("2048128") && hasEdmType3D(rdf))
@@ -259,28 +258,6 @@ public class IndexUtilities {
                   .map(choiceGetter)
                   .map(getString)
                   .toList();
-  }
-
-  /**
-   * MET-6359 Has content tier 1 boolean.
-   *
-   * @param rdf the rdf
-   * @return the boolean
-   */
-  static boolean hasContentTier(RDF rdf) {
-    List<String> tierData;
-    if (RdfTierUtils.hasTierCalculationByTarget(rdf, RdfTier.CONTENT_TIER_1.getTier())) {
-      tierData = RdfTierUtils.extractTierData(rdf.getAggregationList(), Aggregation::getHasQualityAnnotationList);
-    } else {
-      tierData = List.of();
-    }
-    boolean result = tierData.contains(RdfTier.CONTENT_TIER_1.getUri());
-    if (result) {
-      LOGGER.info("Has content tier 1: {}", result);
-      return true;
-    } else {
-      return false;
-    }
   }
 
   /**
