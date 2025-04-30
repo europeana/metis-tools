@@ -7,7 +7,9 @@ import eu.europeana.enrichment.api.external.impl.ClientEntityResolver;
 import eu.europeana.enrichment.api.external.model.EnrichmentBase;
 import eu.europeana.enrichment.api.internal.AggregationFieldType;
 import eu.europeana.enrichment.api.internal.EntityResolver;
+import eu.europeana.enrichment.api.internal.FieldValue;
 import eu.europeana.enrichment.api.internal.ReferenceTermContext;
+import eu.europeana.enrichment.api.internal.SearchTermContext;
 import eu.europeana.enrichment.rest.client.dereference.Dereferencer;
 import eu.europeana.enrichment.rest.client.dereference.DereferencerProvider;
 import eu.europeana.enrichment.rest.client.enrichment.Enricher;
@@ -44,6 +46,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -140,10 +143,11 @@ public class DefaultConfiguration extends Configuration {
   }
 
   private static void processAnXmlFile(DefaultConfiguration defaultConfiguration) throws SerializationException, IOException {
-    RDF rdf = defaultConfiguration.rdfConversionUtils.convertStringToRdf(readFileToString("unit_test/test_enrichment.xml"));
+    RDF rdf = defaultConfiguration.rdfConversionUtils.convertStringToRdf(
+        readFileToString("unit_test/test_enrichment_organizations_2.xml"));
     LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-    Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
-    LOGGER.info("{}\r\n", reports);
+    //    Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
+    //    LOGGER.info("{}\r\n", reports);
     defaultConfiguration.updateOrganizations(rdf);
     LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
   }
@@ -319,7 +323,8 @@ public class DefaultConfiguration extends Configuration {
     for (Map.Entry<Class<? extends AboutType>, Set<String>> entry : entitiesLinksToDereference.entrySet()) {
       Set<ReferenceTermContext> referenceTerms = entry.getValue().stream()
                                                       .map(DefaultConfiguration::getUrl).filter(Objects::nonNull)
-                                                      .map(url -> new ReferenceTermContext(url, new HashSet<>()))
+                                                      .map(url -> ReferenceTermContext.createFromString(url.toString(),
+                                                          new HashSet<>(Arrays.asList(AggregationFieldType.values()))))
                                                       .collect(Collectors.toSet());
       Map<ReferenceTermContext, List<EnrichmentBase>> enrichedReferences = entityResolver.resolveByUri(referenceTerms);
       enrichedResultEntities.put(entry.getKey(), enrichedReferences);
@@ -328,20 +333,59 @@ public class DefaultConfiguration extends Configuration {
     return enrichedResultEntities;
   }
 
+  /**
+   * Updates europeana id organizations that are linked in provider aggregation supported fields. 1. Text, for enrich by text and
+   * replace the link. 2. Resource, see all organizations present in the record. If it finds a resource link is present in an
+   * aggregation. and is not europeana does an enriching by uri and replaces the link. 3. Resource, and if an europeana is
+   * present, does the organization update.
+   *
+   * @param rdf
+   * @return rdf with updated organizations.
+   */
   RDF updateOrganizations(RDF rdf) {
     LOGGER.info("Organization Update");
     //Find europeana id organizations that are linked in provider aggregation supported fields
     List<Aggregation> aggregationList = rdf.getAggregationList();
     Set<String> aggregationEuropeanaLinks = new HashSet<>();
+    Set<Map<FieldValue, AggregationFieldType>> aggregationTextLinks = new HashSet<>();
     for (AggregationFieldType aggregationFieldType : AggregationFieldType.values()) {
+      // case no. 1
+      aggregationList.stream().flatMap(aggregationFieldType::extractFields)
+                     .map(literalType ->
+                         new FieldValue(literalType.getString(),
+                             literalType.getLang() != null ? literalType.getLang().getLang() : null))
+                     .filter(fieldValue -> fieldValue.value() != null && !fieldValue.value().isEmpty())
+                     .forEach(item -> aggregationTextLinks.add(Collections.singletonMap(item, aggregationFieldType)));
+
+      // case no. 2
       aggregationList.stream().flatMap(aggregationFieldType::extractFields)
                      .map(ResourceOrLiteralType::getResource)
                      .filter(Objects::nonNull)
                      .map(ResourceOrLiteralType.Resource::getResource)
-                     .filter(europeanaLinkPattern.asPredicate()) // check if only this organization
+                     .filter(Objects::nonNull)
+                     .filter(europeanaLinkPattern.asPredicate().negate())
+                     .forEach(aggregationEuropeanaLinks::add);
+      //case no. 3
+      aggregationList.stream().flatMap(aggregationFieldType::extractFields)
+                     .map(ResourceOrLiteralType::getResource)
+                     .filter(Objects::nonNull)
+                     .map(ResourceOrLiteralType.Resource::getResource)
+                     .filter(Objects::nonNull)
+                     .filter(europeanaLinkPattern.asPredicate())
                      .forEach(aggregationEuropeanaLinks::add);
     }
-    //Check all present entities and collect links that match
+
+    //case no.1 enrich and replace the link
+    for (Map<FieldValue, AggregationFieldType> literal : aggregationTextLinks) {
+      Set<SearchTermContext> searchTermsContext = new HashSet<>();
+      literal.forEach((key, value) -> searchTermsContext.add(new SearchTermContext(key.value(), key.language(), Set.of(value))));
+      Map<SearchTermContext, List<EnrichmentBase>> enrichedValues = entityResolver.resolveByText(searchTermsContext);
+
+      EntityMergeEngine entityMergeEngine = new EntityMergeEngine();
+      enrichedValues.forEach((key, value) -> entityMergeEngine.mergeSearchEntities(rdf, value, key));
+    }
+
+    // case no.2 and case no.3 Check all present entities and collect links that match
     final Map<Class<? extends AboutType>, Set<String>> entitiesToUpdate = new HashMap<>();
     extendEntitiesMap(entitiesToUpdate, Organization.class,
         findMatchingEntityLinks(aggregationEuropeanaLinks, rdf::getOrganizationList));

@@ -2,14 +2,6 @@ package eu.europeana.metis.reprocessing.config;
 
 import eu.europeana.indexing.tiers.TierCalculationMode;
 import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
-import org.springframework.util.CollectionUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,7 +9,13 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Contains all properties that are required for execution.
@@ -102,8 +100,8 @@ public class PropertiesHolder {
           configurationFileName);
       filePath = configurationFileName;
     }
-    try {
-      properties.load(new FileInputStream(filePath));
+    try(FileInputStream fileInputStream = new FileInputStream(filePath)) {
+      properties.load(fileInputStream);
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
@@ -122,7 +120,7 @@ public class PropertiesHolder {
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
 
     datasetIdsToProcess = Arrays.stream(properties.getProperty("dataset.ids.to.process").split(","))
-                                .filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList());
+                                .filter(StringUtils::isNotBlank).map(String::trim).toList();
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     depublicationEnabled = Boolean.parseBoolean(properties.getProperty("depublication.enabled"));
     cleanDatabasesBeforeProcess = Boolean
@@ -133,7 +131,7 @@ public class PropertiesHolder {
     invalidatePluginTypes = Arrays
         .stream(properties.getProperty("invalidate.plugin.types").split(","))
         .filter(StringUtils::isNotBlank).map(String::trim)
-        .map(ExecutablePluginType::getPluginTypeFromEnumName).collect(Collectors.toList());
+        .map(ExecutablePluginType::getPluginTypeFromEnumName).toList();
 
     if (mode.equals(Mode.POST_PROCESS) && (reprocessBasedOnPluginType == null || CollectionUtils
         .isEmpty(invalidatePluginTypes))) {
