@@ -16,7 +16,6 @@ import eu.europeana.enrichment.rest.client.enrichment.Enricher;
 import eu.europeana.enrichment.rest.client.enrichment.EnricherProvider;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
-import eu.europeana.enrichment.rest.client.report.Report;
 import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.entity.client.EntityApiClient;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
@@ -117,16 +116,38 @@ public class DefaultConfiguration extends Configuration {
 
   private static void processARecordFromMongoSource(DefaultConfiguration defaultConfiguration)
       throws ProcessingException, SerializationException {
-    List<FullBeanImpl> fullBeanList = defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(
-        List.of(
-            "/954/Culturalia_fd913fb8_8a14_40c9_94ec_38158f4d4c81"
-        ));
+    List<FullBeanImpl> fullBeanList = List
+        .of(
+            //i
+            "/2020702/raa_fmi_10000100970001",
+            //f
+            "/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
+            //e
+            "/2048128/114145",
+            //d
+            "/9200579/kyaq8pq9",
+            //c
+            "/9200359/BibliographicResource_3000123626519",
+            //a
+            "/9200579/cynwkevu",
+            //b
+            "/954/Culturalia_fd913fb8_8a14_40c9_94ec_38158f4d4c81",
+            //g
+            "/1087/https___catalonica_bnc_cat_catalonicahub_lod_oai_arca_bnc_cat_10000296883_ent0",
+            //h
+            "/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"
+        )
+        .stream()
+        .map(
+            item -> defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(List.of(item))
+        ).flatMap(List::stream).toList();
 
     for (FullBeanImpl fb : fullBeanList) {
-
       RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
 
       LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
+      // tier calculation
+      // ------------------------------
       //      final boolean preserveTimestamps = true;
       //      final Date recordDate = null;
       //      final List<String> datasetIdsForRedirection = null;
@@ -135,19 +156,20 @@ public class DefaultConfiguration extends Configuration {
       //      final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
       //          datasetIdsForRedirection, performRedirects, tierCalculationMode);
       //      IndexerPreprocessor.preprocessRecord(rdf, indexingProperties);
-      Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
-      LOGGER.info("{}\r\n", reports);
+      // enrich
+      // --------------------------------
+      //  Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
+      //  LOGGER.info("{}\r\n", reports);
       defaultConfiguration.updateOrganizations(rdf);
       LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
     }
+
   }
 
   private static void processAnXmlFile(DefaultConfiguration defaultConfiguration) throws SerializationException, IOException {
     RDF rdf = defaultConfiguration.rdfConversionUtils.convertStringToRdf(
         readFileToString("unit_test/test_enrichment_organizations_2.xml"));
     LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-    //    Set<Report> reports = defaultConfiguration.enricher.enrichment(rdf);
-    //    LOGGER.info("{}\r\n", reports);
     defaultConfiguration.updateOrganizations(rdf);
     LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
   }
@@ -334,12 +356,14 @@ public class DefaultConfiguration extends Configuration {
   }
 
   /**
-   * Updates europeana id organizations that are linked in provider aggregation supported fields. 1. Text, for enrich by text and
-   * replace the link. 2. Resource, see all organizations present in the record. If it finds a resource link is present in an
-   * aggregation. and is not europeana does an enriching by uri and replaces the link. 3. Resource, and if an europeana is
-   * present, does the organization update.
+   * Updates europeana id organizations that are linked in provider aggregation supported fields.
    *
-   * @param rdf
+   * 1. Text/literal, for enrich by text and updates the reference(link).
+   * 2. Resource, see all organizations present in the record. If it finds a resource reference(link) is present in an
+   * aggregation and is not europeana does an enriching by uri and replaces the reference(link).
+   * 3. Resource, and if an europeana is present, does the organization update.
+   *
+   * @param rdf record
    * @return rdf with updated organizations.
    */
   RDF updateOrganizations(RDF rdf) {

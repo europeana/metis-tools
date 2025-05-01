@@ -97,6 +97,7 @@
     <edm:isShownBy rdf:resource="https://arca.bnc.cat/arcabib_pro/ca/catalogo_imagenes/imagen_id.do?idImagen=14658562"/>
     <edm:object rdf:resource="http://mbc.malopolska.pl/Content/48386/d2j:big,0/0437_0001.djvu.jpg"/>
     <edm:provider>Catalònica</edm:provider>
+    <edm:intermediateProvider rdf:resource="http://data.europeana.eu/organization/1482250000004671157"></edm:intermediateProvider>
     <edm:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/"/>
   </ore:Aggregation>
   <ore:Proxy rdf:about="/proxy/provider/15/item_nnhSX08">
