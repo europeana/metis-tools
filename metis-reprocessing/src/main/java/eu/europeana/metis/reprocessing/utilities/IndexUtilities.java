@@ -134,7 +134,7 @@ public class IndexUtilities {
       boolean isTombStoned;
       boolean isRemoved;
       LOGGER.info("Tombstone record for dataset {} {}", datasetId, rdfAbout);
-      isTombStoned = indexerPool.indexTombstone(rdfAbout, DepublicationReason.REMOVED_DATA_AT_SOURCE);
+      isTombStoned = indexerPool.indexTombstone(rdfAbout, DepublicationReason.BROKEN_MEDIA_LINKS);
       LOGGER.info("Tombstoned record result {} {}", isTombStoned, rdfAbout);
       LOGGER.info("Remove record for dataset {} {}", datasetId, rdfAbout);
       isRemoved = indexerPool.removeRecord(rdfAbout);
