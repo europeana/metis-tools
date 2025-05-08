@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#" xmlns:doap="http://usefulinc.com/ns/doap#" xmlns:odrl="http://www.w3.org/ns/odrl/2/" xmlns:cc="http://creativecommons.org/ns#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:svcs="http://rdfs.org/sioc/services#" xmlns:oa="http://www.w3.org/ns/oa#" xmlns:dqv="http://www.w3.org/ns/dqv#">
+  <edm:ProvidedCHO rdf:about="/15/item_nnhSX08"/>
+  <edm:WebResource rdf:about="http://mbc.malopolska.pl/Content/48386/d2j:big,0/0437_0001.djvu.jpg">
+    <edm:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/"/>
+  </edm:WebResource>
+  <edm:WebResource rdf:about="https://arca.bnc.cat/arcabib_pro/ca/consulta/registro.do?id=10000257686">
+    <ebucore:hasMimeType>text/html</ebucore:hasMimeType>
+    <ebucore:fileByteSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ebucore:fileByteSize>
+    <edm:type>TEXT</edm:type>
+  </edm:WebResource>
+  <edm:WebResource rdf:about="https://arca.bnc.cat/arcabib_pro/ca/catalogo_imagenes/imagen_id.do?idImagen=14658562">
+    <rdf:type rdf:resource="http://www.europeana.eu/schemas/edm/FullTextResource"/>
+    <ebucore:hasMimeType>application/pdf</ebucore:hasMimeType>
+    <ebucore:fileByteSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">2668534</ebucore:fileByteSize>
+    <edm:spatialResolution rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">150</edm:spatialResolution>
+    <edm:type>TEXT</edm:type>
+  </edm:WebResource>
+  <edm:TimeSpan rdf:about="#1923">
+    <skos:prefLabel xml:lang="zxx">1923</skos:prefLabel>
+    <dcterms:isPartOf rdf:resource="http://data.europeana.eu/timespan/20"></dcterms:isPartOf>
+    <edm:begin>1923-01-01</edm:begin>
+    <edm:end>1923-12-31</edm:end>
+    <skos:notation rdf:datatype="http://id.loc.gov/datatypes/edtf/EDTF-level1">1923</skos:notation>
+  </edm:TimeSpan>
+  <edm:TimeSpan rdf:about="http://data.europeana.eu/timespan/20">
+    <skos:prefLabel xml:lang="de">20. Jahrhundert</skos:prefLabel>
+    <skos:prefLabel xml:lang="fi">1900-luku</skos:prefLabel>
+    <skos:prefLabel xml:lang="ru">XX век</skos:prefLabel>
+    <skos:prefLabel xml:lang="pt">Século XX</skos:prefLabel>
+    <skos:prefLabel xml:lang="bg">20 век</skos:prefLabel>
+    <skos:prefLabel xml:lang="lt">XX amžius</skos:prefLabel>
+    <skos:prefLabel xml:lang="hr">20. stoljeće</skos:prefLabel>
+    <skos:prefLabel xml:lang="lv">20. gadsimts</skos:prefLabel>
+    <skos:prefLabel xml:lang="fr">XXe siècle</skos:prefLabel>
+    <skos:prefLabel xml:lang="hu">20. század</skos:prefLabel>
+    <skos:prefLabel xml:lang="sk">20. storočie</skos:prefLabel>
+    <skos:prefLabel xml:lang="sl">20. stoletje</skos:prefLabel>
+    <skos:prefLabel xml:lang="ga">20ú haois</skos:prefLabel>
+    <skos:prefLabel xml:lang="ca">Segle XX</skos:prefLabel>
+    <skos:prefLabel xml:lang="sv">1900-talet</skos:prefLabel>
+    <skos:prefLabel xml:lang="el">20ός αιώνας</skos:prefLabel>
+    <skos:prefLabel xml:lang="en">20th century</skos:prefLabel>
+    <skos:prefLabel xml:lang="it">XX secolo</skos:prefLabel>
+    <skos:prefLabel xml:lang="es">Siglo XX</skos:prefLabel>
+    <skos:prefLabel xml:lang="et">20. sajand</skos:prefLabel>
+    <skos:prefLabel xml:lang="cs">20. století</skos:prefLabel>
+    <skos:prefLabel xml:lang="eu">XX. mendea</skos:prefLabel>
+    <skos:prefLabel xml:lang="pl">XX wiek</skos:prefLabel>
+    <skos:prefLabel xml:lang="da">20. århundrede</skos:prefLabel>
+    <skos:prefLabel xml:lang="ro">Secolul al XX-lea</skos:prefLabel>
+    <skos:prefLabel xml:lang="nl">20e eeuw</skos:prefLabel>
+    <skos:altLabel xml:lang="sv">20:e århundradet</skos:altLabel>
+    <skos:altLabel xml:lang="sv">20:e seklet</skos:altLabel>
+    <skos:altLabel xml:lang="sv">1900-tal</skos:altLabel>
+    <skos:altLabel xml:lang="sv">1900-talet (århundrade)</skos:altLabel>
+    <skos:altLabel xml:lang="sv">1900-talet (sekel)</skos:altLabel>
+    <skos:altLabel xml:lang="ru">20 век</skos:altLabel>
+    <skos:altLabel xml:lang="pt">Século 20</skos:altLabel>
+    <skos:altLabel xml:lang="pt">Século vinte</skos:altLabel>
+    <skos:altLabel xml:lang="pt">Periodo 1901-2000</skos:altLabel>
+    <skos:altLabel xml:lang="pt">Ciclo (1901-2000)</skos:altLabel>
+    <skos:altLabel xml:lang="en">20th-century</skos:altLabel>
+    <skos:altLabel xml:lang="en">20th-century</skos:altLabel>
+    <skos:altLabel xml:lang="en">Twentieth century</skos:altLabel>
+    <skos:altLabel xml:lang="en">The past century</skos:altLabel>
+    <skos:altLabel xml:lang="en">History, 20th Century</skos:altLabel>
+    <skos:altLabel xml:lang="en">XX Century</skos:altLabel>
+    <skos:altLabel xml:lang="it">Novecento</skos:altLabel>
+    <skos:altLabel xml:lang="it">20° secolo</skos:altLabel>
+    <skos:altLabel xml:lang="it">'900</skos:altLabel>
+    <skos:altLabel xml:lang="it">Novecento</skos:altLabel>
+    <skos:altLabel xml:lang="fr">20e siècle</skos:altLabel>
+    <skos:altLabel xml:lang="es">Siglo 20</skos:altLabel>
+    <skos:altLabel xml:lang="es">El siglo pasado</skos:altLabel>
+    <skos:altLabel xml:lang="es">Siglo veinte</skos:altLabel>
+    <skos:altLabel xml:lang="es">Siglo XX después de Cristo</skos:altLabel>
+    <skos:altLabel xml:lang="es">Siglo XX d. C.</skos:altLabel>
+    <edm:begin>1901-01-01</edm:begin>
+    <edm:end>2000-12-31</edm:end>
+    <edm:isNextInSequence rdf:resource="http://data.europeana.eu/timespan/19"/>
+    <owl:sameAs rdf:resource="http://www.wikidata.org/entity/Q6927"/>
+    <owl:sameAs rdf:resource="http://id.loc.gov/authorities/names/sh2002012476"/>
+    <owl:sameAs rdf:resource="http://id.loc.gov/authorities/names/sh85139020"/>
+    <owl:sameAs rdf:resource="http://id.nlm.nih.gov/mesh/D049673"/>
+    <owl:sameAs rdf:resource="https://www.freebase.com/m/089_x"/>
+    <owl:sameAs rdf:resource="https://g.co/kg/m/089_x"/>
+    <owl:sameAs rdf:resource="http://id.nlm.nih.gov/mesh/K01.400.504.968"/>
+    <owl:sameAs rdf:resource="http://vocab.getty.edu/aat/300404514"/>
+    <owl:sameAs rdf:resource="http://id.worldcat.org/fast/1159810"/>
+    <owl:sameAs rdf:resource="http://dbpedia.org/resource/20th_century"/>
+  </edm:TimeSpan>
+  <ore:Aggregation rdf:about="/aggregation/provider/15/item_nnhSX08">
+    <edm:aggregatedCHO rdf:resource="/15/item_nnhSX08"/>
+    <edm:dataProvider rdf:resource="http://data.europeana.eu/organization/1482250000004671162"></edm:dataProvider>
+    <edm:isShownAt rdf:resource="https://arca.bnc.cat/arcabib_pro/ca/consulta/registro.do?id=10000257686"/>
+    <edm:isShownBy rdf:resource="https://arca.bnc.cat/arcabib_pro/ca/catalogo_imagenes/imagen_id.do?idImagen=14658562"/>
+    <edm:object rdf:resource="http://mbc.malopolska.pl/Content/48386/d2j:big,0/0437_0001.djvu.jpg"/>
+    <edm:provider>Catalònica</edm:provider>
+    <edm:intermediateProvider rdf:resource="http://data.europeana.eu/organization/1482250000004671157"></edm:intermediateProvider>
+    <edm:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/"/>
+  </ore:Aggregation>
+  <ore:Proxy rdf:about="/proxy/provider/15/item_nnhSX08">
+    <dc:contributor xml:lang="es">Beaupre, Antoni.(Red.)</dc:contributor>
+    <dc:date xml:lang="es">1923</dc:date>
+    <dc:description xml:lang="es">Los Fermentos defensivos en la inmunidad natural y adquirida</dc:description>
+    <dc:format>image/vnd.djvu</dc:format>
+    <dc:language>spa</dc:language>
+    <dc:publisher xml:lang="es">Barcelona : Revista Veterinaria de España</dc:publisher>
+    <dc:rights xml:lang="es">http://creativecommons.org/publicdomain/mark/1.0/</dc:rights>
+    <dc:subject xml:lang="es">20 w.</dc:subject>
+    <dc:subject xml:lang="es">gazety polskie</dc:subject>
+    <dc:subject rdf:resource="http://data.europeana.eu/organization/4140"></dc:subject>
+    <dc:title xml:lang="es">Universitat_Autonoma_de_Barcelona</dc:title>
+    <dc:type xml:lang="es">czasopismo</dc:type>
+    <dcterms:extent>Dziennik polityczny i literacko-społeczny; organ konserwatystów. - Opis fiz.: 4 s. ; 61 cm.</dcterms:extent>
+    <edm:europeanaProxy>false</edm:europeanaProxy>
+    <ore:proxyFor rdf:resource="/15/item_nnhSX08"/>
+    <ore:proxyIn rdf:resource="/aggregation/provider/15/item_nnhSX08"/>
+    <edm:type>TEXT</edm:type>
+  </ore:Proxy>
+  <ore:Proxy rdf:about="/proxy/europeana/15/item_nnhSX08">
+    <dc:date rdf:resource="#1923"></dc:date>
+    <dc:identifier>http://data.europeana.eu/item/nnhSX08</dc:identifier>
+    <dc:language>es</dc:language>
+    <edm:europeanaProxy>true</edm:europeanaProxy>
+    <edm:year>1923</edm:year>
+    <ore:proxyFor rdf:resource="/15/item_nnhSX08"/>
+    <ore:proxyIn rdf:resource="/aggregation/europeana/15/item_nnhSX08"/>
+    <ore:lineage rdf:resource="/proxy/provider/15/item_nnhSX08"/>
+  </ore:Proxy>
+  <edm:EuropeanaAggregation rdf:about="/aggregation/europeana/15/item_nnhSX08">
+    <edm:aggregatedCHO rdf:resource="/15/item_nnhSX08"/>
+    <edm:dataProvider xml:lang="en">Europeana Foundation</edm:dataProvider>
+    <edm:provider xml:lang="en">Europeana Foundation</edm:provider>
+    <edm:datasetName>15_local_30042025_1710</edm:datasetName>
+    <edm:country>Netherlands</edm:country>
+    <edm:preview rdf:resource="https://arca.bnc.cat/arcabib_pro/ca/catalogo_imagenes/imagen_id.do?idImagen=14658562"/>
+    <edm:language>nl</edm:language>
+    <edm:completeness>6</edm:completeness>
+  </edm:EuropeanaAggregation>
+  <foaf:Organization rdf:about="http://data.europeana.eu/organization/4140">
+    <skos:prefLabel xml:lang="eu">Euskadiko Liburutegi Digitala</skos:prefLabel>
+    <skos:prefLabel xml:lang="en">Euskariana</skos:prefLabel>
+  </foaf:Organization>
+  <foaf:Organization rdf:about="http://data.europeana.eu/organization/1482250000004671162">
+    <skos:prefLabel xml:lang="en">Autonomous University of Barcelona</skos:prefLabel>
+    <skos:prefLabel xml:lang="es">Universidad Autonoma de Barcelona</skos:prefLabel>
+    <skos:prefLabel xml:lang="ca">Universitat Autònoma de Barcelona</skos:prefLabel>
+  </foaf:Organization>
+</rdf:RDF>
