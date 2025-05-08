@@ -209,26 +209,10 @@ public class ProcessDataset implements Callable<Void> {
   }
 
   void processRecords(List<FullBeanImpl> nextPageOfRecords) {
-    try (ExecutorService executorService = Executors.newFixedThreadPool(2, Thread.ofVirtual().factory())) {
-      for (int i = 0; i < nextPageOfRecords.size(); i += 2) {
-        FullBeanImpl first = nextPageOfRecords.get(i);
-        FullBeanImpl second = (i + 1 < nextPageOfRecords.size()) ? nextPageOfRecords.get(i + 1) : null;
-        executorService.submit(() -> {
-          final String exceptionStackTrace1 = processAndIndex(first);
-          updateProcessCounts(exceptionStackTrace1, first.getAbout());
-        });
-        if (second != null) {
-          executorService.submit(() -> {
-            final String exceptionStackTrace2 = processAndIndex(second);
-            updateProcessCounts(exceptionStackTrace2, second.getAbout());
-          });
-        }
-      }
+    for (FullBeanImpl fullBean : nextPageOfRecords) {
+      final String exceptionStackTrace = processAndIndex(fullBean);
+      updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
     }
-//    for (FullBeanImpl fullBean : nextPageOfRecords) {
-//      final String exceptionStackTrace = processAndIndex(fullBean);
-//      updateProcessCounts(exceptionStackTrace, fullBean.getAbout());
-//    }
   }
 
   void updateDatasetStatus(int pageProcessed) {
