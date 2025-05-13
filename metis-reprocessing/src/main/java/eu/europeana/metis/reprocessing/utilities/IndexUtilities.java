@@ -129,7 +129,7 @@ public class IndexUtilities {
     if ((datasetId.equals("9200359") && hasContentTier(rdf))
         || (datasetId.equals("9200579") && hasDcCreator(rdf))
         || (datasetId.equals("2048128") && hasEdmType3D(rdf))
-        || (datasetId.equals("2048087") && hasDataProviders(rdf, DATA_PROVIDERS))
+        || (datasetId.equals("2048087") && hasDataProviders(rdf))
     ) {
       boolean isTombStoned;
       boolean isRemoved;
@@ -157,7 +157,8 @@ public class IndexUtilities {
     }
 
     // Otherwise return any value (if available).
-    return Optional.ofNullable(organization.getPrefLabel()).map(Map::entrySet).stream()
+    return Optional.ofNullable(organization.getPrefLabel())
+                   .map(Map::entrySet).stream()
                    .flatMap(Collection::stream)
                    .filter(Objects::nonNull).filter(entry -> entry.getValue() != null)
                    .flatMap(entry -> entry.getValue().stream().filter(StringUtils::isNotBlank)
@@ -171,7 +172,7 @@ public class IndexUtilities {
                                          .filter(proxy -> ArrayUtils.isEmpty(proxy.getLineage())).map(ProxyImpl::getProxyIn)
                                          .map(Arrays::asList).flatMap(List::stream).toList();
 
-    return fullBean.getAggregations().stream().filter(x -> proxyInResult.contains(x.getAbout())).toList();
+    return fullBean.getAggregations().stream().filter(aggregation -> proxyInResult.contains(aggregation.getAbout())).toList();
   }
 
   private static Pair<Set<String>, Map<String, List<String>>> extractUrisAndLiterals(
@@ -319,25 +320,25 @@ public class IndexUtilities {
    * MET-6362 Has data providers boolean.
    *
    * @param rdf the rdf
-   * @param providersList the providers list
    * @return the boolean
    */
-  static boolean hasDataProviders(RDF rdf, List<String> providersList) {
+  static boolean hasDataProviders(RDF rdf) {
     RdfToFullBeanConverter rdfToFullBeanConverter = new RdfToFullBeanConverter();
     FullBeanImpl fullBean = rdfToFullBeanConverter.convertRdfToFullBean(new RdfWrapper(rdf));
 
-    final Map<String, Pair<String, String>> organizationPrefLabelMap = fullBean.getOrganizations().stream()
-                                                                               .filter(
-                                                                                   org -> StringUtils.isNotBlank(org.getAbout()))
-                                                                               .collect(
-                                                                                   Collectors.toMap(OrganizationImpl::getAbout,
-                                                                                       IndexUtilities::findPrefLabelForOrganization,
-                                                                                       (o1, o2) -> o1));
+    final Map<String, Pair<String, String>> organizationPrefLabelMap =
+        fullBean.getOrganizations()
+                .stream()
+                .filter(org -> StringUtils.isNotBlank(org.getAbout()))
+                .collect(
+                    Collectors.toMap(OrganizationImpl::getAbout,
+                        IndexUtilities::findPrefLabelForOrganization,
+                        (o1, o2) -> o1));
 
     AggregationImpl aggregation = getDataProviderAggregations(fullBean).getFirst();
 
-    final Pair<Set<String>, Map<String, List<String>>> dataProviderPair = extractUrisAndLiterals(
-        aggregation.getEdmDataProvider(), organizationPrefLabelMap);
+    final Pair<Set<String>, Map<String, List<String>>> dataProviderPair =
+        extractUrisAndLiterals(aggregation.getEdmDataProvider(), organizationPrefLabelMap);
 
     if (dataProviderPair.getValue().isEmpty()) {
       return false;
@@ -349,7 +350,7 @@ public class IndexUtilities {
           dataProvider = dataProviderPair.getValue().values().stream().findFirst().get().getFirst();
         }
 
-        if (providersList.contains(dataProvider)) {
+        if (IndexUtilities.DATA_PROVIDERS.contains(dataProvider)) {
           LOGGER.info("Has DataProvider: {} => {}", fullBean.getAbout(), dataProvider);
           return true;
         }
