@@ -1,0 +1,86 @@
+#The multiplication of min.parallel.threads and max.parallel.threads.per.datasets is the total amount of threads the application will utilize.
+#This is calculated based on the page size and the number of pages per dataset.
+min.parallel.datasets=
+max.parallel.threads.per.dataset=
+start.from.dataset.index=
+end.at.dataset.index=
+source.mongo.page.size=
+#Possible values CLEAN, DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS, POST_CLEAN.
+#DEFAULT for a normal operation of process and index.
+#CLEAN mode is to be used to just clean the destination databases, it does no processing
+#REPROCESS_ALL_FAILED will process only the failed records for a dataset even if it's not previously completely processed.
+#POST_PROCESS mode is to be used after everything is final and the last step needs to be executed. Don't use this mode unless you know what you are doing.
+#POST_CLEAN mode is to be used to just remove the destination temporary databases, it does no processing
+mode=DEFAULT
+#A list of dataset ids to process instead of all the datasets
+dataset.ids.to.process=
+#Set to true to do a simple read and then write reindex, without altering the record
+identity.process=
+#set to true to enable depublication, this works for content tier generation without removing or generating preview db
+depublication.enabled=
+#Set to true if we want to clear the database before we start a new process. Only applicable for DEFAULT Mode
+clean.databases.before.process=
+#Possible values INITIALISE, SKIP, OVERWRITE
+#INITIALISE Initialise perform tier calculation only if no tiers exist
+#SKIP Skip tier calculation mode. Do not perform any tier calculation
+#OVERWRITE Overwrite tier calculation mode. Always perform tier calculation, overwriting any existing tiers
+tier.calculation.mode=INITIALISE
+#The plugin where the reprocessed dataset workflow execution and it's first plugin(normally preview) should be based upon. For example ENRICHMENT. MUST not be empty if mode is POST_PROCESS
+reprocess.based.on.plugin.type=
+#The plugins in metis core to invalidate during POST_PROCESS. For example if the base plugin type was ENRICHMENT then the plugins that have to be invalidated would be the ones following ENRICHMENT. MUST not be empty if mode is POST_PROCESS
+invalidate.plugin.types=
+
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo Metis Core
+mongo.metis.core.hosts=
+mongo.metis.core.port=
+mongo.metis.core.authentication.db=
+mongo.metis.core.username=
+mongo.metis.core.password=
+mongo.metis.core.enableSSL=false
+mongo.metis.core.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
+
+#Mongo Source
+mongo.source.hosts=
+mongo.source.port=
+mongo.source.authentication.db=
+mongo.source.username=
+mongo.source.password=
+mongo.source.enableSSL=false
+mongo.source.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
+
+#Mongo Destination
+mongo.destination.hosts=
+mongo.destination.port=
+mongo.destination.authentication.db=
+mongo.destination.username=
+mongo.destination.password=
+mongo.destination.enableSSL=false
+mongo.destination.db=
+mongo.destination.tombstone.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
+
+#Solr/Zookeeper Destination
+solr.destination.hosts=
+zookeeper.destination.hosts=
+zookeeper.destination.port=
+zookeeper.destination.chroot=
+zookeeper.destination.defaultCollection=
+
+#EXTRA CONFIGURATION
+dereference.url=
+#Enrichment
+enrichment.batch.size=
+#Entity Management Base Url for Entity Retrieval
+entity.management.url=
+#Entity Api V2 url for search and suggest
+entity.api.url=
+entity.api.key=
