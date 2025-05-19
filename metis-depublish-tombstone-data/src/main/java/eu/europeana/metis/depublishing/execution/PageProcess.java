@@ -1,7 +1,7 @@
 package eu.europeana.metis.depublishing.execution;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.metis.depublishing.dao.MongoSourceMongoDao;
+import eu.europeana.metis.depublishing.dao.MongoDao;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -37,8 +37,8 @@ public class PageProcess implements Callable<Integer> {
     List<FullBeanImpl> nextPageOfRecords = processDataset.getFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("{} - Processing page: {}, range of records: {} - {}",
-          prefixDatasetidLog, nextPage, nextPage * MongoSourceMongoDao.PAGE_SIZE,
-          ((nextPage + 1) * MongoSourceMongoDao.PAGE_SIZE) - 1);
+          prefixDatasetidLog, nextPage, nextPage * MongoDao.PAGE_SIZE,
+          ((nextPage + 1) * MongoDao.PAGE_SIZE) - 1);
       processDataset.processRecords(nextPageOfRecords);
       processDataset.updateDatasetStatus(nextPage);
       nextPage = processDataset.getNextPageAndIncrement();

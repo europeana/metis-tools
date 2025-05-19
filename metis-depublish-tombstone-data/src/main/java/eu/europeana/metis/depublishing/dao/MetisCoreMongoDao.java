@@ -13,22 +13,18 @@ import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.core.mongo.MorphiaDatastoreProviderImpl;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
+import eu.europeana.metis.depublishing.config.PropertiesHolder;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
-import eu.europeana.metis.depublishing.config.PropertiesHolder;
 import eu.europeana.metis.utils.CustomTruststoreAppender;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Mongo Dao for functionality related to metis-core, simplified.
- *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-05-16
  */
 public class MetisCoreMongoDao {
 
@@ -51,6 +47,17 @@ public class MetisCoreMongoDao {
     workflowExecutionDao = new WorkflowExecutionDao(morphiaDatastoreProvider);
   }
 
+  private static Datastore createMetisCoreDatastore(MongoClient mongoClient, String databaseName) {
+    MapperOptions mapperOptions = MapperOptions.builder().discriminatorKey("className")
+                                               .discriminator(DiscriminatorFunction.className())
+                                               .collectionNaming(NamingStrategy.identity()).build();
+    final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName, mapperOptions);
+    final Mapper mapper = datastore.getMapper();
+    mapper.map(Dataset.class);
+    mapper.map(WorkflowExecution.class);
+    return datastore;
+  }
+
   public List<String> getAllDatasetIds() {
     Query<Dataset> query = metisCoreDatastore.find(Dataset.class);
     final List<Dataset> datasets = MorphiaUtils.getListOfQueryRetryable(query);
@@ -60,7 +67,15 @@ public class MetisCoreMongoDao {
   public Dataset getDataset(String datasetId) {
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> metisCoreDatastore.find(Dataset.class).filter(Filters.eq(DATASET_ID, datasetId))
-            .first());
+                                .first());
+  }
+
+  public WorkflowExecutionDao getWorkflowExecutionDao() {
+    return workflowExecutionDao;
+  }
+
+  public void close() {
+    metisCoreMongoInitializer.close();
   }
 
   private MongoInitializer prepareMetisCoreConfiguration()
@@ -77,25 +92,6 @@ public class MetisCoreMongoDao {
         propertiesHolder.metisCoreMongoEnableSSL, propertiesHolder.metisCoreConnectionPoolSize);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
-  }
-
-  private static Datastore createMetisCoreDatastore(MongoClient mongoClient, String databaseName) {
-    MapperOptions mapperOptions = MapperOptions.builder().discriminatorKey("className")
-        .discriminator(DiscriminatorFunction.className())
-        .collectionNaming(NamingStrategy.identity()).build();
-    final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName, mapperOptions);
-    final Mapper mapper = datastore.getMapper();
-    mapper.map(Dataset.class);
-    mapper.map(WorkflowExecution.class);
-    return datastore;
-  }
-
-  public WorkflowExecutionDao getWorkflowExecutionDao() {
-    return workflowExecutionDao;
-  }
-
-  public void close() {
-    metisCoreMongoInitializer.close();
   }
 
 }

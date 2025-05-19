@@ -14,8 +14,6 @@ import org.bson.types.ObjectId;
 /**
  * Model class that contains failed record identifiers.
  *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-05-20
  */
 @Entity("FailedRecord")
 @Indexes({@Index(fields = {@Field("failedUrl")}, options = @IndexOptions(unique = true))})

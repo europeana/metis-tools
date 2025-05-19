@@ -6,9 +6,6 @@ import eu.europeana.metis.mongo.connection.MongoProperties;
 
 /**
  * Initialize MongoClient
- *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-04-16
  */
 public class MongoInitializer {
 
@@ -37,6 +34,14 @@ public class MongoInitializer {
     mongoClient = new MongoClientProvider<>(getMongoProperties()).createMongoClient();
   }
 
+  public void close() {
+    mongoClient.close();
+  }
+
+  public MongoClient getMongoClient() {
+    return mongoClient;
+  }
+
   private MongoProperties<IllegalArgumentException> getMongoProperties() {
     final MongoProperties<IllegalArgumentException> mongoProperties = new MongoProperties<>(
         IllegalArgumentException::new);
@@ -44,13 +49,5 @@ public class MongoInitializer {
         mongoPassword, mongoEnablessl, null, "Metis Reprocessing");
     mongoProperties.setMaxConnectionPoolSize(metisCoreConnectionPoolSize);
     return mongoProperties;
-  }
-
-  public void close() {
-    mongoClient.close();
-  }
-
-  public MongoClient getMongoClient() {
-    return mongoClient;
   }
 }

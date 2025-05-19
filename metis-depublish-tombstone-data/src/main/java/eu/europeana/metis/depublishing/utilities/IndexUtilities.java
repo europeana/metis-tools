@@ -4,8 +4,8 @@ import com.mongodb.MongoWriteException;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
-import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.depublishing.config.Configuration;
+import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.schema.jibx.AboutType;
 import eu.europeana.metis.schema.jibx.ProvidedCHOType;
 import eu.europeana.metis.schema.jibx.RDF;
@@ -21,9 +21,6 @@ import org.slf4j.LoggerFactory;
  * Contains functionality for indexing.
  * <p>Methods in this class will be provided as implementations of functional interfaces for
  * performing the indexing of records</p>
- *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019 -05-17
  */
 public class IndexUtilities {
 
@@ -63,27 +60,30 @@ public class IndexUtilities {
 
         if (configuration.isDepublicationEnabled()) {
           final String datasetId = getDatasetIdOfRecordToBePurged(rdf);
-          depublishRecord(datasetId, rdfAbout, indexerPool);
+          // if no detail, erase the whole dataset tombstones
+          if (configuration.getRecordIdsToProcess().isEmpty()) {
+            tombstoneRemove(datasetId, rdfAbout, indexerPool);
+          } else if (configuration.getRecordIdsToProcess().contains(rdfAbout)) {
+            tombstoneRemove(datasetId, rdfAbout, indexerPool);
+          }
         }
         return null;
       }, retryExceptions);
     } catch (Exception e) {
-      throw new RecordRelatedIndexingException("A Runtime Exception occurred while indexing record", e);
+      throw new RecordRelatedIndexingException("A Runtime Exception occurred while tombstone record", e);
     }
   }
 
-  private static void depublishRecord( String datasetId, String rdfAbout, IndexerPool indexerPool)
-      throws IndexingException {
-      boolean isTombStoned;
-      boolean isRemoved;
-      LOGGER.info("Tombstone record for dataset {} {}", datasetId, rdfAbout);
-      isTombStoned = indexerPool.removeRecord(rdfAbout);
-      LOGGER.info("Tombstoned record result {} {}", isTombStoned, rdfAbout);
-      LOGGER.info("Remove record for dataset {} {}", datasetId, rdfAbout);
-      isRemoved = indexerPool.removeRecord(rdfAbout);
-      LOGGER.info("Removed record result {} {}", isRemoved, rdfAbout);
+  private static void tombstoneRemove(String datasetId, String rdfAbout, IndexerPool indexerPool) throws IndexingException {
+    boolean isRecordRemoved;
+    boolean isTombStoneRemoved;
+    LOGGER.info("Tombstone removed record for dataset {} {}", datasetId, rdfAbout);
+    isTombStoneRemoved = indexerPool.removeTombstone(rdfAbout);
+    LOGGER.info("Tombstone removed record result {} {}", isTombStoneRemoved, rdfAbout);
+    LOGGER.info("Remove record for dataset {} {}", datasetId, rdfAbout);
+    isRecordRemoved = indexerPool.removeRecord(rdfAbout);
+    LOGGER.info("Remove record result {} {}", isRecordRemoved, rdfAbout);
   }
-
 
   private static String getDatasetIdOfRecordToBePurged(RDF rdf) {
     Optional<String> about = rdf.getProvidedCHOList()
@@ -96,11 +96,9 @@ public class IndexUtilities {
     if (about.isPresent()) {
       final String[] splitRecordIdentifier = about.get().split("/");
       result = splitRecordIdentifier[1];
-      }
+    }
 
     return result;
   }
-
-
 
 }

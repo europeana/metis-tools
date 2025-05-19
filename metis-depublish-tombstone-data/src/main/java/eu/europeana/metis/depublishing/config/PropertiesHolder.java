@@ -1,7 +1,5 @@
 package eu.europeana.metis.depublishing.config;
 
-import eu.europeana.indexing.tiers.TierCalculationMode;
-import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,35 +13,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Contains all properties that are required for execution.
  * <p>During construction will read properties from the specified file from the classpath.</p>
  *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-04-16
  */
 public class PropertiesHolder {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesHolder.class);
   public static final Marker STATISTICS_LOGS_MARKER = MarkerFactory.getMarker("STATISTICS_LOGS");
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesHolder.class);
   //General parameters
   public final int minParallelDatasets;
   public final int maxParallelThreadsPerDataset;
   public final int startFromDatasetIndex;
   public final int endAtDatasetIndex;
-  public final int sourceMongoPageSize;
+  public final int mongoPageSize;
   public final Mode mode;
   public final List<String> datasetIdsToProcess;
+  public final List<String> recordIdsToProcess;
   public final boolean identityProcess;
   public final boolean depublicationEnabled;
-  public final boolean cleanDatabasesBeforeProcess;
-  public final TierCalculationMode tierCalculationMode;
-
-  public final ExecutablePluginType reprocessBasedOnPluginType;
-  public final List<ExecutablePluginType> invalidatePluginTypes;
 
   //Metis Core Mongo
   public final String truststorePath;
@@ -56,26 +46,17 @@ public class PropertiesHolder {
   public final boolean metisCoreMongoEnableSSL;
   public final String metisCoreMongoDb;
   public final int metisCoreConnectionPoolSize;
-  //Mongo Source
-  public final String[] sourceMongoHosts;
-  public final int[] sourceMongoPorts;
-  public final String sourceMongoAuthenticationDb;
-  public final String sourceMongoUsername;
-  public final String sourceMongoPassword;
-  public final boolean sourceMongoEnableSSL;
-  public final String sourceMongoDb;
-  public final int sourceMongoConnectionPoolSize;
 
   //Mongo Destination
-  public final String[] destinationMongoHosts;
-  public final int[] destinationMongoPorts;
-  public final String destinationMongoAuthenticationDb;
-  public final String destinationMongoUsername;
-  public final String destinationMongoPassword;
-  public final boolean destinationMongoEnableSSL;
-  public final String destinationMongoDb;
-  public final int destinationMongoConnectionPoolSize;
-  public final String destinationMongoTombstoneDb;
+  public final String[] mongoHosts;
+  public final int[] mongoPorts;
+  public final String mongoAuthenticationDb;
+  public final String mongoUsername;
+  public final String mongoPassword;
+  public final boolean mongoEnableSSL;
+  public final String mongoDb;
+  public final int mongoConnectionPoolSize;
+  public final String mongoTombstoneDb;
 
   //Solr/Zookeeper Destination
   public final String[] destinationSolrHosts;
@@ -100,7 +81,7 @@ public class PropertiesHolder {
           configurationFileName);
       filePath = configurationFileName;
     }
-    try(FileInputStream fileInputStream = new FileInputStream(filePath)) {
+    try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
       properties.load(fileInputStream);
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
@@ -116,29 +97,15 @@ public class PropertiesHolder {
     endAtDatasetIndex =
         StringUtils.isBlank(properties.getProperty("end.at.dataset.index")) ? Integer.MAX_VALUE
             : Integer.parseInt(properties.getProperty("end.at.dataset.index"));
-    sourceMongoPageSize = Integer.parseInt(properties.getProperty("source.mongo.page.size"));
+    mongoPageSize = Integer.parseInt(properties.getProperty("mongo.page.size"));
     mode = Mode.getModeFromEnumName(properties.getProperty("mode"));
 
     datasetIdsToProcess = Arrays.stream(properties.getProperty("dataset.ids.to.process").split(","))
                                 .filter(StringUtils::isNotBlank).map(String::trim).toList();
+    recordIdsToProcess = Arrays.stream(properties.getProperty("record.ids.to.process").split(","))
+                               .filter(StringUtils::isNotBlank).map(String::trim).toList();
     identityProcess = Boolean.parseBoolean(properties.getProperty("identity.process"));
     depublicationEnabled = Boolean.parseBoolean(properties.getProperty("depublication.enabled"));
-    cleanDatabasesBeforeProcess = Boolean
-        .parseBoolean(properties.getProperty("clean.databases.before.process"));
-    tierCalculationMode = TierCalculationMode.valueOf(properties.getProperty("tier.calculation.mode"));
-    reprocessBasedOnPluginType = ExecutablePluginType
-        .getPluginTypeFromEnumName(properties.getProperty("reprocess.based.on.plugin.type"));
-    invalidatePluginTypes = Arrays
-        .stream(properties.getProperty("invalidate.plugin.types").split(","))
-        .filter(StringUtils::isNotBlank).map(String::trim)
-        .map(ExecutablePluginType::getPluginTypeFromEnumName).toList();
-
-    if (mode.equals(Mode.POST_PROCESS) && (reprocessBasedOnPluginType == null || CollectionUtils
-        .isEmpty(invalidatePluginTypes))) {
-      throw new IllegalArgumentException(String.format("If mode is: %s, the "
-          + "reprocessBasedOnPluginType must not be null and invalidatePluginTypes must not be "
-          + "empty", Mode.POST_PROCESS));
-    }
 
     //Metis Core Mongo
     truststorePath = properties.getProperty("truststore.path");
@@ -160,31 +127,20 @@ public class PropertiesHolder {
     metisCoreMongoDb = properties.getProperty("mongo.metis.core.db");
     metisCoreConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.metis.core.connection.pool.size"), 50);
 
-    //Mongo Source
-    sourceMongoHosts = properties.getProperty("mongo.source.hosts").split(",");
-    sourceMongoPorts = Arrays.stream(properties.getProperty("mongo.source.port").split(","))
-                             .mapToInt(Integer::parseInt).toArray();
-    sourceMongoAuthenticationDb = properties.getProperty("mongo.source.authentication.db");
-    sourceMongoUsername = properties.getProperty("mongo.source.username");
-    sourceMongoPassword = properties.getProperty("mongo.source.password");
-    sourceMongoEnableSSL = Boolean.parseBoolean(properties.getProperty("mongo.source.enableSSL"));
-    sourceMongoDb = properties.getProperty("mongo.source.db");
-    sourceMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.source.connection.pool.size"), 500);
-
     //Mongo Destination
-    destinationMongoHosts = properties.getProperty("mongo.destination.hosts").split(",");
-    destinationMongoPorts = Arrays
+    mongoHosts = properties.getProperty("mongo.destination.hosts").split(",");
+    mongoPorts = Arrays
         .stream(properties.getProperty("mongo.destination.port").split(","))
         .mapToInt(Integer::parseInt).toArray();
-    destinationMongoAuthenticationDb = properties
+    mongoAuthenticationDb = properties
         .getProperty("mongo.destination.authentication.db");
-    destinationMongoUsername = properties.getProperty("mongo.destination.username");
-    destinationMongoPassword = properties.getProperty("mongo.destination.password");
-    destinationMongoEnableSSL = Boolean
+    mongoUsername = properties.getProperty("mongo.destination.username");
+    mongoPassword = properties.getProperty("mongo.destination.password");
+    mongoEnableSSL = Boolean
         .parseBoolean(properties.getProperty("mongo.destination.enableSSL"));
-    destinationMongoDb = properties.getProperty("mongo.destination.db");
-    destinationMongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.destination.connection.pool.size"), 500);
-    destinationMongoTombstoneDb = properties.getProperty("mongo.destination.tombstone.db");
+    mongoDb = properties.getProperty("mongo.destination.db");
+    mongoConnectionPoolSize = NumberUtils.toInt(properties.getProperty("mongo.destination.connection.pool.size"), 500);
+    mongoTombstoneDb = properties.getProperty("mongo.destination.tombstone.db");
 
     //Solr/Zookeeper Destination
     destinationSolrHosts = properties.getProperty("solr.destination.hosts").split(",");

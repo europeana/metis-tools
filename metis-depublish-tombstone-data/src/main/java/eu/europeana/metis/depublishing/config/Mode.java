@@ -3,11 +3,9 @@ package eu.europeana.metis.depublishing.config;
 /**
  * Mode of execution of the script.
  *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-04-19
  */
 public enum Mode {
-  DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS, POST_CLEAN, CLEAN;
+  DEFAULT, REPROCESS_ALL_FAILED;
 
   public static Mode getModeFromEnumName(String enumName) {
     for (Mode mode : Mode.values()) {

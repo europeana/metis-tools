@@ -17,8 +17,6 @@ import org.bson.types.ObjectId;
 /**
  * Model class for containing dataset status information.
  *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-05-14
  */
 @Entity("DatasetStatus")
 @Indexes({@Index(fields = {@Field("datasetId")}, options = @IndexOptions(unique = true))})

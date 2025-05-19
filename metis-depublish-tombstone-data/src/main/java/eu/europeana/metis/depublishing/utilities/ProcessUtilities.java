@@ -7,9 +7,9 @@ import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
 import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
-import eu.europeana.metis.depublishing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.depublishing.config.Configuration;
+import eu.europeana.metis.depublishing.dao.MongoDao;
+import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -44,20 +44,20 @@ public class ProcessUtilities {
 
   public static RDF processFullBean(FullBeanImpl fullBean, Configuration configuration) {
     if (configuration.isIdentityProcess()) {
-      return identityProcess(fullBean, configuration.getMongoSourceMongoDao());
+      return identityProcess(fullBean, configuration.getMongoDao());
     } else {
       return process(fullBean, configuration);
     }
   }
 
   private static RDF identityProcess(FullBeanImpl fullBean,
-      MongoSourceMongoDao mongoSourceMongoDao) {
+      MongoDao mongoSourceMongoDao) {
     injectWebResourceMetaInfo(fullBean, mongoSourceMongoDao);
     return EdmUtils.toRDF(fullBean, true);
   }
 
   private static RDF process(FullBeanImpl fullBean, Configuration configuration) {
-    RDF rdf = identityProcess(fullBean, configuration.getMongoSourceMongoDao());
+    RDF rdf = identityProcess(fullBean, configuration.getMongoDao());
     rdf = compute(configuration, rdf);
     return rdf;
   }
@@ -67,7 +67,7 @@ public class ProcessUtilities {
   }
 
   private static void injectWebResourceMetaInfo(final FullBean fullBean,
-      final MongoSourceMongoDao mongoSourceMongoDao) {
+      final MongoDao mongoSourceMongoDao) {
     Map<String, WebResource> webResourceHashCodes = prepareWebResourceHashCodes(fullBean);
     final List<WebResourceMetaInfoImpl> webResourceMetaInfos = mongoSourceMongoDao
         .getTechnicalMetadataForHashCodes(new ArrayList<>(webResourceHashCodes.keySet()));
