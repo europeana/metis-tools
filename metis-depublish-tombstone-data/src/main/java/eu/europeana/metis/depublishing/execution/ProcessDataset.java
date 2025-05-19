@@ -274,9 +274,8 @@ public class ProcessDataset implements Callable<Void> {
 
   private String processAndIndex(FullBeanImpl fullBean) {
     try {
-      preProcessAndCleanUpHasTargetQualityAnnotations(fullBean);
       final RDF rdf = processRecord(fullBean);
-      indexRecord(rdf);
+      removeTombstone(rdf);
     } catch (ProcessingException e) {
       LOGGER.error("{} - Could not process record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
@@ -288,31 +287,6 @@ public class ProcessDataset implements Callable<Void> {
       return exceptionStacktraceToString(e);
     }
     return "";
-  }
-
-  private void preProcessAndCleanUpHasTargetQualityAnnotations(FullBeanImpl fullBean) {
-    if (fullBean.getQualityAnnotations() != null) {
-      fullBean.setQualityAnnotations(
-          Stream.concat(
-              fullBean.getQualityAnnotations()
-                      .stream()
-                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length == 1),
-              fullBean.getQualityAnnotations()
-                      .stream()
-                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length > 1)
-                      .map(
-                          qualityAnnotation -> {
-                            qualityAnnotation.setTarget(
-                                Arrays.stream(qualityAnnotation.getTarget())
-                                      .filter(target -> !target.startsWith("/aggregation/provider"))
-                                      .toArray(String[]::new)
-                            );
-                            return qualityAnnotation;
-                          }
-                      )
-          ).toList()
-      );
-    }
   }
 
   private void updateProcessFailedOnlyCounts(String exceptionStackTrace, String resourceId,
@@ -375,10 +349,10 @@ public class ProcessDataset implements Callable<Void> {
     }
   }
 
-  private void indexRecord(RDF rdf) throws IndexingException {
+  private void removeTombstone(RDF rdf) throws IndexingException {
     final long startTimeIndex = System.nanoTime();
     try {
-      configuration.getRdfIndexer().accept(rdf, true, configuration);
+      configuration.getRdfIndexer().accept(rdf, configuration);
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeIndex);
       synchronized (this) {
