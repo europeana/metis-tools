@@ -2,6 +2,7 @@ package eu.europeana.metis.reprocessing.config;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.enrichment.api.external.impl.ClientEntityResolver;
+import eu.europeana.enrichment.api.external.impl.ClientEntityResolver.OperationMode;
 import eu.europeana.enrichment.api.external.model.EnrichmentBase;
 import eu.europeana.enrichment.api.internal.AggregationFieldType;
 import eu.europeana.enrichment.api.internal.EntityResolver;
@@ -207,7 +208,7 @@ public class DefaultConfiguration extends Configuration {
     properties.put("token_endpoint", propertiesHolderExtension.entityApiTokenEndpoint);
     properties.put("grant_params", propertiesHolderExtension.entityApiGrantParams);
 
-    return new ClientEntityResolver(new EntityApiClient(new EntityClientConfiguration(properties)));
+    return new ClientEntityResolver(new EntityApiClient(new EntityClientConfiguration(properties)), OperationMode.CACHED);
   }
 
   /**

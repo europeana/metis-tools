@@ -124,8 +124,7 @@ public class PostProcessUtilities {
         .toList();
 
     deprecatedPlugins.stream().map(abstractExecutablePlugin -> {
-      final WorkflowExecution workflowExecution = workflowExecutionDao.getByExternalTaskId(
-          Long.parseLong(abstractExecutablePlugin.getPlugin().getExternalTaskId()));
+      final WorkflowExecution workflowExecution = workflowExecutionDao.getByExternalTaskId(abstractExecutablePlugin.getPlugin().getExternalTaskId());
       final Optional<AbstractMetisPlugin> metisPluginWithType = workflowExecution
           .getMetisPlugins()
           .stream()
