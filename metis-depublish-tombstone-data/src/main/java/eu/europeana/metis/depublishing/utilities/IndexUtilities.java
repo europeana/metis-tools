@@ -1,14 +1,19 @@
 package eu.europeana.metis.depublishing.utilities;
 
 import com.mongodb.MongoWriteException;
+import eu.europeana.corelib.definitions.edm.entity.ChangeLog;
+import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
+import eu.europeana.indexing.fullbean.RdfToFullBeanConverter;
+import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.depublishing.config.Configuration;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.schema.jibx.AboutType;
 import eu.europeana.metis.schema.jibx.ProvidedCHOType;
 import eu.europeana.metis.schema.jibx.RDF;
+import eu.europeana.metis.utils.DepublicationReason;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,8 +48,7 @@ public class IndexUtilities {
    * @param configuration the configuration class that contains required properties
    * @throws IndexingException if an exception occurred during indexing
    */
-  public static void removeTombstone(RDF rdf, Configuration configuration)
-      throws IndexingException {
+  public static void removeTombstone(RDF rdf, Configuration configuration) throws IndexingException {
     try {
       //The indexer pool shouldn't be closed here, therefore it's not initialized in a
       // try-with-resources block
@@ -61,9 +65,9 @@ public class IndexUtilities {
           final String datasetId = getDatasetIdOfRecordToBePurged(rdf);
           // if no detail, erase the whole dataset tombstones
           if (configuration.getRecordIdsToProcess().isEmpty()) {
-            tombstoneRemove(datasetId, rdfAbout, indexerPool);
+            tombstoneRemove(datasetId, rdfAbout, rdf, indexerPool);
           } else if (configuration.getRecordIdsToProcess().contains(rdfAbout)) {
-            tombstoneRemove(datasetId, rdfAbout, indexerPool);
+            tombstoneRemove(datasetId, rdfAbout, rdf, indexerPool);
           }
         }
         return null;
@@ -73,16 +77,29 @@ public class IndexUtilities {
     }
   }
 
-  private static void tombstoneRemove(String datasetId, String rdfAbout, IndexerPool indexerPool) throws IndexingException {
+  private static void tombstoneRemove(String datasetId, String rdfAbout, RDF rdf, IndexerPool indexerPool) throws IndexingException {
     boolean isRecordRemoved;
     boolean isTombStoneRemoved;
-    LOGGER.info("Removing tombstone record {}", rdfAbout);
-    LOGGER.info("Tombstone removed record for dataset {} {}", datasetId, rdfAbout);
-    isTombStoneRemoved = indexerPool.removeTombstone(rdfAbout);
-    LOGGER.info("Tombstone removed record result {} {}", isTombStoneRemoved, rdfAbout);
-    LOGGER.info("Remove record for dataset {} {}", datasetId, rdfAbout);
-    isRecordRemoved = indexerPool.removeRecord(rdfAbout);
-    LOGGER.info("Remove record result {} {}", isRecordRemoved, rdfAbout);
+    RdfToFullBeanConverter rdfToFullBeanConverter = new RdfToFullBeanConverter();
+    FullBeanImpl fullBean = rdfToFullBeanConverter.convertRdfToFullBean(new RdfWrapper(rdf));
+    ChangeLog changeLog = fullBean.getEuropeanaAggregation().getChangeLog().getFirst();
+    final String BASE_URL = "http://data.europeana.eu/vocabulary/depublicationReason/";
+    DepublicationReason reason = DepublicationReason.valueOf(changeLog.getContext().replace(BASE_URL,""));
+    switch (reason) {
+      case GDPR, PERMISSION_ISSUES, SENSITIVE_CONTENT -> {
+        LOGGER.info("Removing tombstone record {}", rdfAbout);
+        LOGGER.info("Tombstone removed record for dataset {} {}", datasetId, rdfAbout);
+        isTombStoneRemoved = indexerPool.removeTombstone(rdfAbout);
+        LOGGER.info("Tombstone removed record result {} {}", isTombStoneRemoved, rdfAbout);
+        LOGGER.info("Remove record for dataset {} {}", datasetId, rdfAbout);
+        isRecordRemoved = indexerPool.removeRecord(rdfAbout);
+        LOGGER.info("Remove record result {} {}", isRecordRemoved, rdfAbout);
+      }
+      case BROKEN_MEDIA_LINKS, REMOVED_DATA_AT_SOURCE, LEGACY, GENERIC ->
+        LOGGER.info("Not applicable reason {}{}", rdfAbout, reason.getTitle());
+      default -> LOGGER.info("Not removing tombstone record {}", rdfAbout);
+    }
+
   }
 
   private static String getDatasetIdOfRecordToBePurged(RDF rdf) {
