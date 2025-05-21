@@ -52,8 +52,6 @@ import org.slf4j.LoggerFactory;
  * <p>This is where the new records will reside as well as progress information of datasets and
  * failed records, see {@link DatasetStatus} and {@link FailedRecord}</p>
  *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-05-16
  */
 public class MongoDao {
   public static final String ABOUT = "about";
@@ -118,7 +116,7 @@ public class MongoDao {
   }
 
   public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
-    Query<FailedRecord> query = mongoDatastore.find(FailedRecord.class);
+    Query<FailedRecord> query = mongoTombstoneDatastore.find(FailedRecord.class);
     query.filter(Filters.regex(FAILED_URL,"^/" + datasetId + "/"))
          .filter(Filters.eq(SUCCESSFULLY_REPROCESSED, false));
     return MorphiaUtils.getListOfQueryRetryable(query,
@@ -128,44 +126,38 @@ public class MongoDao {
 
   public List<DatasetStatus> getAllDatasetStatuses() {
     return MorphiaUtils
-        .getListOfQueryRetryable(mongoDatastore.find(DatasetStatus.class));
+        .getListOfQueryRetryable(mongoTombstoneDatastore.find(DatasetStatus.class));
   }
 
   public DatasetStatus getDatasetStatus(String datasetId) {
-    return mongoDatastore.find(DatasetStatus.class)
+    return mongoTombstoneDatastore.find(DatasetStatus.class)
                          .filter(Filters.eq(DATASET_ID, datasetId)).first();
   }
 
   public void deleteDatasetStatus(String datasetId) {
-    mongoDatastore.find(DatasetStatus.class).filter(Filters.eq(DATASET_ID, datasetId))
+    mongoTombstoneDatastore.find(DatasetStatus.class).filter(Filters.eq(DATASET_ID, datasetId))
                   .delete();
   }
 
   public void storeDatasetStatusToDb(DatasetStatus datasetStatus) {
     ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
-        () -> mongoDatastore.save(datasetStatus));
+        () -> mongoTombstoneDatastore.save(datasetStatus));
   }
 
   public void storeFailedRecordToDb(FailedRecord failedRecord) {
     //Will replace it if already existent
     ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
-        () -> mongoDatastore.save(failedRecord));
+        () -> mongoTombstoneDatastore.save(failedRecord));
   }
 
   public void deleteFailedRecordFromDb(FailedRecord failedRecord) {
     //Will replace it if already existent
     ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
-        () -> mongoDatastore.delete(failedRecord));
-  }
-
-  public void deleteAllSuccessfulReprocessedFailedRecords() {
-    Query<FailedRecord> query = mongoDatastore.find(FailedRecord.class);
-    query.filter(Filters.eq(SUCCESSFULLY_REPROCESSED, true));
-    query.delete(new DeleteOptions().multi(true));
+        () -> mongoTombstoneDatastore.delete(failedRecord));
   }
 
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
-    Query<FullBeanImpl> query = mongoDatastore.find(FullBeanImpl.class);
+    Query<FullBeanImpl> query = mongoTombstoneDatastore.find(FullBeanImpl.class);
     query.filter(Filters.regex(ABOUT,"^/" + datasetId + "/"));
     return MorphiaUtils.getListOfQueryRetryable(query,
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE));
@@ -173,7 +165,7 @@ public class MongoDao {
 
   public List<FullBeanImpl> getRecordsFromList(List<String> recordIds) {
     List<FullBeanImpl> fullBeans = new ArrayList<>();
-    Query<FullBeanImpl> query = mongoDatastore.find(FullBeanImpl.class);
+    Query<FullBeanImpl> query = mongoTombstoneDatastore.find(FullBeanImpl.class);
     recordIds.forEach(recordId -> {
       query.filter(Filters.eq(ABOUT, recordId));
       fullBeans.add(ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::first));
@@ -183,13 +175,13 @@ public class MongoDao {
 
 
   public long getTotalRecordsForDataset(String datasetId) {
-    Query<FullBeanImpl> query = mongoDatastore.find(FullBeanImpl.class);
+    Query<FullBeanImpl> query = mongoTombstoneDatastore.find(FullBeanImpl.class);
     query.filter(Filters.regex(ABOUT,"^/" + datasetId + "/"));
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::count);
   }
 
   public List<WebResourceMetaInfoImpl> getTechnicalMetadataForHashCodes(List<String> hashCodes) {
-    final Query<WebResourceMetaInfoImpl> query = mongoDatastore
+    final Query<WebResourceMetaInfoImpl> query = mongoTombstoneDatastore
         .find(WebResourceMetaInfoImpl.class);
     final BasicDBObject basicObject = new BasicDBObject("$in", hashCodes);
     query.filter(Filters.eq("_id", basicObject));

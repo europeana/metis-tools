@@ -43,7 +43,7 @@ mongo.destination.enableSSL=false
 mongo.destination.db=
 mongo.destination.tombstone.db=
 #Not setting this will results to default
-mongo.metis.core.connection.pool.size=
+mongo.destination.connection.pool.size=
 
 #Solr/Zookeeper Destination
 solr.destination.hosts=

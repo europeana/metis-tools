@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Entry class for the reprocessing script.
  *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-05-14
  */
 public class ReprocessingMain {
 
@@ -29,8 +27,7 @@ public class ReprocessingMain {
 
     final Configuration configuration = new DefaultConfiguration(propertiesHolder);
 
-    final ExecutorManager executorManager = new ExecutorManager(configuration,
-        propertiesHolder);
+    final ExecutorManager executorManager = new ExecutorManager(configuration, propertiesHolder);
     executorManager.startReprocessing();
     executorManager.close();
 

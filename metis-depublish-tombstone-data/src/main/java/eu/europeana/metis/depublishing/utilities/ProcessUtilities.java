@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
  * <p>Methods in this class will be provided as implementations of functional interfaces for
  * performing the processing of records</p>
  *
- * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
- * @since 2019-05-15
  */
 public class ProcessUtilities {
 

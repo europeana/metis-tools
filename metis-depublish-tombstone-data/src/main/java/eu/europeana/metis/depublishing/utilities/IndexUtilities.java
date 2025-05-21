@@ -56,7 +56,6 @@ public class IndexUtilities {
                                    .map(AboutType::getAbout)
                                    .findFirst()
                                    .orElse("");
-        LOGGER.info("Removing tombstone record {}", rdfAbout);
 
         if (configuration.isDepublicationEnabled()) {
           final String datasetId = getDatasetIdOfRecordToBePurged(rdf);
@@ -77,6 +76,7 @@ public class IndexUtilities {
   private static void tombstoneRemove(String datasetId, String rdfAbout, IndexerPool indexerPool) throws IndexingException {
     boolean isRecordRemoved;
     boolean isTombStoneRemoved;
+    LOGGER.info("Removing tombstone record {}", rdfAbout);
     LOGGER.info("Tombstone removed record for dataset {} {}", datasetId, rdfAbout);
     isTombStoneRemoved = indexerPool.removeTombstone(rdfAbout);
     LOGGER.info("Tombstone removed record result {} {}", isTombStoneRemoved, rdfAbout);
