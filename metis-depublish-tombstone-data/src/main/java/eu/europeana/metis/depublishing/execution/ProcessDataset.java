@@ -270,7 +270,7 @@ public class ProcessDataset implements Callable<Void> {
   private String processAndDepublish(FullBeanImpl fullBean) {
     try {
       final RDF rdf = processRecord(fullBean);
-      removeTombstone(rdf);
+      removeTombstone(rdf, fullBean);
     } catch (ProcessingException e) {
       LOGGER.error("{} - Could not process record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
@@ -344,10 +344,10 @@ public class ProcessDataset implements Callable<Void> {
     }
   }
 
-  private void removeTombstone(RDF rdf) throws IndexingException {
+  private void removeTombstone(RDF rdf, FullBeanImpl fullBean) throws IndexingException {
     final long startTimeIndex = System.nanoTime();
     try {
-      configuration.getRdfIndexer().accept(rdf, configuration);
+      configuration.getRdfIndexer().accept(rdf, fullBean, configuration);
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeIndex);
       synchronized (this) {

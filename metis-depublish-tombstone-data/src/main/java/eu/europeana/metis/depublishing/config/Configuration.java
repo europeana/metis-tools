@@ -112,7 +112,7 @@ public abstract class Configuration {
 
   public abstract ThrowingBiFunction<FullBeanImpl, Configuration, RDF> getFullBeanProcessor();
 
-  public abstract ThrowingBiConsumer<RDF, Configuration> getRdfIndexer();
+  public abstract ThrowingTriConsumer<RDF, FullBeanImpl, Configuration> getRdfIndexer();
 
   public abstract RDF processRDF(RDF rdf);
 
@@ -196,9 +196,9 @@ public abstract class Configuration {
   }
 
   @FunctionalInterface
-  public interface ThrowingBiConsumer<K, S> {
+  public interface ThrowingTriConsumer<K, V, S> {
 
-    void accept(K k, S s) throws IndexingException;
+    void accept(K k, V v, S s) throws IndexingException;
   }
 
   @FunctionalInterface

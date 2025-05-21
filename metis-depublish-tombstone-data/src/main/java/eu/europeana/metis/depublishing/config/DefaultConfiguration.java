@@ -19,7 +19,7 @@ import java.net.URISyntaxException;
 public class DefaultConfiguration extends Configuration {
 
   private final ThrowingBiFunction<FullBeanImpl, Configuration, RDF> fullBeanProcessor;
-  private final ThrowingBiConsumer<RDF, Configuration> rdfIndexer;
+  private final ThrowingTriConsumer<RDF, FullBeanImpl, Configuration> rdfIndexer;
 
   public DefaultConfiguration(PropertiesHolder propertiesHolderExtension)
       throws URISyntaxException, TrustStoreConfigurationException, IndexingException {
@@ -35,7 +35,7 @@ public class DefaultConfiguration extends Configuration {
   }
 
   @Override
-  public ThrowingBiConsumer<RDF, Configuration> getRdfIndexer() {
+  public ThrowingTriConsumer<RDF, FullBeanImpl, Configuration> getRdfIndexer() {
     return rdfIndexer;
   }
 
