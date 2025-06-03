@@ -335,6 +335,9 @@ public class DefaultConfiguration extends Configuration {
     enrichedReferencesToUpdate.forEach(
         (referenceTermContext, enrichmentBases) -> entityMergeEngine.mergeEntities(rdf, enrichmentBases, referenceTermContext));
 
+    LOGGER.info("reference cache:{}",entityResolver.cacheReferenceTermStats());
+    LOGGER.info("search cache:{}",entityResolver.cacheSearchTermStats());
+    LOGGER.info("entity cache:{}",entityResolver.cacheEntityStats());
     return rdf;
   }
 }
