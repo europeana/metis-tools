@@ -194,12 +194,12 @@ public class RdfIndexTierUtils {
    * @return the boolean
    * @throws IndexingException the indexing exception
    */
-  static boolean hasContentTier(RDF rdf) throws IndexingException {
+  public static boolean hasContentTier(RDF rdf) throws IndexingException {
     AbstractTierTarget<?> target = getTarget(rdf);
     final Optional<QualityAnnotation> existingAnnotation = Optional.ofNullable(
         getExistingAnnotation(rdf, target.getAbout(), RdfTier.CONTENT_TIER_1.getTier()));
 
-    if (existingAnnotation.isPresent()) {
+    if (existingAnnotation.isPresent() && RdfTier.CONTENT_TIER_1.getUri().equals(existingAnnotation.get().getHasBody().getResource())) {
       LOGGER.info("Has content tier 1: {}", target.getAbout());
       return true;
     } else {

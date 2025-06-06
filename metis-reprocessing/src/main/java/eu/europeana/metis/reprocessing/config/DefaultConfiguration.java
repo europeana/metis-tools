@@ -117,6 +117,8 @@ public class DefaultConfiguration extends Configuration {
             "/9200579/kyaq8pq9",
             //c
             "/9200359/BibliographicResource_3000123626519",
+            "/9200359/BibliographicResource_3000100585617", //with contentTier 4
+            "/9200359/BibliographicResource_3000100387622", //with contentTier 1
             //a
             "/9200579/cynwkevu",
             //b
