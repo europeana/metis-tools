@@ -9,6 +9,9 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.OrganizationImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
+import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
+import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
+import eu.europeana.entity.client.exception.EntityClientException;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
 import eu.europeana.indexing.exception.IndexingException;
@@ -18,6 +21,11 @@ import eu.europeana.indexing.tiers.TierCalculationMode;
 import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
+import eu.europeana.metis.reprocessing.config.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
+import eu.europeana.metis.schema.convert.RdfConversionUtils;
+import eu.europeana.metis.schema.convert.SerializationException;
 import eu.europeana.metis.schema.jibx.AboutType;
 import eu.europeana.metis.schema.jibx.EdmType;
 import eu.europeana.metis.schema.jibx.EuropeanaType;
@@ -27,8 +35,11 @@ import eu.europeana.metis.schema.jibx.ProxyType;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
 import eu.europeana.metis.schema.jibx.Type2;
+import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.metis.utils.DepublicationReason;
+import eu.europeana.normalization.util.NormalizationConfigurationException;
 import java.lang.invoke.MethodHandles;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,6 +54,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -80,6 +92,48 @@ public class IndexUtilities {
   }
 
   private IndexUtilities() {
+  }
+
+  public static void main(String[] args)
+      throws IndexingException, DereferenceException, NormalizationConfigurationException,
+      TrustStoreConfigurationException, EntityClientException, EnrichmentException,
+      URISyntaxException, ProcessingException, SerializationException {
+    DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
+        "application.properties"));
+    RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
+    List<FullBeanImpl> fullBeanList = Stream
+        .of(
+            "/2058621/LoCloud_census_1891_333f3696_44da_44fb_9d83_99101300749e" //,
+            //i
+            //            "/2020702/raa_fmi_10000100970001",
+            //            //f
+            //            "/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
+            //            //e
+            //            "/2048128/114145",
+            //            //d
+            //            "/9200579/kyaq8pq9",
+            //            //c
+            //            "/9200359/BibliographicResource_3000123626519",
+            //            "/9200359/BibliographicResource_3000100585617", //with contentTier 4
+            //            "/9200359/BibliographicResource_3000100387622", //with contentTier 1
+            //            //a
+            //            "/9200579/cynwkevu",
+            //            //b
+            //            "/954/Culturalia_fd913fb8_8a14_40c9_94ec_38158f4d4c81",
+            //            //g
+            //            "/1087/https___catalonica_bnc_cat_catalonicahub_lod_oai_arca_bnc_cat_10000296883_ent0",
+            //            //h
+            //            "/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"
+        )
+        .map(item -> defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(List.of(item)))
+        .flatMap(List::stream)
+        .toList();
+    for (FullBeanImpl fb : fullBeanList) {
+      RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
+
+      LOGGER.info("rdf:\r\n{}\r\n", rdfConversionUtils.convertRdfToString(rdf));
+      indexRecord(rdf, true, defaultConfiguration);
+    }
   }
 
   /**
