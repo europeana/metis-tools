@@ -10,9 +10,7 @@ import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
-import eu.europeana.metis.schema.jibx.Notation;
 import eu.europeana.metis.schema.jibx.RDF;
-import eu.europeana.metis.schema.jibx.TimeSpanType;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -55,16 +53,7 @@ public class ProcessUtilities {
   private static RDF identityProcess(FullBeanImpl fullBean,
       MongoSourceMongoDao mongoSourceMongoDao) {
     injectWebResourceMetaInfo(fullBean, mongoSourceMongoDao);
-    injectTimeSpanNotationToRDF();
     return EdmUtils.toRDF(fullBean, true);
-  }
-
-  private static void injectTimeSpanNotationToRDF() {
-    RDF rdf = new RDF();
-    TimeSpanType timeSpanType = new TimeSpanType();
-    Notation notation = new Notation();
-    timeSpanType.setNotation(notation);
-    rdf.setTimeSpanList(List.of(timeSpanType));
   }
 
   private static RDF process(FullBeanImpl fullBean, Configuration configuration) {
