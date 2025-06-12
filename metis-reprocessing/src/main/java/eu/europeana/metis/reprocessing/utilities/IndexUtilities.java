@@ -104,8 +104,9 @@ public class IndexUtilities {
     List<FullBeanImpl> fullBeanList = Stream
         .of(
             //"/2058621/LoCloud_census_1891_333f3696_44da_44fb_9d83_99101300749e" //,
-            "/2058621/LoCloud_census_1891_0000301d_0140_4df8_9bf2_189f6903f63a",
-            "/2058621/LoCloud_census_1891_000020c7_a69b_4215_8ce2_7ff8928a88ee"
+            "/2022422/Sargetia_20_2007_naturale_pdf"
+            //, "/2058621/LoCloud_census_1891_0000301d_0140_4df8_9bf2_189f6903f63a"
+            //, "/2058621/LoCloud_census_1891_000020c7_a69b_4215_8ce2_7ff8928a88ee"
             //i
             //            "/2020702/raa_fmi_10000100970001",
             //            //f
