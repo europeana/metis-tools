@@ -49,12 +49,6 @@ public class MetisCoreMongoDao {
     workflowExecutionDao = new WorkflowExecutionDao(morphiaDatastoreProvider);
   }
 
-  public List<String> getAllDatasetIds() {
-    Query<Dataset> query = metisCoreDatastore.find(Dataset.class);
-    final List<Dataset> datasets = MorphiaUtils.getListOfQueryRetryable(query);
-    return datasets.stream().map(Dataset::getDatasetId).collect(Collectors.toList());
-  }
-
   public Dataset getDataset(String datasetId) {
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(
         () -> metisCoreDatastore.find(Dataset.class).filter(Filters.eq(DATASET_ID, datasetId))

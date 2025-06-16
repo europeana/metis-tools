@@ -4,6 +4,14 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
+import dev.morphia.aggregation.expressions.AccumulatorExpressions;
+import dev.morphia.aggregation.expressions.ArrayExpressions;
+import dev.morphia.aggregation.expressions.Expressions;
+import dev.morphia.aggregation.expressions.StringExpressions;
+import dev.morphia.aggregation.stages.Group;
+import dev.morphia.aggregation.stages.Sort;
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
@@ -41,22 +49,33 @@ import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.removal.config.PropertiesHolder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Mongo Dao for source records.
  * <p>Contains functionality for reading the source records that are being reprocessed.</p>
- *
  */
 public class MongoSourceMongoDao {
 
+  /**
+   * The constant ABOUT.
+   */
   public static final String ABOUT = "about";
   private static final int DEFAULT_PAGE_SIZE = 200;
+  /**
+   * The constant PAGE_SIZE.
+   */
   public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   private final MongoInitializer sourceMongoInitializer;
   private final Datastore mongoSourceTombstoneDatastore;
   private final PropertiesHolder propertiesHolder;
 
+  /**
+   * Instantiates a new Mongo source mongo dao.
+   *
+   * @param propertiesHolder the properties holder
+   */
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
     this.propertiesHolder = propertiesHolder;
     PAGE_SIZE = propertiesHolder.sourceMongoPageSize;
@@ -100,6 +119,13 @@ public class MongoSourceMongoDao {
     return datastore;
   }
 
+  /**
+   * Gets next page of records.
+   *
+   * @param datasetId the dataset id
+   * @param nextPage the next page
+   * @return the next page of records
+   */
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
     Query<FullBeanImpl> query = mongoSourceTombstoneDatastore.find(FullBeanImpl.class);
     query.filter(Filters.regex(ABOUT, "^/" + datasetId + "/"));
@@ -107,6 +133,12 @@ public class MongoSourceMongoDao {
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE));
   }
 
+  /**
+   * Gets records from list.
+   *
+   * @param recordIds the record ids
+   * @return the records from list
+   */
   public List<FullBeanImpl> getRecordsFromList(List<String> recordIds) {
     List<FullBeanImpl> fullBeans = new ArrayList<>();
     Query<FullBeanImpl> query = mongoSourceTombstoneDatastore.find(FullBeanImpl.class);
@@ -117,13 +149,48 @@ public class MongoSourceMongoDao {
     return fullBeans;
   }
 
+  /**
+   * Gets all dataset ids.
+   *
+   * @return the all dataset ids
+   */
+  public List<String> getAllDatasetIds() {
+    List<GroupedDataset> datasets = mongoSourceTombstoneDatastore
+        .aggregate(FullBeanImpl.class)
+        .group(
+            Group.group(Group.id(
+                    ArrayExpressions.elementAt(
+                        StringExpressions.split(Expressions.field("about"),
+                            Expressions.value("/")), Expressions.value(1)
+                    )
+                )
+            ).field("totalValue",
+                AccumulatorExpressions.sum(Expressions.value(1)))
+        )
+        .sort(Sort.sort().descending("totalValue"))
+        .execute(GroupedDataset.class)
+        .toList();
+    return datasets.stream().map(GroupedDataset::getDatasetId).collect(Collectors.toList());
+  }
 
+  /**
+   * Gets total records for dataset.
+   *
+   * @param datasetId the dataset id
+   * @return the total records for dataset
+   */
   public long getTotalRecordsForDataset(String datasetId) {
     Query<FullBeanImpl> query = mongoSourceTombstoneDatastore.find(FullBeanImpl.class);
-    query.filter(Filters.regex(ABOUT,"^/" + datasetId + "/"));
+    query.filter(Filters.regex(ABOUT, "^/" + datasetId + "/"));
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::count);
   }
 
+  /**
+   * Gets technical metadata for hash codes.
+   *
+   * @param hashCodes the hash codes
+   * @return the technical metadata for hash codes
+   */
   public List<WebResourceMetaInfoImpl> getTechnicalMetadataForHashCodes(List<String> hashCodes) {
     final Query<WebResourceMetaInfoImpl> query = mongoSourceTombstoneDatastore
         .find(WebResourceMetaInfoImpl.class);
@@ -132,6 +199,9 @@ public class MongoSourceMongoDao {
     return MorphiaUtils.getListOfQueryRetryable(query);
   }
 
+  /**
+   * Close.
+   */
   public void close() {
     sourceMongoInitializer.close();
   }
@@ -143,5 +213,26 @@ public class MongoSourceMongoDao {
         propertiesHolder.sourceMongoEnableSSL, propertiesHolder.sourceMongoConnectionPoolSize);
     mongoInitializer.initializeMongoClient();
     return mongoInitializer;
+  }
+
+
+  /**
+   * The type Grouped dataset temporary class used to calculate the amount of datasets of the tombstone database to be purged.
+   */
+  @Entity
+  public static class GroupedDataset {
+
+    @Id
+    private String datasetId;  // This will hold the group key: the segment of the "about" string
+    private int totalValue;   // total of records
+
+    /**
+     * Gets dataset id.
+     *
+     * @return the dataset id
+     */
+    public String getDatasetId() {
+      return datasetId;
+    }
   }
 }
