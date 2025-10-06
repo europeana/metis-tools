@@ -9,6 +9,7 @@
     <modules>
         <module>metis-performance-metric</module>
         <module>metis-statistics-data</module>
+        <module>metis-webresource-finder</module>
     </modules>
 </project>
 
