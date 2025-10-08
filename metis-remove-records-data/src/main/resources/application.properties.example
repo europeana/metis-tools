@@ -1,0 +1,54 @@
+#The multiplication of min.parallel.threads and max.parallel.threads.per.datasets is the total amount of threads the application will utilize.
+#This is calculated based on the page size and the number of pages per dataset.
+min.parallel.datasets=
+max.parallel.threads.per.dataset=
+start.from.dataset.index=
+end.at.dataset.index=
+source.mongo.page.size=
+#Possible values DRY_RUN, CLEAN, DEFAULT, REPROCESS_ALL_FAILED, POST_PROCESS, POST_CLEAN.
+#DRY_RUN for running through the processing without removing records.
+#DEFAULT for a normal operation of process and index.
+#CLEAN mode is to be used to just clean the destination databases, it does no processing
+#REPROCESS_ALL_FAILED will process only the failed records for a dataset even if it's not previously completely processed.
+#POST_CLEAN mode is to be used to just remove the destination temporary databases, it does no processing
+mode=DEFAULT
+#A list of dataset ids to process instead of all the datasets, if empty removes all the datasets
+dataset.ids.to.process=
+#A name of a text file located in resource containing the list of records id to process bypassing processing all dataset ids.
+record.ids.to.process=
+#Set to true to do a simple read and then write reindex, without altering the record
+identity.process=
+
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo Metis Core
+mongo.metis.core.hosts=
+mongo.metis.core.port=
+mongo.metis.core.authentication.db=
+mongo.metis.core.username=
+mongo.metis.core.password=
+mongo.metis.core.enableSSL=false
+mongo.metis.core.db=
+#Not setting this will results to default
+mongo.metis.core.connection.pool.size=
+
+#Mongo Source
+mongo.source.hosts=
+mongo.source.port=
+mongo.source.authentication.db=
+mongo.source.username=
+mongo.source.password=
+mongo.source.enableSSL=false
+mongo.source.db=
+mongo.source.tombstone.db=
+#Not setting this will results to default
+mongo.source.connection.pool.size=
+
+#Solr/Zookeeper Destination
+solr.destination.hosts=
+zookeeper.destination.hosts=
+zookeeper.destination.port=
+zookeeper.destination.chroot=
+zookeeper.destination.defaultCollection=

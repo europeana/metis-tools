@@ -10,6 +10,7 @@
         <module>metis-performance-metric</module>
         <module>metis-statistics-data</module>
         <module>metis-webresource-finder</module>
+        <module>metis-remove-records-data</module>
     </modules>
 </project>
 
