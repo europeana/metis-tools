@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,8 +194,8 @@ abstract class AbstractPluginIdentification {
   abstract List<ExecutionPluginNode> identifyPlugins(ExecutionPluginForest forest);
 
   private Set<String> getDatasetIds() {
-    final MongoCollection<WorkflowExecution> collection = morphiaDatastoreProvider.getDatastore()
-            .getMapper().getCollection(WorkflowExecution.class);
+    final MongoCollection<Document> collection = morphiaDatastoreProvider.getDatastore()
+        .getDatabase().getCollection(WorkflowExecution.class.getSimpleName());
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> {
       final Set<String> datasetIds = new HashSet<>();
       collection.distinct("datasetId", String.class).cursor().forEachRemaining(datasetIds::add);

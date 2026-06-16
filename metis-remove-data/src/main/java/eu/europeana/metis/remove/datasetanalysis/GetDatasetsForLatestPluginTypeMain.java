@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.bson.Document;
 
 /**
  * This class analyzes the data and lists all datasets of which the latest executed plugin
@@ -74,8 +75,8 @@ public class GetDatasetsForLatestPluginTypeMain {
   }
 
   private static Set<String> getDatasetIds(MorphiaDatastoreProvider morphiaDatastoreProvider) {
-    final MongoCollection<WorkflowExecution> collection = morphiaDatastoreProvider.getDatastore()
-        .getMapper().getCollection(WorkflowExecution.class);
+    final MongoCollection<Document> collection = morphiaDatastoreProvider.getDatastore()
+        .getDatabase().getCollection(WorkflowExecution.class.getSimpleName());
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(() -> {
       final Set<String> datasetIds = new HashSet<>();
       collection.distinct("datasetId", String.class).cursor().forEachRemaining(datasetIds::add);
