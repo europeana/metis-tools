@@ -1,0 +1,19 @@
+#Mongo metis-core
+mongo.core.hosts=
+mongo.core.port=
+mongo.core.authentication.db=
+mongo.core.username=
+mongo.core.password=
+mongo.core.enableSSL=
+mongo.core.db=
+mongo.core.application.name=
+
+#eCloud
+ecloud.mcs.baseUrl=
+ecloud.provider=
+ecloud.username=
+ecloud.password=
+
+#Truststore
+truststore.path=
+truststore.password=

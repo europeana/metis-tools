@@ -1,0 +1,33 @@
+package eu.europeana.metis.published.records.harvest.utils;
+
+import com.mongodb.client.MongoClient;
+import eu.europeana.metis.mongo.connection.MongoClientProvider;
+
+/**
+ * Initialize MongoClient
+ *
+ * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
+ * @since 2018-05-02
+ */
+public class MongoInitializer {
+
+  private final PropertiesHolder propertiesHolder;
+  private MongoClient mongoClient;
+
+  public MongoInitializer(PropertiesHolder propertiesHolder) {
+    this.propertiesHolder = propertiesHolder;
+  }
+
+  public void initializeMongoClient() {
+    this.mongoClient = new MongoClientProvider<>(propertiesHolder.getMongoCoreProperties())
+            .createMongoClient();
+  }
+
+  public void close() {
+    mongoClient.close();
+  }
+
+  public MongoClient getMongoClient() {
+    return mongoClient;
+  }
+}
