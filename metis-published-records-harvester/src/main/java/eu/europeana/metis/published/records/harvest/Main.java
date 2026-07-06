@@ -32,6 +32,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -61,6 +64,7 @@ public class Main {
   private static Map<String, Set<String>> readInput() throws IOException {
     final Map<String, Set<String>> result = new HashMap<>();
     final AtomicInteger counter = new AtomicInteger();
+    final AtomicInteger alreadyExistCounter = new AtomicInteger();
     LOGGER.info("Reading record IDs ...");
     try (final InputStream input = Files.newInputStream(Path.of(INPUT_FILE));
         final BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
@@ -73,19 +77,23 @@ public class Main {
           continue;
         }
         final String trimmedLine = line.trim();
-        final int datasetEnd = trimmedLine.indexOf('/', 1);
-        if (datasetEnd <= 1 || datasetEnd != trimmedLine.lastIndexOf('/')) {
+        final String datasetId = getDatasetId(trimmedLine);
+        if (datasetId == null) {
           LOGGER.warn("Ignoring invalid input: {}", trimmedLine);
           continue;
         }
-        result.computeIfAbsent(trimmedLine.substring(1, datasetEnd), key -> new HashSet<>())
-            .add(trimmedLine);
+        if (Files.exists(getFile(datasetId, trimmedLine))) {
+          alreadyExistCounter.incrementAndGet();
+          continue;
+        }
+        result.computeIfAbsent(datasetId, key -> new HashSet<>()).add(trimmedLine);
         if (counter.incrementAndGet() % 1000 == 0) {
           LOGGER.info("  {} record IDs read.", counter.get());
         }
       }
     }
     LOGGER.info("Total of {} valid record IDs found.", counter.get());
+    LOGGER.info("{} records have been harvested and will be skipped.", alreadyExistCounter.get());
     return result;
   }
 
@@ -152,8 +160,6 @@ public class Main {
    */
   private static void downloadRecords(Map<String, Set<String>> records,
       Map<String, List<Revision>> revisions, Application application) throws Exception {
-    final AtomicInteger counter = new AtomicInteger();
-    LOGGER.info("Writing record contents ...");
     try (final UISClient uisClient = new UISClient(application.getProperties().ecloudMcsBaseUrl,
         application.getProperties().ecloudUsername, application.getProperties().ecloudPassword,
         10_000, 10_000);
@@ -164,19 +170,32 @@ public class Main {
         final FileServiceClient fileServiceClient = new FileServiceClient(
             application.getProperties().ecloudMcsBaseUrl,
             application.getProperties().ecloudUsername, application.getProperties().ecloudPassword,
-            10_000, 10_000)) {
+            10_000, 10_000);
+        final ExecutorService executor = Executors.newFixedThreadPool(8)) {
+      final AtomicInteger counter = new AtomicInteger();
+      LOGGER.info("Writing record contents ...");
       for (Map.Entry<String, Set<String>> datasetEntry : records.entrySet()) {
         final String dataset = datasetEntry.getKey();
         for (String record : datasetEntry.getValue()) {
-          final String recordContents = getRecordFromECloud(record, revisions.get(dataset),
-              application, uisClient, recordServiceClient, fileServiceClient);
-          if (recordContents != null) {
-            saveRecordToFile(dataset, record, recordContents);
-          }
-          if (counter.incrementAndGet() % 10 == 0) {
-            LOGGER.info("  {} records done.", counter.get());
-          }
+          executor.submit(() -> {
+            try {
+              final String recordContents = getRecordFromECloud(record, revisions.get(dataset),
+                  application, uisClient, recordServiceClient, fileServiceClient);
+              if (recordContents != null) {
+                saveRecordToFile(dataset, record, recordContents);
+              }
+              if (counter.incrementAndGet() % 10 == 0) {
+                LOGGER.info("  {} records done.", counter.get());
+              }
+            } catch (Exception e) {
+              LOGGER.warn("Error while writing record contents.", e);
+            }
+          });
         }
+      }
+      executor.shutdown();
+      if (!executor.awaitTermination(100, TimeUnit.DAYS)) {
+        LOGGER.error("Timed out waiting for executor to terminate.");
       }
       LOGGER.info("Total of {} records written.", counter.get());
     }
@@ -263,12 +282,37 @@ public class Main {
    */
   private static void saveRecordToFile(String dataset, String recordId, String recordContents)
       throws IOException {
-    final Path directory = Path.of(DESTINATION_DIRECTORY, dataset);
-    if (!Files.exists(directory)) {
-      Files.createDirectory(directory);
+    final Path file = getFile(dataset, recordId);
+    if (!Files.exists(file.getParent())) {
+      synchronized (Main.class) {
+        if (!Files.exists(file.getParent())) {
+          Files.createDirectory(file.getParent());
+        }
+      }
     }
-    final Path file = directory.resolve(recordId.substring(recordId.lastIndexOf('/') + 1) + ".xml");
     Files.writeString(file, recordContents, StandardOpenOption.CREATE,
         StandardOpenOption.TRUNCATE_EXISTING);
+  }
+
+  /**
+   * @param trimmedLine The trimmed line (expected to contain just a record ID).
+   * @return Dataset ID extracted from the record ID.
+   */
+  private static String getDatasetId(String trimmedLine) {
+    final int datasetEnd = trimmedLine.indexOf('/', 1);
+    if (datasetEnd <= 1 || datasetEnd != trimmedLine.lastIndexOf('/')) {
+      return null;
+    }
+    return trimmedLine.substring(1, datasetEnd);
+  }
+
+  /**
+   * @param dataset  The dataset ID
+   * @param recordId The record ID
+   * @return The file path to save the record.
+   */
+  private static Path getFile(String dataset, String recordId) {
+    final Path directory = Path.of(DESTINATION_DIRECTORY, dataset);
+    return directory.resolve(recordId.substring(recordId.lastIndexOf('/') + 1) + ".xml");
   }
 }
