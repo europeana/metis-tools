@@ -26,6 +26,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -125,7 +127,6 @@ public class ExecutorManager {
         parallelDatasets--;
         countOfTotalCurrentThreads -= futureConsumedThreads;
         reprocessedDatasets++;
-        LOGGER.info(PROCESSED_DATASETS_STR, reprocessedDatasets);
         LOGGER.info(PROCESSED_DATASETS_STR, reprocessedDatasets);
       }
       Callable<Void> callable = new ProcessDataset(datasetStatus, configuration,
@@ -244,6 +245,14 @@ public class ExecutorManager {
 
   public void close() {
     threadPool.shutdown();
+    try {
+      if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) {
+        threadPool.shutdownNow();
+      }
+    } catch (InterruptedException e) {
+      threadPool.shutdownNow();
+      LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
+    }
   }
 
   /**

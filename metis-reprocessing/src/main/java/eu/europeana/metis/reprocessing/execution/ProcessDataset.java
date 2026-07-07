@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.commons.collections.CollectionUtils;
@@ -412,5 +413,13 @@ public class ProcessDataset implements Callable<Void> {
 
   public void close() {
     threadPool.shutdown();
+    try {
+      if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) {
+        threadPool.shutdownNow();
+      }
+    } catch (InterruptedException e) {
+      threadPool.shutdownNow();
+      LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
+    }
   }
 }

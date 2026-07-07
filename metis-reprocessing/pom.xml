@@ -47,12 +47,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.maven.compiler.plugin>3.13.0</version.maven.compiler.plugin>
-        <version.metis-schema>11-SNAPSHOT</version.metis-schema>
-        <version.metis>15-SNAPSHOT</version.metis>
+        <version.metis-schema>15-SNAPSHOT</version.metis-schema>
+        <version.metis>18-SNAPSHOT</version.metis>
         <version.metis-core>15-SNAPSHOT</version.metis-core>
-        <version.metis-normalization>15-SNAPSHOT</version.metis-normalization>
-        <version.corelib>2.17.3</version.corelib>
-        <version.entity-api-client>2.1.1-SNAPSHOT</version.entity-api-client>
+        <version.metis-normalization>18-SNAPSHOT</version.metis-normalization>
+        <version.corelib>2.17.8-SNAPSHOT</version.corelib>
+        <version.entity-api-client>2.3</version.entity-api-client>
 
         <!-- These two versions are interdependent. -->
         <version.slf4j>2.0.12</version.slf4j>
