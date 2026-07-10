@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -145,7 +145,7 @@ public abstract class Configuration {
 
   public abstract ThrowingTriConsumer<RDF, Boolean, Configuration> getRdfIndexer();
 
-  public abstract ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor();
+  public abstract ThrowingQuadConsumer<String, Instant, Instant, Configuration> getAfterReprocessProcessor();
 
   public abstract RDF processRDF(RDF rdf);
 

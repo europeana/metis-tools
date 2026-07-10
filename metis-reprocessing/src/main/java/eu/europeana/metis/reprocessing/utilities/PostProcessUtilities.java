@@ -15,13 +15,12 @@ import eu.europeana.metis.core.workflow.plugins.ReindexToPreviewPluginMetadata;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPlugin;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPluginMetadata;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
 
 /**
@@ -47,20 +46,20 @@ public class PostProcessUtilities {
    * @param endDate the end date of the re-processing
    * @param configuration the configuration class that contains required properties
    */
-  public static void postProcess(String datasetId, Date startDate, Date endDate,
+  public static void postProcess(String datasetId, Instant startDate, Instant endDate,
       Configuration configuration) {
     updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, configuration);
   }
 
-  public static void updateMetisCoreWorkflowExecutions(String datasetId, Date startDate,
-      Date endDate, Configuration configuration) {
+  public static void updateMetisCoreWorkflowExecutions(String datasetId, Instant startDate,
+      Instant endDate, Configuration configuration) {
     createReindexWorkflowExecutions(datasetId, startDate, endDate, configuration);
     // TODO: 28/10/2021 Set a flag for invalidating or not?
     setInvalidFlagToPlugins(datasetId, configuration);
   }
 
-  private static void createReindexWorkflowExecutions(String datasetId, Date startDate,
-      Date endDate, Configuration configuration) {
+  private static void createReindexWorkflowExecutions(String datasetId, Instant startDate,
+      Instant endDate, Configuration configuration) {
     final PluginWithExecutionId<ExecutablePlugin> lastExecutionToBeBasedOn = configuration
         .getMetisCoreMongoDao().getWorkflowExecutionDao()
         .getLatestSuccessfulExecutablePlugin(datasetId,
@@ -97,7 +96,7 @@ public class PostProcessUtilities {
     reindexToPublishPlugin.setPluginStatus(PluginStatus.FINISHED);
 
     final Dataset dataset = configuration.getMetisCoreMongoDao().getDataset(datasetId);
-    final ArrayList<AbstractMetisPlugin> abstractMetisPlugins = new ArrayList<>();
+    final List<AbstractMetisPlugin<?>> abstractMetisPlugins = new ArrayList<>();
     abstractMetisPlugins.add(reindexToPreviewPlugin);
     abstractMetisPlugins.add(reindexToPublishPlugin);
     final WorkflowExecution workflowExecution = new WorkflowExecution();
@@ -125,7 +124,7 @@ public class PostProcessUtilities {
 
     deprecatedPlugins.stream().map(abstractExecutablePlugin -> {
       final WorkflowExecution workflowExecution = workflowExecutionDao.getByExternalTaskId(abstractExecutablePlugin.getPlugin().getExternalTaskId());
-      final Optional<AbstractMetisPlugin> metisPluginWithType = workflowExecution
+      final Optional<AbstractMetisPlugin<?>> metisPluginWithType = workflowExecution
           .getMetisPlugins()
           .stream()
           .filter(plugin ->

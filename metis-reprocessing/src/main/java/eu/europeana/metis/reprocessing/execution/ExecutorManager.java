@@ -12,6 +12,8 @@ import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.reprocessing.config.PropertiesHolder;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -94,7 +96,7 @@ public class ExecutorManager {
       return;
     }
 
-    Date startDate = new Date();
+    Instant startDate = Instant.now();
     Timer timer = new Timer();
     ScheduledThreadForSpeedProjection st = new ScheduledThreadForSpeedProjection(startDate,
         datasetStatuses);
@@ -261,12 +263,12 @@ public class ExecutorManager {
    */
   private class ScheduledThreadForSpeedProjection extends TimerTask {
 
-    private final Date startDate;
+    private final Instant startDate;
     private final long totalPreviouslyProcessed;
     private final List<DatasetStatus> datasetStatuses;
     private final long totalRecords;
 
-    ScheduledThreadForSpeedProjection(Date startDate, List<DatasetStatus> datasetStatuses) {
+    ScheduledThreadForSpeedProjection(Instant startDate, List<DatasetStatus> datasetStatuses) {
       this.startDate = startDate;
       this.datasetStatuses = datasetStatuses;
       this.totalPreviouslyProcessed = datasetStatuses.stream().map(
@@ -279,8 +281,8 @@ public class ExecutorManager {
 
     public void run() {
       LOGGER.info("Scheduled calculation of projection speed started");
-      Date nowDate = new Date();
-      long secondsInBetween = (nowDate.getTime() - startDate.getTime()) / 1000;
+      Instant nowInstant = Instant.now();
+      long secondsInBetween = ChronoUnit.SECONDS.between(startDate, nowInstant);
       //Only calculate projected date if a defined time threshold has passed
       final List<DatasetStatus> datasetStatusesSnapshot = datasetStatuses.stream().map(
           datasetStatus -> configuration.getMongoDestinationMongoDao()
@@ -298,8 +300,8 @@ public class ExecutorManager {
       final double totalHoursRequiredWithoutPreviouslyProcessed =
           ((totalRecords - totalPreviouslyProcessed) / (recordsPerSecond <= 0 ? 1
               : recordsPerSecond)) / 3600;
-      final Date projectedEndDate = Date.from(startDate.toInstant()
-          .plus(Duration.ofMinutes((long) (totalHoursRequiredWithoutPreviouslyProcessed * 60))));
+      final Instant projectedEndDate = startDate
+          .plus(Duration.ofMinutes((long) (totalHoursRequiredWithoutPreviouslyProcessed * 60)));
 
       LOGGER.info(String.format(
           "Average time required, with current speed, for a full reprocess: %.2f Hours, projected end date: %s",

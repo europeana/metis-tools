@@ -13,6 +13,7 @@ import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -138,7 +139,7 @@ public class ProcessDataset implements Callable<Void> {
 
   private void loopOverAllRecordsAndProcess() throws ExecutionException, InterruptedException {
     nextPage = getStartingNextPage();
-    datasetStatus.setStartDate(new Date());
+    datasetStatus.setStartDate(Instant.now());
     configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     defaultOperation();
   }
@@ -205,7 +206,7 @@ public class ProcessDataset implements Callable<Void> {
     }
 
     //Set End Date
-    datasetStatus.setEndDate(new Date());
+    datasetStatus.setEndDate(Instant.now());
     configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
   }
 

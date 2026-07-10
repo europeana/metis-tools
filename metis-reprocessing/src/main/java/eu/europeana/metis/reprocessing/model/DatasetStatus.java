@@ -1,6 +1,5 @@
 package eu.europeana.metis.reprocessing.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
@@ -9,10 +8,11 @@ import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexes;
 import eu.europeana.metis.mongo.model.HasMongoObjectId;
 import eu.europeana.metis.mongo.utils.ObjectIdSerializer;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import org.bson.types.ObjectId;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Model class for containing dataset status information.
@@ -29,8 +29,8 @@ public class DatasetStatus implements HasMongoObjectId {
   private ObjectId id;
   private String datasetId;
   private int indexInOrderedList;
-  private Date startDate;
-  private Date endDate;
+  private Instant startDate;
+  private Instant endDate;
   private long totalRecords;
   private volatile long totalProcessed;
   private volatile long totalFailedRecords;
@@ -71,19 +71,19 @@ public class DatasetStatus implements HasMongoObjectId {
     this.indexInOrderedList = indexInOrderedList;
   }
 
-  public Date getStartDate() {
+  public Instant getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(Date startDate) {
+  public void setStartDate(Instant startDate) {
     this.startDate = startDate;
   }
 
-  public Date getEndDate() {
+  public Instant getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(Date endDate) {
+  public void setEndDate(Instant endDate) {
     this.endDate = endDate;
   }
 
