@@ -1,21 +1,19 @@
 package eu.europeana.metis.reprocessing.execution;
 
 import static java.util.Map.Entry.comparingByValue;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import eu.europeana.indexing.exception.IndexingException;
-import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.config.Configuration;
-import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.reprocessing.config.PropertiesHolder;
+import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
+import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +26,6 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -253,6 +250,7 @@ public class ExecutorManager {
       }
     } catch (InterruptedException e) {
       threadPool.shutdownNow();
+      Thread.currentThread().interrupt();
       LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
     }
   }

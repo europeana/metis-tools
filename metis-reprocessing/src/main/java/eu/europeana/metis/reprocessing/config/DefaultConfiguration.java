@@ -210,7 +210,7 @@ public class DefaultConfiguration extends Configuration {
     properties.put("token_endpoint", propertiesHolderExtension.entityApiTokenEndpoint);
     properties.put("grant_params", propertiesHolderExtension.entityApiGrantParams);
 
-    return new ClientEntityResolver(new EntityApiClient(new EntityClientConfiguration(properties)), OperationMode.CACHED);
+    return new ClientEntityResolver(new EntityApiClient(new EntityClientConfiguration(properties)), OperationMode.NON_CACHED);
   }
 
   /**

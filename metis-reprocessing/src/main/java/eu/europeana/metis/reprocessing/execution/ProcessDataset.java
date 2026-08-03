@@ -15,7 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -420,7 +419,9 @@ public class ProcessDataset implements Callable<Void> {
       }
     } catch (InterruptedException e) {
       threadPool.shutdownNow();
+      Thread.currentThread().interrupt();
       LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
+
     }
   }
 }
