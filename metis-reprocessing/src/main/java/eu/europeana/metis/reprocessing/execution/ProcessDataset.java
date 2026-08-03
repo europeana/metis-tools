@@ -13,8 +13,8 @@ import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.commons.collections.CollectionUtils;
@@ -137,7 +138,7 @@ public class ProcessDataset implements Callable<Void> {
 
   private void loopOverAllRecordsAndProcess() throws ExecutionException, InterruptedException {
     nextPage = getStartingNextPage();
-    datasetStatus.setStartDate(new Date());
+    datasetStatus.setStartDate(Instant.now());
     configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     defaultOperation();
   }
@@ -204,7 +205,7 @@ public class ProcessDataset implements Callable<Void> {
     }
 
     //Set End Date
-    datasetStatus.setEndDate(new Date());
+    datasetStatus.setEndDate(Instant.now());
     configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
   }
 
@@ -412,5 +413,15 @@ public class ProcessDataset implements Callable<Void> {
 
   public void close() {
     threadPool.shutdown();
+    try {
+      if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) {
+        threadPool.shutdownNow();
+      }
+    } catch (InterruptedException e) {
+      threadPool.shutdownNow();
+      Thread.currentThread().interrupt();
+      LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
+
+    }
   }
 }

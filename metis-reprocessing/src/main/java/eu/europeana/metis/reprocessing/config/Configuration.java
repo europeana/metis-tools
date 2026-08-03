@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,8 +61,7 @@ public abstract class Configuration {
     this.propertiesHolder = propertiesHolder;
     //Create metis core dao only if there aren't any specific datasets to process and mode not
     // POST_PROCESS
-    if (CollectionUtils.isEmpty(propertiesHolder.datasetIdsToProcess) || propertiesHolder.mode
-        .equals(Mode.POST_PROCESS)) {
+    if (CollectionUtils.isEmpty(propertiesHolder.datasetIdsToProcess) || propertiesHolder.mode.equals(Mode.POST_PROCESS)) {
       metisCoreMongoDao = new MetisCoreMongoDao(propertiesHolder);
     } else {
       metisCoreMongoDao = null;
@@ -74,9 +73,8 @@ public abstract class Configuration {
     prepareMongoSettings(indexingSettings);
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
-    destinationCompoundSolrClient = new SolrClientProvider<>(indexingSettings.getSolrProperties())
-        .createSolrClient();
-    IndexerFactory indexerFactory = new IndexerFactory(indexingSettings);
+    destinationCompoundSolrClient = new SolrClientProvider<>(indexingSettings.getSolrProperties()).createSolrClient();
+    IndexerFactory indexerFactory = IndexerFactory.create(indexingSettings);
     destinationIndexerPool = new IndexerPool(indexerFactory, 600, 60);
     destinationIndexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
@@ -147,7 +145,7 @@ public abstract class Configuration {
 
   public abstract ThrowingTriConsumer<RDF, Boolean, Configuration> getRdfIndexer();
 
-  public abstract ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor();
+  public abstract ThrowingQuadConsumer<String, Instant, Instant, Configuration> getAfterReprocessProcessor();
 
   public abstract RDF processRDF(RDF rdf);
 

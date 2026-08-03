@@ -36,9 +36,9 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,7 +66,7 @@ public class DefaultConfiguration extends Configuration {
 
   private final ThrowingBiFunction<FullBeanImpl, Configuration, RDF> fullBeanProcessor;
   private final ThrowingTriConsumer<RDF, Boolean, Configuration> rdfIndexer;
-  private final ThrowingQuadConsumer<String, Date, Date, Configuration> afterReprocessProcessor;
+  private final ThrowingQuadConsumer<String, Instant, Instant, Configuration> afterReprocessProcessor;
   private final RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
   private ClientEntityResolver entityResolver;
 
@@ -179,7 +179,7 @@ public class DefaultConfiguration extends Configuration {
   }
 
   @Override
-  public ThrowingQuadConsumer<String, Date, Date, Configuration> getAfterReprocessProcessor() {
+  public ThrowingQuadConsumer<String, Instant, Instant, Configuration> getAfterReprocessProcessor() {
     return afterReprocessProcessor;
   }
 
@@ -210,7 +210,7 @@ public class DefaultConfiguration extends Configuration {
     properties.put("token_endpoint", propertiesHolderExtension.entityApiTokenEndpoint);
     properties.put("grant_params", propertiesHolderExtension.entityApiGrantParams);
 
-    return new ClientEntityResolver(new EntityApiClient(new EntityClientConfiguration(properties)), OperationMode.CACHED);
+    return new ClientEntityResolver(new EntityApiClient(new EntityClientConfiguration(properties)), OperationMode.NON_CACHED);
   }
 
   /**

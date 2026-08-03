@@ -114,42 +114,38 @@ public class MongoSourceMongoDao {
 
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
     Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
-    query.filter(Filters.regex(ABOUT).pattern("^/" + datasetId + "/"));
+    query.filter(Filters.regex(ABOUT, "^/" + datasetId + "/"));
     return MorphiaUtils.getListOfQueryRetryable(query,
         new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE));
   }
 
   public List<FullBeanImpl> getRecordsFromList(List<String> recordIds) {
-    List<FullBeanImpl> fullBeans = new ArrayList<>();
     Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
-    recordIds.forEach(recordId -> {
-      query.filter(Filters.eq(ABOUT, recordId));
-      fullBeans.add(ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::first));
-    });
-    return fullBeans;
+    query.filter(Filters.in(ABOUT, recordIds));
+    return new ArrayList<>(MorphiaUtils.getListOfQueryRetryable(query));
   }
 
-//  public List<FullBeanImpl> getThumbnailRecordsToProcess(String datasetId, int nextPage) {
-//    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
-//
-//    query.filter(Filters.and(Filters.eq(QUALITY_ANNOTATIONS, CONTENT_TIER_ZERO),
-//        Filters.eq(TYPE, RESOURCE_TYPE)
-//    ));
-//    query.filter(Filters.regex(ABOUT).pattern("^/" + datasetId + "/"));
-//
-//    List<FullBeanImpl> fullBeanList = MorphiaUtils.getListOfQueryRetryable(query, new FindOptions()
-//        .skip(nextPage * PAGE_SIZE)
-//        .limit(PAGE_SIZE));
-//
-//    fullBeanList = fullBeanList.stream()
-//                               .filter(recordStage -> hasThumbnailsAndValidLicense(EdmUtils.toRDF(recordStage)))
-//                               .collect(Collectors.toList());
-//    return fullBeanList;
-//  }
+  //  public List<FullBeanImpl> getThumbnailRecordsToProcess(String datasetId, int nextPage) {
+  //    Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
+  //
+  //    query.filter(Filters.and(Filters.eq(QUALITY_ANNOTATIONS, CONTENT_TIER_ZERO),
+  //        Filters.eq(TYPE, RESOURCE_TYPE)
+  //    ));
+  //    query.filter(Filters.regex(ABOUT, "^/" + datasetId + "/"));
+  //
+  //    List<FullBeanImpl> fullBeanList = MorphiaUtils.getListOfQueryRetryable(query, new FindOptions()
+  //        .skip(nextPage * PAGE_SIZE)
+  //        .limit(PAGE_SIZE));
+  //
+  //    fullBeanList = fullBeanList.stream()
+  //                               .filter(recordStage -> hasThumbnailsAndValidLicense(EdmUtils.toRDF(recordStage)))
+  //                               .collect(Collectors.toList());
+  //    return fullBeanList;
+  //  }
 
   public long getTotalRecordsForDataset(String datasetId) {
     Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
-    query.filter(Filters.regex(ABOUT).pattern("^/" + datasetId + "/"));
+    query.filter(Filters.regex(ABOUT, "^/" + datasetId + "/"));
     return ExternalRequestUtil.retryableExternalRequestForNetworkExceptions(query::count);
   }
 
@@ -165,32 +161,32 @@ public class MongoSourceMongoDao {
     sourceMongoInitializer.close();
   }
 
-//  private boolean isValidLicense(String rights) {
-//    Set<String> validLicenses = Set.of(
-//        RightsOption.CC_BY.getUrl(),
-//        RightsOption.CC_ZERO.getUrl(),
-//        RightsOption.CC_BY_SA.getUrl(),
-//        RightsOption.CC_NOC.getUrl(),
-//        RightsOption.CC_BY_NC_SA.getUrl(),
-//        RightsOption.CC_BY_NC_ND.getUrl(),
-//        RightsOption.CC_BY_ND.getUrl(),
-//        RightsOption.CC_BY_NC.getUrl()
-//    );
-//
-//    for (String validLicense : validLicenses) {
-//      if (rights.startsWith(validLicense)) {
-//        return true;
-//      }
-//    }
-//    return false;
-//  }
-//
-//  private boolean hasThumbnailsAndValidLicense(RDF rdfRecord) {
-//    RdfWrapper rdfWrapper = new RdfWrapper(rdfRecord);
-//    boolean validLicense = rdfRecord.getAggregationList().stream().allMatch(a -> isValidLicense(a.getRights().getResource()));
-//    boolean hasThumbnails = rdfWrapper.hasThumbnails();
-//    return hasThumbnails && validLicense;
-//  }
+  //  private boolean isValidLicense(String rights) {
+  //    Set<String> validLicenses = Set.of(
+  //        RightsOption.CC_BY.getUrl(),
+  //        RightsOption.CC_ZERO.getUrl(),
+  //        RightsOption.CC_BY_SA.getUrl(),
+  //        RightsOption.CC_NOC.getUrl(),
+  //        RightsOption.CC_BY_NC_SA.getUrl(),
+  //        RightsOption.CC_BY_NC_ND.getUrl(),
+  //        RightsOption.CC_BY_ND.getUrl(),
+  //        RightsOption.CC_BY_NC.getUrl()
+  //    );
+  //
+  //    for (String validLicense : validLicenses) {
+  //      if (rights.startsWith(validLicense)) {
+  //        return true;
+  //      }
+  //    }
+  //    return false;
+  //  }
+  //
+  //  private boolean hasThumbnailsAndValidLicense(RDF rdfRecord) {
+  //    RdfWrapper rdfWrapper = new RdfWrapper(rdfRecord);
+  //    boolean validLicense = rdfRecord.getAggregationList().stream().allMatch(a -> isValidLicense(a.getRights().getResource()));
+  //    boolean hasThumbnails = rdfWrapper.hasThumbnails();
+  //    return hasThumbnails && validLicense;
+  //  }
 
   private MongoInitializer prepareMongoSourceConfiguration() {
     MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.sourceMongoHosts,
