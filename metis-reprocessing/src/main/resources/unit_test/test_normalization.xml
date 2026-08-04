@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:adms="http://www.w3.org/ns/adms#"
+  xmlns:cc="http://creativecommons.org/ns#"
+  xmlns:crm="http://www.cidoc-crm.org/rdfs/cidoc_crm_v5.0.2_english_label.rdfs#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcat="http://www.w3.org/ns/dcat#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:doap="http://usefulinc.com/ns/doap#"
+  xmlns:ebucore="http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#"
+  xmlns:edm="http://www.europeana.eu/schemas/edm/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:odrl="http://www.w3.org/ns/odrl/2/"
+  xmlns:ore="http://www.openarchives.org/ore/terms/"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:prov="http://www.w3.org/ns/prov#"
+  xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:schema="https://schema.org/"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:svcs="http://rdfs.org/sioc/services#"
+  xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <edm:ProvidedCHO rdf:about="/1152/https___ark_bnf_fr_ark_12148_bpt6k279983"/>
+  <edm:WebResource rdf:about="https://www.eagle-network.eu/voc/material/lod/">
+    <edm:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/"/>
+  </edm:WebResource>
+  <ore:Aggregation rdf:about="/aggregation/provider/1152/https___ark_bnf_fr_ark_12148_bpt6k279983">
+    <edm:aggregatedCHO rdf:resource="/1152/https___ark_bnf_fr_ark_12148_bpt6k279983"/>
+    <edm:dataProvider>CMC - CMC Associates Ltd.</edm:dataProvider>
+    <edm:isShownAt rdf:resource="http://fbc.pionier.net.pl/id/oai:mbc.malopolska.pl:48386"/>
+    <edm:object rdf:resource="http://mbc.malopolska.pl/Content/48386/d2j:big,0/0437_0001.djvu.jpg"/>
+    <edm:provider>CARARE</edm:provider>
+    <edm:rights rdf:resource="http://rightsstatements.org/vocab/InC/1.0/"/>
+    <edm:intermediateProvider>CARARE</edm:intermediateProvider>
+  </ore:Aggregation>
+  <ore:Proxy rdf:about="/proxy/provider/1152/https___ark_bnf_fr_ark_12148_bpt6k279983">
+    <dc:contributor xml:lang="pl">Beau</dc:contributor>
+    <dc:creator xml:lang="pl">Beau_1</dc:creator>
+    <dc:date xml:lang="pl">1923</dc:date>
+    <dc:description xml:lang="en">"he showed a gypsy face"</dc:description>
+    <dc:format>image/vnd.djvu</dc:format>
+    <dc:language>pol</dc:language>
+    <dc:publisher xml:lang="pl">Spółka Wydawnicza "Czas"</dc:publisher>
+    <dc:rights xml:lang="pl">Biblioteka Książąt Czartoryskich</dc:rights>
+    <dc:subject xml:lang="pl">20 w.</dc:subject>
+    <dc:subject xml:lang="pl">gazety polskie</dc:subject>
+    <dc:title xml:lang="pl">gypsy</dc:title>
+    <dc:type xml:lang="pl">czasopismo</dc:type>
+    <dc:type xml:lang="pl">czasopismo</dc:type>
+    <dcterms:created>2025</dcterms:created>
+    <dcterms:extent>gypsy</dcterms:extent>
+    <dcterms:spatial xml:lang="esx">Western Anatolia (gesxeral region) Batı Anadolu</dcterms:spatial>
+    <dcterms:temporal>2025_1</dcterms:temporal>
+    <edm:pid>https://n2t.net/ark:/12148/bpt6k279983</edm:pid>
+    <edm:pid>https://ark.bnf.fr/ark:/12148/bpt6k279983</edm:pid>
+    <edm:pid>http://digital.ucd.ie/view/ivrla:3827</edm:pid>
+    <edm:pid>invalid pid test</edm:pid>
+    <edm:europeanaProxy>false</edm:europeanaProxy>
+    <ore:proxyFor rdf:resource="/1152/https___ark_bnf_fr_ark_12148_bpt6k279983"/>
+    <ore:proxyIn rdf:resource="/aggregation/provider/1152/https___ark_bnf_fr_ark_12148_bpt6k279983"/>
+    <edm:type>TEXT</edm:type>
+  </ore:Proxy>
+  <ore:Proxy rdf:about="/proxy/europeana/1152/https___ark_bnf_fr_ark_12148_bpt6k279983">
+    <dc:identifier>https://ark.bnf.fr/ark:12148/bpt6k279983</dc:identifier>
+    <edm:europeanaProxy>true</edm:europeanaProxy>
+    <ore:proxyFor rdf:resource="/1152/https___ark_bnf_fr_ark_12148_bpt6k279983"/>
+    <ore:proxyIn rdf:resource="/aggregation/europeana/1152/https___ark_bnf_fr_ark_12148_bpt6k279983"/>
+    <ore:lineage rdf:resource="/proxy/provider/1152/https___ark_bnf_fr_ark_12148_bpt6k279983"/>
+  </ore:Proxy>
+  <edm:EuropeanaAggregation rdf:about="/aggregation/europeana/1152/https___ark_bnf_fr_ark_12148_bpt6k279983">
+    <edm:aggregatedCHO rdf:resource="/1152/https___ark_bnf_fr_ark_12148_bpt6k279983"/>
+    <edm:dataProvider xml:lang="en">Europeana Foundation</edm:dataProvider>
+    <edm:provider xml:lang="en">Europeana Foundation</edm:provider>
+    <edm:datasetName>1152_test_04082026_1613</edm:datasetName>
+    <edm:country>Netherlands</edm:country>
+    <edm:language>nl</edm:language>
+    <prov:wasGeneratedBy rdf:resource="http://data.europeana.eu/provenance/europeana"/>
+  </edm:EuropeanaAggregation>
+</rdf:RDF>

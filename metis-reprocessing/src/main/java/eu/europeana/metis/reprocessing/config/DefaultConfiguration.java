@@ -3,16 +3,9 @@ package eu.europeana.metis.reprocessing.config;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.enrichment.api.external.impl.ClientEntityResolver;
 import eu.europeana.enrichment.api.external.impl.ClientEntityResolver.OperationMode;
-import eu.europeana.enrichment.api.external.model.EnrichmentBase;
-import eu.europeana.enrichment.api.internal.AggregationFieldType;
 import eu.europeana.enrichment.api.internal.EntityResolver;
-import eu.europeana.enrichment.api.internal.FieldType;
-import eu.europeana.enrichment.api.internal.FieldValue;
-import eu.europeana.enrichment.api.internal.ReferenceTermContext;
-import eu.europeana.enrichment.api.internal.SearchTermContext;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
-import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.entity.client.EntityApiClient;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.exception.EntityClientException;
@@ -23,12 +16,14 @@ import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
 import eu.europeana.metis.schema.convert.RdfConversionUtils;
 import eu.europeana.metis.schema.convert.SerializationException;
-import eu.europeana.metis.schema.jibx.AboutType;
-import eu.europeana.metis.schema.jibx.Aggregation;
-import eu.europeana.metis.schema.jibx.Organization;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
+import eu.europeana.normalization.Normalizer;
+import eu.europeana.normalization.NormalizerFactory;
+import eu.europeana.normalization.NormalizerStep;
+import eu.europeana.normalization.model.NormalizationResult;
 import eu.europeana.normalization.util.NormalizationConfigurationException;
+import eu.europeana.normalization.util.NormalizationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,17 +32,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +43,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Extra configuration class that is part of {@link Configuration}.
  * <p>This class is meant to be modifiable and different per re-processing operation.
- * It contains 3 functional interfaces that should be initialized properly and they are triggered internally during the
+ * It contains 3 functional interfaces that should be initialized properly, and they are triggered internally during the
  * re-processing.</p>
  */
 public class DefaultConfiguration extends Configuration {
@@ -68,6 +54,7 @@ public class DefaultConfiguration extends Configuration {
   private final ThrowingTriConsumer<RDF, Boolean, Configuration> rdfIndexer;
   private final ThrowingQuadConsumer<String, Instant, Instant, Configuration> afterReprocessProcessor;
   private final RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
+  private final Normalizer normalizer = new NormalizerFactory().getNormalizer(NormalizerStep.NORMALIZE_PIDS);
   private ClientEntityResolver entityResolver;
 
 
@@ -99,7 +86,7 @@ public class DefaultConfiguration extends Configuration {
 
     processAnXmlFile(defaultConfiguration);
 
-    processARecordFromMongoSource(defaultConfiguration);
+  //  processARecordFromMongoSource(defaultConfiguration);
 
   }
 
@@ -136,17 +123,7 @@ public class DefaultConfiguration extends Configuration {
       RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
 
       LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-      // tier calculation
-      // ------------------------------
-      //      final boolean preserveTimestamps = true;
-      //      final Date recordDate = null;
-      //      final List<String> datasetIdsForRedirection = null;
-      //      final boolean performRedirects = false;
-      //      final TierCalculationMode tierCalculationMode = TierCalculationMode.INITIALISE;//defaultConfiguration.getTierCalculationMode();
-      //      final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
-      //          datasetIdsForRedirection, performRedirects, tierCalculationMode);
-      //      IndexerPreprocessor.preprocessRecord(rdf, indexingProperties);
-      defaultConfiguration.updateOrganizations(rdf);
+      rdf = defaultConfiguration.normalizePIDS(rdf);
       LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
     }
 
@@ -154,9 +131,9 @@ public class DefaultConfiguration extends Configuration {
 
   private static void processAnXmlFile(DefaultConfiguration defaultConfiguration) throws SerializationException, IOException {
     RDF rdf = defaultConfiguration.rdfConversionUtils.convertStringToRdf(
-        readFileToString("unit_test/test_enrichment_organizations_2.xml"));
+        readFileToString("unit_test/test_normalization.xml"));
     LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-    defaultConfiguration.updateOrganizations(rdf);
+    rdf = defaultConfiguration.normalizePIDS(rdf);
     LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
   }
 
@@ -185,9 +162,8 @@ public class DefaultConfiguration extends Configuration {
 
   @Override
   public RDF processRDF(RDF rdf) {
-    rdf = updateOrganizations(rdf);
+    rdf = normalizePIDS(rdf);
     LOGGER.debug("DONE");
-
     return rdf;
   }
 
@@ -214,132 +190,20 @@ public class DefaultConfiguration extends Configuration {
   }
 
   /**
-   * Updates europeana id organizations that are linked in provider aggregation supported fields.
-   * <p>
-   * 1. Text/literal, for enrichment by text and updates with a reference(link). 2. Resource, see all organizations present in the
-   * record. If it finds a resource reference(link) is present in an aggregation and is not europeana does an enriching by uri and
-   * replaces the reference(link). 3. Resource, and if an europeana is present, does the organization update.
-   *
+   * Run the europeana PID normalisation to the record
    * @param rdf record
-   * @return rdf with updated organizations.
+   * @return rdf with normalised PIDs
    */
-  RDF updateOrganizations(RDF rdf) {
-    LOGGER.info("Organization Update");
-    //Find europeana id organizations that are linked in provider aggregation supported fields
-    List<Aggregation> aggregations = Optional.ofNullable(rdf.getAggregationList())
-                                             .stream()
-                                             .flatMap(Collection::stream)
-                                             .filter(Objects::nonNull)
-                                             .toList();
-
-    final Map<FieldValue, Set<FieldType<Aggregation>>> aggregationLiteralValuesMap = new HashMap<>();
-    final Map<String, Set<FieldType<?>>> aggregationReferencesMap = new HashMap<>();
-
-    for (AggregationFieldType aggregationFieldType : AggregationFieldType.values()) {
-      // case no. 1 collect all values
-      aggregations.stream()
-                  .map(aggregationFieldType::extractFieldValuesForEnrichment)
-                  .flatMap(Collection::stream)
-                  .forEach(fieldValue -> aggregationLiteralValuesMap
-                      .computeIfAbsent(fieldValue, value -> new HashSet<>())
-                      .add(aggregationFieldType)
-                  );
-
-      // case no. 2 and case no. 3 collect all valid url references
-      aggregations.stream()
-                  .map(aggregationFieldType::extractFieldLinksForEnrichment)
-                  .flatMap(Collection::stream)
-                  .map(DefaultConfiguration::convertToValidURLString)
-                  .filter(Objects::nonNull)
-                  .forEach(referenceLink -> aggregationReferencesMap
-                      .computeIfAbsent(referenceLink, value -> new HashSet<>())
-                      .add(aggregationFieldType)
-                  );
+  RDF normalizePIDS(RDF rdf) {
+    LOGGER.info("Normalising PID");
+    RDF computedRDF = rdf;
+    try {
+      final String rdfString = rdfConversionUtils.convertRdfToString(rdf);
+      final NormalizationResult result = normalizer.normalize(rdfString);
+      computedRDF = rdfConversionUtils.convertStringToRdf(result.getNormalizedRecordInEdmXml());
+    } catch (RuntimeException | SerializationException | NormalizationException e) {
+      LOGGER.warn("Something went wrong during normalisation", e);
     }
-
-    // case no.1 enrich values and add a reference(link)
-    // ***************************************************************************************************************************
-    final Set<SearchTermContext> searchTermsContext = aggregationLiteralValuesMap
-        .entrySet()
-        .stream()
-        .map(literalValuesMap ->
-            new SearchTermContext(literalValuesMap.getKey().value(),
-                literalValuesMap.getKey().language(), literalValuesMap.getValue()))
-        .collect(Collectors.toSet());
-
-    Map<SearchTermContext, List<EnrichmentBase>> enrichedValues = entityResolver.resolveByText(searchTermsContext);
-    EntityMergeEngine entityMergeEngine = new EntityMergeEngine();
-
-    // update with organization id's case no. 1
-    enrichedValues.forEach(
-        (searchTermContext, enrichmentBases) -> entityMergeEngine.mergeEntities(rdf, enrichmentBases, searchTermContext));
-
-    // case no. 2 and case no. 3
-    // ***************************************************************************************************************************
-
-    final Set<ReferenceTermContext> allReferenceTerms = aggregationReferencesMap
-        .entrySet()
-        .stream()
-        .map(referencesMap -> ReferenceTermContext
-            .createFromString(referencesMap.getKey(), referencesMap.getValue()))
-        .collect(Collectors.toSet());
-
-    final Set<String> existingOrganisationIds = Optional
-        .ofNullable(rdf.getOrganizationList())
-        .stream()
-        .flatMap(Collection::stream)
-        .filter(Objects::nonNull)
-        .map(AboutType::getAbout)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toSet());
-
-    final Set<String> existingOtherEntityIds = Stream
-        .of(rdf.getAgentList(), rdf.getConceptList(), rdf.getPlaceList(), rdf.getTimeSpanList())
-        .filter(Objects::nonNull).flatMap(Collection::stream)
-        .filter(Objects::nonNull).map(AboutType::getAbout)
-        .filter(Objects::nonNull).collect(Collectors.toSet());
-
-    final Set<ReferenceTermContext> referencesToResolve = allReferenceTerms
-        .stream()
-        .filter(referenceTermContext ->
-            !existingOrganisationIds.contains(referenceTermContext.getReferenceAsString()))
-        .filter(referenceTermContext ->
-            !existingOtherEntityIds.contains(referenceTermContext.getReferenceAsString()))
-        .collect(Collectors.toSet());
-
-    final Set<ReferenceTermContext> referencesToUpdate = allReferenceTerms
-        .stream()
-        .filter(referenceTermContext ->
-            existingOrganisationIds.contains(referenceTermContext.getReferenceAsString()))
-        .collect(Collectors.toSet());
-
-    final Map<ReferenceTermContext, List<EnrichmentBase>> enrichedReferencesResolved = entityResolver.resolveByUri(
-        referencesToResolve);
-    // update with organizations id's case no. 2
-    enrichedReferencesResolved.forEach(
-        (referenceTermContext, enrichmentBases) -> entityMergeEngine.mergeEntities(rdf, enrichmentBases, referenceTermContext));
-
-    final Map<ReferenceTermContext, List<EnrichmentBase>> enrichedReferencesToUpdate = entityResolver.resolveByUri(
-        referencesToUpdate);
-
-    final Map<String, Organization> organisationMap = Optional
-        .ofNullable(rdf.getOrganizationList())
-        .stream()
-        .flatMap(Collection::stream)
-        .filter(Objects::nonNull)
-        .filter(organization -> organization.getAbout() != null)
-        .collect(Collectors.toMap(AboutType::getAbout, Function.identity()));
-    // remove old organizations id's
-    enrichedReferencesToUpdate.forEach(
-        (referenceTermContext, enrichmentBases) -> organisationMap.remove(referenceTermContext.getReferenceAsString()));
-    rdf.setOrganizationList(new ArrayList<>(organisationMap.values()));
-    // update with new organization id's case no. 3
-    enrichedReferencesToUpdate.forEach(
-        (referenceTermContext, enrichmentBases) -> entityMergeEngine.mergeEntities(rdf, enrichmentBases, referenceTermContext));
-
-    LOGGER.info("reference cache:{}",entityResolver.cacheReferenceTermStats());
-    LOGGER.info("search cache:{}",entityResolver.cacheSearchTermStats());
-    LOGGER.info("entity cache:{}",entityResolver.cacheEntityStats());
-    return rdf;
+    return computedRDF;
   }
 }
