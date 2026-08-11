@@ -7,7 +7,6 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.reprocessing.config.PropertiesHolder;
-import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import java.io.IOException;
 import java.time.Duration;
@@ -54,6 +53,7 @@ public class ExecutorManager {
   private final int totalAllowedThreads;
   private final int startFromDatasetIndex;
   private final int endAtDatasetIndex;
+  private final int pageSize;
 
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Void> completionService;
@@ -63,6 +63,7 @@ public class ExecutorManager {
     this.maxParallelThreadsPerDataset = propertiesHolder.maxParallelThreadsPerDataset;
     this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
     this.endAtDatasetIndex = propertiesHolder.endAtDatasetIndex;
+    this.pageSize = propertiesHolder.sourceMongoPageSize;
     totalAllowedThreads = maxParallelThreads * maxParallelThreadsPerDataset;
     threadPool = Executors.newFixedThreadPool(totalAllowedThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
@@ -109,7 +110,7 @@ public class ExecutorManager {
     for (int i = startFromDatasetIndex; i < endAtDatasetIndex && i < datasetStatuses.size(); i++) {
       final DatasetStatus datasetStatus = datasetStatuses.get(i);
       final int numberOfPages = (int) Math
-          .ceil((double) datasetStatus.getTotalRecords() / MongoSourceMongoDao.PAGE_SIZE);
+          .ceil((double) datasetStatus.getTotalRecords() / pageSize);
       int maxThreadsConsumedByDataset = Math.min(numberOfPages, maxParallelThreadsPerDataset);
 
       while (countOfTotalCurrentThreads >= totalAllowedThreads || maxThreadsConsumedByDataset > (
@@ -165,7 +166,7 @@ public class ExecutorManager {
       final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
       AtomicInteger atomicIndex = new AtomicInteger(0);
       datasetStatuses = datasetsWithSize.entrySet().stream().filter(entry -> entry.getValue() > 0)
-          .sorted(Collections.reverseOrder(comparingByValue())).map(
+                                        .sorted(Collections.reverseOrder(comparingByValue())).map(
               entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
                   atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
     }
@@ -251,13 +252,13 @@ public class ExecutorManager {
     } catch (InterruptedException e) {
       threadPool.shutdownNow();
       Thread.currentThread().interrupt();
-      LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
+      LOGGER.error("Interrupted while waiting for thread pool to shut down", e);
     }
   }
 
   /**
-   * Interal {@link TimerTask} that is supposed to run as a daemon thread periodically, to calculate
-   * the speed and time required for the current full operation to complete.
+   * Interal {@link TimerTask} that is supposed to run as a daemon thread periodically, to calculate the speed and time required
+   * for the current full operation to complete.
    */
   private class ScheduledThreadForSpeedProjection extends TimerTask {
 
@@ -270,11 +271,11 @@ public class ExecutorManager {
       this.startDate = startDate;
       this.datasetStatuses = datasetStatuses;
       this.totalPreviouslyProcessed = datasetStatuses.stream().map(
-          datasetStatus -> configuration.getMongoDestinationMongoDao()
-                                        .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
-          .mapToLong(DatasetStatus::getTotalProcessed).sum();
+                                                         datasetStatus -> configuration.getMongoDestinationMongoDao()
+                                                                                       .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
+                                                     .mapToLong(DatasetStatus::getTotalProcessed).sum();
       this.totalRecords = datasetStatuses.stream().map(DatasetStatus::getTotalRecords)
-          .reduce(0L, Long::sum);
+                                         .reduce(0L, Long::sum);
     }
 
     public void run() {
@@ -283,13 +284,13 @@ public class ExecutorManager {
       long secondsInBetween = ChronoUnit.SECONDS.between(startDate, nowInstant);
       //Only calculate projected date if a defined time threshold has passed
       final List<DatasetStatus> datasetStatusesSnapshot = datasetStatuses.stream().map(
-          datasetStatus -> configuration.getMongoDestinationMongoDao()
-                                        .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
-          .toList();
+                                                                             datasetStatus -> configuration.getMongoDestinationMongoDao()
+                                                                                                           .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
+                                                                         .toList();
       final long totalProcessedFromStartDate = datasetStatusesSnapshot.stream()
-          .filter(ds -> ds.getStartDate() != null)
-          .filter(ds -> ds.getStartDate().compareTo(startDate) >= 0)
-          .mapToLong(DatasetStatus::getTotalProcessed).sum();
+                                                                      .filter(ds -> ds.getStartDate() != null)
+                                                                      .filter(ds -> ds.getStartDate().compareTo(startDate) >= 0)
+                                                                      .mapToLong(DatasetStatus::getTotalProcessed).sum();
 
       final double recordsPerSecond =
           (double) (totalProcessedFromStartDate - totalPreviouslyProcessed) / secondsInBetween;

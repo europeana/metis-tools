@@ -6,13 +6,12 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.config.Mode;
-import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.schema.jibx.RDF;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +33,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is a {@link Callable} class that would be initialized with a {@link #datasetId}.
- * <p>It is responsible of re-processing a dataset as a whole, by paging records from the
- * database, while keeping track of it's dataset status. This class should not require modification and only provided
+ * <p>It is responsible for re-processing a dataset as a whole, by paging records from the
+ * database, while keeping track of its dataset status. This class should not require modification and only provided
  * functionality in the {@link Configuration} should be modifiable.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -50,6 +49,7 @@ public class ProcessDataset implements Callable<Void> {
   private final Configuration configuration;
   private final int maxParallelPageThreads;
   private int nextPage;
+  private final int pageSize;
 
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Integer> completionService;
@@ -64,11 +64,20 @@ public class ProcessDataset implements Callable<Void> {
     this.maxParallelPageThreads = maxParallelPageThreads;
     threadPool = Executors.newFixedThreadPool(maxParallelPageThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
+    this.pageSize = configuration.getPropertiesHolder().sourceMongoPageSize;
+  }
+
+  public int getPageSize() {
+    return this.pageSize;
   }
 
   @Override
   public Void call() throws ExecutionException, InterruptedException {
-    processDataset();
+    try {
+      processDataset();
+    } finally {
+      close();
+    }
     return null;
   }
 
@@ -106,7 +115,6 @@ public class ProcessDataset implements Callable<Void> {
       LOGGER.info("{} - Applied post processing function", prefixDatasetIdLog);
     }
     LOGGER.info("{} - Processing end", prefixDatasetIdLog);
-    close();
   }
 
   private void finalizeDatasetStatus(long startProcess) {
@@ -169,6 +177,7 @@ public class ProcessDataset implements Callable<Void> {
       counterFailedRecordsProcessed += nextPageOfRecords.size();
       LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
           prefixDatasetIdLog, counterFailedRecordsProcessed, totalFailedRecords);
+      failedNextPage++;  // FIX #3: INCREMENT PAGE NUMBER TO AVOID INFINITE LOOP
       failedRecords = getFailedRecords(failedNextPage);
       nextPageOfRecords = getFailedFullBeans(failedRecords);
     }
@@ -191,7 +200,7 @@ public class ProcessDataset implements Callable<Void> {
         final Future<Integer> recordsInPageProcessed = completionService.take();
         threadCounter--;
         //If page here was less than the page size, then exit while
-        if (recordsInPageProcessed.get() < MongoSourceMongoDao.PAGE_SIZE) {
+        if (recordsInPageProcessed.get() < pageSize) {
           break;
         }
       }
@@ -404,11 +413,11 @@ public class ProcessDataset implements Callable<Void> {
   }
 
   private static String exceptionStacktraceToString(Exception e) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    PrintStream ps = new PrintStream(baos);
-    e.printStackTrace(ps);
-    ps.close();
-    return baos.toString();
+    StringWriter sw = new StringWriter();
+    try (PrintWriter pw = new PrintWriter(sw)) {
+      e.printStackTrace(pw);
+    }
+    return sw.toString();
   }
 
   public void close() {
@@ -420,8 +429,7 @@ public class ProcessDataset implements Callable<Void> {
     } catch (InterruptedException e) {
       threadPool.shutdownNow();
       Thread.currentThread().interrupt();
-      LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
-
+      LOGGER.error("Interrupted while waiting for thread pool to shut down", e);
     }
   }
 }

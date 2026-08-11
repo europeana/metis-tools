@@ -70,23 +70,27 @@ public class DefaultConfiguration extends Configuration {
 
   public static String readFileToString(String file) throws IOException {
     ClassLoader classLoader = DefaultConfiguration.class.getClassLoader();
-    InputStream inputStream = classLoader.getResourceAsStream(file);
-    if (inputStream == null) {
-      throw new IOException("Failed reading file " + file);
+    try (InputStream inputStream = classLoader.getResourceAsStream(file)) {
+      if (inputStream == null) {
+        throw new IOException("Failed reading file " + file);
+      }
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        return reader.lines().collect(Collectors.joining("\n"));
+      }
     }
-    return new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"));
   }
 
-  public static void renameToMainForTests(String[] args)
+  //public static void renameToMainForTests(String[] args)
+  public static void main(String[] args)
       throws IndexingException, DereferenceException, NormalizationConfigurationException,
       TrustStoreConfigurationException, EnrichmentException, URISyntaxException,
       SerializationException, ProcessingException, EntityClientException, IOException {
     DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
         "application.properties"));
 
-    processAnXmlFile(defaultConfiguration);
+  //  processAnXmlFile(defaultConfiguration);
 
-  //  processARecordFromMongoSource(defaultConfiguration);
+    processARecordFromMongoSource(defaultConfiguration);
 
   }
 
@@ -94,26 +98,8 @@ public class DefaultConfiguration extends Configuration {
       throws ProcessingException, SerializationException {
     List<FullBeanImpl> fullBeanList = Stream
         .of(
-            //i
-            "/2020702/raa_fmi_10000100970001",
-            //f
-            "/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
-            //e
-            "/2048128/114145",
-            //d
-            "/9200579/kyaq8pq9",
-            //c
-            "/9200359/BibliographicResource_3000123626519",
-            "/9200359/BibliographicResource_3000100585617", //with contentTier 4
-            "/9200359/BibliographicResource_3000100387622", //with contentTier 1
-            //a
-            "/9200579/cynwkevu",
-            //b
-            "/954/Culturalia_fd913fb8_8a14_40c9_94ec_38158f4d4c81",
-            //g
-            "/1087/https___catalonica_bnc_cat_catalonicahub_lod_oai_arca_bnc_cat_10000296883_ent0",
-            //h
-            "/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"
+            "/867/https___hispana_mcu_es_lod_oai_prensahistorica_mcu_es_11000468588_ent0",
+            "/817/NHMUKXZOOX1935X8X20X138"
         )
         .map(item -> defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(List.of(item)))
         .flatMap(List::stream)
@@ -124,6 +110,7 @@ public class DefaultConfiguration extends Configuration {
 
       LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
       rdf = defaultConfiguration.normalizePIDS(rdf);
+
       LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
     }
 

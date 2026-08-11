@@ -1,54 +1,34 @@
 package eu.europeana.metis.reprocessing.utilities;
 
-import static eu.europeana.metis.reprocessing.utilities.RdfIndexTierUtils.hasContentTier;
-import static java.util.function.Predicate.not;
-import static org.apache.commons.lang3.BooleanUtils.isFalse;
-
 import com.mongodb.MongoWriteException;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.corelib.solr.entity.AggregationImpl;
-import eu.europeana.corelib.solr.entity.OrganizationImpl;
-import eu.europeana.corelib.solr.entity.ProxyImpl;
+import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
+import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
+import eu.europeana.entity.client.exception.EntityClientException;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
-import eu.europeana.indexing.common.fullbean.RdfToFullBeanConverter;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.indexing.tiers.TierCalculationMode;
-import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
+import eu.europeana.metis.reprocessing.config.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
+import eu.europeana.metis.schema.convert.RdfConversionUtils;
+import eu.europeana.metis.schema.convert.SerializationException;
 import eu.europeana.metis.schema.jibx.AboutType;
-import eu.europeana.metis.schema.jibx.EdmType;
-import eu.europeana.metis.schema.jibx.EuropeanaType;
-import eu.europeana.metis.schema.jibx.EuropeanaType.Choice;
-import eu.europeana.metis.schema.jibx.ProvidedCHOType;
-import eu.europeana.metis.schema.jibx.ProxyType;
 import eu.europeana.metis.schema.jibx.RDF;
-import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
-import eu.europeana.metis.schema.jibx.Type2;
-import eu.europeana.metis.utils.DepublicationReason;
+import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
+import eu.europeana.normalization.util.NormalizationConfigurationException;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,15 +44,6 @@ public class IndexUtilities {
 
   private static final Map<Class<?>, String> retryExceptions;
   private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-//  private static final List<String> DATA_PROVIDERS = List.of(
-//      "Burns Scotland",
-//      "Royal Albert Memorial Museum & Art Gallery",
-//      "University College London",
-//      "Egypt Centre",
-//      "Wiltshire Treasures",
-//      "Wakefield Council",
-//      "Horniman Museum and Gardens",
-//      "Battersea Arts Centre");
 
   static {
     retryExceptions = new HashMap<>(ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
@@ -122,6 +93,33 @@ public class IndexUtilities {
     } catch (Exception e) {
       throw new RecordRelatedIndexingException("A Runtime Exception occurred while indexing record", e);
     }
+  }
+
+  public static void main(String[] args)
+      throws IndexingException, DereferenceException, NormalizationConfigurationException,
+      TrustStoreConfigurationException, EntityClientException, EnrichmentException, URISyntaxException, SerializationException, ProcessingException {
+
+    DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
+        "application.properties"));
+    RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
+    List<FullBeanImpl> fullBeanList = Stream
+        .of(
+            "/867/https___hispana_mcu_es_lod_oai_prensahistorica_mcu_es_11000468588_ent0",
+            "/817/NHMUKXZOOX1935X8X20X138"
+        )
+        .map(item -> defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(List.of(item)))
+        .flatMap(List::stream)
+        .toList();
+
+    for (FullBeanImpl fb : fullBeanList) {
+      RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
+
+      LOGGER.info("Before:\r\n{}\r\n", rdfConversionUtils.convertRdfToString(rdf));
+      indexRecord(rdf, true, defaultConfiguration);
+
+      LOGGER.info("After:\r\n{}\r\n", rdfConversionUtils.convertRdfToString(rdf));
+    }
+
   }
 
 //  private static void depublishRecord(RDF rdf, String datasetId, String rdfAbout, IndexerPool indexerPool)

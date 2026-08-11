@@ -8,14 +8,12 @@ import dev.morphia.mapping.Mapper;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.filters.Filters;
-import eu.europeana.corelib.definitions.model.RightsOption;
 import eu.europeana.corelib.edm.model.metainfo.AudioMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.ImageMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.TextMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.ThreeDMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.VideoMetaInfoImpl;
 import eu.europeana.corelib.edm.model.metainfo.WebResourceMetaInfoImpl;
-import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.derived.AttributionSnippet;
 import eu.europeana.corelib.solr.entity.AddressImpl;
@@ -38,15 +36,11 @@ import eu.europeana.corelib.solr.entity.QualityAnnotationImpl;
 import eu.europeana.corelib.solr.entity.ServiceImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.mongo.utils.MorphiaUtils;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.PropertiesHolder;
-import eu.europeana.metis.schema.jibx.RDF;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Mongo Dao for source records.
@@ -63,18 +57,22 @@ public class MongoSourceMongoDao {
   public static final String TYPE = "type";
   public static final String RESOURCE_TYPE = "IMAGE";
   private static final int DEFAULT_PAGE_SIZE = 200;
-  public static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   private final MongoInitializer sourceMongoInitializer;
   private final Datastore mongoSourceDatastore;
   private final PropertiesHolder propertiesHolder;
+  private final int pageSize;
 
   public MongoSourceMongoDao(PropertiesHolder propertiesHolder) {
     this.propertiesHolder = propertiesHolder;
-    PAGE_SIZE = propertiesHolder.sourceMongoPageSize;
+    this.pageSize = propertiesHolder.sourceMongoPageSize;
     sourceMongoInitializer = prepareMongoSourceConfiguration();
     mongoSourceDatastore = createMongoSourceDatastore(sourceMongoInitializer.getMongoClient(),
         propertiesHolder.sourceMongoDb);
+  }
+
+  public int getPageSize() {
+    return pageSize;
   }
 
   private static Datastore createMongoSourceDatastore(MongoClient mongoClient,
@@ -112,11 +110,20 @@ public class MongoSourceMongoDao {
     return datastore;
   }
 
+  private MongoInitializer prepareMongoSourceConfiguration() {
+    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.sourceMongoHosts,
+        propertiesHolder.sourceMongoPorts, propertiesHolder.sourceMongoAuthenticationDb,
+        propertiesHolder.sourceMongoUsername, propertiesHolder.sourceMongoPassword,
+        propertiesHolder.sourceMongoEnableSSL, propertiesHolder.sourceMongoConnectionPoolSize);
+    mongoInitializer.initializeMongoClient();
+    return mongoInitializer;
+  }
+
   public List<FullBeanImpl> getNextPageOfRecords(String datasetId, int nextPage) {
     Query<FullBeanImpl> query = mongoSourceDatastore.find(FullBeanImpl.class);
     query.filter(Filters.regex(ABOUT, "^/" + datasetId + "/"));
     return MorphiaUtils.getListOfQueryRetryable(query,
-        new FindOptions().skip(nextPage * PAGE_SIZE).limit(PAGE_SIZE));
+        new FindOptions().skip(nextPage * pageSize).limit(pageSize));
   }
 
   public List<FullBeanImpl> getRecordsFromList(List<String> recordIds) {
@@ -158,42 +165,8 @@ public class MongoSourceMongoDao {
   }
 
   public void close() {
-    sourceMongoInitializer.close();
-  }
-
-  //  private boolean isValidLicense(String rights) {
-  //    Set<String> validLicenses = Set.of(
-  //        RightsOption.CC_BY.getUrl(),
-  //        RightsOption.CC_ZERO.getUrl(),
-  //        RightsOption.CC_BY_SA.getUrl(),
-  //        RightsOption.CC_NOC.getUrl(),
-  //        RightsOption.CC_BY_NC_SA.getUrl(),
-  //        RightsOption.CC_BY_NC_ND.getUrl(),
-  //        RightsOption.CC_BY_ND.getUrl(),
-  //        RightsOption.CC_BY_NC.getUrl()
-  //    );
-  //
-  //    for (String validLicense : validLicenses) {
-  //      if (rights.startsWith(validLicense)) {
-  //        return true;
-  //      }
-  //    }
-  //    return false;
-  //  }
-  //
-  //  private boolean hasThumbnailsAndValidLicense(RDF rdfRecord) {
-  //    RdfWrapper rdfWrapper = new RdfWrapper(rdfRecord);
-  //    boolean validLicense = rdfRecord.getAggregationList().stream().allMatch(a -> isValidLicense(a.getRights().getResource()));
-  //    boolean hasThumbnails = rdfWrapper.hasThumbnails();
-  //    return hasThumbnails && validLicense;
-  //  }
-
-  private MongoInitializer prepareMongoSourceConfiguration() {
-    MongoInitializer mongoInitializer = new MongoInitializer(propertiesHolder.sourceMongoHosts,
-        propertiesHolder.sourceMongoPorts, propertiesHolder.sourceMongoAuthenticationDb,
-        propertiesHolder.sourceMongoUsername, propertiesHolder.sourceMongoPassword,
-        propertiesHolder.sourceMongoEnableSSL, propertiesHolder.sourceMongoConnectionPoolSize);
-    mongoInitializer.initializeMongoClient();
-    return mongoInitializer;
+    if (sourceMongoInitializer != null) {
+      sourceMongoInitializer.close();
+    }
   }
 }

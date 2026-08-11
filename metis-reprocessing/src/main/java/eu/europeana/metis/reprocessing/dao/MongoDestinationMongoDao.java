@@ -2,6 +2,7 @@ package eu.europeana.metis.reprocessing.dao;
 
 import com.mongodb.client.MongoClient;
 import dev.morphia.Datastore;
+import dev.morphia.DatastoreImpl;
 import dev.morphia.DeleteOptions;
 import dev.morphia.Morphia;
 import dev.morphia.mapping.Mapper;
@@ -61,22 +62,24 @@ public class MongoDestinationMongoDao {
   private static final Logger LOGGER = LoggerFactory.getLogger(MongoDestinationMongoDao.class);
 
   private final MongoInitializer destinationMongoInitializer;
-  private final Datastore mongoDestinationDatastore;
-  private final Datastore mongoDestinationTombstoneDatastore;
+  private final DatastoreImpl mongoDestinationDatastore;
+  private final DatastoreImpl mongoDestinationTombstoneDatastore;
   private final PropertiesHolder propertiesHolder;
+  private final int pageSize;
 
   public MongoDestinationMongoDao(PropertiesHolder propertiesHolder) {
     this.propertiesHolder = propertiesHolder;
+    this.pageSize = propertiesHolder.sourceMongoPageSize;
     destinationMongoInitializer = prepareMongoDestinationConfiguration();
-    mongoDestinationDatastore = createMongoDestinationDatastore(
+    mongoDestinationDatastore = (DatastoreImpl) createMongoDestinationDatastore(
         destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoDb);
-    mongoDestinationTombstoneDatastore = createMongoDestinationDatastore(
+    mongoDestinationTombstoneDatastore = (DatastoreImpl) createMongoDestinationDatastore(
         destinationMongoInitializer.getMongoClient(), propertiesHolder.destinationMongoTombstoneDb);
   }
 
   private static Datastore createMongoDestinationDatastore(MongoClient mongoClient,
       String databaseName) {
-    final Datastore datastore = Morphia.createDatastore(mongoClient, databaseName);
+    final DatastoreImpl datastore = (DatastoreImpl) Morphia.createDatastore(mongoClient, databaseName);
     final Mapper mapper = datastore.getMapper();
     mapper.getEntityModel(DatasetStatus.class);
     mapper.getEntityModel(FailedRecord.class);
@@ -110,17 +113,17 @@ public class MongoDestinationMongoDao {
     mapper.getEntityModel(VideoMetaInfoImpl.class);
     mapper.getEntityModel(ThreeDMetaInfoImpl.class);
     //Ensure indexes, to create them in destination only
-    datastore.ensureIndexes();
+    datastore.applyIndexes();
     return datastore;
   }
 
   public List<FailedRecord> getNextPageOfFailedRecords(String datasetId, int nextPage) {
     Query<FailedRecord> query = mongoDestinationDatastore.find(FailedRecord.class);
-    query.filter(Filters.regex(FAILED_URL).pattern("^/" + datasetId + "/"))
+    query.filter(Filters.regex(FAILED_URL, "^/" + datasetId + "/"))
          .filter(Filters.eq(SUCCESSFULLY_REPROCESSED, false));
     return MorphiaUtils.getListOfQueryRetryable(query,
-        new FindOptions().skip(nextPage * MongoSourceMongoDao.PAGE_SIZE)
-                         .limit(MongoSourceMongoDao.PAGE_SIZE));
+        new FindOptions().skip(nextPage * pageSize)
+                         .limit(pageSize));
   }
 
   public List<DatasetStatus> getAllDatasetStatuses() {
@@ -139,8 +142,8 @@ public class MongoDestinationMongoDao {
   }
 
   public void deleteAll() {
-      mongoDestinationDatastore.getDatabase().drop();
-      mongoDestinationDatastore.ensureIndexes();
+    mongoDestinationDatastore.getDatabase().drop();
+    mongoDestinationDatastore.applyIndexes();
   }
 
   public void dropTemporaryCollections() {

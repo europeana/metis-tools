@@ -87,6 +87,10 @@ public abstract class Configuration {
     invalidatePluginTypes = propertiesHolder.invalidatePluginTypes;
   }
 
+  public PropertiesHolderExtension getPropertiesHolder() {
+    return propertiesHolder;
+  }
+
   public MetisCoreMongoDao getMetisCoreMongoDao() {
     return metisCoreMongoDao;
   }
@@ -123,7 +127,9 @@ public abstract class Configuration {
     return identityProcess;
   }
 
-  public boolean isDepublicationEnabled() { return depublicationEnabled; }
+  public boolean isDepublicationEnabled() {
+    return depublicationEnabled;
+  }
 
   public boolean isClearDatabasesBeforeProcess() {
     return clearDatabasesBeforeProcess;
