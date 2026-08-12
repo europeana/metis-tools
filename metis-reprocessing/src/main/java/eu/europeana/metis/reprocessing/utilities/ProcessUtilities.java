@@ -147,10 +147,10 @@ public class ProcessUtilities {
    */
   private static String md5Hex(final String stringToMd5) throws MediaExtractionException {
     try {
-      byte[] bytes = stringToMd5.getBytes(StandardCharsets.UTF_8.name());
+      byte[] bytes = stringToMd5.getBytes(StandardCharsets.UTF_8);
       byte[] md5bytes = MessageDigest.getInstance("MD5").digest(bytes);
       return String.format("%032x", new BigInteger(1, md5bytes));
-    } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+    } catch (NoSuchAlgorithmException e) {
       throw new MediaExtractionException("Could not compute md5 hash", e);
     }
   }

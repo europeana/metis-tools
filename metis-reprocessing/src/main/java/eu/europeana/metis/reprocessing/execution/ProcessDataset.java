@@ -123,8 +123,7 @@ public class ProcessDataset implements Callable<Void> {
         .setActualTimeProcessAndIndex(datasetStatus.getActualTimeProcessAndIndex() + elapsedTime);
     configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     LOGGER.info("{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
-    LOGGER
-        .info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
+    LOGGER.info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
   }
 
   /**
@@ -164,8 +163,7 @@ public class ProcessDataset implements Callable<Void> {
     List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(failedRecords);
     long counterFailedRecordsProcessed = 0;
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER.info("{} - Processing number of records: {}", prefixDatasetIdLog,
-          nextPageOfRecords.size());
+      LOGGER.info("{} - Processing number of records: {}", prefixDatasetIdLog, nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final String exceptionStackTrace = processAndIndex(fullBean);
         failedRecords.stream()
@@ -177,7 +175,6 @@ public class ProcessDataset implements Callable<Void> {
       counterFailedRecordsProcessed += nextPageOfRecords.size();
       LOGGER.info("{} - Processed number of records: {} out of total number of failed records: {}",
           prefixDatasetIdLog, counterFailedRecordsProcessed, totalFailedRecords);
-      failedNextPage++;  // FIX #3: INCREMENT PAGE NUMBER TO AVOID INFINITE LOOP
       failedRecords = getFailedRecords(failedNextPage);
       nextPageOfRecords = getFailedFullBeans(failedRecords);
     }
@@ -284,7 +281,6 @@ public class ProcessDataset implements Callable<Void> {
 
   private String processAndIndex(FullBeanImpl fullBean) {
     try {
-      preProcessAndCleanUpHasTargetQualityAnnotations(fullBean);
       final RDF rdf = processRecord(fullBean);
       indexRecord(rdf);
     } catch (ProcessingException e) {
@@ -294,7 +290,8 @@ public class ProcessDataset implements Callable<Void> {
       LOGGER.error("{} - Could not index record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
     } catch (RuntimeException e) {
-      LOGGER.error("{} - Could not process or index(RuntimeException) record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
+      LOGGER.error("{} - Could not process or index(RuntimeException) record: {}{}", prefixDatasetIdLog, fullBean.getAbout(), e);
+      LOGGER.error("{} - Exception stack trace: {}", prefixDatasetIdLog, e.getSuppressed());
       return exceptionStacktraceToString(e);
     }
     return "";
@@ -379,8 +376,7 @@ public class ProcessDataset implements Callable<Void> {
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeProcess);
       synchronized (this) {
-        datasetStatus.setTotalTimeProcessingInSecs(
-            datasetStatus.getTotalTimeProcessingInSecs() + elapsedTime);
+        datasetStatus.setTotalTimeProcessingInSecs(datasetStatus.getTotalTimeProcessingInSecs() + elapsedTime);
       }
     }
   }
@@ -392,8 +388,7 @@ public class ProcessDataset implements Callable<Void> {
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeIndex);
       synchronized (this) {
-        datasetStatus
-            .setTotalTimeIndexingInSecs(datasetStatus.getTotalTimeIndexingInSecs() + elapsedTime);
+        datasetStatus.setTotalTimeIndexingInSecs(datasetStatus.getTotalTimeIndexingInSecs() + elapsedTime);
       }
     }
   }
@@ -401,8 +396,7 @@ public class ProcessDataset implements Callable<Void> {
   private void postProcess() {
     try {
       configuration.getAfterReprocessProcessor()
-                   .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),
-                       configuration);
+                   .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(), configuration);
     } catch (ProcessingException e) {
       LOGGER.error("{} - After reprocessing operation failed!", prefixDatasetIdLog, e);
     }
