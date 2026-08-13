@@ -13,7 +13,6 @@ import eu.europeana.metis.schema.jibx.RDF;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -25,7 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -290,36 +288,10 @@ public class ProcessDataset implements Callable<Void> {
       LOGGER.error("{} - Could not index record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
     } catch (RuntimeException e) {
-      LOGGER.error("{} - Could not process or index(RuntimeException) record: {}{}", prefixDatasetIdLog, fullBean.getAbout(), e);
-      LOGGER.error("{} - Exception stack trace: {}", prefixDatasetIdLog, e.getSuppressed());
+      LOGGER.error("{} - Could not process or index(RuntimeException) record: {} {}", prefixDatasetIdLog, fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
     }
     return "";
-  }
-
-  private void preProcessAndCleanUpHasTargetQualityAnnotations(FullBeanImpl fullBean) {
-    if (fullBean.getQualityAnnotations() != null) {
-      fullBean.setQualityAnnotations(
-          Stream.concat(
-              fullBean.getQualityAnnotations()
-                      .stream()
-                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length == 1),
-              fullBean.getQualityAnnotations()
-                      .stream()
-                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length > 1)
-                      .map(
-                          qualityAnnotation -> {
-                            qualityAnnotation.setTarget(
-                                Arrays.stream(qualityAnnotation.getTarget())
-                                      .filter(target -> !target.startsWith("/aggregation/provider"))
-                                      .toArray(String[]::new)
-                            );
-                            return qualityAnnotation;
-                          }
-                      )
-          ).toList()
-      );
-    }
   }
 
   private void updateProcessFailedOnlyCounts(String exceptionStackTrace, String resourceId,

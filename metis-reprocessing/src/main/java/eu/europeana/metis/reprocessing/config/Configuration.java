@@ -46,7 +46,7 @@ public abstract class Configuration {
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
   private final CompoundSolrClient destinationCompoundSolrClient;
   private final IndexerPool destinationIndexerPool;
-  private final Indexer destinationIndexer;
+  //private final Indexer destinationIndexer;
   private final Mode mode;
   private final boolean identityProcess;
   private final boolean depublicationEnabled;
@@ -74,9 +74,9 @@ public abstract class Configuration {
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
     destinationCompoundSolrClient = new SolrClientProvider<>(indexingSettings.getSolrProperties()).createSolrClient();
-    IndexerFactory indexerFactory = IndexerFactory.create(indexingSettings);
-    destinationIndexerPool = new IndexerPool(indexerFactory, 600, 60);
-    destinationIndexer = indexerFactory.getIndexer();
+    //IndexerFactory indexerFactory = IndexerFactory.create(indexingSettings);
+    destinationIndexerPool = new IndexerPool(indexingSettings, 600, 60);
+    //destinationIndexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
@@ -109,10 +109,6 @@ public abstract class Configuration {
 
   public IndexerPool getDestinationIndexerPool() {
     return destinationIndexerPool;
-  }
-
-  public Indexer getDestinationIndexer() {
-    return destinationIndexer;
   }
 
   public Mode getMode() {
@@ -163,7 +159,6 @@ public abstract class Configuration {
     mongoDestinationMongoDao.close();
     destinationCompoundSolrClient.close();
     destinationIndexerPool.close();
-    destinationIndexer.close();
   }
 
   private void prepareMongoSettings(IndexingSettings indexingSettings) throws IndexingException {
@@ -190,7 +185,6 @@ public abstract class Configuration {
       indexingSettings.setMongoCredentials(propertiesHolder.destinationMongoUsername,
           propertiesHolder.destinationMongoPassword,
           propertiesHolder.destinationMongoAuthenticationDb);
-
     }
 
     if (propertiesHolder.destinationMongoEnableSSL) {
@@ -201,16 +195,15 @@ public abstract class Configuration {
   private void prepareSolrSettings(IndexingSettings indexingSettings)
       throws URISyntaxException, SetupRelatedIndexingException {
     for (String instance : propertiesHolder.destinationSolrHosts) {
-      indexingSettings
-          .addSolrHost(new URI(instance + propertiesHolder.destinationZookeeperDefaultCollection));
+      indexingSettings.addSolrHost(new URI(instance + propertiesHolder.destinationZookeeperDefaultCollection));
     }
+    indexingSettings.getSolrProperties().setSolrUseHttp1(propertiesHolder.destinationSolrUseHttp1);
   }
 
   private void prepareZookeeperSettings(IndexingSettings indexingSettings)
       throws SetupRelatedIndexingException {
     for (int i = 0; i < propertiesHolder.destinationZookeeperHosts.length; i++) {
-      if (propertiesHolder.destinationZookeeperHosts.length
-          == propertiesHolder.destinationZookeeperPorts.length) {
+      if (propertiesHolder.destinationZookeeperHosts.length == propertiesHolder.destinationZookeeperPorts.length) {
         indexingSettings.addZookeeperHost(
             new InetSocketAddress(propertiesHolder.destinationZookeeperHosts[i],
                 propertiesHolder.destinationZookeeperPorts[i]));
@@ -221,8 +214,7 @@ public abstract class Configuration {
       }
     }
     indexingSettings.setZookeeperChroot(propertiesHolder.destinationZookeeperChroot);
-    indexingSettings
-        .setZookeeperDefaultCollection(propertiesHolder.destinationZookeeperDefaultCollection);
+    indexingSettings.setZookeeperDefaultCollection(propertiesHolder.destinationZookeeperDefaultCollection);
   }
 
   @FunctionalInterface

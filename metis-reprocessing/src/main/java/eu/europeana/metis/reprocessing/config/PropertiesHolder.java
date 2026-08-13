@@ -80,6 +80,7 @@ public class PropertiesHolder {
   //Solr/Zookeeper Destination
   public final String[] destinationSolrHosts;
   public final String[] destinationZookeeperHosts;
+  public final boolean destinationSolrUseHttp1;
   public final int[] destinationZookeeperPorts;
   public final String destinationZookeeperChroot;
   public final String destinationZookeeperDefaultCollection;
@@ -188,6 +189,7 @@ public class PropertiesHolder {
 
     //Solr/Zookeeper Destination
     destinationSolrHosts = properties.getProperty("solr.destination.hosts").split(",");
+    destinationSolrUseHttp1 = Boolean.parseBoolean(properties.getProperty("solr.destination.useHttp1"));
     destinationZookeeperHosts = properties.getProperty("zookeeper.destination.hosts").split(",");
     destinationZookeeperPorts = Arrays
         .stream(properties.getProperty("zookeeper.destination.port").split(","))

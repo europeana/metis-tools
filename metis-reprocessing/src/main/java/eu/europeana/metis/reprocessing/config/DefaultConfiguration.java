@@ -80,8 +80,8 @@ public class DefaultConfiguration extends Configuration {
     }
   }
 
-  //public static void renameToMainForTests(String[] args)
-  public static void main(String[] args)
+  public static void renameToMainForTests(String[] args)
+  //public static void main(String[] args)
       throws IndexingException, DereferenceException, NormalizationConfigurationException,
       TrustStoreConfigurationException, EnrichmentException, URISyntaxException,
       SerializationException, ProcessingException, EntityClientException, IOException {
@@ -150,7 +150,7 @@ public class DefaultConfiguration extends Configuration {
   @Override
   public RDF processRDF(RDF rdf) {
     rdf = normalizePIDS(rdf);
-    LOGGER.debug("DONE");
+    LOGGER.info("Normalisation DONE");
     return rdf;
   }
 

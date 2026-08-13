@@ -77,16 +77,21 @@ public class ExecutorManager {
             configuration.getMode(), startFromDatasetIndex, endAtDatasetIndex,
             totalAllowedThreads);
     //In default mode we try cleanup
-    if (configuration.getMode().equals(Mode.DEFAULT)) {
-      checkForCleaningDatabases();
-    } else if (configuration.getMode().equals(Mode.CLEAN)) {
-      checkForCleaningDatabases();
-      //We only clean dbs and return
-      return;
-    } else if (configuration.getMode().equals(Mode.POST_CLEAN)) {
-      //We only clean/remove the collections that were created for assisting the processing
-      configuration.getMongoDestinationMongoDao().dropTemporaryCollections();
-      return;
+    switch (configuration.getMode()) {
+      case DEFAULT:
+        checkForCleaningDatabases();
+        break;
+      case CLEAN:
+        checkForCleaningDatabases();
+        //We only clean dbs and return
+        return;
+      case POST_CLEAN:
+        //We only clean/remove the collections that were created for assisting the processing
+        configuration.getMongoDestinationMongoDao().dropTemporaryCollections();
+        return;
+      default:
+        // Other modes will proceed with normal reprocessing
+        break;
     }
     final List<DatasetStatus> datasetStatuses = getDatasetStatuses();
     if (CollectionUtils.isEmpty(datasetStatuses)) {
@@ -142,6 +147,9 @@ public class ExecutorManager {
       try {
         //Check and log for exceptions
         completedFuture.get();
+      } catch( InterruptedException e) {
+        Thread.currentThread().interrupt();
+        LOGGER.warn("Interrupted while waiting for dataset processing to complete.");
       } catch (Exception e) {
         LOGGER.error("An exception occurred in a callable.", e);
       }
@@ -156,19 +164,22 @@ public class ExecutorManager {
     LOGGER.info("Calculating order of datasets for processing..");
 
     final List<DatasetStatus> datasetStatuses;
-    if (configuration.getMode().equals(Mode.REPROCESS_ALL_FAILED)) {
-      datasetStatuses = configuration.getMongoDestinationMongoDao().getAllDatasetStatuses();
-      datasetStatuses.removeIf(datasetStatus -> datasetStatus.getTotalFailedRecords() <= 0);
-    } else if (configuration.getMode().equals(Mode.POST_PROCESS)) {
-      datasetStatuses = configuration.getMongoDestinationMongoDao().getAllDatasetStatuses();
-    } else {
-      //We want the biggest datasets to start first
-      final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
-      AtomicInteger atomicIndex = new AtomicInteger(0);
-      datasetStatuses = datasetsWithSize.entrySet().stream().filter(entry -> entry.getValue() > 0)
-                                        .sorted(Collections.reverseOrder(comparingByValue())).map(
-              entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
-                  atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
+    switch (configuration.getMode()) {
+      case REPROCESS_ALL_FAILED:
+        datasetStatuses = configuration.getMongoDestinationMongoDao().getAllDatasetStatuses();
+        datasetStatuses.removeIf(datasetStatus -> datasetStatus.getTotalFailedRecords() <= 0);
+        break;
+      case POST_PROCESS:
+        datasetStatuses = configuration.getMongoDestinationMongoDao().getAllDatasetStatuses();
+        break;
+      default:
+        //We want the biggest datasets to start first
+        final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
+        AtomicInteger atomicIndex = new AtomicInteger(0);
+        datasetStatuses = datasetsWithSize.entrySet().stream().filter(entry -> entry.getValue() > 0)
+                                          .sorted(Collections.reverseOrder(comparingByValue())).map(
+                entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
+                    atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
     }
     LOGGER.info("Calculated order of datasets for processing");
     return datasetStatuses;
@@ -181,7 +192,7 @@ public class ExecutorManager {
       configuration.getMongoDestinationMongoDao().deleteAll();
       try {
         configuration.getDestinationCompoundSolrClient().getSolrClient().deleteByQuery("*:*");
-        configuration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
+        configuration.getDestinationIndexerPool().triggerFlushOfPendingChanges(true);
       } catch (SolrServerException | IOException | IndexingException e) {
         LOGGER.warn("Could not cleanup solr", e);
       }
@@ -195,7 +206,7 @@ public class ExecutorManager {
     //try-with-resources block
     try {
       LOGGER.info("Commit changes");
-      configuration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
+      configuration.getDestinationIndexerPool().triggerFlushOfPendingChanges(true);
       LOGGER.info("Committed changes");
     } catch (IndexingException e) {
       LOGGER.warn("Could not commit changes to solr, changes will be visible after auto commit", e);
@@ -257,7 +268,7 @@ public class ExecutorManager {
   }
 
   /**
-   * Interal {@link TimerTask} that is supposed to run as a daemon thread periodically, to calculate the speed and time required
+   * Internal {@link TimerTask} that is supposed to run as a daemon thread periodically, to calculate the speed and time required
    * for the current full operation to complete.
    */
   private class ScheduledThreadForSpeedProjection extends TimerTask {
@@ -302,9 +313,11 @@ public class ExecutorManager {
       final Instant projectedEndDate = startDate
           .plus(Duration.ofMinutes((long) (totalHoursRequiredWithoutPreviouslyProcessed * 60)));
 
-      LOGGER.info(String.format(
-          "Average time required, with current speed, for a full reprocess: %.2f Hours, projected end date: %s",
-          totalHoursRequired, projectedEndDate));
+      if(LOGGER.isInfoEnabled()) {
+        LOGGER.info(String.format(
+            "Average time required, with current speed, for a full reprocess: %.2f Hours, projected end date: %s",
+            totalHoursRequired, projectedEndDate));
+      }
     }
   }
 }

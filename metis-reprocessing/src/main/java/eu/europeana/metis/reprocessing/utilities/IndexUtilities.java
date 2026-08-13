@@ -1,6 +1,7 @@
 package eu.europeana.metis.reprocessing.utilities;
 
 import com.mongodb.MongoWriteException;
+import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
@@ -94,6 +95,7 @@ public class IndexUtilities {
   }
 
   public static void renameToMainToTest(String[] args)
+  //public static void main(String[] args)
       throws IndexingException, DereferenceException, NormalizationConfigurationException,
       TrustStoreConfigurationException, EntityClientException, EnrichmentException, URISyntaxException,
       ProcessingException {
@@ -103,15 +105,17 @@ public class IndexUtilities {
 
     List<FullBeanImpl> fullBeanList = Stream
         .of(
-            "/73/S_OM_object_OMA022205"
+            "/9200365/BibliographicResource_3000055595788"
         )
         .map(item -> defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(List.of(item)))
         .flatMap(List::stream)
         .toList();
 
     for (FullBeanImpl fb : fullBeanList) {
-      RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
-      indexRecord(rdf, true, defaultConfiguration);
+      RDF other = EdmUtils.toRDF(fb);
+      indexRecord(other, true, defaultConfiguration);
+      //RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
+      //indexRecord(rdf, true, defaultConfiguration);
     }
   }
 }
