@@ -16,6 +16,7 @@ import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
 import eu.europeana.metis.schema.convert.RdfConversionUtils;
 import eu.europeana.metis.schema.convert.SerializationException;
+import eu.europeana.metis.schema.jibx.ProvidedCHOType;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
 import eu.europeana.normalization.Normalizer;
@@ -32,7 +33,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,7 +60,39 @@ public class DefaultConfiguration extends Configuration {
   private final RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
   private final Normalizer normalizer = new NormalizerFactory().getNormalizer(NormalizerStep.NORMALIZE_PIDS);
   private ClientEntityResolver entityResolver;
-
+  private static final String[] datasetsToNormalise = new String[] {
+      "179","08711","428","331","260","497","498","302","569","619","2064947",
+      "2064934","2064910","2064912","2064913","2064907","2055737","2064901","131","13","2064950","2064945","2064951","2064925",
+      "2064944","2064949","2064929","2064903","1001","2064931","69","3","2064920","2064902","12","2064909","2064948","2064927",
+      "2064940","2064908","2064923","2064905","2048210","1367","2064904","2064930","2064916","1231","2064915","2064942","2020107",
+      "1251","1327","92058","92056","92068","92057","15","9200394","38","1055","194","2020128","2020127","284","92053","221","222",
+      "223","5","92","940","258","2020109","707","934","706","785","139","615","719","921","15409","215","328","922","15405","214",
+      "641","255","916","920","327","394","217","938","919","1089","155","216","438","393","1119","915","574","392","917","169",
+      "204","884","1129","898","1395","1397","1394","1392","1393","1400","1169","1401","1399","1396","1063","1398","1168","1402",
+      "1229","08535","990","504","672","2048424","495","713","368","358","372","362","2048437","2048441","492","315","2048425",
+      "2048426","572","2022712","304","879","353","340","593","297","299","877","303","307","541","1423","881","355","1248",
+      "10501","298","640","598","763","764","744","815","848","816","425","2021651","2021657","203","629","855","1415","231",
+      "09315","228","229","809","630","637","318","230","09317","233","2048221","739","2059219","2059205","2059204","0940431",
+      "235","237","238","0940420","0940429","0940439","92040","2020708","421","467","2024907","652","653","657","659","589","654",
+      "655","656","658","660","661","2048374","1150","889","1247","2048128","1440","15515","490","2021004","2021003","2021001",
+      "2021006","2021005","9200133","9200352","932","1297","1312","1371","1372","1459","865","1313","1373","996","1315","1450",
+      "1370","1375","1302","1298","1299","1314","869","1303","1377","1376","1285","1508","1374","1449","1490","1382","1507","858",
+      "857","859","1080","1504","856","1565","9200449","9200408","9200140","9200365","9200324","9200373","9200364","9200317",
+      "9200395","92097","9200119","9200182","9200382","9200173","9200385","9200167","9200118","92080","92075","9200111","9200110",
+      "2022039","2022076","2022054","2022065","2022077","2022078","2022079","2022038","2022001","2022002","2022068","2022042",
+      "2022058","2022023","2022024","2022025","2022037","2022080","2022082","2022083","2022062","2022084","2022052","2022064",
+      "2022043","2022044","2058208","2058201","2058207","2058206","2022089","2022091","2022093","2022094","2022095","2022096",
+      "180","2048603","2048621","2048620","2048614","9200498","9200516","9200517","794","9200518","124","9200519","9200521",
+      "9200522","780","2059510","08904","08804","08803","2020710","1","101","102","14","103","104","90402","07931","07932",
+      "9200211","08574","1391","808","91625","91617","91672","76","916118","154","916108","916105","916124","916121","91670",
+      "134","916123","916109","916106","91616","91668","91627","91666","91619","91608","916122","91674","91658","91676","1465",
+      "91624","900","1045","133","77","916119","958","1042","410","1044","91609","916120","91698","91650","91652","75","72",
+      "1351","91653","91641","91682","91654","91643","91639","916113","91640","1039","1177","347","916114","91659","916110",
+      "91669","71","90","52","91607","91699","91673","91694","323","91647","91644","916117","346","412","901","91683","916116",
+      "91680","348","91631","144","602","1040","91663","91642","73","91646","565","132","601","944","91662","91685","916101",
+      "91657","916115","153","535","916107","91691","91656","1489","74","847","916100","91687","156","91695","91648","91655",
+      "91645","91688","91690","91651","91660","91689","91671","91684","91665","411","916104","91697","916112","1349","1350",
+      "1538","91693","1095","1097" };
 
   public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
       throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException, NormalizationConfigurationException, EntityClientException {
@@ -149,9 +185,25 @@ public class DefaultConfiguration extends Configuration {
 
   @Override
   public RDF processRDF(RDF rdf) {
-    rdf = normalizePIDS(rdf);
-    LOGGER.info("Normalisation DONE");
+    if (hasDatasetIdOfRecordToBeNormalised(rdf)) {
+      rdf = normalizePIDS(rdf);
+      LOGGER.info("Normalisation DONE");
+    }
     return rdf;
+  }
+
+  private static boolean hasDatasetIdOfRecordToBeNormalised(RDF rdf) {
+    Optional<String> about = rdf.getProvidedCHOList()
+                                .stream()
+                                .filter(Objects::nonNull)
+                                .findFirst()
+                                .map(ProvidedCHOType::getAbout);
+    if (about.isPresent()) {
+      final String[] splitRecordIdentifier = about.get().split("/");
+      String datasetId = splitRecordIdentifier[1];
+      return Arrays.asList(datasetsToNormalise).contains(datasetId);
+    }
+    return false;
   }
 
   private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension) throws EntityClientException {
