@@ -29,8 +29,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.Arrays;
@@ -117,14 +115,13 @@ public class DefaultConfiguration extends Configuration {
   }
 
   public static void renameToMainForTests(String[] args)
-  //public static void main(String[] args)
       throws IndexingException, DereferenceException, NormalizationConfigurationException,
       TrustStoreConfigurationException, EnrichmentException, URISyntaxException,
       SerializationException, ProcessingException, EntityClientException, IOException {
     DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
         "application.properties"));
 
-  //  processAnXmlFile(defaultConfiguration);
+    processAnXmlFile(defaultConfiguration);
 
     processARecordFromMongoSource(defaultConfiguration);
 
@@ -146,7 +143,6 @@ public class DefaultConfiguration extends Configuration {
 
       LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
       rdf = defaultConfiguration.normalizePIDS(rdf);
-
       LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
     }
 
@@ -158,14 +154,6 @@ public class DefaultConfiguration extends Configuration {
     LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
     rdf = defaultConfiguration.normalizePIDS(rdf);
     LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-  }
-
-  private static String convertToValidURLString(String link) {
-    try {
-      return URI.create(link).toURL().toString();
-    } catch (MalformedURLException e) {
-      return null;
-    }
   }
 
   @Override

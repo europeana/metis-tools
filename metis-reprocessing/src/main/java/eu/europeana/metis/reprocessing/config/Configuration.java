@@ -1,8 +1,6 @@
 package eu.europeana.metis.reprocessing.config;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.indexing.Indexer;
-import eu.europeana.indexing.IndexerFactory;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingSettings;
 import eu.europeana.indexing.exception.IndexingException;
@@ -46,7 +44,6 @@ public abstract class Configuration {
   private final MongoDestinationMongoDao mongoDestinationMongoDao;
   private final CompoundSolrClient destinationCompoundSolrClient;
   private final IndexerPool destinationIndexerPool;
-  //private final Indexer destinationIndexer;
   private final Mode mode;
   private final boolean identityProcess;
   private final boolean depublicationEnabled;
@@ -74,9 +71,7 @@ public abstract class Configuration {
     prepareSolrSettings(indexingSettings);
     prepareZookeeperSettings(indexingSettings);
     destinationCompoundSolrClient = new SolrClientProvider<>(indexingSettings.getSolrProperties()).createSolrClient();
-    //IndexerFactory indexerFactory = IndexerFactory.create(indexingSettings);
     destinationIndexerPool = new IndexerPool(indexingSettings, 600, 60);
-    //destinationIndexer = indexerFactory.getIndexer();
     mode = propertiesHolder.mode;
     datasetIdsToProcess = propertiesHolder.datasetIdsToProcess;
     identityProcess = propertiesHolder.identityProcess;
