@@ -92,6 +92,18 @@ public class DefaultConfiguration extends Configuration {
       "91645","91688","91690","91651","91660","91689","91671","91684","91665","411","916104","91697","916112","1349","1350",
       "1538","91693","1095","1097" };
 
+  /**
+   * Instantiates a new Default configuration.
+   *
+   * @param propertiesHolderExtension the properties holder extension
+   * @throws DereferenceException the dereference exception
+   * @throws EnrichmentException the enrichment exception
+   * @throws URISyntaxException the uri syntax exception
+   * @throws TrustStoreConfigurationException the trust store configuration exception
+   * @throws IndexingException the indexing exception
+   * @throws NormalizationConfigurationException the normalization configuration exception
+   * @throws EntityClientException the entity client exception
+   */
   public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
       throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException, NormalizationConfigurationException, EntityClientException {
     super(propertiesHolderExtension);
@@ -102,6 +114,13 @@ public class DefaultConfiguration extends Configuration {
     initializeAdditionalElements(propertiesHolderExtension);
   }
 
+  /**
+   * Read file to string string.
+   *
+   * @param file the file
+   * @return the string
+   * @throws IOException the io exception
+   */
   public static String readFileToString(String file) throws IOException {
     ClassLoader classLoader = DefaultConfiguration.class.getClassLoader();
     try (InputStream inputStream = classLoader.getResourceAsStream(file)) {
@@ -114,6 +133,21 @@ public class DefaultConfiguration extends Configuration {
     }
   }
 
+  /**
+   * Rename to main for tests.
+   *
+   * @param args the args
+   * @throws IndexingException the indexing exception
+   * @throws DereferenceException the dereference exception
+   * @throws NormalizationConfigurationException the normalization configuration exception
+   * @throws TrustStoreConfigurationException the trust store configuration exception
+   * @throws EnrichmentException the enrichment exception
+   * @throws URISyntaxException the uri syntax exception
+   * @throws SerializationException the serialization exception
+   * @throws ProcessingException the processing exception
+   * @throws EntityClientException the entity client exception
+   * @throws IOException the io exception
+   */
   public static void renameToMainForTests(String[] args)
       throws IndexingException, DereferenceException, NormalizationConfigurationException,
       TrustStoreConfigurationException, EnrichmentException, URISyntaxException,
@@ -180,6 +214,16 @@ public class DefaultConfiguration extends Configuration {
     return rdf;
   }
 
+  /**
+   * Is dataset on whitelist boolean.
+   *
+   * @param datasetId the dataset id
+   * @return true when is on whitelist otherwise false
+   */
+  public static boolean isDatasetOnWhitelist(String datasetId) {
+    return Arrays.asList(datasetsToNormalise).contains(datasetId);
+  }
+
   private static boolean hasDatasetIdOfRecordToBeNormalised(RDF rdf) {
     Optional<String> about = rdf.getProvidedCHOList()
                                 .stream()
@@ -189,7 +233,7 @@ public class DefaultConfiguration extends Configuration {
     if (about.isPresent()) {
       final String[] splitRecordIdentifier = about.get().split("/");
       String datasetId = splitRecordIdentifier[1];
-      return Arrays.asList(datasetsToNormalise).contains(datasetId);
+      return isDatasetOnWhitelist(datasetId);
     }
     return false;
   }
@@ -218,6 +262,7 @@ public class DefaultConfiguration extends Configuration {
 
   /**
    * Run the europeana PID normalisation to the record
+   *
    * @param rdf record
    * @return rdf with normalised PIDs
    */

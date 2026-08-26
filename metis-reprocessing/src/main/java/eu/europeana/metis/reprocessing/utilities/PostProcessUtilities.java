@@ -15,6 +15,7 @@ import eu.europeana.metis.core.workflow.plugins.ReindexToPreviewPluginMetadata;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPlugin;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPluginMetadata;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +49,9 @@ public class PostProcessUtilities {
    */
   public static void postProcess(String datasetId, Instant startDate, Instant endDate,
       Configuration configuration) {
-    updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, configuration);
+    if (DefaultConfiguration.isDatasetOnWhitelist(datasetId)) {
+      updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, configuration);
+    }
   }
 
   public static void updateMetisCoreWorkflowExecutions(String datasetId, Instant startDate,
@@ -75,8 +78,7 @@ public class PostProcessUtilities {
             : lastExecutionToBeBasedOn.getPlugin().getStartedDate());
     final ReindexToPreviewPlugin reindexToPreviewPlugin = new ReindexToPreviewPlugin(
         reindexToPreviewPluginMetadata);
-    reindexToPreviewPlugin
-        .setId(new ObjectId().toString() + "-" + reindexToPreviewPlugin.getPluginType().name());
+    reindexToPreviewPlugin.setId(new ObjectId().toString() + "-" + reindexToPreviewPlugin.getPluginType().name());
     reindexToPreviewPlugin.setStartedDate(startDate);
     reindexToPreviewPlugin.setFinishedDate(endDate);
     reindexToPreviewPlugin.setPluginStatus(PluginStatus.FINISHED);
@@ -89,8 +91,7 @@ public class PostProcessUtilities {
         .setRevisionTimestampPreviousPlugin(reindexToPreviewPlugin.getStartedDate());
     final ReindexToPublishPlugin reindexToPublishPlugin = new ReindexToPublishPlugin(
         reindexToPublishPluginMetadata);
-    reindexToPublishPlugin
-        .setId(new ObjectId().toString() + "-" + reindexToPublishPlugin.getPluginType().name());
+    reindexToPublishPlugin.setId(new ObjectId().toString() + "-" + reindexToPublishPlugin.getPluginType().name());
     reindexToPublishPlugin.setStartedDate(startDate);
     reindexToPublishPlugin.setFinishedDate(endDate);
     reindexToPublishPlugin.setPluginStatus(PluginStatus.FINISHED);
