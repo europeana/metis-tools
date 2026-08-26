@@ -11,19 +11,24 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <version.spring.boot>2.7.14</version.spring.boot>
-    <version.log4j>2.17.1</version.log4j>
+    <version.maven.compiler.plugin>3.13.0</version.maven.compiler.plugin>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <version.spring.boot>3.4.0</version.spring.boot>
     <version.commons.lang3>3.12.0</version.commons.lang3>
-    <version.amazonaws>1.12.385</version.amazonaws>
-    <version.metis-common-utils>11-SNAPSHOT</version.metis-common-utils>
-    <version.metis-common-mongo>11-SNAPSHOT</version.metis-common-mongo>
-    <version.metis-core-service>11-SNAPSHOT</version.metis-core-service>
-    <version.metis-indexing>11-SNAPSHOT</version.metis-indexing>
-    <version.metis-mediaprocessing>11-SNAPSHOT</version.metis-mediaprocessing>
-    <version.metis-image-enhancer>1-SNAPSHOT</version.metis-image-enhancer>
+    <version.metis-normalization>14-SNAPSHOT</version.metis-normalization>
+    <version.corelib>2.16.10-SNAPSHOT</version.corelib>
+    <!-- These two versions are interdependent. -->
+    <version.slf4j>2.0.12</version.slf4j>
+    <version.log4j>2.23.0</version.log4j>
+    <version.junit>5.11.4</version.junit>
+    <version.morphia>2.4.5</version.morphia>
+    <version.mongodb>4.10.2</version.mongodb>
+    <version.metis-common-utils>15-SNAPSHOT</version.metis-common-utils>
+    <version.metis-common-mongo>15-SNAPSHOT</version.metis-common-mongo>
+    <version.metis-core-service>15-SNAPSHOT</version.metis-core-service>
+    <version.metis-indexing>15-SNAPSHOT</version.metis-indexing>
+    <version.metis-mediaprocessing>15-SNAPSHOT</version.metis-mediaprocessing>
   </properties>
 
   <dependencies>
@@ -60,6 +65,42 @@
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-common-mongo</artifactId>
       <version>${version.metis-common-mongo}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>dev.morphia.morphia</groupId>
+          <artifactId>morphia-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>dev.morphia.morphia</groupId>
+      <artifactId>morphia-core</artifactId>
+      <version>${version.morphia}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-core</artifactId>
+      <version>${version.mongodb}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>bson</artifactId>
+      <version>${version.mongodb}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>bson-record-codec</artifactId>
+      <version>${version.mongodb}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-sync</artifactId>
+      <version>${version.mongodb}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-legacy</artifactId>
+      <version>${version.mongodb}</version>
     </dependency>
     <dependency>
       <groupId>eu.europeana.metis</groupId>
@@ -79,25 +120,30 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-s3</artifactId>
-      <version>${version.amazonaws}</version>
-    </dependency>
-    <dependency>
       <groupId>eu.europeana.metis</groupId>
       <artifactId>metis-media-service</artifactId>
       <version>${version.metis-mediaprocessing}</version>
     </dependency>
     <dependency>
-      <groupId>eu.europeana.metis.image.enhancement</groupId>
-      <artifactId>metis-image-enhancer-client</artifactId>
-      <version>${version.metis-image-enhancer}</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${version.junit}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>5.8.2</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.junit.vintage</groupId>
+          <artifactId>junit-vintage-engine</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.vaadin.external.google</groupId>
+          <artifactId>android-json</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -108,7 +154,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${version.maven.compiler.plugin}</version>
         <configuration>
-          <release>11</release>
+          <release>21</release>
         </configuration>
       </plugin>
       <plugin>

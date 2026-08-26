@@ -1,7 +1,7 @@
 package eu.europeana.metis.processor;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.metis.processor.utilities.ImageEnhancerUtil;
+import eu.europeana.indexing.IndexerPool;
 import eu.europeana.metis.schema.jibx.RDF;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -18,12 +18,12 @@ public class RecordsProcessor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private final ExecutorService threadPool;
-  private final ImageEnhancerUtil imageEnhancerUtil;
+  private final IndexerPool indexerPool;
   private final ExecutorCompletionService<RDF> completionService;
 
-  public RecordsProcessor(int maxThreads, ImageEnhancerUtil imageEnhancerUtil) {
+  public RecordsProcessor(int maxThreads, IndexerPool indexerPool) {
     this.threadPool = Executors.newFixedThreadPool(maxThreads);
-    this.imageEnhancerUtil = imageEnhancerUtil;
+    this.indexerPool = indexerPool;
     this.completionService = new ExecutorCompletionService<>(threadPool);
   }
 
@@ -31,7 +31,7 @@ public class RecordsProcessor {
 
     List<Future<RDF>> futureList = new ArrayList<>(fullBeans.size());
     for (FullBeanImpl fullbean : fullBeans) {
-      RecordCallable recordCallable = new RecordCallable(fullbean, imageEnhancerUtil);
+      RecordCallable recordCallable = new RecordCallable(fullbean, indexerPool);
       futureList.add(completionService.submit(recordCallable));
     }
 
