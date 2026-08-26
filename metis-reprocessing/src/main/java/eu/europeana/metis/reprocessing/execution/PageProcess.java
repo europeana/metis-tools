@@ -1,7 +1,6 @@
 package eu.europeana.metis.reprocessing.execution;
 
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -12,10 +11,10 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link Callable} class, processing records page by page for a specific dataset.
  * <p>Obtaining page numbers is performed by an internal asynchronous thread that calls a
- * synchronous operation of {@link ProcessDataset#getNextPageAndIncrement()}. Each page of
- * {@link FullBeanImpl} records is requested asynchronously and stored in an internal limited {@link
- * BlockingQueue} (FullBeanImpl)}. The main thread processes available items from the queue and for
- * each list of records calls {@link ProcessDataset#processRecords(List)}</p>
+ * synchronous operation of {@link ProcessDataset#getNextPageAndIncrement()}.
+ * Each page of {@link FullBeanImpl} records is requested asynchronously and stored in an internal
+ * limited {@link BlockingQueue} (FullBeanImpl)}. The main thread processes available items from
+ * the queue and for each list of records calls {@link ProcessDataset#processRecords(List)}</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
  * @since 2019-06-11
@@ -37,8 +36,8 @@ public class PageProcess implements Callable<Integer> {
     List<FullBeanImpl> nextPageOfRecords = processDataset.getFullBeans(nextPage);
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
       LOGGER.info("{} - Processing page: {}, range of records: {} - {}",
-          prefixDatasetidLog, nextPage, nextPage * MongoSourceMongoDao.PAGE_SIZE,
-          ((nextPage + 1) * MongoSourceMongoDao.PAGE_SIZE) - 1);
+          prefixDatasetidLog, nextPage, nextPage * processDataset.getPageSize(),
+          ((nextPage + 1) * processDataset.getPageSize()) - 1);
       processDataset.processRecords(nextPageOfRecords);
       processDataset.updateDatasetStatus(nextPage);
       nextPage = processDataset.getNextPageAndIncrement();

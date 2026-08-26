@@ -7,7 +7,6 @@ import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.reprocessing.config.PropertiesHolder;
-import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import java.io.IOException;
 import java.time.Duration;
@@ -54,6 +53,7 @@ public class ExecutorManager {
   private final int totalAllowedThreads;
   private final int startFromDatasetIndex;
   private final int endAtDatasetIndex;
+  private final int pageSize;
 
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Void> completionService;
@@ -63,6 +63,7 @@ public class ExecutorManager {
     this.maxParallelThreadsPerDataset = propertiesHolder.maxParallelThreadsPerDataset;
     this.startFromDatasetIndex = propertiesHolder.startFromDatasetIndex;
     this.endAtDatasetIndex = propertiesHolder.endAtDatasetIndex;
+    this.pageSize = propertiesHolder.sourceMongoPageSize;
     totalAllowedThreads = maxParallelThreads * maxParallelThreadsPerDataset;
     threadPool = Executors.newFixedThreadPool(totalAllowedThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
@@ -76,16 +77,21 @@ public class ExecutorManager {
             configuration.getMode(), startFromDatasetIndex, endAtDatasetIndex,
             totalAllowedThreads);
     //In default mode we try cleanup
-    if (configuration.getMode().equals(Mode.DEFAULT)) {
-      checkForCleaningDatabases();
-    } else if (configuration.getMode().equals(Mode.CLEAN)) {
-      checkForCleaningDatabases();
-      //We only clean dbs and return
-      return;
-    } else if (configuration.getMode().equals(Mode.POST_CLEAN)) {
-      //We only clean/remove the collections that were created for assisting the processing
-      configuration.getMongoDestinationMongoDao().dropTemporaryCollections();
-      return;
+    switch (configuration.getMode()) {
+      case DEFAULT:
+        checkForCleaningDatabases();
+        break;
+      case CLEAN:
+        checkForCleaningDatabases();
+        //We only clean dbs and return
+        return;
+      case POST_CLEAN:
+        //We only clean/remove the collections that were created for assisting the processing
+        configuration.getMongoDestinationMongoDao().dropTemporaryCollections();
+        return;
+      default:
+        // Other modes will proceed with normal reprocessing
+        break;
     }
     final List<DatasetStatus> datasetStatuses = getDatasetStatuses();
     if (CollectionUtils.isEmpty(datasetStatuses)) {
@@ -109,7 +115,7 @@ public class ExecutorManager {
     for (int i = startFromDatasetIndex; i < endAtDatasetIndex && i < datasetStatuses.size(); i++) {
       final DatasetStatus datasetStatus = datasetStatuses.get(i);
       final int numberOfPages = (int) Math
-          .ceil((double) datasetStatus.getTotalRecords() / MongoSourceMongoDao.PAGE_SIZE);
+          .ceil((double) datasetStatus.getTotalRecords() / pageSize);
       int maxThreadsConsumedByDataset = Math.min(numberOfPages, maxParallelThreadsPerDataset);
 
       while (countOfTotalCurrentThreads >= totalAllowedThreads || maxThreadsConsumedByDataset > (
@@ -141,6 +147,9 @@ public class ExecutorManager {
       try {
         //Check and log for exceptions
         completedFuture.get();
+      } catch( InterruptedException e) {
+        Thread.currentThread().interrupt();
+        LOGGER.warn("Interrupted while waiting for dataset processing to complete.");
       } catch (Exception e) {
         LOGGER.error("An exception occurred in a callable.", e);
       }
@@ -155,19 +164,22 @@ public class ExecutorManager {
     LOGGER.info("Calculating order of datasets for processing..");
 
     final List<DatasetStatus> datasetStatuses;
-    if (configuration.getMode().equals(Mode.REPROCESS_ALL_FAILED)) {
-      datasetStatuses = configuration.getMongoDestinationMongoDao().getAllDatasetStatuses();
-      datasetStatuses.removeIf(datasetStatus -> datasetStatus.getTotalFailedRecords() <= 0);
-    } else if (configuration.getMode().equals(Mode.POST_PROCESS)) {
-      datasetStatuses = configuration.getMongoDestinationMongoDao().getAllDatasetStatuses();
-    } else {
-      //We want the biggest datasets to start first
-      final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
-      AtomicInteger atomicIndex = new AtomicInteger(0);
-      datasetStatuses = datasetsWithSize.entrySet().stream().filter(entry -> entry.getValue() > 0)
-          .sorted(Collections.reverseOrder(comparingByValue())).map(
-              entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
-                  atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
+    switch (configuration.getMode()) {
+      case REPROCESS_ALL_FAILED:
+        datasetStatuses = configuration.getMongoDestinationMongoDao().getAllDatasetStatuses();
+        datasetStatuses.removeIf(datasetStatus -> datasetStatus.getTotalFailedRecords() <= 0);
+        break;
+      case POST_PROCESS:
+        datasetStatuses = configuration.getMongoDestinationMongoDao().getAllDatasetStatuses();
+        break;
+      default:
+        //We want the biggest datasets to start first
+        final Map<String, Long> datasetsWithSize = getDatasetsWithSize();
+        AtomicInteger atomicIndex = new AtomicInteger(0);
+        datasetStatuses = datasetsWithSize.entrySet().stream().filter(entry -> entry.getValue() > 0)
+                                          .sorted(Collections.reverseOrder(comparingByValue())).map(
+                entry -> retrieveOrInitializeDatasetStatus(entry.getKey(),
+                    atomicIndex.getAndIncrement(), entry.getValue())).collect(Collectors.toList());
     }
     LOGGER.info("Calculated order of datasets for processing");
     return datasetStatuses;
@@ -180,7 +192,7 @@ public class ExecutorManager {
       configuration.getMongoDestinationMongoDao().deleteAll();
       try {
         configuration.getDestinationCompoundSolrClient().getSolrClient().deleteByQuery("*:*");
-        configuration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
+        configuration.getDestinationIndexerPool().triggerFlushOfPendingChanges(true);
       } catch (SolrServerException | IOException | IndexingException e) {
         LOGGER.warn("Could not cleanup solr", e);
       }
@@ -194,7 +206,7 @@ public class ExecutorManager {
     //try-with-resources block
     try {
       LOGGER.info("Commit changes");
-      configuration.getDestinationIndexer().triggerFlushOfPendingChanges(true);
+      configuration.getDestinationIndexerPool().triggerFlushOfPendingChanges(true);
       LOGGER.info("Committed changes");
     } catch (IndexingException e) {
       LOGGER.warn("Could not commit changes to solr, changes will be visible after auto commit", e);
@@ -251,13 +263,13 @@ public class ExecutorManager {
     } catch (InterruptedException e) {
       threadPool.shutdownNow();
       Thread.currentThread().interrupt();
-      LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
+      LOGGER.error("Interrupted while waiting for thread pool to shut down", e);
     }
   }
 
   /**
-   * Interal {@link TimerTask} that is supposed to run as a daemon thread periodically, to calculate
-   * the speed and time required for the current full operation to complete.
+   * Internal {@link TimerTask} that is supposed to run as a daemon thread periodically, to calculate the speed and time required
+   * for the current full operation to complete.
    */
   private class ScheduledThreadForSpeedProjection extends TimerTask {
 
@@ -270,11 +282,11 @@ public class ExecutorManager {
       this.startDate = startDate;
       this.datasetStatuses = datasetStatuses;
       this.totalPreviouslyProcessed = datasetStatuses.stream().map(
-          datasetStatus -> configuration.getMongoDestinationMongoDao()
-                                        .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
-          .mapToLong(DatasetStatus::getTotalProcessed).sum();
+                                                         datasetStatus -> configuration.getMongoDestinationMongoDao()
+                                                                                       .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
+                                                     .mapToLong(DatasetStatus::getTotalProcessed).sum();
       this.totalRecords = datasetStatuses.stream().map(DatasetStatus::getTotalRecords)
-          .reduce(0L, Long::sum);
+                                         .reduce(0L, Long::sum);
     }
 
     public void run() {
@@ -283,13 +295,13 @@ public class ExecutorManager {
       long secondsInBetween = ChronoUnit.SECONDS.between(startDate, nowInstant);
       //Only calculate projected date if a defined time threshold has passed
       final List<DatasetStatus> datasetStatusesSnapshot = datasetStatuses.stream().map(
-          datasetStatus -> configuration.getMongoDestinationMongoDao()
-                                        .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
-          .toList();
+                                                                             datasetStatus -> configuration.getMongoDestinationMongoDao()
+                                                                                                           .getDatasetStatus(datasetStatus.getDatasetId())).filter(Objects::nonNull)
+                                                                         .toList();
       final long totalProcessedFromStartDate = datasetStatusesSnapshot.stream()
-          .filter(ds -> ds.getStartDate() != null)
-          .filter(ds -> ds.getStartDate().compareTo(startDate) >= 0)
-          .mapToLong(DatasetStatus::getTotalProcessed).sum();
+                                                                      .filter(ds -> ds.getStartDate() != null)
+                                                                      .filter(ds -> ds.getStartDate().compareTo(startDate) >= 0)
+                                                                      .mapToLong(DatasetStatus::getTotalProcessed).sum();
 
       final double recordsPerSecond =
           (double) (totalProcessedFromStartDate - totalPreviouslyProcessed) / secondsInBetween;
@@ -301,9 +313,11 @@ public class ExecutorManager {
       final Instant projectedEndDate = startDate
           .plus(Duration.ofMinutes((long) (totalHoursRequiredWithoutPreviouslyProcessed * 60)));
 
-      LOGGER.info(String.format(
-          "Average time required, with current speed, for a full reprocess: %.2f Hours, projected end date: %s",
-          totalHoursRequired, projectedEndDate));
+      if(LOGGER.isInfoEnabled()) {
+        LOGGER.info(String.format(
+            "Average time required, with current speed, for a full reprocess: %.2f Hours, projected end date: %s",
+            totalHoursRequired, projectedEndDate));
+      }
     }
   }
 }

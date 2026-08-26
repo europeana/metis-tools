@@ -6,15 +6,13 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.config.Configuration;
 import eu.europeana.metis.reprocessing.config.Mode;
-import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
 import eu.europeana.metis.reprocessing.model.FailedRecord;
 import eu.europeana.metis.schema.jibx.RDF;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -26,7 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,8 +31,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is a {@link Callable} class that would be initialized with a {@link #datasetId}.
- * <p>It is responsible of re-processing a dataset as a whole, by paging records from the
- * database, while keeping track of it's dataset status. This class should not require modification and only provided
+ * <p>It is responsible for re-processing a dataset as a whole, by paging records from the
+ * database, while keeping track of its dataset status. This class should not require modification and only provided
  * functionality in the {@link Configuration} should be modifiable.</p>
  *
  * @author Simon Tzanakis (Simon.Tzanakis@europeana.eu)
@@ -50,6 +47,7 @@ public class ProcessDataset implements Callable<Void> {
   private final Configuration configuration;
   private final int maxParallelPageThreads;
   private int nextPage;
+  private final int pageSize;
 
   private final ExecutorService threadPool;
   private final ExecutorCompletionService<Integer> completionService;
@@ -64,11 +62,20 @@ public class ProcessDataset implements Callable<Void> {
     this.maxParallelPageThreads = maxParallelPageThreads;
     threadPool = Executors.newFixedThreadPool(maxParallelPageThreads);
     completionService = new ExecutorCompletionService<>(threadPool);
+    this.pageSize = configuration.getPropertiesHolder().sourceMongoPageSize;
+  }
+
+  public int getPageSize() {
+    return this.pageSize;
   }
 
   @Override
   public Void call() throws ExecutionException, InterruptedException {
-    processDataset();
+    try {
+      processDataset();
+    } finally {
+      close();
+    }
     return null;
   }
 
@@ -106,7 +113,6 @@ public class ProcessDataset implements Callable<Void> {
       LOGGER.info("{} - Applied post processing function", prefixDatasetIdLog);
     }
     LOGGER.info("{} - Processing end", prefixDatasetIdLog);
-    close();
   }
 
   private void finalizeDatasetStatus(long startProcess) {
@@ -115,8 +121,7 @@ public class ProcessDataset implements Callable<Void> {
         .setActualTimeProcessAndIndex(datasetStatus.getActualTimeProcessAndIndex() + elapsedTime);
     configuration.getMongoDestinationMongoDao().storeDatasetStatusToDb(datasetStatus);
     LOGGER.info("{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
-    LOGGER
-        .info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
+    LOGGER.info(STATISTICS_LOGS_MARKER, "{} - DatasetStatus - {}", prefixDatasetIdLog, datasetStatus);
   }
 
   /**
@@ -156,8 +161,7 @@ public class ProcessDataset implements Callable<Void> {
     List<FullBeanImpl> nextPageOfRecords = getFailedFullBeans(failedRecords);
     long counterFailedRecordsProcessed = 0;
     while (CollectionUtils.isNotEmpty(nextPageOfRecords)) {
-      LOGGER.info("{} - Processing number of records: {}", prefixDatasetIdLog,
-          nextPageOfRecords.size());
+      LOGGER.info("{} - Processing number of records: {}", prefixDatasetIdLog, nextPageOfRecords.size());
       for (FullBeanImpl fullBean : nextPageOfRecords) {
         final String exceptionStackTrace = processAndIndex(fullBean);
         failedRecords.stream()
@@ -191,7 +195,7 @@ public class ProcessDataset implements Callable<Void> {
         final Future<Integer> recordsInPageProcessed = completionService.take();
         threadCounter--;
         //If page here was less than the page size, then exit while
-        if (recordsInPageProcessed.get() < MongoSourceMongoDao.PAGE_SIZE) {
+        if (recordsInPageProcessed.get() < pageSize) {
           break;
         }
       }
@@ -275,7 +279,6 @@ public class ProcessDataset implements Callable<Void> {
 
   private String processAndIndex(FullBeanImpl fullBean) {
     try {
-      preProcessAndCleanUpHasTargetQualityAnnotations(fullBean);
       final RDF rdf = processRecord(fullBean);
       indexRecord(rdf);
     } catch (ProcessingException e) {
@@ -285,35 +288,10 @@ public class ProcessDataset implements Callable<Void> {
       LOGGER.error("{} - Could not index record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
     } catch (RuntimeException e) {
-      LOGGER.error("{} - Could not process or index(RuntimeException) record: {}", prefixDatasetIdLog, fullBean.getAbout(), e);
+      LOGGER.error("{} - Could not process or index(RuntimeException) record: {} {}", prefixDatasetIdLog, fullBean.getAbout(), e);
       return exceptionStacktraceToString(e);
     }
     return "";
-  }
-
-  private void preProcessAndCleanUpHasTargetQualityAnnotations(FullBeanImpl fullBean) {
-    if (fullBean.getQualityAnnotations() != null) {
-      fullBean.setQualityAnnotations(
-          Stream.concat(
-              fullBean.getQualityAnnotations()
-                      .stream()
-                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length == 1),
-              fullBean.getQualityAnnotations()
-                      .stream()
-                      .filter(qualityAnnotation -> qualityAnnotation.getTarget().length > 1)
-                      .map(
-                          qualityAnnotation -> {
-                            qualityAnnotation.setTarget(
-                                Arrays.stream(qualityAnnotation.getTarget())
-                                      .filter(target -> !target.startsWith("/aggregation/provider"))
-                                      .toArray(String[]::new)
-                            );
-                            return qualityAnnotation;
-                          }
-                      )
-          ).toList()
-      );
-    }
   }
 
   private void updateProcessFailedOnlyCounts(String exceptionStackTrace, String resourceId,
@@ -370,8 +348,7 @@ public class ProcessDataset implements Callable<Void> {
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeProcess);
       synchronized (this) {
-        datasetStatus.setTotalTimeProcessingInSecs(
-            datasetStatus.getTotalTimeProcessingInSecs() + elapsedTime);
+        datasetStatus.setTotalTimeProcessingInSecs(datasetStatus.getTotalTimeProcessingInSecs() + elapsedTime);
       }
     }
   }
@@ -383,8 +360,7 @@ public class ProcessDataset implements Callable<Void> {
     } finally {
       final double elapsedTime = nanoTimeToSeconds(System.nanoTime() - startTimeIndex);
       synchronized (this) {
-        datasetStatus
-            .setTotalTimeIndexingInSecs(datasetStatus.getTotalTimeIndexingInSecs() + elapsedTime);
+        datasetStatus.setTotalTimeIndexingInSecs(datasetStatus.getTotalTimeIndexingInSecs() + elapsedTime);
       }
     }
   }
@@ -392,8 +368,7 @@ public class ProcessDataset implements Callable<Void> {
   private void postProcess() {
     try {
       configuration.getAfterReprocessProcessor()
-                   .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(),
-                       configuration);
+                   .accept(datasetId, datasetStatus.getStartDate(), datasetStatus.getEndDate(), configuration);
     } catch (ProcessingException e) {
       LOGGER.error("{} - After reprocessing operation failed!", prefixDatasetIdLog, e);
     }
@@ -404,11 +379,11 @@ public class ProcessDataset implements Callable<Void> {
   }
 
   private static String exceptionStacktraceToString(Exception e) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    PrintStream ps = new PrintStream(baos);
-    e.printStackTrace(ps);
-    ps.close();
-    return baos.toString();
+    StringWriter sw = new StringWriter();
+    try (PrintWriter pw = new PrintWriter(sw)) {
+      e.printStackTrace(pw);
+    }
+    return sw.toString();
   }
 
   public void close() {
@@ -420,8 +395,7 @@ public class ProcessDataset implements Callable<Void> {
     } catch (InterruptedException e) {
       threadPool.shutdownNow();
       Thread.currentThread().interrupt();
-      LOGGER.error("Interrupted while waiting for thread pool to shut down",e);
-
+      LOGGER.error("Interrupted while waiting for thread pool to shut down", e);
     }
   }
 }

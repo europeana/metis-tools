@@ -43,7 +43,7 @@
         <version.metis>18-SNAPSHOT</version.metis>
         <version.metis-core>17-SNAPSHOT</version.metis-core>
         <version.metis-normalization>18-SNAPSHOT</version.metis-normalization>
-        <version.corelib>2.18.0</version.corelib>
+        <version.corelib>2.18.1-SNAPSHOT</version.corelib>
         <version.entity-api-client>2.3</version.entity-api-client>
         <version.jakarta.annotation-api>3.0.0</version.jakarta.annotation-api>
         <version.jakarta.xml.bind>4.0.1</version.jakarta.xml.bind>

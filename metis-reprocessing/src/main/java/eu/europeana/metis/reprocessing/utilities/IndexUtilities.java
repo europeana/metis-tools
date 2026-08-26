@@ -1,54 +1,33 @@
 package eu.europeana.metis.reprocessing.utilities;
 
-import static eu.europeana.metis.reprocessing.utilities.RdfIndexTierUtils.hasContentTier;
-import static java.util.function.Predicate.not;
-import static org.apache.commons.lang3.BooleanUtils.isFalse;
-
 import com.mongodb.MongoWriteException;
+import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.corelib.solr.entity.AggregationImpl;
-import eu.europeana.corelib.solr.entity.OrganizationImpl;
-import eu.europeana.corelib.solr.entity.ProxyImpl;
+import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
+import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
+import eu.europeana.entity.client.exception.EntityClientException;
 import eu.europeana.indexing.IndexerPool;
 import eu.europeana.indexing.IndexingProperties;
-import eu.europeana.indexing.common.fullbean.RdfToFullBeanConverter;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.indexing.exception.RecordRelatedIndexingException;
 import eu.europeana.indexing.tiers.TierCalculationMode;
-import eu.europeana.indexing.utils.RdfWrapper;
 import eu.europeana.metis.network.ExternalRequestUtil;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
+import eu.europeana.metis.reprocessing.config.PropertiesHolderExtension;
+import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.schema.jibx.AboutType;
-import eu.europeana.metis.schema.jibx.EdmType;
-import eu.europeana.metis.schema.jibx.EuropeanaType;
-import eu.europeana.metis.schema.jibx.EuropeanaType.Choice;
-import eu.europeana.metis.schema.jibx.ProvidedCHOType;
-import eu.europeana.metis.schema.jibx.ProxyType;
 import eu.europeana.metis.schema.jibx.RDF;
-import eu.europeana.metis.schema.jibx.ResourceOrLiteralType;
-import eu.europeana.metis.schema.jibx.Type2;
-import eu.europeana.metis.utils.DepublicationReason;
+import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
+import eu.europeana.normalization.util.NormalizationConfigurationException;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,15 +43,6 @@ public class IndexUtilities {
 
   private static final Map<Class<?>, String> retryExceptions;
   private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-//  private static final List<String> DATA_PROVIDERS = List.of(
-//      "Burns Scotland",
-//      "Royal Albert Memorial Museum & Art Gallery",
-//      "University College London",
-//      "Egypt Centre",
-//      "Wiltshire Treasures",
-//      "Wakefield Council",
-//      "Horniman Museum and Gardens",
-//      "Battersea Arts Centre");
 
   static {
     retryExceptions = new HashMap<>(ExternalRequestUtil.UNMODIFIABLE_MAP_WITH_NETWORK_EXCEPTIONS);
@@ -124,238 +94,167 @@ public class IndexUtilities {
     }
   }
 
-//  private static void depublishRecord(RDF rdf, String datasetId, String rdfAbout, IndexerPool indexerPool)
-//      throws IndexingException {
-//    if ((datasetId.equals("9200359") && hasContentTier(rdf))
-//        || (datasetId.equals("9200579") && hasDcCreator(rdf))
-//        || (datasetId.equals("2048128") && hasEdmType3D(rdf))
-//        || (datasetId.equals("2048087") && hasDataProviders(rdf))
-//    ) {
-//      boolean isTombStoned;
-//      boolean isRemoved;
-//      LOGGER.info("Tombstone record for dataset {} {}", datasetId, rdfAbout);
-//      isTombStoned = indexerPool.indexTombstone(rdfAbout, DepublicationReason.BROKEN_MEDIA_LINKS);
-//      LOGGER.info("Tombstoned record result {} {}", isTombStoned, rdfAbout);
-//      LOGGER.info("Remove record for dataset {} {}", datasetId, rdfAbout);
-//      isRemoved = indexerPool.removeRecord(rdfAbout);
-//      LOGGER.info("Removed record result {} {}", isRemoved, rdfAbout);
-//    }
-//  }
-//
-//  private static Pair<String, String> findPrefLabelForOrganization(OrganizationImpl organization) {
-//
-//    // Try to find an English one first.
-//    final List<Pair<String, String>> englishValues = new ArrayList<>(2);
-//    Optional.ofNullable(organization.getPrefLabel()).map(labels -> labels.get("en")).stream()
-//            .flatMap(List::stream).filter(Objects::nonNull).findFirst()
-//            .ifPresent(value -> englishValues.add(new ImmutablePair<>("en", value)));
-//    Optional.ofNullable(organization.getPrefLabel()).map(labels -> labels.get("eng")).stream()
-//            .flatMap(List::stream).filter(Objects::nonNull).findFirst()
-//            .ifPresent(value -> englishValues.add(new ImmutablePair<>("eng", value)));
-//    if (!englishValues.isEmpty()) {
-//      return englishValues.getFirst();
-//    }
-//
-//    // Otherwise return any value (if available).
-//    return Optional.ofNullable(organization.getPrefLabel())
-//                   .map(Map::entrySet).stream()
-//                   .flatMap(Collection::stream)
-//                   .filter(Objects::nonNull).filter(entry -> entry.getValue() != null)
-//                   .flatMap(entry -> entry.getValue().stream().filter(StringUtils::isNotBlank)
-//                                          .map(value -> new ImmutablePair<>(entry.getKey(), value)))
-//                   .findFirst().orElse(null);
-//  }
-//
-//  private static List<AggregationImpl> getDataProviderAggregations(FullBeanImpl fullBean) {
-//    List<String> proxyInResult = fullBean.getProxies().stream()
-//                                         .filter(not(ProxyImpl::isEuropeanaProxy))
-//                                         .filter(proxy -> ArrayUtils.isEmpty(proxy.getLineage())).map(ProxyImpl::getProxyIn)
-//                                         .map(Arrays::asList).flatMap(List::stream).toList();
-//
-//    return fullBean.getAggregations().stream().filter(aggregation -> proxyInResult.contains(aggregation.getAbout())).toList();
-//  }
-//
-//  private static Pair<Set<String>, Map<String, List<String>>> extractUrisAndLiterals(
-//      final Map<String, List<String>> urisLiteralsMap, Map<String, Pair<String, String>> organizationPrefLabelMap) {
-//    final Set<String> organizationUris = new HashSet<>();
-//    final Map<String, List<String>> literalsMap = new HashMap<>();
-//
-//    if (MapUtils.isNotEmpty(urisLiteralsMap)) {
-//      splitOrganizationUrisFromLiterals(urisLiteralsMap, organizationUris, literalsMap, organizationPrefLabelMap);
-//
-//      //Extend map with organization pref labels
-//      if (CollectionUtils.isNotEmpty(organizationUris)) {
-//        addOrganizationPrefLabelsToLiterals(organizationUris, literalsMap, organizationPrefLabelMap);
-//      }
-//    }
-//    return new ImmutablePair<>(organizationUris, literalsMap);
-//  }
-//
-//  private static void splitOrganizationUrisFromLiterals(Map<String, List<String>> urisLiteralsMap,
-//      Set<String> organizationUris, Map<String, List<String>> literalsMap,
-//      Map<String, Pair<String, String>> organizationPrefLabelMap) {
-//    for (Map.Entry<String, List<String>> entry : urisLiteralsMap.entrySet()) {
-//      final List<String> literals = new ArrayList<>();
-//      for (String value : entry.getValue()) {
-//        if (organizationPrefLabelMap.containsKey(value)) {
-//          organizationUris.add(value);
-//        } else {
-//          literals.add(value);
-//        }
-//      }
-//      if (!literals.isEmpty()) {
-//        literalsMap.put(entry.getKey(), literals);
-//      }
-//    }
-//  }
-//
-//  private static void addOrganizationPrefLabelsToLiterals(Set<String> organizationUris,
-//      Map<String, List<String>> literalsMap, Map<String, Pair<String, String>> organizationPrefLabelMap) {
-//    for (String organizationUri : organizationUris) {
-//      final Pair<String, String> entry = organizationPrefLabelMap.get(organizationUri);
-//      if (entry != null) {
-//        literalsMap.computeIfAbsent(entry.getKey(), key -> new ArrayList<>()).add(entry.getValue());
-//      }
-//    }
-//  }
-//
-//  private static String getDatasetIdOfRecordToBePurged(RDF rdf) {
-//    Optional<String> about = rdf.getProvidedCHOList()
-//                                .stream()
-//                                .filter(Objects::nonNull)
-//                                .findFirst()
-//                                .map(ProvidedCHOType::getAbout);
-//
-//    String result = "";
-//    if (about.isPresent()) {
-//      final String[] splitRecordIdentifier = about.get().split("/");
-//      String datasetId = splitRecordIdentifier[1];
-//      if (datasetId.equals("9200359") || datasetId.equals("9200579")
-//          || datasetId.equals("2048128") || datasetId.equals("2048087")) {
-//        result = datasetId;
-//      }
-//    }
-//    return result;
-//  }
-//
-//  private static boolean isProviderProxy(ProxyType proxy) {
-//    return proxy.getEuropeanaProxy() == null || isFalse(proxy.getEuropeanaProxy().isEuropeanaProxy());
-//  }
-//
-//  private static List<ProxyType> getProviderProxies(RDF rdf) {
-//    return Optional.ofNullable(rdf.getProxyList())
-//                   .stream()
-//                   .flatMap(Collection::stream)
-//                   .filter(Objects::nonNull)
-//                   .filter(IndexUtilities::isProviderProxy)
-//                   .toList();
-//  }
-//
-//  private static <T> List<String> getChoicesInStringList(List<Choice> choices, Predicate<Choice> choicePredicate,
-//      Function<Choice, T> choiceGetter, Function<T, String> getString) {
-//    return choices.stream()
-//                  .filter(Objects::nonNull)
-//                  .filter(choicePredicate)
-//                  .map(choiceGetter)
-//                  .map(getString)
-//                  .toList();
-//  }
-//
-//  /**
-//   * MET-6360 Has dc creator boolean.
-//   *
-//   * @param rdf the rdf
-//   * @return the boolean
-//   */
-//  static boolean hasDcCreator(RDF rdf) {
-//    final List<Choice> choices = getProviderProxies(rdf)
-//        .stream()
-//        .map(EuropeanaType::getChoiceList)
-//        .filter(Objects::nonNull)
-//        .flatMap(Collection::stream)
-//        .toList();
-//    final List<String> creators = getChoicesInStringList(choices,
-//        Choice::ifCreator,
-//        Choice::getCreator,
-//        ResourceOrLiteralType::getString);
-//    boolean result = creators.contains("Science Museum, London");
-//    if (result) {
-//      LOGGER.info("Has DC creator: {}", creators);
-//      return true;
-//    } else {
-//      return false;
-//    }
-//  }
-//
-//  /**
-//   * MET-6361 Has edm type 3D boolean.
-//   *
-//   * @param rdf the rdf
-//   * @return the boolean
-//   */
-//  static boolean hasEdmType3D(RDF rdf) {
-//    if (rdf.getProxyList() != null && !rdf.getProxyList().isEmpty()) {
-//      final Set<EdmType> types = rdf.getProxyList()
-//                                    .stream()
-//                                    .map(ProxyType::getType)
-//                                    .filter(Objects::nonNull)
-//                                    .map(Type2::getType)
-//                                    .filter(Objects::nonNull)
-//                                    .collect(Collectors.toSet());
-//      if (types.size() == 1) {
-//        EdmType type = types.iterator().next();
-//        boolean result = type.equals(EdmType._3_D);
-//        if (result) {
-//          LOGGER.info("Has EdmType3d: {}", type);
-//          return true;
-//        } else {
-//          return false;
-//        }
-//      }
-//    }
-//    return false;
-//  }
-//
-//  /**
-//   * MET-6362 Has data providers boolean.
-//   *
-//   * @param rdf the rdf
-//   * @return the boolean
-//   */
-//  static boolean hasDataProviders(RDF rdf) {
-//    RdfToFullBeanConverter rdfToFullBeanConverter = new RdfToFullBeanConverter();
-//    FullBeanImpl fullBean = rdfToFullBeanConverter.convertRdfToFullBean(new RdfWrapper(rdf));
-//
-//    final Map<String, Pair<String, String>> organizationPrefLabelMap =
-//        fullBean.getOrganizations()
-//                .stream()
-//                .filter(org -> StringUtils.isNotBlank(org.getAbout()))
-//                .collect(
-//                    Collectors.toMap(OrganizationImpl::getAbout,
-//                        IndexUtilities::findPrefLabelForOrganization,
-//                        (o1, o2) -> o1));
-//
-//    AggregationImpl aggregation = getDataProviderAggregations(fullBean).getFirst();
-//
-//    final Pair<Set<String>, Map<String, List<String>>> dataProviderPair =
-//        extractUrisAndLiterals(aggregation.getEdmDataProvider(), organizationPrefLabelMap);
-//
-//    if (dataProviderPair.getValue().isEmpty()) {
-//      return false;
-//    } else {
-//      if (dataProviderPair.getKey().contains(rdf.getAggregationList().getFirst().getDataProvider().getResource().getResource())) {
-//        String dataProvider = "";
-//
-//        if (dataProviderPair.getValue().values().stream().findFirst().isPresent()) {
-//          dataProvider = dataProviderPair.getValue().values().stream().findFirst().get().getFirst();
-//        }
-//
-//        if (IndexUtilities.DATA_PROVIDERS.contains(dataProvider)) {
-//          LOGGER.info("Has DataProvider: {} => {}", fullBean.getAbout(), dataProvider);
-//          return true;
-//        }
-//      }
-//    }
-//    return false;
-//  }
+  public static void renameToMainToTest(String[] args)
+  //public static void main(String[] args)
+      throws IndexingException, DereferenceException, NormalizationConfigurationException,
+      TrustStoreConfigurationException, EntityClientException, EnrichmentException, URISyntaxException,
+      ProcessingException {
+
+    DefaultConfiguration defaultConfiguration = new DefaultConfiguration(new PropertiesHolderExtension(
+        "application.properties"));
+
+    List<FullBeanImpl> fullBeanList = Stream
+        .of(
+            "/1469/21_15123_LLYgrJMp" // webresource bug
+            /*"/318/marc_nli_000042980", //Illegal character code 0xd83c in content text
+            "/318/marc_nli_000042981",
+            "/318/marc_nli_000042984",
+            "/318/marc_nli_000042985",
+            "/318/marc_nli_000042987",
+            "/318/marc_nli_000042994",
+            "/318/marc_nli_000042995",
+            "/318/marc_nli_000042998",
+            "/318/marc_nli_000042999",
+            "/318/marc_nli_000043002",
+            "/318/marc_nli_000043006",
+            "/318/marc_nli_000043007",
+            "/318/marc_nli_000043008",
+            "/318/marc_nli_000043009",
+            "/318/marc_nli_000043022",
+            "/318/marc_nli_000043042",
+            "/318/marc_nli_000043044",
+            "/318/marc_nli_000043045",
+            "/318/marc_nli_000043046",
+            "/318/marc_nli_000043048",
+            "/318/marc_nli_000043049",
+            "/318/marc_nli_000043050",
+            "/318/marc_nli_000043052",
+            "/318/marc_nli_000043053",
+            "/318/marc_nli_000043057",
+            "/318/marc_nli_000043059",
+            "/318/marc_nli_000043061",
+            "/318/marc_nli_000043064",
+            "/318/marc_nli_000043066",
+            "/318/marc_nli_000043075",
+            "/318/marc_nli_000043078",
+            "/318/marc_nli_000043086",
+            "/318/marc_nli_000043087",
+            "/318/marc_nli_000043088",
+            "/318/marc_nli_000043090",
+            "/318/marc_nli_000043092",
+            "/318/marc_nli_000043094",
+            "/318/marc_nli_000043100",
+            "/318/marc_nli_000043102",
+            "/318/marc_nli_000043103",
+            "/318/marc_nli_000043106",
+            "/318/marc_nli_000043110",
+            "/318/marc_nli_000043112",
+            "/318/marc_nli_000043113",
+            "/318/marc_nli_000043123",
+            "/318/marc_nli_000043131",
+            "/318/marc_nli_000043132",
+            "/318/marc_nli_000043135",
+            "/318/marc_nli_000043137",
+            "/318/marc_nli_000043142",
+            "/318/marc_nli_000043144",
+            "/318/marc_nli_000043145",
+            "/318/marc_nli_000043146",
+            "/318/marc_nli_000043147",
+            "/318/marc_nli_000043152",
+            "/318/marc_nli_000043154",
+            "/318/marc_nli_000043155",
+            "/318/marc_nli_000043156",
+            "/318/marc_nli_000043163",
+            "/318/marc_nli_000043164",
+            "/318/marc_nli_000043165",
+            "/318/marc_nli_000043183",
+            "/318/marc_nli_000043184",
+            "/318/marc_nli_000043186",
+            "/318/marc_nli_000043189",
+            "/318/marc_nli_000043192",
+            "/318/marc_nli_000043196",
+            "/318/marc_nli_000043200",
+            "/318/marc_nli_000043201",
+            "/318/marc_nli_000043202",
+            "/318/marc_nli_000043203",
+            "/318/marc_nli_000043206",
+            "/318/marc_nli_000043207",
+            "/318/marc_nli_000043208",
+            "/318/marc_nli_000043209",
+            "/318/marc_nli_000043210",
+            "/318/marc_nli_000043211",
+            "/318/marc_nli_000043213",
+            "/318/marc_nli_000043216",
+            "/318/marc_nli_000043217",
+            "/318/marc_nli_000043221",
+            "/318/marc_nli_000043222",
+            "/318/marc_nli_000043226",
+            "/318/marc_nli_000043231",
+            "/318/marc_nli_000043239",
+            "/318/marc_nli_000043247",
+            "/318/marc_nli_000043248",
+            "/318/marc_nli_000043249", //Illegal character code 0xd83c in content text
+            "/318/marc_nli_002926270", //Illegal character code 0xd83c in content text
+            "/318/marc_nli_002926554",
+            "/318/marc_nli_002926562",
+            "/318/marc_nli_002926571",
+            "/318/marc_nli_002926575",
+            "/318/marc_nli_002926576",
+            "/318/marc_nli_002926973",
+            "/318/marc_nli_002927018",
+            "/318/marc_nli_003012771",
+            "/318/marc_nli_003013370",
+            "/318/marc_nli_003013372",
+            "/318/marc_nli_003013710",
+            "/318/marc_nli_003013789",
+            "/318/marc_nli_003014366",
+            "/318/marc_nli_003014435",
+            "/318/marc_nli_003014962",
+            "/318/marc_nli_003014968",
+            "/318/marc_nli_003014970",
+            "/318/marc_nli_003014975",
+            "/318/marc_nli_003015204",
+            "/318/marc_nli_003015230",
+            "/318/marc_nli_003015254",
+            "/318/marc_nli_003015785",
+            "/318/marc_nli_003016115",
+            "/318/marc_nli_003016653",
+            "/318/marc_nli_003016655",
+            "/318/marc_nli_003016668",
+            "/318/marc_nli_003016687",
+            "/318/marc_nli_003016698",
+            "/318/marc_nli_003016711",
+            "/318/marc_nli_003016765",
+            "/318/marc_nli_003017087",
+            "/318/marc_nli_003017180",
+            "/318/marc_nli_003017199",
+            "/318/marc_nli_003017629",
+            "/318/marc_nli_003018045",
+            "/318/marc_nli_003018376",
+            "/318/marc_nli_003018382",
+            "/318/marc_nli_003018387",
+            "/318/marc_nli_003018396",
+            "/318/marc_nli_003018404",
+            "/318/marc_nli_003018408",
+            "/318/marc_nli_003018411",
+            "/318/marc_nli_003018417",
+            "/318/marc_nli_003022951",
+            "/318/marc_nli_003022985",
+            "/318/marc_nli_003024240",
+            "/318/marc_nli_003024488",
+            "/318/marc_nli_003024499",
+            "/318/marc_nli_003024529",
+            "/318/marc_nli_003024849",
+            "/318/marc_nli_003024933"*/
+        )
+        .map(item -> defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(List.of(item)))
+        .flatMap(List::stream)
+        .toList();
+
+    for (FullBeanImpl fb : fullBeanList) {
+
+      RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
+      indexRecord(rdf, true, defaultConfiguration);
+    }
+  }
 }

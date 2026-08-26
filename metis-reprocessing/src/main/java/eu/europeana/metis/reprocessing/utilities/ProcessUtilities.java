@@ -8,22 +8,17 @@ import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.metis.mediaprocessing.exception.MediaExtractionException;
-import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.dao.MongoSourceMongoDao;
 import eu.europeana.metis.schema.jibx.RDF;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +61,12 @@ public class ProcessUtilities {
     return configuration.processRDF(rdf);
   }
 
+  /**
+   * Inject web resource meta info.
+   *
+   * @param fullBean the full bean
+   * @param mongoSourceMongoDao the mongo source mongo dao
+   */
   private static void injectWebResourceMetaInfo(final FullBean fullBean,
       final MongoSourceMongoDao mongoSourceMongoDao) {
     Map<String, WebResource> webResourceHashCodes = prepareWebResourceHashCodes(fullBean);
@@ -77,55 +78,46 @@ public class ProcessUtilities {
     }
   }
 
+  /**
+   * Prepare web resource hash codes map.
+   *
+   * @param fullBean the full bean
+   * @return the map
+   */
   private static Map<String, WebResource> prepareWebResourceHashCodes(FullBean fullBean) {
     Map<String, WebResource> hashCodes = new HashMap<>();
-
     for (final Aggregation aggregation : fullBean.getAggregations()) {
-      final Set<String> urls = new HashSet<>();
-
-      if (StringUtils.isNotEmpty(aggregation.getEdmIsShownBy())) {
-        urls.add(aggregation.getEdmIsShownBy());
-      }
-
-      if (StringUtils.isNotEmpty(aggregation.getEdmIsShownAt())) {
-        urls.add(aggregation.getEdmIsShownAt());
-      }
-
-      if (null != aggregation.getHasView()) {
-        urls.addAll(Arrays.asList(aggregation.getHasView()));
-      }
-
-      if (null != aggregation.getEdmObject()) {
-        urls.add(aggregation.getEdmObject());
-      }
-
-      checkMatchingWebResourcesAndGenerateHash(fullBean.getAbout(), aggregation, urls, hashCodes);
+      checkMatchingWebResourcesAndGenerateHash(fullBean.getAbout(), aggregation, hashCodes);
     }
     return hashCodes;
   }
 
+  /**
+   * Check matching web resources and generate hash.
+   *
+   * @param fullBeanAbout the full bean about
+   * @param aggregation the aggregation
+   * @param hashCodes the hash codes
+   */
   private static void checkMatchingWebResourcesAndGenerateHash(String fullBeanAbout,
-      Aggregation aggregation, Set<String> urls, Map<String, WebResource> hashCodes) {
+      Aggregation aggregation, Map<String, WebResource> hashCodes) {
     for (final WebResource webResource : aggregation.getWebResources()) {
-      if (!urls.contains(webResource.getAbout().trim())) {
-        continue;
-      }
-
       try {
-        // Locate the technical meta data from the web resource about
+
+        // Locate the technical metadata from the web resource about
         if (webResource.getAbout() != null) {
           String hashCodeAbout = md5Hex(webResource.getAbout() + "-" + fullBeanAbout);
           hashCodes.put(hashCodeAbout, webResource);
         }
 
-        // Locate the technical meta data from the aggregation is shown by
+        // Locate the technical metadata from the aggregation is shown by
         if (!hashCodes.containsValue(webResource) && aggregation.getEdmIsShownBy() != null) {
           String hashCodeIsShownBy = md5Hex(
               aggregation.getEdmIsShownBy() + "-" + aggregation.getAbout());
           hashCodes.put(hashCodeIsShownBy, webResource);
         }
 
-        // Locate the technical meta data from the aggregation is shown at
+        // Locate the technical metadata from the aggregation is shown at
         if (!hashCodes.containsValue(webResource) && aggregation.getEdmIsShownAt() != null) {
           String hashCodeIsShownAt = md5Hex(
               aggregation.getEdmIsShownAt() + "-" + aggregation.getAbout());
@@ -139,6 +131,20 @@ public class ProcessUtilities {
   }
 
   /**
+   * Inject web resource meta info.
+   *
+   * @param webResourceHashCodes the web resource hash codes
+   * @param webResourceMetaInfos the web resource meta infos
+   */
+  public void injectWebResourceMetaInfo(Map<String, WebResource> webResourceHashCodes,
+      List<WebResourceMetaInfoImpl> webResourceMetaInfos) {
+    for (WebResourceMetaInfoImpl webResourceMetaInfo : webResourceMetaInfos) {
+      WebResource webResource = webResourceHashCodes.get(webResourceMetaInfo.getId());
+      ((WebResourceImpl) webResource).setWebResourceMetaInfo(webResourceMetaInfo);
+    }
+  }
+
+  /**
    * Converts a string to md5 hash.
    *
    * @param stringToMd5 the string to convert
@@ -147,10 +153,10 @@ public class ProcessUtilities {
    */
   private static String md5Hex(final String stringToMd5) throws MediaExtractionException {
     try {
-      byte[] bytes = stringToMd5.getBytes(StandardCharsets.UTF_8.name());
+      byte[] bytes = stringToMd5.getBytes(StandardCharsets.UTF_8);
       byte[] md5bytes = MessageDigest.getInstance("MD5").digest(bytes);
       return String.format("%032x", new BigInteger(1, md5bytes));
-    } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+    } catch (NoSuchAlgorithmException e) {
       throw new MediaExtractionException("Could not compute md5 hash", e);
     }
   }

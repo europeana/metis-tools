@@ -3,16 +3,9 @@ package eu.europeana.metis.reprocessing.config;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.enrichment.api.external.impl.ClientEntityResolver;
 import eu.europeana.enrichment.api.external.impl.ClientEntityResolver.OperationMode;
-import eu.europeana.enrichment.api.external.model.EnrichmentBase;
-import eu.europeana.enrichment.api.internal.AggregationFieldType;
 import eu.europeana.enrichment.api.internal.EntityResolver;
-import eu.europeana.enrichment.api.internal.FieldType;
-import eu.europeana.enrichment.api.internal.FieldValue;
-import eu.europeana.enrichment.api.internal.ReferenceTermContext;
-import eu.europeana.enrichment.api.internal.SearchTermContext;
 import eu.europeana.enrichment.rest.client.exceptions.DereferenceException;
 import eu.europeana.enrichment.rest.client.exceptions.EnrichmentException;
-import eu.europeana.enrichment.utils.EntityMergeEngine;
 import eu.europeana.entity.client.EntityApiClient;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.exception.EntityClientException;
@@ -23,31 +16,26 @@ import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;
 import eu.europeana.metis.reprocessing.utilities.ProcessUtilities;
 import eu.europeana.metis.schema.convert.RdfConversionUtils;
 import eu.europeana.metis.schema.convert.SerializationException;
-import eu.europeana.metis.schema.jibx.AboutType;
-import eu.europeana.metis.schema.jibx.Aggregation;
-import eu.europeana.metis.schema.jibx.Organization;
+import eu.europeana.metis.schema.jibx.ProvidedCHOType;
 import eu.europeana.metis.schema.jibx.RDF;
 import eu.europeana.metis.utils.CustomTruststoreAppender.TrustStoreConfigurationException;
+import eu.europeana.normalization.Normalizer;
+import eu.europeana.normalization.NormalizerFactory;
+import eu.europeana.normalization.NormalizerStep;
+import eu.europeana.normalization.model.NormalizationResult;
 import eu.europeana.normalization.util.NormalizationConfigurationException;
+import eu.europeana.normalization.util.NormalizationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +45,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Extra configuration class that is part of {@link Configuration}.
  * <p>This class is meant to be modifiable and different per re-processing operation.
- * It contains 3 functional interfaces that should be initialized properly and they are triggered internally during the
+ * It contains 3 functional interfaces that should be initialized properly, and they are triggered internally during the
  * re-processing.</p>
  */
 public class DefaultConfiguration extends Configuration {
@@ -68,8 +56,41 @@ public class DefaultConfiguration extends Configuration {
   private final ThrowingTriConsumer<RDF, Boolean, Configuration> rdfIndexer;
   private final ThrowingQuadConsumer<String, Instant, Instant, Configuration> afterReprocessProcessor;
   private final RdfConversionUtils rdfConversionUtils = new RdfConversionUtils();
+  private final Normalizer normalizer = new NormalizerFactory().getNormalizer(NormalizerStep.NORMALIZE_PIDS);
   private ClientEntityResolver entityResolver;
-
+  private static final String[] datasetsToNormalise = new String[] {
+      "179","08711","428","331","260","497","498","302","569","619","2064947",
+      "2064934","2064910","2064912","2064913","2064907","2055737","2064901","131","13","2064950","2064945","2064951","2064925",
+      "2064944","2064949","2064929","2064903","1001","2064931","69","3","2064920","2064902","12","2064909","2064948","2064927",
+      "2064940","2064908","2064923","2064905","2048210","1367","2064904","2064930","2064916","1231","2064915","2064942","2020107",
+      "1251","1327","92058","92056","92068","92057","15","9200394","38","1055","194","2020128","2020127","284","92053","221","222",
+      "223","5","92","940","258","2020109","707","934","706","785","139","615","719","921","15409","215","328","922","15405","214",
+      "641","255","916","920","327","394","217","938","919","1089","155","216","438","393","1119","915","574","392","917","169",
+      "204","884","1129","898","1395","1397","1394","1392","1393","1400","1169","1401","1399","1396","1063","1398","1168","1402",
+      "1229","08535","990","504","672","2048424","495","713","368","358","372","362","2048437","2048441","492","315","2048425",
+      "2048426","572","2022712","304","879","353","340","593","297","299","877","303","307","541","1423","881","355","1248",
+      "10501","298","640","598","763","764","744","815","848","816","425","2021651","2021657","203","629","855","1415","231",
+      "09315","228","229","809","630","637","318","230","09317","233","2048221","739","2059219","2059205","2059204","0940431",
+      "235","237","238","0940420","0940429","0940439","92040","2020708","421","467","2024907","652","653","657","659","589","654",
+      "655","656","658","660","661","2048374","1150","889","1247","2048128","1440","15515","490","2021004","2021003","2021001",
+      "2021006","2021005","9200133","9200352","932","1297","1312","1371","1372","1459","865","1313","1373","996","1315","1450",
+      "1370","1375","1302","1298","1299","1314","869","1303","1377","1376","1285","1508","1374","1449","1490","1382","1507","858",
+      "857","859","1080","1504","856","1565","9200449","9200408","9200140","9200365","9200324","9200373","9200364","9200317",
+      "9200395","92097","9200119","9200182","9200382","9200173","9200385","9200167","9200118","92080","92075","9200111","9200110",
+      "2022039","2022076","2022054","2022065","2022077","2022078","2022079","2022038","2022001","2022002","2022068","2022042",
+      "2022058","2022023","2022024","2022025","2022037","2022080","2022082","2022083","2022062","2022084","2022052","2022064",
+      "2022043","2022044","2058208","2058201","2058207","2058206","2022089","2022091","2022093","2022094","2022095","2022096",
+      "180","2048603","2048621","2048620","2048614","9200498","9200516","9200517","794","9200518","124","9200519","9200521",
+      "9200522","780","2059510","08904","08804","08803","2020710","1","101","102","14","103","104","90402","07931","07932",
+      "9200211","08574","1391","808","91625","91617","91672","76","916118","154","916108","916105","916124","916121","91670",
+      "134","916123","916109","916106","91616","91668","91627","91666","91619","91608","916122","91674","91658","91676","1465",
+      "91624","900","1045","133","77","916119","958","1042","410","1044","91609","916120","91698","91650","91652","75","72",
+      "1351","91653","91641","91682","91654","91643","91639","916113","91640","1039","1177","347","916114","91659","916110",
+      "91669","71","90","52","91607","91699","91673","91694","323","91647","91644","916117","346","412","901","91683","916116",
+      "91680","348","91631","144","602","1040","91663","91642","73","91646","565","132","601","944","91662","91685","916101",
+      "91657","916115","153","535","916107","91691","91656","1489","74","847","916100","91687","156","91695","91648","91655",
+      "91645","91688","91690","91651","91660","91689","91671","91684","91665","411","916104","91697","916112","1349","1350",
+      "1538","91693","1095","1097" };
 
   public DefaultConfiguration(PropertiesHolderExtension propertiesHolderExtension)
       throws DereferenceException, EnrichmentException, URISyntaxException, TrustStoreConfigurationException, IndexingException, NormalizationConfigurationException, EntityClientException {
@@ -83,11 +104,14 @@ public class DefaultConfiguration extends Configuration {
 
   public static String readFileToString(String file) throws IOException {
     ClassLoader classLoader = DefaultConfiguration.class.getClassLoader();
-    InputStream inputStream = classLoader.getResourceAsStream(file);
-    if (inputStream == null) {
-      throw new IOException("Failed reading file " + file);
+    try (InputStream inputStream = classLoader.getResourceAsStream(file)) {
+      if (inputStream == null) {
+        throw new IOException("Failed reading file " + file);
+      }
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        return reader.lines().collect(Collectors.joining("\n"));
+      }
     }
-    return new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"));
   }
 
   public static void renameToMainForTests(String[] args)
@@ -107,26 +131,8 @@ public class DefaultConfiguration extends Configuration {
       throws ProcessingException, SerializationException {
     List<FullBeanImpl> fullBeanList = Stream
         .of(
-            //i
-            "/2020702/raa_fmi_10000100970001",
-            //f
-            "/2048087/ProvidedCHO_Battersea_Arts_Centre_BAC_9_YT_002_006_002",
-            //e
-            "/2048128/114145",
-            //d
-            "/9200579/kyaq8pq9",
-            //c
-            "/9200359/BibliographicResource_3000123626519",
-            "/9200359/BibliographicResource_3000100585617", //with contentTier 4
-            "/9200359/BibliographicResource_3000100387622", //with contentTier 1
-            //a
-            "/9200579/cynwkevu",
-            //b
-            "/954/Culturalia_fd913fb8_8a14_40c9_94ec_38158f4d4c81",
-            //g
-            "/1087/https___catalonica_bnc_cat_catalonicahub_lod_oai_arca_bnc_cat_10000296883_ent0",
-            //h
-            "/164/https___catalonica_bnc_cat_catalonicahub_lod_oai_ddd_uab_cat_100377_ent1"
+            "/867/https___hispana_mcu_es_lod_oai_prensahistorica_mcu_es_11000468588_ent0",
+            "/817/NHMUKXZOOX1935X8X20X138"
         )
         .map(item -> defaultConfiguration.getMongoSourceMongoDao().getRecordsFromList(List.of(item)))
         .flatMap(List::stream)
@@ -136,17 +142,7 @@ public class DefaultConfiguration extends Configuration {
       RDF rdf = defaultConfiguration.getFullBeanProcessor().apply(fb, defaultConfiguration);
 
       LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-      // tier calculation
-      // ------------------------------
-      //      final boolean preserveTimestamps = true;
-      //      final Date recordDate = null;
-      //      final List<String> datasetIdsForRedirection = null;
-      //      final boolean performRedirects = false;
-      //      final TierCalculationMode tierCalculationMode = TierCalculationMode.INITIALISE;//defaultConfiguration.getTierCalculationMode();
-      //      final IndexingProperties indexingProperties = new IndexingProperties(recordDate, preserveTimestamps,
-      //          datasetIdsForRedirection, performRedirects, tierCalculationMode);
-      //      IndexerPreprocessor.preprocessRecord(rdf, indexingProperties);
-      defaultConfiguration.updateOrganizations(rdf);
+      rdf = defaultConfiguration.normalizePIDS(rdf);
       LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
     }
 
@@ -154,18 +150,10 @@ public class DefaultConfiguration extends Configuration {
 
   private static void processAnXmlFile(DefaultConfiguration defaultConfiguration) throws SerializationException, IOException {
     RDF rdf = defaultConfiguration.rdfConversionUtils.convertStringToRdf(
-        readFileToString("unit_test/test_enrichment_organizations_2.xml"));
+        readFileToString("unit_test/test_normalization.xml"));
     LOGGER.info("Before:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-    defaultConfiguration.updateOrganizations(rdf);
+    rdf = defaultConfiguration.normalizePIDS(rdf);
     LOGGER.info("After:\r\n{}\r\n", defaultConfiguration.rdfConversionUtils.convertRdfToString(rdf));
-  }
-
-  private static String convertToValidURLString(String link) {
-    try {
-      return URI.create(link).toURL().toString();
-    } catch (MalformedURLException e) {
-      return null;
-    }
   }
 
   @Override
@@ -185,10 +173,25 @@ public class DefaultConfiguration extends Configuration {
 
   @Override
   public RDF processRDF(RDF rdf) {
-    rdf = updateOrganizations(rdf);
-    LOGGER.debug("DONE");
-
+    if (hasDatasetIdOfRecordToBeNormalised(rdf)) {
+      rdf = normalizePIDS(rdf);
+      LOGGER.info("Normalisation DONE");
+    }
     return rdf;
+  }
+
+  private static boolean hasDatasetIdOfRecordToBeNormalised(RDF rdf) {
+    Optional<String> about = rdf.getProvidedCHOList()
+                                .stream()
+                                .filter(Objects::nonNull)
+                                .findFirst()
+                                .map(ProvidedCHOType::getAbout);
+    if (about.isPresent()) {
+      final String[] splitRecordIdentifier = about.get().split("/");
+      String datasetId = splitRecordIdentifier[1];
+      return Arrays.asList(datasetsToNormalise).contains(datasetId);
+    }
+    return false;
   }
 
   private void initializeAdditionalElements(PropertiesHolderExtension propertiesHolderExtension) throws EntityClientException {
@@ -214,132 +217,20 @@ public class DefaultConfiguration extends Configuration {
   }
 
   /**
-   * Updates europeana id organizations that are linked in provider aggregation supported fields.
-   * <p>
-   * 1. Text/literal, for enrichment by text and updates with a reference(link). 2. Resource, see all organizations present in the
-   * record. If it finds a resource reference(link) is present in an aggregation and is not europeana does an enriching by uri and
-   * replaces the reference(link). 3. Resource, and if an europeana is present, does the organization update.
-   *
+   * Run the europeana PID normalisation to the record
    * @param rdf record
-   * @return rdf with updated organizations.
+   * @return rdf with normalised PIDs
    */
-  RDF updateOrganizations(RDF rdf) {
-    LOGGER.info("Organization Update");
-    //Find europeana id organizations that are linked in provider aggregation supported fields
-    List<Aggregation> aggregations = Optional.ofNullable(rdf.getAggregationList())
-                                             .stream()
-                                             .flatMap(Collection::stream)
-                                             .filter(Objects::nonNull)
-                                             .toList();
-
-    final Map<FieldValue, Set<FieldType<Aggregation>>> aggregationLiteralValuesMap = new HashMap<>();
-    final Map<String, Set<FieldType<?>>> aggregationReferencesMap = new HashMap<>();
-
-    for (AggregationFieldType aggregationFieldType : AggregationFieldType.values()) {
-      // case no. 1 collect all values
-      aggregations.stream()
-                  .map(aggregationFieldType::extractFieldValuesForEnrichment)
-                  .flatMap(Collection::stream)
-                  .forEach(fieldValue -> aggregationLiteralValuesMap
-                      .computeIfAbsent(fieldValue, value -> new HashSet<>())
-                      .add(aggregationFieldType)
-                  );
-
-      // case no. 2 and case no. 3 collect all valid url references
-      aggregations.stream()
-                  .map(aggregationFieldType::extractFieldLinksForEnrichment)
-                  .flatMap(Collection::stream)
-                  .map(DefaultConfiguration::convertToValidURLString)
-                  .filter(Objects::nonNull)
-                  .forEach(referenceLink -> aggregationReferencesMap
-                      .computeIfAbsent(referenceLink, value -> new HashSet<>())
-                      .add(aggregationFieldType)
-                  );
+  RDF normalizePIDS(RDF rdf) {
+    LOGGER.info("Normalising PID");
+    RDF computedRDF = rdf;
+    try {
+      final String rdfString = rdfConversionUtils.convertRdfToString(rdf);
+      final NormalizationResult result = normalizer.normalize(rdfString);
+      computedRDF = rdfConversionUtils.convertStringToRdf(result.getNormalizedRecordInEdmXml());
+    } catch (RuntimeException | SerializationException | NormalizationException e) {
+      LOGGER.warn("Something went wrong during normalisation", e);
     }
-
-    // case no.1 enrich values and add a reference(link)
-    // ***************************************************************************************************************************
-    final Set<SearchTermContext> searchTermsContext = aggregationLiteralValuesMap
-        .entrySet()
-        .stream()
-        .map(literalValuesMap ->
-            new SearchTermContext(literalValuesMap.getKey().value(),
-                literalValuesMap.getKey().language(), literalValuesMap.getValue()))
-        .collect(Collectors.toSet());
-
-    Map<SearchTermContext, List<EnrichmentBase>> enrichedValues = entityResolver.resolveByText(searchTermsContext);
-    EntityMergeEngine entityMergeEngine = new EntityMergeEngine();
-
-    // update with organization id's case no. 1
-    enrichedValues.forEach(
-        (searchTermContext, enrichmentBases) -> entityMergeEngine.mergeEntities(rdf, enrichmentBases, searchTermContext));
-
-    // case no. 2 and case no. 3
-    // ***************************************************************************************************************************
-
-    final Set<ReferenceTermContext> allReferenceTerms = aggregationReferencesMap
-        .entrySet()
-        .stream()
-        .map(referencesMap -> ReferenceTermContext
-            .createFromString(referencesMap.getKey(), referencesMap.getValue()))
-        .collect(Collectors.toSet());
-
-    final Set<String> existingOrganisationIds = Optional
-        .ofNullable(rdf.getOrganizationList())
-        .stream()
-        .flatMap(Collection::stream)
-        .filter(Objects::nonNull)
-        .map(AboutType::getAbout)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toSet());
-
-    final Set<String> existingOtherEntityIds = Stream
-        .of(rdf.getAgentList(), rdf.getConceptList(), rdf.getPlaceList(), rdf.getTimeSpanList())
-        .filter(Objects::nonNull).flatMap(Collection::stream)
-        .filter(Objects::nonNull).map(AboutType::getAbout)
-        .filter(Objects::nonNull).collect(Collectors.toSet());
-
-    final Set<ReferenceTermContext> referencesToResolve = allReferenceTerms
-        .stream()
-        .filter(referenceTermContext ->
-            !existingOrganisationIds.contains(referenceTermContext.getReferenceAsString()))
-        .filter(referenceTermContext ->
-            !existingOtherEntityIds.contains(referenceTermContext.getReferenceAsString()))
-        .collect(Collectors.toSet());
-
-    final Set<ReferenceTermContext> referencesToUpdate = allReferenceTerms
-        .stream()
-        .filter(referenceTermContext ->
-            existingOrganisationIds.contains(referenceTermContext.getReferenceAsString()))
-        .collect(Collectors.toSet());
-
-    final Map<ReferenceTermContext, List<EnrichmentBase>> enrichedReferencesResolved = entityResolver.resolveByUri(
-        referencesToResolve);
-    // update with organizations id's case no. 2
-    enrichedReferencesResolved.forEach(
-        (referenceTermContext, enrichmentBases) -> entityMergeEngine.mergeEntities(rdf, enrichmentBases, referenceTermContext));
-
-    final Map<ReferenceTermContext, List<EnrichmentBase>> enrichedReferencesToUpdate = entityResolver.resolveByUri(
-        referencesToUpdate);
-
-    final Map<String, Organization> organisationMap = Optional
-        .ofNullable(rdf.getOrganizationList())
-        .stream()
-        .flatMap(Collection::stream)
-        .filter(Objects::nonNull)
-        .filter(organization -> organization.getAbout() != null)
-        .collect(Collectors.toMap(AboutType::getAbout, Function.identity()));
-    // remove old organizations id's
-    enrichedReferencesToUpdate.forEach(
-        (referenceTermContext, enrichmentBases) -> organisationMap.remove(referenceTermContext.getReferenceAsString()));
-    rdf.setOrganizationList(new ArrayList<>(organisationMap.values()));
-    // update with new organization id's case no. 3
-    enrichedReferencesToUpdate.forEach(
-        (referenceTermContext, enrichmentBases) -> entityMergeEngine.mergeEntities(rdf, enrichmentBases, referenceTermContext));
-
-    LOGGER.info("reference cache:{}",entityResolver.cacheReferenceTermStats());
-    LOGGER.info("search cache:{}",entityResolver.cacheSearchTermStats());
-    LOGGER.info("entity cache:{}",entityResolver.cacheEntityStats());
-    return rdf;
+    return computedRDF;
   }
 }
