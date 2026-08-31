@@ -10,6 +10,7 @@ import eu.europeana.entity.client.EntityApiClient;
 import eu.europeana.entity.client.config.EntityClientConfiguration;
 import eu.europeana.entity.client.exception.EntityClientException;
 import eu.europeana.indexing.exception.IndexingException;
+import eu.europeana.metis.core.workflow.plugins.ExecutablePluginType;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.utilities.IndexUtilities;
 import eu.europeana.metis.reprocessing.utilities.PostProcessUtilities;

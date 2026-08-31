@@ -50,8 +50,8 @@ public abstract class Configuration {
   private final boolean clearDatabasesBeforeProcess;
   private final TierCalculationMode tierCalculationMode;
   private final List<String> datasetIdsToProcess;
-  private final ExecutablePluginType reprocessBasedOnPluginType;
-  private final List<ExecutablePluginType> invalidatePluginTypes;
+  private ExecutablePluginType reprocessBasedOnPluginType;
+  private List<ExecutablePluginType> invalidatePluginTypes;
 
   protected Configuration(PropertiesHolderExtension propertiesHolder)
       throws IndexingException, URISyntaxException, CustomTruststoreAppender.TrustStoreConfigurationException {
@@ -134,8 +134,16 @@ public abstract class Configuration {
     return reprocessBasedOnPluginType;
   }
 
+  public void setReprocessBasedOnPluginType(ExecutablePluginType executablePluginType) {
+    this.reprocessBasedOnPluginType = executablePluginType;
+  }
+
   public List<ExecutablePluginType> getInvalidatePluginTypes() {
     return invalidatePluginTypes;
+  }
+
+  public void setInvalidatePluginTypes(List<ExecutablePluginType> invalidatePluginTypes) {
+    this.invalidatePluginTypes =  List.copyOf(invalidatePluginTypes);
   }
 
   public abstract ThrowingBiFunction<FullBeanImpl, Configuration, RDF> getFullBeanProcessor();
