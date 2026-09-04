@@ -1,5 +1,6 @@
 package eu.europeana.metis.reprocessing.utilities;
 
+import com.apicatalog.jsonld.StringUtils;
 import eu.europeana.metis.core.dao.PluginWithExecutionId;
 import eu.europeana.metis.core.dao.WorkflowExecutionDao;
 import eu.europeana.metis.core.dataset.Dataset;
@@ -15,8 +16,10 @@ import eu.europeana.metis.core.workflow.plugins.ReindexToPreviewPluginMetadata;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPlugin;
 import eu.europeana.metis.core.workflow.plugins.ReindexToPublishPluginMetadata;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -33,6 +36,11 @@ import org.bson.types.ObjectId;
  */
 public class PostProcessUtilities {
 
+  private static final String WHITE_LIST_REPROCESS_PLUGIN ="VALIDATION_INTERNAL";
+  private static final String WHITE_LIST_INVALIDATION = "NORMALIZATION,ENRICHMENT,MEDIA_PROCESS,PREVIEW,PUBLISH";
+  private static final String NON_WHITE_LIST_REPROCESS_PLUGIN ="MEDIA_PROCESS";
+  private static final String NON_WHITE_LIST_INVALIDATION = "PREVIEW,PUBLISH";
+
   private PostProcessUtilities() {
   }
 
@@ -46,15 +54,28 @@ public class PostProcessUtilities {
    * @param endDate the end date of the re-processing
    * @param configuration the configuration class that contains required properties
    */
-  public static void postProcess(String datasetId, Instant startDate, Instant endDate,
-      Configuration configuration) {
+  public static void postProcess(String datasetId, Instant startDate, Instant endDate, Configuration configuration) {
+    
+    if (DefaultConfiguration.isDatasetOnWhitelist(datasetId)) {
+      configuration.setInvalidatePluginTypes(Arrays
+          .stream(WHITE_LIST_INVALIDATION.split(","))
+          .filter(StringUtils::isNotBlank).map(String::trim)
+          .map(ExecutablePluginType::getPluginTypeFromEnumName).toList());
+      configuration.setReprocessBasedOnPluginType(ExecutablePluginType
+          .getPluginTypeFromEnumName(WHITE_LIST_REPROCESS_PLUGIN));
+    } else {
+      configuration.setInvalidatePluginTypes(Arrays
+          .stream(NON_WHITE_LIST_INVALIDATION.split(","))
+          .filter(StringUtils::isNotBlank).map(String::trim)
+          .map(ExecutablePluginType::getPluginTypeFromEnumName).toList());
+      configuration.setReprocessBasedOnPluginType(ExecutablePluginType
+          .getPluginTypeFromEnumName(NON_WHITE_LIST_REPROCESS_PLUGIN));
+    }
     updateMetisCoreWorkflowExecutions(datasetId, startDate, endDate, configuration);
   }
 
-  public static void updateMetisCoreWorkflowExecutions(String datasetId, Instant startDate,
-      Instant endDate, Configuration configuration) {
+  public static void updateMetisCoreWorkflowExecutions(String datasetId, Instant startDate, Instant endDate, Configuration configuration) {
     createReindexWorkflowExecutions(datasetId, startDate, endDate, configuration);
-    // TODO: 28/10/2021 Set a flag for invalidating or not?
     setInvalidFlagToPlugins(datasetId, configuration);
   }
 
@@ -75,8 +96,7 @@ public class PostProcessUtilities {
             : lastExecutionToBeBasedOn.getPlugin().getStartedDate());
     final ReindexToPreviewPlugin reindexToPreviewPlugin = new ReindexToPreviewPlugin(
         reindexToPreviewPluginMetadata);
-    reindexToPreviewPlugin
-        .setId(new ObjectId().toString() + "-" + reindexToPreviewPlugin.getPluginType().name());
+    reindexToPreviewPlugin.setId(new ObjectId().toString() + "-" + reindexToPreviewPlugin.getPluginType().name());
     reindexToPreviewPlugin.setStartedDate(startDate);
     reindexToPreviewPlugin.setFinishedDate(endDate);
     reindexToPreviewPlugin.setPluginStatus(PluginStatus.FINISHED);
@@ -89,8 +109,7 @@ public class PostProcessUtilities {
         .setRevisionTimestampPreviousPlugin(reindexToPreviewPlugin.getStartedDate());
     final ReindexToPublishPlugin reindexToPublishPlugin = new ReindexToPublishPlugin(
         reindexToPublishPluginMetadata);
-    reindexToPublishPlugin
-        .setId(new ObjectId().toString() + "-" + reindexToPublishPlugin.getPluginType().name());
+    reindexToPublishPlugin.setId(new ObjectId().toString() + "-" + reindexToPublishPlugin.getPluginType().name());
     reindexToPublishPlugin.setStartedDate(startDate);
     reindexToPublishPlugin.setFinishedDate(endDate);
     reindexToPublishPlugin.setPluginStatus(PluginStatus.FINISHED);

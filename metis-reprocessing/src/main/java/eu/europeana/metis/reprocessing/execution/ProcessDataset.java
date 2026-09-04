@@ -5,6 +5,7 @@ import static eu.europeana.metis.reprocessing.config.PropertiesHolder.STATISTICS
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.indexing.exception.IndexingException;
 import eu.europeana.metis.reprocessing.config.Configuration;
+import eu.europeana.metis.reprocessing.config.DefaultConfiguration;
 import eu.europeana.metis.reprocessing.config.Mode;
 import eu.europeana.metis.reprocessing.exception.ProcessingException;
 import eu.europeana.metis.reprocessing.model.DatasetStatus;
@@ -82,35 +83,41 @@ public class ProcessDataset implements Callable<Void> {
   private void processDataset() throws ExecutionException, InterruptedException {
     LOGGER.info("{} - Processing start", prefixDatasetIdLog);
     final long startProcessTime = System.nanoTime();
-    if (configuration.getMode() == Mode.DEFAULT) {
-      if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
-        LOGGER.info(
-            "{} - Reprocessing not started because it was already completely processed with totalRecords: {} - totalProcessed: {}",
-            prefixDatasetIdLog, datasetStatus.getTotalRecords(), datasetStatus.getTotalProcessed());
-        return;
-      }
-      //Process normally if not completely processed
-      loopOverAllRecordsAndProcess();
-      finalizeDatasetStatus(startProcessTime);
-    } else if (configuration.getMode() == Mode.REPROCESS_ALL_FAILED) {
-      if (datasetStatus.getTotalFailedRecords() <= 0) {
-        //Do not process dataset further cause we only process failed ones
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(
-              "{} - Reprocessing not started because mode is: {} and there are no failed records",
-              prefixDatasetIdLog, configuration.getMode().name());
+    switch (configuration.getMode()) {
+      case DEFAULT -> {
+        if (datasetStatus.getTotalRecords() == datasetStatus.getTotalProcessed()) {
+          LOGGER.info(
+              "{} - Reprocessing not started because it was already completely processed with totalRecords: {} - totalProcessed: {}",
+              prefixDatasetIdLog, datasetStatus.getTotalRecords(), datasetStatus.getTotalProcessed());
+          return;
         }
-        return;
+        //Process normally if not completely processed
+        loopOverAllRecordsAndProcess();
+        finalizeDatasetStatus(startProcessTime);
       }
-      LOGGER.info(
-          "{} - Reprocessing will happen only on previously failed records, number of which is {}",
-          prefixDatasetIdLog, datasetStatus.getTotalFailedRecords());
-      //Process only failed records no matter if the dataset has already been completed
-      loopOverAllFailedRecordsAndProcess();
-      finalizeDatasetStatus(startProcessTime);
-    } else if (configuration.getMode() == Mode.POST_PROCESS) {
-      postProcess();
-      LOGGER.info("{} - Applied post processing function", prefixDatasetIdLog);
+      case REPROCESS_ALL_FAILED -> {
+        if (datasetStatus.getTotalFailedRecords() <= 0) {
+          //Do not process dataset further cause we only process failed ones
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(
+                "{} - Reprocessing not started because mode is: {} and there are no failed records",
+                prefixDatasetIdLog, configuration.getMode().name());
+          }
+          return;
+        }
+        LOGGER.info(
+            "{} - Reprocessing will happen only on previously failed records, number of which is {}",
+            prefixDatasetIdLog, datasetStatus.getTotalFailedRecords());
+        //Process only failed records no matter if the dataset has already been completed
+        loopOverAllFailedRecordsAndProcess();
+        finalizeDatasetStatus(startProcessTime);
+      }
+      case POST_PROCESS -> {
+        postProcess();
+        LOGGER.info("{} - Applied post processing function", prefixDatasetIdLog);
+      }
+      case null, default -> {
+      }
     }
     LOGGER.info("{} - Processing end", prefixDatasetIdLog);
   }
