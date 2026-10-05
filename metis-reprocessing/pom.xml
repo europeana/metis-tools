@@ -40,8 +40,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.maven.compiler.plugin>3.13.0</version.maven.compiler.plugin>
         <version.metis-schema>15-SNAPSHOT</version.metis-schema>
-        <version.metis>18-SNAPSHOT</version.metis>
-        <version.metis-core>17-SNAPSHOT</version.metis-core>
+        <version.metis>19-SNAPSHOT</version.metis>
+        <version.metis-core>18-SNAPSHOT</version.metis-core>
         <version.metis-normalization>18-SNAPSHOT</version.metis-normalization>
         <version.corelib>2.18.1-SNAPSHOT</version.corelib>
         <version.entity-api-client>2.3</version.entity-api-client>
