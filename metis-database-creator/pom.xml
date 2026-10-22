@@ -8,18 +8,14 @@
   <artifactId>metis-database-creator</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.3</version>
-    <relativePath/> <!-- lookup parent from repository -->
-  </parent>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven.compiler.plugin>3.8.1</version.maven.compiler.plugin>
-    <version.metis>15-SNAPSHOT</version.metis>
-    <version.corelib>2.16.10-SNAPSHOT</version.corelib>
+    <version.metis>19-SNAPSHOT</version.metis>
+		<version.metis-common>21-SNAPSHOT</version.metis-common>
+		<version.metis-core>18-SNAPSHOT</version.metis-core>
+    <version.corelib>2.18.1-SNAPSHOT</version.corelib>
+		<version.spring.boot>4.1.0</version.spring.boot>
     <!-- These two versions are interdependent. -->
     <version.slf4j>2.0.12</version.slf4j>
     <version.log4j>2.23.0</version.log4j>
@@ -42,16 +38,28 @@
     </plugins>
   </build>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${version.spring.boot}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
   <dependencies>
     <dependency>
       <artifactId>metis-core-common</artifactId>
       <groupId>eu.europeana.metis</groupId>
-      <version>${version.metis}</version>
+      <version>${version.metis-core}</version>
     </dependency>
     <dependency>
       <artifactId>metis-core-service</artifactId>
       <groupId>eu.europeana.metis</groupId>
-      <version>${version.metis}</version>
+      <version>${version.metis-core}</version>
     </dependency>
     <dependency>
       <groupId>eu.europeana.corelib</groupId>
