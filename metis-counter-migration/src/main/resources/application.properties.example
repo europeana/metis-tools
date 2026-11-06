@@ -1,0 +1,92 @@
+####################################################################################################
+spring.application.name=migration-metis-counters
+spring.main.web-application-type=none
+#
+spring.sql.init.mode=always
+management.endpoints.web.exposure.include=*
+management.endpoint.health.show-details=always
+#
+spring.datasource.connection-fetch=lazy
+#
+spring.mongodb.host=
+spring.mongodb.port=
+spring.mongodb.database=
+spring.mongodb.username=
+spring.mongodb.password=
+spring.mongodb.authentication-database=
+#
+spring.batch.data.mongodb.schema.initialize=
+
+#The multiplication of min.parallel.threads and max.parallel.threads.per.datasets is the total amount of threads the application
+#This is calculated based on the page size and the number of pages per dataset.
+min.parallel.datasets=
+max.parallel.threads.per.dataset=
+#Possible values PRE_PROCESS, DEFAULT, REPROCESS_ALL_FAILED,  POST_PROCESS
+#PRE_PROCESS, preview
+#DEFAULT for a normal operation of preview and process.
+#REPROCESS_ALL_FAILED will process only the failed datasets.
+#POST_PROCESS mode is to be used verify the counters.
+mode=
+#A list of dataset ids to process instead of all the datasets comma separated values with dataset_id
+dataset.ids.to.process=
+
+#Truststore
+truststore.path=
+truststore.password=
+
+#Mongo Metis Core
+mongo.metis.core.hosts=
+mongo.metis.core.port=
+mongo.metis.core.authentication.db=
+mongo.metis.core.username=
+mongo.metis.core.password=
+mongo.metis.core.enableSSL=
+mongo.metis.core.db=
+mongo.metis.core.connection.pool.size=
+mongo.metis.core.readPreference=
+migration.workflow.DATASET.chunkSize=
+migration.workflow.DATASET.parallelizeSize=
+
+####################################################################################################
+# Sandbox
+engine.baseUrl=
+
+# ECloud test
+#ecloud.baseUrl=
+#ecloud.dpsBaseUrl=
+#ecloud.provider=
+#ecloud.username=
+#ecloud.password=
+# ECloud prod
+ecloud.baseUrl=
+ecloud.dpsBaseUrl=
+ecloud.provider=
+ecloud.username=
+ecloud.password=
+####################################################################################################
+metis-core.engineType=
+metis-core.maxConcurrentThreads=
+metis-core.dpsMonitorCheckIntervalInSeconds=
+metis-core.dpsConnectTimeoutInMilliseconds=
+metis-core.dpsReadTimeoutInMilliseconds=
+metis-core.failsafeMarginOfInactivityInSeconds=
+metis-core.workflowDispatchPeriodCheckInMilliseconds=
+metis-core.pollingTimeoutForCleaningCompletionServiceInMilliseconds=
+metis-core.userCacheClearIntervalInMinutes=
+#If a task passed this cap the task will be cancelled
+metis-core.periodOfNoProcessedRecordsChangeInMinutes=
+metis-core.threadLimitThrottlingLevelWeak=
+metis-core.threadLimitThrottlingLevelMedium=
+metis-core.threadLimitThrottlingLevelStrong=
+#Use this to specify the FQDN where the application will be hosted under
+metis-core.baseUrl=
+#Use this to specify the maximum execution list length that is served by
+#Metis Core (regardless on whether the list is paginated).
+metis-core.maxServedExecutionListLength=
+metis-core.maxDepublishRecordIdsPerDataset=
+#Use this to specify the default sampling size for Link Checking
+metis-core.linkCheckingDefaultSamplingSize=
+#Solr
+metis-core.solrCommitPeriodInMinutes=
+# CORS
+metis-core.allowedCorsHosts=*
