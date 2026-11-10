@@ -77,32 +77,4 @@ public class MigrationCounterConfiguration {
     executor.initialize();
     return executor;
   }
-
-  //  @Bean
-  //  public CommandLineRunner commandLineRunner(
-  //      @Qualifier("pipelineTaskExecutor") TaskExecutor pipelineTaskExecutor,
-  //      JobOperator jobOperator,
-  //      Job job,
-  //      ApplicationContext applicationContext) {
-  //      return args -> {
-  //
-  //      pipelineTaskExecutor.execute(() -> {
-  //
-  //          try {
-  //            JobParameter<String> jobParameter = new JobParameter<>("executionId", "executionId" + Instant.now().toEpochMilli(),
-  //                String.class);
-  //            JobParameters jobParameters = new JobParameters(Set.of(jobParameter));
-  //
-  //           JobExecution execution = jobOperator.start(job, jobParameters);
-  //            log.info("Job execution with id {}::{}", execution.getId(), execution.getStatus());
-  //
-  //          } catch (JobInstanceAlreadyCompleteException | JobExecutionAlreadyRunningException | InvalidJobParametersException |
-  //                   JobRestartException e) {
-  //            e.printStackTrace();
-  //
-  //          }
-  //
-  //        });
-  //      };
-  //  }
 }

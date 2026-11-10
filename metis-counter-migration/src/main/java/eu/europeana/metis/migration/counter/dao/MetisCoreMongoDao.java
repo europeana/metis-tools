@@ -39,7 +39,7 @@ public class MetisCoreMongoDao {
     metisCoreDatastore = createMetisCoreDatastore(mongoClient, propertiesHolder.getMetisCoreMongoDb());
 
     final MorphiaDatastoreProviderImpl morphiaDatastoreProvider = new MorphiaDatastoreProviderImpl(
-        mongoClient, propertiesHolder.getMetisCoreMongoDb());
+        mongoClient, propertiesHolder.getMetisCoreMongoDb(), false);
     workflowExecutionDao = new WorkflowExecutionDao(morphiaDatastoreProvider);
   }
 

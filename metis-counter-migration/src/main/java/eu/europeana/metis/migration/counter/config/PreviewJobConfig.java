@@ -69,7 +69,7 @@ public class PreviewJobConfig {
         .template(mongoTemplate)
         .name("datasetMongoPagingItemReader")
         .collection("Dataset")
-        .jsonQuery("{datasetId:\"1543\"}")
+        .jsonQuery("{}")
         .targetType(Dataset.class)
         .sorts(Map.of("datasetId", Direction.ASC))
         .pageSize(10)

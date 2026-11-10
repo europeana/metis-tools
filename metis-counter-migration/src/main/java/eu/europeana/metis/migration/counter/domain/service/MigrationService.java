@@ -6,7 +6,6 @@ import eu.europeana.metis.core.engine.base.EngineTask;
 import eu.europeana.metis.core.engine.base.EngineTaskClient;
 import eu.europeana.metis.core.engine.base.EngineTaskSettings;
 import eu.europeana.metis.core.engine.base.task.report.EngineTaskProgress;
-import eu.europeana.metis.core.execution.EngineTaskMonitor;
 import eu.europeana.metis.core.workflow.WorkflowExecution;
 import eu.europeana.metis.core.workflow.plugins.AbstractExecutablePlugin;
 import eu.europeana.metis.core.workflow.plugins.AbstractMetisPlugin;
@@ -70,10 +69,10 @@ public class MigrationService<S extends EngineTaskSettings, T extends EngineTask
           log.info("Executing metisPlugin {}.", metisPlugin.getClass().getSimpleName());
           ExecutionProgress executionProgressTemp = ((AbstractExecutablePlugin<?>) metisPlugin).getExecutionProgress();
           ExecutionProgress executionProgress = new ExecutionProgress(executionProgressTemp);
-          final EngineTaskMonitor<S, T> engineTaskMonitor = new EngineTaskMonitor<>(((AbstractExecutablePlugin<?>) metisPlugin),
-              engineTaskClient);
           try {
-            EngineTaskProgress engineTaskProgress = engineTaskMonitor.monitor();
+            log.info("Requesting progress information for externalTaskId: {}", ((AbstractExecutablePlugin<?>) metisPlugin).getExternalTaskId());
+            EngineTaskProgress engineTaskProgress = engineTaskClient.getEngineTaskProgress(((AbstractExecutablePlugin<?>) metisPlugin).getTopologyName(), ((AbstractExecutablePlugin<?>) metisPlugin).getExternalTaskId(), (((AbstractExecutablePlugin<?>) metisPlugin).getPluginMetadata()).getExecutablePluginType());
+            log.info("Task information received for externalTaskId: {}", ((AbstractExecutablePlugin<?>) metisPlugin).getExternalTaskId());
             if (!isProgressEqual(executionProgress, engineTaskProgress)) {
               log.info("Metis & eCloud different");
               logExecutionProgressWithHeader(executionProgress);
@@ -173,43 +172,42 @@ public class MigrationService<S extends EngineTaskSettings, T extends EngineTask
    */
   public List<MigrationCounterResult> process(List<WorkflowExecutionEngineTaskProgress> workflowExecutionEngineTaskProgressList) {
     List<MigrationCounterResult> migrationCounterResults = new ArrayList<>();
-    workflowExecutionEngineTaskProgressList.forEach(item -> {
-          item.workflowExecution.getMetisPlugins().forEach(metisPlugin -> {
-            if (metisPlugin instanceof AbstractExecutablePlugin<?>
-                && Objects.equals(metisPlugin.getId(), item.metisPlugin.getId())) {
-              log.info("Checking metisPlugin {}.", metisPlugin.getClass().getSimpleName());
-              ExecutionProgress executionProgressTemp = ((AbstractExecutablePlugin<?>) metisPlugin).getExecutionProgress();
-              ExecutionProgress executionProgress = new ExecutionProgress(executionProgressTemp);
-              if (!isProgressEqual(executionProgress, item.engineTaskProgress)) {
-                log.info("Updating metisPlugin & eCloud different {}", metisPlugin.getClass().getSimpleName());
-                ExecutionProgress updatedExecutionProgress = new ExecutionProgress();
-                updatedExecutionProgress.setExpectedRecords(item.engineTaskProgress.getExpectedRecords());
-                updatedExecutionProgress.setProcessedRecords(item.engineTaskProgress.getProcessedRecords());
-                updatedExecutionProgress.setFailRecords(item.engineTaskProgress.getFailRecords());
-                updatedExecutionProgress.setSuccessRecords(item.engineTaskProgress.getSuccessRecords());
-                updatedExecutionProgress.setWarningRecords(item.engineTaskProgress.getWarningRecords());
-                updatedExecutionProgress.setDuplicateRecords(item.engineTaskProgress.getDuplicateRecords());
-                updatedExecutionProgress.setUnchangedRecords(item.engineTaskProgress.getUnchangedRecords());
-                updatedExecutionProgress.setExpectedDepublishRecords(item.engineTaskProgress.getExpectedDepublishRecords());
-                updatedExecutionProgress.setSuccessDepublishRecords(item.engineTaskProgress.getSuccessDepublishRecords());
-                updatedExecutionProgress.setFailDepublishRecords(item.engineTaskProgress.getFailDepublishRecords());
-                updatedExecutionProgress.setProcessedDepublishRecords(item.engineTaskProgress.getProcessedDepublishRecords());
-                ((AbstractExecutablePlugin<?>) metisPlugin).setExecutionProgress(updatedExecutionProgress);
-                logExecutionProgressWithHeader(updatedExecutionProgress);
-              }
-            }
-          });
-          try {
-            metisCoreMongoDao.getWorkflowExecutionDao().updateWorkflowPlugins(item.workflowExecution);
-            migrationCounterResults.add(
-                new MigrationCounterResult(item.workflowExecution.getId(), item.workflowExecution.getDatasetId(), true));
-          } catch (RuntimeException ex) {
-            log.error("error updating dataset: {}\r\n{}", item.workflowExecution().getDatasetId(), ex);
-            migrationCounterResults.add(
-                new MigrationCounterResult(item.workflowExecution.getId(), item.workflowExecution.getDatasetId(), false));
+    for (WorkflowExecutionEngineTaskProgress item : workflowExecutionEngineTaskProgressList) {
+      for (AbstractMetisPlugin<?> metisPlugin : item.workflowExecution.getMetisPlugins()) {
+        if (metisPlugin instanceof AbstractExecutablePlugin<?>
+            && Objects.equals(metisPlugin.getId(), item.metisPlugin.getId())) {
+          log.info("Checking metisPlugin {}.", metisPlugin.getClass().getSimpleName());
+          ExecutionProgress executionProgressTemp = ((AbstractExecutablePlugin<?>) metisPlugin).getExecutionProgress();
+          ExecutionProgress executionProgress = new ExecutionProgress(executionProgressTemp);
+          if (!isProgressEqual(executionProgress, item.engineTaskProgress)) {
+            log.info("Updating metisPlugin & eCloud different {}", metisPlugin.getClass().getSimpleName());
+            ExecutionProgress updatedExecutionProgress = new ExecutionProgress();
+            updatedExecutionProgress.setExpectedRecords(item.engineTaskProgress.getExpectedRecords());
+            updatedExecutionProgress.setProcessedRecords(item.engineTaskProgress.getProcessedRecords());
+            updatedExecutionProgress.setFailRecords(item.engineTaskProgress.getFailRecords());
+            updatedExecutionProgress.setSuccessRecords(item.engineTaskProgress.getSuccessRecords());
+            updatedExecutionProgress.setWarningRecords(item.engineTaskProgress.getWarningRecords());
+            updatedExecutionProgress.setDuplicateRecords(item.engineTaskProgress.getDuplicateRecords());
+            updatedExecutionProgress.setUnchangedRecords(item.engineTaskProgress.getUnchangedRecords());
+            updatedExecutionProgress.setExpectedDepublishRecords(item.engineTaskProgress.getExpectedDepublishRecords());
+            updatedExecutionProgress.setSuccessDepublishRecords(item.engineTaskProgress.getSuccessDepublishRecords());
+            updatedExecutionProgress.setFailDepublishRecords(item.engineTaskProgress.getFailDepublishRecords());
+            updatedExecutionProgress.setProcessedDepublishRecords(item.engineTaskProgress.getProcessedDepublishRecords());
+            ((AbstractExecutablePlugin<?>) metisPlugin).setExecutionProgress(updatedExecutionProgress);
+            logExecutionProgressWithHeader(updatedExecutionProgress);
           }
         }
-    );
+      }
+      try {
+        metisCoreMongoDao.getWorkflowExecutionDao().update(item.workflowExecution);
+        migrationCounterResults.add(
+            new MigrationCounterResult(item.workflowExecution.getId(), item.workflowExecution.getDatasetId(), true));
+      } catch (RuntimeException ex) {
+        log.error("error updating dataset: {}\r\n{}", item.workflowExecution().getDatasetId(), ex);
+        migrationCounterResults.add(
+            new MigrationCounterResult(item.workflowExecution.getId(), item.workflowExecution.getDatasetId(), false));
+      }
+    }
     return migrationCounterResults;
   }
 
