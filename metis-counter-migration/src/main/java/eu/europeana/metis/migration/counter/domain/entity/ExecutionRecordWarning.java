@@ -14,9 +14,7 @@ public class ExecutionRecordWarning {
 
   private ExecutionRecord executionRecord;
 
-
   private String message;
-
 
   private String exception;
 }

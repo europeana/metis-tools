@@ -1,8 +1,12 @@
 package eu.europeana.metis.migration.counter.domain.service;
 
+import com.mongodb.MongoClient;
+import eu.europeana.metis.migration.counter.config.MongoInitializer;
+import eu.europeana.metis.migration.counter.dao.MetisCoreMongoDao;
 import java.time.Instant;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
@@ -17,8 +21,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @Slf4j
 public class MainBatchJobRunnerService implements CommandLineRunner, ExitCodeGenerator {
 
@@ -26,13 +31,15 @@ public class MainBatchJobRunnerService implements CommandLineRunner, ExitCodeGen
   private final JobOperator jobOperator;
   private final Job job;
   private int exitCode = 0;
-
+  private final MongoInitializer mongoInitializer;
   public MainBatchJobRunnerService(@Qualifier("pipelineTaskExecutor") TaskExecutor pipelineTaskExecutor,
       JobOperator jobOperator,
-      Job job) {
+      Job job,
+      MongoInitializer mongoInitializer) {
     this.pipelineTaskExecutor = pipelineTaskExecutor;
     this.jobOperator = jobOperator;
     this.job = job;
+    this.mongoInitializer = mongoInitializer;
   }
 
   @Override
@@ -60,10 +67,12 @@ public class MainBatchJobRunnerService implements CommandLineRunner, ExitCodeGen
       this.exitCode = 1;
       throw e;
     }
+    mongoInitializer.close();
   }
 
   @Override
   public int getExitCode() {
     return exitCode;
   }
+
 }

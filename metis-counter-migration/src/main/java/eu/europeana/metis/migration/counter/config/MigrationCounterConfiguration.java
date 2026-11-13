@@ -21,11 +21,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Slf4j
 public class MigrationCounterConfiguration {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MigrationCounterConfiguration.class);
 
   private static final int WORKFLOW_CORE_POOL_SIZE = 4;
   private static final int WORKFLOW_QUEUE_CAPACITY = 20;
-  public static final int HTTP_CLIENT_TIMEOUT_SECONDS = 5;
 
   private final PropertiesHolder propertiesHolder;
 
@@ -38,7 +36,7 @@ public class MigrationCounterConfiguration {
       throws CustomTruststoreAppender.TrustStoreConfigurationException {
     if (StringUtils.isNotEmpty(propertiesHolder.getTruststorePath())
         && StringUtils.isNotEmpty(propertiesHolder.getTruststorePassword())) {
-      LOGGER.info("Append default truststore with custom truststore");
+      log.info("Append default truststore with custom truststore");
       CustomTruststoreAppender.appendCustomTruststoreToDefault(propertiesHolder.getTruststorePath(),
           propertiesHolder.getTruststorePassword());
     }
@@ -74,6 +72,8 @@ public class MigrationCounterConfiguration {
     executor.setMaxPoolSize(WORKFLOW_CORE_POOL_SIZE);
     executor.setQueueCapacity(WORKFLOW_QUEUE_CAPACITY);
     executor.setThreadNamePrefix("PipelineJob-");
+    executor.setWaitForTasksToCompleteOnShutdown(true);
+    executor.setAwaitTerminationSeconds(900);
     executor.initialize();
     return executor;
   }

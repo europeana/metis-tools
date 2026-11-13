@@ -1,18 +1,16 @@
 package eu.europeana.metis.migration.counter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@Slf4j
 @SpringBootApplication
 public class MigrationCounterMain {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MigrationCounterMain.class);
-
   static void main(String[] args) {
-    LOGGER.info("Starting script");
+    log.info("Starting script");
     System.exit(SpringApplication.exit(SpringApplication.run(MigrationCounterMain.class, args)));
-    LOGGER.info("End script");
+    log.info("End script");
   }
 }

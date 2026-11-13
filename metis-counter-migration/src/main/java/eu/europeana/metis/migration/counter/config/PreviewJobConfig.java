@@ -2,10 +2,12 @@ package eu.europeana.metis.migration.counter.config;
 
 import eu.europeana.metis.core.dataset.Dataset;
 import eu.europeana.metis.migration.counter.config.WorkflowConfigurationProperties.ParallelizeConfig;
+import eu.europeana.metis.migration.counter.dao.MetisCoreMongoDao;
 import eu.europeana.metis.migration.counter.domain.dto.AbstractExecutionRecordDTO;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.Future;
+import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
@@ -69,6 +71,7 @@ public class PreviewJobConfig {
         .template(mongoTemplate)
         .name("datasetMongoPagingItemReader")
         .collection("Dataset")
+        //.jsonQuery("{datasetId:\"1543\"}")
         .jsonQuery("{}")
         .targetType(Dataset.class)
         .sorts(Map.of("datasetId", Direction.ASC))
